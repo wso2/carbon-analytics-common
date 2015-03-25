@@ -31,7 +31,59 @@
         <parameter name="ServiceClass" locked="false">
             org.wso2.carbon.analytics.dashboard.admin.DashboardAdminService
         </parameter>
-       
+
+
+        <!--TODO - Confirm this method of permission granting-->
+        <!--TODO add component.xml-->
+
+        <operation name="addDataView">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="updateDataView">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="deleteDataView">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="addWidget">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="addDashboard">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="updateDashboard">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="addWidgetToDashboard">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
+        <operation name="updateWidgetInDashboard">
+            <parameter name="AuthorizationAction" locked="true">
+                /permission/admin/monitor/dashboard/edit
+            </parameter>
+        </operation>
+
     </service>
 
     <parameter name="adminService" locked="true">true</parameter>
