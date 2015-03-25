@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
-    <scr:component enabled="true" immediate="true" name="eventStreamService.component">
-        <implementation class="org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceDS"/>
-        <property name="service.pid" value="eventStreamService.component"/>
-        <reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1" policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"/>
-        <reference name="eventStreamListener.service" interface="org.wso2.carbon.event.stream.core.EventStreamListener" cardinality="0..n" policy="dynamic" bind="setEventStreamListener" unbind="unsetEventStreamListener"/>
-    </scr:component>
-</components>

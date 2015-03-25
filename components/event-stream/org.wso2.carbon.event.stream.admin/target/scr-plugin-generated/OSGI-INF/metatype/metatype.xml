@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
-    <OCD id="eventStreamAdmin.component" name="%eventStreamAdmin.component.name" description="%eventStreamAdmin.component.description"/>
-    <Designate pid="eventStreamAdmin.component">
-        <Object ocdref="eventStreamAdmin.component"/>
-    </Designate>
-</metatype:MetaData>

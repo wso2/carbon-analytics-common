@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
-    <scr:component enabled="true" immediate="true" name="binaryDataReceiver.component">
-        <implementation class="org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiverServiceComponent"/>
-        <property name="service.pid" value="binaryDataReceiver.component" private="false"/>
-        <reference name="databridge.core" interface="org.wso2.carbon.databridge.core.DataBridgeReceiverService" cardinality="1..1" policy="dynamic" bind="setDataBridgeReceiverService" unbind="unsetDatabridgeReceiverService" checked="true" strategy="event"/>
-    </scr:component>
-</components>

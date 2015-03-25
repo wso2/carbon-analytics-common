@@ -1,6 +1,0 @@
-/home/dodan/Programs/analytics-commons/carbon-analytics-common/components/data-bridge/org.wso2.carbon.databridge.receiver.binary/src/main/java/org/wso2/carbon/databridge/receiver/binary/internal/RequestProcessor.java
-/home/dodan/Programs/analytics-commons/carbon-analytics-common/components/data-bridge/org.wso2.carbon.databridge.receiver.binary/src/main/java/org/wso2/carbon/databridge/receiver/binary/BinaryDataReceiverConstants.java
-/home/dodan/Programs/analytics-commons/carbon-analytics-common/components/data-bridge/org.wso2.carbon.databridge.receiver.binary/src/main/java/org/wso2/carbon/databridge/receiver/binary/internal/BinaryDataReceiverServiceComponent.java
-/home/dodan/Programs/analytics-commons/carbon-analytics-common/components/data-bridge/org.wso2.carbon.databridge.receiver.binary/src/main/java/org/wso2/carbon/databridge/receiver/binary/BinaryEventConverter.java
-/home/dodan/Programs/analytics-commons/carbon-analytics-common/components/data-bridge/org.wso2.carbon.databridge.receiver.binary/src/main/java/org/wso2/carbon/databridge/receiver/binary/BinaryDataReceiver.java
-/home/dodan/Programs/analytics-commons/carbon-analytics-common/components/data-bridge/org.wso2.carbon.databridge.receiver.binary/src/main/java/org/wso2/carbon/databridge/receiver/binary/conf/BinaryDataReceiverConfiguration.java

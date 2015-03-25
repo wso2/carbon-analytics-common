@@ -1,8 +1,0 @@
-org/wso2/carbon/databridge/receiver/binary/BinaryEventConverter$1.class
-org/wso2/carbon/databridge/receiver/binary/BinaryDataReceiverConstants.class
-org/wso2/carbon/databridge/receiver/binary/internal/BinaryDataReceiverServiceComponent.class
-org/wso2/carbon/databridge/receiver/binary/internal/RequestProcessor.class
-org/wso2/carbon/databridge/receiver/binary/BinaryDataReceiver.class
-org/wso2/carbon/databridge/receiver/binary/BinaryDataReceiver$BinaryTransportReceiver.class
-org/wso2/carbon/databridge/receiver/binary/BinaryEventConverter.class
-org/wso2/carbon/databridge/receiver/binary/conf/BinaryDataReceiverConfiguration.class

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
-    <OCD id="thriftdatareceiver.component" name="%thriftdatareceiver.component.name" description="%thriftdatareceiver.component.description"/>
-    <Designate pid="thriftdatareceiver.component">
-        <Object ocdref="thriftdatareceiver.component"/>
-    </Designate>
-</metatype:MetaData>
