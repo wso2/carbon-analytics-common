@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <option name="DEFAULT_COMPILER" value="Javac" />
+    <resourceExtensions />
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.form" />
+      <entry name="!?*.class" />
+      <entry name="!?*.groovy" />
+      <entry name="!?*.scala" />
+      <entry name="!?*.flex" />
+      <entry name="!?*.kt" />
+      <entry name="!?*.clj" />
+      <entry name="!?*.aj" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="org.wso2.carbon.analytics.dashboard.admin" />
+        <module name="org.wso2.carbon.analytics.dashboard.stub" />
+        <module name="org.wso2.carbon.analytics.dashboard.ui" />
+        <module name="org.wso2.carbon.databridge.agent" />
+        <module name="org.wso2.carbon.databridge.agent.thrift" />
+        <module name="org.wso2.carbon.databridge.commons" />
+        <module name="org.wso2.carbon.databridge.commons.binary" />
+        <module name="org.wso2.carbon.databridge.commons.thrift" />
+        <module name="org.wso2.carbon.databridge.core" />
+        <module name="org.wso2.carbon.databridge.receiver.binary" />
+        <module name="org.wso2.carbon.databridge.receiver.thrift" />
+        <module name="org.wso2.carbon.databridge.streamdefn.filesystem" />
+        <module name="org.wso2.carbon.databridge.streamdefn.registry" />
+        <module name="org.wso2.carbon.event.stream.admin" />
+        <module name="org.wso2.carbon.event.stream.core" />
+        <module name="org.wso2.carbon.event.stream.stub" />
+        <module name="org.wso2.carbon.event.stream.ui" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="analytics-dashboard" target="1.6" />
+      <module name="carbon-analytics-common" target="1.6" />
+      <module name="data-bridge" target="1.6" />
+      <module name="data-bridge-feature" target="1.6" />
+      <module name="event-stream" target="1.6" />
+      <module name="event-stream-feature" target="1.6" />
+      <module name="org.wso2.carbon.analytics.dashboard.admin" target="1.6" />
+      <module name="org.wso2.carbon.analytics.dashboard.stub" target="1.6" />
+      <module name="org.wso2.carbon.analytics.dashboard.ui" target="1.6" />
+      <module name="org.wso2.carbon.databridge.agent" target="1.6" />
+      <module name="org.wso2.carbon.databridge.agent.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.agent.thrift" target="1.6" />
+      <module name="org.wso2.carbon.databridge.agent.thrift.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.commons" target="1.6" />
+      <module name="org.wso2.carbon.databridge.commons.binary" target="1.6" />
+      <module name="org.wso2.carbon.databridge.commons.binary.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.commons.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.commons.thrift" target="1.6" />
+      <module name="org.wso2.carbon.databridge.commons.thrift.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.core" target="1.6" />
+      <module name="org.wso2.carbon.databridge.core.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.datapublisher.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.datareceiver.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.receiver.binary" target="1.6" />
+      <module name="org.wso2.carbon.databridge.receiver.binary.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.receiver.thrift" target="1.6" />
+      <module name="org.wso2.carbon.databridge.receiver.thrift.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.streamdefn.filesystem" target="1.6" />
+      <module name="org.wso2.carbon.databridge.streamdefn.filesystem.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.databridge.streamdefn.registry" target="1.6" />
+      <module name="org.wso2.carbon.databridge.streamdefn.registry.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.admin" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.core" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.feature" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.server.feature" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.stub" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.ui" target="1.6" />
+      <module name="org.wso2.carbon.event.stream.ui.feature" target="1.6" />
+      <module name="service-stubs" target="1.6" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

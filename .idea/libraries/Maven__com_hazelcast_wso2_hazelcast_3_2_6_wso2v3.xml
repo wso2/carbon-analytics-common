@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.hazelcast.wso2:hazelcast:3.2.6.wso2v3">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/hazelcast/wso2/hazelcast/3.2.6.wso2v3/hazelcast-3.2.6.wso2v3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/hazelcast/wso2/hazelcast/3.2.6.wso2v3/hazelcast-3.2.6.wso2v3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/hazelcast/wso2/hazelcast/3.2.6.wso2v3/hazelcast-3.2.6.wso2v3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

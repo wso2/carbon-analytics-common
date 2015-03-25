@@ -6,11 +6,11 @@
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="columns" nillable="true" type="ax23:Column"></xs:element>
                     <xs:element minOccurs="0" name="dataSource" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="filter" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"></xs:element>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="widgets" nillable="true" type="ax23:Widget"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="widgetInstances" nillable="true" type="ax23:Widget"></xs:element>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="Column">
@@ -32,7 +32,7 @@
                     <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"></xs:element>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="roles" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="title" nillable="true" type="xs:string"></xs:element>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="widgets" nillable="true" type="ax23:WidgetMetaData"></xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="widgetInstances" nillable="true" type="ax23:WidgetMetaData"></xs:element>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="WidgetMetaData">

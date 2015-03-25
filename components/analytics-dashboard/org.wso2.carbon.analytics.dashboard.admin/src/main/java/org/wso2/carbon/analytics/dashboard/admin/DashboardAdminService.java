@@ -21,10 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.dashboard.admin.data.Dashboard;
 import org.wso2.carbon.analytics.dashboard.admin.data.DataView;
 import org.wso2.carbon.analytics.dashboard.admin.data.Widget;
-import org.wso2.carbon.analytics.dashboard.admin.data.WidgetMetaData;
+import org.wso2.carbon.analytics.dashboard.admin.data.WidgetInstance;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.registry.api.Collection;
 import org.wso2.carbon.registry.api.RegistryException;
+import org.wso2.carbon.registry.core.RegistryConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +36,14 @@ public class DashboardAdminService extends AbstractAdmin {
 	 * Relative Registry locations for dataViews and dashboards.
 	 */
 	private static final String DATAVIEWS_DIR =
-			"/repository/components/org.wso2.carbon.analytics.dashboards/";
+			RegistryConstants.PATH_SEPARATOR + "repository" + RegistryConstants.PATH_SEPARATOR +
+			"components" + RegistryConstants.PATH_SEPARATOR +
+			"org.wso2.carbon.analytics.dataviews" + RegistryConstants.PATH_SEPARATOR;
+
 	private static final String DASHBOARDS_DIR =
-			"/repository/components/org.wso2.carbon.analytics.dataviews/";
+			RegistryConstants.PATH_SEPARATOR + "repository" + RegistryConstants.PATH_SEPARATOR +
+			"components" + RegistryConstants.PATH_SEPARATOR +
+			"org.wso2.carbon.analytics.dashboards" + RegistryConstants.PATH_SEPARATOR;
 
 	/**
 	 * Logger
@@ -49,14 +55,15 @@ public class DashboardAdminService extends AbstractAdmin {
 	 * @throws AxisFault
 	 */
 	public DataView[] getDataViewsInfo() throws AxisFault {
-		ArrayList<DataView> dataViews = new ArrayList<DataView>();
+
+		List<DataView> dataViews = new ArrayList<>();
 		Collection dataViewsCollection = RegistryUtils.readCollection(DATAVIEWS_DIR);
 		String[] resourceNames;
 		try {
 			resourceNames = dataViewsCollection.getChildren();
 		} catch (RegistryException e) {
 			logger.error(e);
-			throw new AxisFault(e.getMessage(), e);
+			throw new AxisFault("Registry Exception", e);//TODO have different exceptions
 		}
 		for (String resourceName : resourceNames) {
 			DataView dataView = getDataView(resourceName.replace(DATAVIEWS_DIR, ""));
@@ -92,7 +99,6 @@ public class DashboardAdminService extends AbstractAdmin {
 			logger.error(errorMessage);
 			throw new AxisFault(errorMessage);
 		}
-
 	}
 
 	/**
@@ -165,12 +171,11 @@ public class DashboardAdminService extends AbstractAdmin {
 	 * @return DataView object with a single widget in the widget array-list.
 	 * @throws AxisFault
 	 */
-	public DataView getWidgetWithDataViewInfo(String dataViewID, String widgetID) throws AxisFault {
+	public Widget getWidget(String dataViewID, String widgetID)
+			throws AxisFault {
 		DataView dataView = getDataView(dataViewID);
 		Widget widget = dataView.getWidget(widgetID);
-		dataView.setWidgets(new Widget[0]);
-		dataView.addWidget(widget);
-		return dataView;
+		return widget;
 	}
 
 	/**
@@ -188,10 +193,9 @@ public class DashboardAdminService extends AbstractAdmin {
 	 */
 	public Dashboard[] getDashboards() throws AxisFault {
 		try {
-			List<Dashboard> dashboards = new ArrayList<Dashboard>();
+			List<Dashboard> dashboards = new ArrayList<>();
 			Collection dashboardsCollection = RegistryUtils.readCollection(DASHBOARDS_DIR);
-			String[] resourceNames =
-					dashboardsCollection.getChildren();
+			String[] resourceNames = dashboardsCollection.getChildren();
 			for (String resourceName : resourceNames) {
 				Dashboard dashboard = getDashboard(resourceName.replace(DASHBOARDS_DIR, ""));
 				dashboards.add(dashboard);
@@ -201,7 +205,7 @@ public class DashboardAdminService extends AbstractAdmin {
 		} catch (Exception e) {
 			String errorMessage = "Unable to extract resources from collection";
 			logger.error(errorMessage);
-			throw new AxisFault(errorMessage);
+			throw new AxisFault(errorMessage, e);
 		}
 	}
 
@@ -248,30 +252,29 @@ public class DashboardAdminService extends AbstractAdmin {
 			logger.debug(errorMessage);
 			throw new AxisFault(errorMessage);
 		}
-
 	}
 
 	/**
 	 * @param dashboardID Id of the dashboard to which the widget-meta-data will be appended.
-	 * @param widget      Metadata to be appended.
+	 * @param widgetInstance      Metadata to be appended.
 	 * @throws AxisFault
 	 */
-	public boolean addWidgetToDashboard(String dashboardID, WidgetMetaData widget)
+	public boolean addWidgetInstance(String dashboardID, WidgetInstance widgetInstance)
 			throws AxisFault {
 		Dashboard dashboard = getDashboard(dashboardID);
-		dashboard.addWidget(widget);
+		dashboard.addWidgetInstance(widgetInstance);
 		return updateDashboard(dashboard);
 	}
 
 	/**
 	 * @param dashboardID Id of the dashboard to which the widget-meta-data will be updated.
-	 * @param widget      Metadata to be updated.
+	 * @param widgetInstance      Metadata to be updated.
 	 * @throws AxisFault
 	 */
-	public boolean updateWidgetInDashboard(String dashboardID, WidgetMetaData widget)
+	public boolean updateWidgetInstance(String dashboardID, WidgetInstance widgetInstance)
 			throws AxisFault {
 		Dashboard dashboard = getDashboard(dashboardID);
-		dashboard.updateWidget(widget);
+		dashboard.updateWidgetInstance(widgetInstance);
 		return updateDashboard(dashboard);
 	}
 }

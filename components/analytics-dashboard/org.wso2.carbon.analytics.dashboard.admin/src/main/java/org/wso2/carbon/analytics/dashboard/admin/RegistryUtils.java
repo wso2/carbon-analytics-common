@@ -33,7 +33,7 @@ import java.io.InputStreamReader;
 
 public class RegistryUtils {
 
-	//TODO- Use privileged carbon context
+	//TODO- Use osgi service
 	private static CarbonContext carbonContext = CarbonContext.getThreadLocalCarbonContext();
 	private static Registry registry = carbonContext.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
 
