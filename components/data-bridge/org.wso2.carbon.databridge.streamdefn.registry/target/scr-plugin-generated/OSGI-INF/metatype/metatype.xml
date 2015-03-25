@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
+    <OCD id="registry.streamdefn.comp" name="%registry.streamdefn.comp.name" description="%registry.streamdefn.comp.description"/>
+    <Designate pid="registry.streamdefn.comp">
+        <Object ocdref="registry.streamdefn.comp"/>
+    </Designate>
+</metatype:MetaData>

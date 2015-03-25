@@ -15,6 +15,9 @@
  */
 package org.wso2.carbon.analytics.dashboard.admin.data;
 
+/**
+ * One of many Column definitions of a specific data-table/data-stream
+ */
 public class Column {
 	private String name;
 	private String type;

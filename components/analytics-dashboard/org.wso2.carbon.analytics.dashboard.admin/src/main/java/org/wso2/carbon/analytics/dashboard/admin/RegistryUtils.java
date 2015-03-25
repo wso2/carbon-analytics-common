@@ -16,9 +16,9 @@
 package org.wso2.carbon.analytics.dashboard.admin;
 
 import com.google.gson.Gson;
-import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dashboard.admin.exception.RegistryResourceException;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.registry.api.Collection;
@@ -33,7 +33,7 @@ import java.io.InputStreamReader;
 
 public class RegistryUtils {
 
-	//TODO- Use privileged carbon context
+	//TODO- Use osgi service
 	private static CarbonContext carbonContext = CarbonContext.getThreadLocalCarbonContext();
 	private static Registry registry = carbonContext.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
 
@@ -48,7 +48,8 @@ public class RegistryUtils {
 	 * @param url     Relative url to where the resource will be saved.
 	 * @param content Data to be written to the registry as a json string. Must be a bean object(eg- String objects are not supported).
 	 */
-	protected static void writeResource(String url, Object content) throws AxisFault {
+	protected static void writeResource(String url, Object content)
+			throws RegistryResourceException {
 		try {
 			Gson gson = new Gson();
 
@@ -61,7 +62,7 @@ public class RegistryUtils {
 		} catch (Exception re) {
 			String errorMessage = "Unable to write resource at url:" + url;
 			logger.error(errorMessage);
-			throw new AxisFault(errorMessage);
+			throw new RegistryResourceException(errorMessage);
 		}
 	}
 
@@ -72,7 +73,8 @@ public class RegistryUtils {
 	 * @param targetClass Target object type which the json content will be mapped into.
 	 * @return Object by mapping into a given class, the json read from the registry.
 	 */
-	protected static Object readResource(String url, Class targetClass) throws AxisFault {
+	protected static Object readResource(String url, Class targetClass)
+			throws RegistryResourceException {
 		InputStream contentStream = null;
 		InputStreamReader isr = null;
 		try {
@@ -87,7 +89,7 @@ public class RegistryUtils {
 		} catch (Exception e) {
 			String errorMessage = "Unable to read resource from url:" + url;
 			logger.error(errorMessage);
-			throw new AxisFault(errorMessage);
+			throw new RegistryResourceException(errorMessage);
 		} finally {
 			closeQuitely(contentStream);
 			closeQuitely(isr);
@@ -103,7 +105,7 @@ public class RegistryUtils {
 				closeable.close();
 			}
 		} catch (IOException ignore) {
-	    /* ignore */
+		/* ignore */
 		}
 	}
 
@@ -112,15 +114,15 @@ public class RegistryUtils {
 	 *
 	 * @param url Resource url relative to the registry.
 	 * @return True if resource exists.
-	 * @throws AxisFault .
+	 * @throws RegistryResourceException .
 	 */
-	protected static boolean isResourceExist(String url) throws AxisFault {
+	protected static boolean isResourceExist(String url) throws RegistryResourceException {
 		try {
 			return registry.resourceExists(url);
 		} catch (RegistryException e) {
 			String errorMessage = "Unable perform isResourceExists check";
 			logger.error(errorMessage);
-			throw new AxisFault(e.getMessage(), e);
+			throw new RegistryResourceException(e.getMessage(), e);
 		}
 	}
 
@@ -129,24 +131,24 @@ public class RegistryUtils {
 	 *
 	 * @param collectionURL Collection url relative to the registry.
 	 * @return Collection.
-	 * @throws AxisFault
+	 * @throws RegistryResourceException
 	 */
-	protected static Collection readCollection(String collectionURL) throws AxisFault {
+	protected static Collection readCollection(String collectionURL)
+			throws RegistryResourceException {
 
 		try {
 			return (Collection) registry.get(collectionURL);
 		} catch (Exception e) {
 			String errorMessage = "Unable to read resource collection from url:" + collectionURL;
 			logger.error(errorMessage);
-			throw new AxisFault(errorMessage);
+			throw new RegistryResourceException(errorMessage);
 		}
 	}
 
 	/**
 	 * @param url url of the resource to be deleted from the registry.
-	 * @throws AxisFault
 	 */
-	protected static boolean deleteResource(String url) throws AxisFault {
+	protected static boolean deleteResource(String url) {
 		try {
 			registry.delete(url);
 			return true;

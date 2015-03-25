@@ -1,0 +1,44 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.event.stream.admin.internal.ds;uses:="
+ org.wso2.carbon.event.stream.admin.internal.util,org.osgi.service.com
+ ponent,org.wso2.carbon.event.stream.core";version="1.0.0.SNAPSHOT",or
+ g.wso2.carbon.event.stream.admin.internal.exception;version="1.0.0.SN
+ APSHOT",org.wso2.carbon.event.stream.admin.internal.util;uses:="org.w
+ so2.carbon.databridge.commons,org.wso2.carbon.event.stream.core";vers
+ ion="1.0.0.SNAPSHOT",org.wso2.carbon.event.stream.admin.internal;uses
+ :="org.apache.axis2,org.wso2.carbon.databridge.commons,org.apache.com
+ mons.logging,org.wso2.carbon.core,org.wso2.carbon.context,org.wso2.ca
+ rbon.databridge.commons.exception,org.wso2.carbon.event.stream.admin.
+ internal.util,org.wso2.carbon.databridge.commons.utils,org.wso2.carbo
+ n.event.stream.core.exception,org.wso2.carbon.event.stream.core,com.g
+ oogle.gson";version="1.0.0.SNAPSHOT"
+Service-Component: OSGI-INF/serviceComponents.xml
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.event.stream.admin
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281998192
+Bundle-ManifestVersion: 2
+Bundle-Description: This is a Carbon bundle that represent the event s
+ tream admin module.
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Carbon-Component: UIBundle
+Bundle-SymbolicName: org.wso2.carbon.event.stream.admin
+Import-Package: com.google.gson;resolution:=optional;version="[2.1,3)"
+ ,org.apache.axis2;resolution:=optional;version="[1.6,2)",org.apache.c
+ ommons.logging;resolution:=optional;version="[1.2,2)",org.osgi.servic
+ e.component;resolution:=optional;version="[1.2,2)",org.wso2.carbon.co
+ ntext;resolution:=optional;version="[4.3,5)",org.wso2.carbon.core;res
+ olution:=optional;version="[4.3,5)",org.wso2.carbon.databridge.common
+ s;resolution:=optional;version="[1.0,2)",org.wso2.carbon.databridge.c
+ ommons.exception;resolution:=optional;version="[1.0,2)",org.wso2.carb
+ on.databridge.commons.utils;resolution:=optional;version="[1.0,2)",or
+ g.wso2.carbon.event.stream.core;version="[1.0,2)",org.wso2.carbon.eve
+ nt.stream.core.exception;version="[1.0,2)",org.wso2.carbon.utils;vers
+ ion="[4.3,5)"
+Bundle-DocURL: http://www.wso2.org/
+

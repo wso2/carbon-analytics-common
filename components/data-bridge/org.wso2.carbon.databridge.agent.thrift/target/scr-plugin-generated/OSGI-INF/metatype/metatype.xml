@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
+    <OCD id="agentservice.component" name="%agentservice.component.name" description="%agentservice.component.description"/>
+    <Designate pid="agentservice.component">
+        <Object ocdref="agentservice.component"/>
+    </Designate>
+</metatype:MetaData>
