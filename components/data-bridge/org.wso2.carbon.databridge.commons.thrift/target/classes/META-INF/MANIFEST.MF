@@ -1,0 +1,40 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.databridge.commons.thrift.service.secu
+ re;uses:="org.apache.thrift.protocol,org.apache.thrift.async,org.apac
+ he.thrift.transport,org.apache.thrift,org.wso2.carbon.databridge.comm
+ ons.thrift.exception,org.wso2.carbon.databridge.commons.thrift.data,o
+ rg.slf4j,org.apache.thrift.meta_data";version="1.0.0.SNAPSHOT",org.ws
+ o2.carbon.databridge.commons.thrift.data;uses:="org.apache.thrift,org
+ .apache.thrift.protocol,org.apache.thrift.transport,org.apache.thrift
+ .meta_data";version="1.0.0.SNAPSHOT",org.wso2.carbon.databridge.commo
+ ns.thrift.utils;version="1.0.0.SNAPSHOT",org.wso2.carbon.databridge.c
+ ommons.thrift.exception;uses:="org.apache.thrift,org.apache.thrift.pr
+ otocol,org.apache.thrift.transport,org.apache.thrift.meta_data";versi
+ on="1.0.0.SNAPSHOT",org.wso2.carbon.databridge.commons.thrift.service
+ .general;uses:="org.apache.thrift.protocol,org.apache.thrift.async,or
+ g.apache.thrift.transport,org.apache.thrift,org.wso2.carbon.databridg
+ e.commons.thrift.exception,org.wso2.carbon.databridge.commons.thrift.
+ data,org.slf4j,org.apache.thrift.meta_data";version="1.0.0.SNAPSHOT"
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.databridge.commons.thrift
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281945222
+Bundle-ManifestVersion: 2
+Bundle-Description: org.wso2.carbon.agent.commons.thrift is the common
+  thrift objects used in Agent and        Thrift Event Receiver
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-SymbolicName: org.wso2.carbon.databridge.commons.thrift
+Import-Package: org.apache.thrift;resolution:=optional;version="[0.8,1
+ )",org.apache.thrift.async;resolution:=optional;version="[0.8,1)",org
+ .apache.thrift.meta_data;resolution:=optional;version="[0.8,1)",org.a
+ pache.thrift.protocol;resolution:=optional;version="[0.8,1)",org.apac
+ he.thrift.transport;resolution:=optional;version="[0.8,1)",org.osgi.f
+ ramework;version="[1.6,2)",org.slf4j;resolution:=optional;version="[1
+ .7,2)"
+Bundle-DocURL: http://www.wso2.org/
+

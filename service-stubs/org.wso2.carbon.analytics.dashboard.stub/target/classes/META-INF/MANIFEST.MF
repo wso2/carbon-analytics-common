@@ -1,0 +1,34 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.analytics.dashboard.stub;uses:="org.ap
+ ache.axis2,org.apache.axis2.transport,org.apache.axis2.client,org.apa
+ che.axis2.context,javax.xml.namespace,org.apache.axiom.om,org.apache.
+ axis2.description,org.apache.axiom.soap,org.apache.axis2.util,org.apa
+ che.axis2.client.async,org.apache.axis2.addressing,javax.xml.stream,o
+ rg.apache.axis2.engine,org.apache.axis2.databinding";version="1.0.0.S
+ NAPSHOT"
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: WSO2 Carbon - Analytics Dashboard Stub
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281937326
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Description: WSO2 is an open source application development sof
+ tware company focused on providing service-oriented        architectu
+ re solutions for professional developers.
+Bundle-SymbolicName: org.wso2.carbon.analytics.dashboard.stub
+Import-Package: javax.xml.namespace,javax.xml.stream;version="[1.0,2)"
+ ,org.apache.axiom.om,org.apache.axiom.soap,org.apache.axis2;version="
+ [1.6,2)",org.apache.axis2.addressing;version="[1.6,2)",org.apache.axi
+ s2.client;version="[1.6,2)",org.apache.axis2.client.async;version="[1
+ .6,2)",org.apache.axis2.context;version="[1.6,2)",org.apache.axis2.da
+ tabinding;version="[1.6,2)",org.apache.axis2.databinding.utils;versio
+ n="[1.6,2)",org.apache.axis2.databinding.utils.reader;version="[1.6,2
+ )",org.apache.axis2.description;version="[1.6,2)",org.apache.axis2.en
+ gine;version="[1.6,2)",org.apache.axis2.transport;version="[1.6,2)",o
+ rg.apache.axis2.util;version="[1.6,2)"
+Bundle-DocURL: http://www.wso2.org/
+

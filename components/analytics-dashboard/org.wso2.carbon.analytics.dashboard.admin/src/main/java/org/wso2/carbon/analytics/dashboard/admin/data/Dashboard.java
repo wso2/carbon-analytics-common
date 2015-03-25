@@ -15,14 +15,14 @@
  */
 package org.wso2.carbon.analytics.dashboard.admin.data;
 
-import org.apache.axis2.AxisFault;
+import org.wso2.carbon.analytics.dashboard.admin.exception.InvalidRequestException;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Displays widgets
- * Contains the links to a set of widgets, each residing inside a specific dataView object
+ * Dashboard attributes and a set of widgetInstances
+ * Contains a set of widget-Instances, definition of each residing inside a specific dataView object
  */
 public class Dashboard {
 
@@ -30,7 +30,7 @@ public class Dashboard {
 	private String title;
 	private String group;
 	private String[] roles;
-	private WidgetMetaData[] widgets;
+	private WidgetInstance[] widgetInstances;
 
 	public String getTitle() {
 		return title;
@@ -64,37 +64,38 @@ public class Dashboard {
 		this.roles = roles;
 	}
 
-	public WidgetMetaData[] getWidgets() {
-		return widgets;
+	public WidgetInstance[] getWidgetInstances() {
+		return widgetInstances;
 	}
 
-	public void setWidgets(WidgetMetaData[] widgets) {
-		this.widgets = widgets;
+	public void setWidgetInstances(WidgetInstance[] widgetInstances) {
+		this.widgetInstances = widgetInstances;
 	}
 
-	public void addWidget(WidgetMetaData widget) throws AxisFault {
-		for (WidgetMetaData existingWidget : widgets) {
-			if (existingWidget.getId().equals(widget.getId())) {
-				throw new AxisFault("Widget with given ID already exists in the dashboard");
+	public void addWidgetInstance(WidgetInstance widgetInstance) throws InvalidRequestException {
+		for (WidgetInstance existingWidget : widgetInstances) {
+			if (existingWidget.getWidgetID().equals(widgetInstance.getWidgetID())) {
+				throw new InvalidRequestException(
+						"Widget Instance with given widget ID already exists in the dashboard");
 			}
 		}
-		List<WidgetMetaData> widgetMetaDataList = Arrays.asList(widgets);
-		widgetMetaDataList.add(widget);
-		widgets = widgetMetaDataList.toArray(new WidgetMetaData[widgetMetaDataList.size()]);
+		widgetInstances = Arrays.copyOf(widgetInstances, widgetInstances.length + 1);
+		widgetInstances[widgetInstances.length - 1] = widgetInstance;
 	}
 
-	public boolean updateWidget(WidgetMetaData widget) throws AxisFault {
-		boolean updateStatus = deleteWidget(widget.getId());
-		addWidget(widget);
+	public boolean updateWidgetInstance(WidgetInstance widgetInstance)
+			throws InvalidRequestException {
+		boolean updateStatus = deleteWidgetInstance(widgetInstance.getWidgetID());
+		addWidgetInstance(widgetInstance);
 		return updateStatus;
 	}
 
-	public boolean deleteWidget(String widgetID) throws AxisFault {
-		List<WidgetMetaData> widgetMetaDataList = Arrays.asList(widgets);
-		for (WidgetMetaData existingWidget : widgetMetaDataList) {
-			if (existingWidget.getId().equals(widgetID)) {
-				widgetMetaDataList.remove(existingWidget);
-				widgets = widgetMetaDataList.toArray(new WidgetMetaData[widgetMetaDataList.size()]);
+	public boolean deleteWidgetInstance(String widgetID) {
+		List<WidgetInstance> instanceList = Arrays.asList(widgetInstances);
+		for (WidgetInstance existingInstance : instanceList) {
+			if (existingInstance.getWidgetID().equals(widgetID)) {
+				instanceList.remove(existingInstance);
+				widgetInstances = instanceList.toArray(new WidgetInstance[instanceList.size()]);
 				return true;
 			}
 		}

@@ -1,0 +1,42 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.databridge.receiver.binary;uses:="org.
+ wso2.carbon.databridge.receiver.binary.conf,org.apache.commons.loggin
+ g,org.wso2.carbon.databridge.core,org.wso2.carbon.databridge.commons.
+ binary,javax.net,org.wso2.carbon.databridge.core.exception,javax.net.
+ ssl,org.wso2.carbon.base,org.wso2.carbon.databridge.commons,org.wso2.
+ carbon.context,org.wso2.carbon.databridge.commons.exception";version=
+ "1.0.0.SNAPSHOT",org.wso2.carbon.databridge.receiver.binary.conf;uses
+ :="org.wso2.carbon.databridge.core.conf,org.wso2.carbon.utils";versio
+ n="1.0.0.SNAPSHOT"
+Service-Component: OSGI-INF/serviceComponents.xml
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.databridge.receiver.binary
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281952051
+Bundle-ManifestVersion: 2
+Bundle-Description: It's is used relieve the dispatch the events via B
+ inary TCP transport
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-SymbolicName: org.wso2.carbon.databridge.receiver.binary
+Import-Package: javax.net;resolution:=optional,javax.net.ssl;resolutio
+ n:=optional,org.apache.commons.logging;resolution:=optional;version="
+ [1.2,2)",org.osgi.framework;version="[1.6,2)",org.osgi.service.compon
+ ent;resolution:=optional;version="[1.2,2)",org.wso2.carbon.base;resol
+ ution:=optional;version="[1.0,2)",org.wso2.carbon.context;resolution:
+ =optional;version="[4.3,5)",org.wso2.carbon.databridge.commons;resolu
+ tion:=optional;version="[1.0,2)",org.wso2.carbon.databridge.commons.b
+ inary;resolution:=optional;version="[1.0,2)",org.wso2.carbon.databrid
+ ge.commons.exception;resolution:=optional;version="[1.0,2)",org.wso2.
+ carbon.databridge.core;resolution:=optional;version="[1.0,2)",org.wso
+ 2.carbon.databridge.core.conf;resolution:=optional;version="[1.0,2)",
+ org.wso2.carbon.databridge.core.exception;resolution:=optional;versio
+ n="[1.0,2)",org.wso2.carbon.databridge.receiver.binary.conf;resolutio
+ n:=optional,org.wso2.carbon.utils;resolution:=optional;version="[4.3,
+ 5)"
+Bundle-DocURL: http://www.wso2.org/
+

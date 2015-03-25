@@ -1,0 +1,3 @@
+org/wso2/carbon/databridge/streamdefn/filesystem/internal/ServiceHolder.class
+org/wso2/carbon/databridge/streamdefn/filesystem/internal/FileSystemStreamDefnStoreDS.class
+org/wso2/carbon/databridge/streamdefn/filesystem/FileSystemStreamDefinitionStore.class
