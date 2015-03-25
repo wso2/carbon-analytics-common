@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.event.stream.ui;uses:="org.apache.axis
+ 2,javax.servlet,org.wso2.carbon.event.stream.stub,org.wso2.carbon.ui,
+ org.apache.axis2.client,org.wso2.carbon.event.stream.stub.types,org.a
+ pache.axis2.context,com.google.gson,javax.servlet.http";version="1.0.
+ 0.SNAPSHOT",org.wso2.carbon.event.stream.ui.i18n;version="1.0.0.SNAPS
+ HOT"
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.event.stream.ui
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281999198
+Bundle-ManifestVersion: 2
+Bundle-Description: This is a Carbon bundle that represent the event s
+ tream ui module.
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Carbon-Component: UIBundle
+Bundle-SymbolicName: org.wso2.carbon.event.stream.ui
+Import-Package: com.google.gson;resolution:=optional;version="[2.1,3)"
+ ,javax.servlet;resolution:=optional;version="[2.6,3)",javax.servlet.h
+ ttp;resolution:=optional;version="[2.6,3)",org.apache.axis2;version="
+ [1.6,2)",org.apache.axis2.client;version="[1.6,2)",org.apache.axis2.c
+ ontext;version="[1.6,2)",org.wso2.carbon.event.stream.stub;version="[
+ 1.0,2)",org.wso2.carbon.event.stream.stub.types;version="[1.0,2)",org
+ .wso2.carbon.ui;resolution:=optional;version="[4.3,5)",org.wso2.carbo
+ n.utils;version="[4.3,5)"
+Bundle-DocURL: http://www.wso2.org/
+

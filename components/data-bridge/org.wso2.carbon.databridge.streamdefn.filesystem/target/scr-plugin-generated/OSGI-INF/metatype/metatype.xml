@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
+    <OCD id="filesystem.streamdefn.store.comp" name="%filesystem.streamdefn.store.comp.name" description="%filesystem.streamdefn.store.comp.description"/>
+    <Designate pid="filesystem.streamdefn.store.comp">
+        <Object ocdref="filesystem.streamdefn.store.comp"/>
+    </Designate>
+</metatype:MetaData>
