@@ -1,0 +1,47 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.event.stream.stub;uses:="javax.xml.str
+ eam,org.wso2.carbon.event.stream.stub.types,org.apache.axis2.databind
+ ing,javax.xml.namespace,org.apache.axis2.databinding.utils,org.apache
+ .axis2.databinding.utils.reader,org.apache.axiom.om,org.apache.axis2,
+ org.apache.axis2.transport,org.apache.axis2.client,org.apache.axis2.c
+ ontext,org.apache.axis2.description,org.apache.axiom.soap,org.apache.
+ axis2.util,org.apache.axis2.client.async,org.apache.axis2.addressing,
+ org.apache.axis2.engine";version="1.0.0.SNAPSHOT",org.wso2.carbon.eve
+ nt.stream.stub.types;uses:="javax.xml.stream,org.apache.axis2.databin
+ ding.utils,org.apache.axis2.databinding,javax.xml.namespace,org.apach
+ e.axis2.databinding.utils.reader,org.apache.axiom.om";version="1.0.0.
+ SNAPSHOT"
+Ignore-Package: javax.xml.namespace
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.event.stream.stub
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281933426
+Bundle-ManifestVersion: 2
+Bundle-Description: WSO2 is an open source application development sof
+ tware company focused on providing service-oriented        architectu
+ re solutions for professional developers.
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Carbon-Component: UIBundle
+Bundle-SymbolicName: org.wso2.carbon.event.stream.stub
+Import-Package: javax.xml.namespace;version="0.0.0",javax.xml.stream;r
+ esolution:=optional;version="[1.0,2)",org.apache.axiom.om;resolution:
+ =optional,org.apache.axiom.soap;resolution:=optional,org.apache.axis2
+ ;resolution:=optional;version="[1.6,2)",org.apache.axis2.addressing;r
+ esolution:=optional;version="[1.6,2)",org.apache.axis2.client;resolut
+ ion:=optional;version="[1.6,2)",org.apache.axis2.client.async;resolut
+ ion:=optional;version="[1.6,2)",org.apache.axis2.context;resolution:=
+ optional;version="[1.6,2)",org.apache.axis2.databinding;resolution:=o
+ ptional;version="[1.6,2)",org.apache.axis2.databinding.utils;resoluti
+ on:=optional;version="[1.6,2)",org.apache.axis2.databinding.utils.rea
+ der;resolution:=optional;version="[1.6,2)",org.apache.axis2.descripti
+ on;resolution:=optional;version="[1.6,2)",org.apache.axis2.engine;res
+ olution:=optional;version="[1.6,2)",org.apache.axis2.transport;resolu
+ tion:=optional;version="[1.6,2)",org.apache.axis2.util;resolution:=op
+ tional;version="[1.6,2)"
+Bundle-DocURL: http://www.wso2.org/
+

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
+    <scr:component enabled="true" immediate="true" name="eventStreamAdmin.component">
+        <implementation class="org.wso2.carbon.event.stream.admin.internal.ds.EventStreamAdminServiceDS"/>
+        <property name="service.pid" value="eventStreamAdmin.component" private="false"/>
+        <reference name="eventStreamService.service" interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1" policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService" checked="true" strategy="event"/>
+    </scr:component>
+</components>

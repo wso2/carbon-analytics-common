@@ -15,7 +15,7 @@ Bundle-Vendor: WSO2
 DynamicImport-Package: *
 Build-Jdk: 1.7.0_07
 Bundle-Version: 1.0.0.SNAPSHOT
-Bnd-LastModified: 1427280622914
+Bnd-LastModified: 1427281940219
 Bundle-ManifestVersion: 2
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
 Bundle-Description: Analytics Dashboard Admin

@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.databridge.streamdefn.filesystem.inter
+ nal;uses:="org.wso2.carbon.databridge.core.definitionstore,org.wso2.c
+ arbon.databridge.streamdefn.filesystem,org.osgi.framework,org.wso2.ca
+ rbon.event.stream.core,org.osgi.service.component";version="1.0.0.SNA
+ PSHOT",org.wso2.carbon.databridge.streamdefn.filesystem;uses:="org.ws
+ o2.carbon.databridge.streamdefn.filesystem.internal,org.wso2.carbon.d
+ atabridge.commons,org.wso2.carbon.databridge.core.exception,org.apach
+ e.commons.logging,org.wso2.carbon.databridge.core.definitionstore,org
+ .wso2.carbon.context,org.wso2.carbon.event.stream.core.exception,org.
+ wso2.carbon.event.stream.core";version="1.0.0.SNAPSHOT"
+Service-Component: OSGI-INF/serviceComponents.xml
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.databridge.streamdefn.filesystem
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281996939
+Bundle-ManifestVersion: 2
+Bundle-Description: File based Stream Definition Store
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-SymbolicName: org.wso2.carbon.databridge.streamdefn.filesystem
+Import-Package: org.apache.commons.logging;resolution:=optional;versio
+ n="[1.2,2)",org.osgi.framework;version="[1.6,2)",org.osgi.service.com
+ ponent;resolution:=optional;version="[1.2,2)",org.wso2.carbon.context
+ ;resolution:=optional;version="[4.3,5)",org.wso2.carbon.databridge.co
+ mmons;resolution:=optional;version="[1.0,2)",org.wso2.carbon.databrid
+ ge.core.definitionstore;resolution:=optional;version="[1.0,2)",org.ws
+ o2.carbon.databridge.core.exception;resolution:=optional;version="[1.
+ 0,2)",org.wso2.carbon.event.stream.core;resolution:=optional;version=
+ "[1.0,2)",org.wso2.carbon.event.stream.core.exception;resolution:=opt
+ ional;version="[1.0,2)"
+Bundle-DocURL: http://www.wso2.org/
+

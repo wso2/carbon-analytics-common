@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.databridge.commons;uses:="org.wso2.car
+ bon.databridge.commons.utils,org.wso2.carbon.databridge.commons.excep
+ tion";version="1.0.0.SNAPSHOT",org.wso2.carbon.databridge.commons.uti
+ ls;uses:="org.wso2.carbon.databridge.commons,org.apache.commons.loggi
+ ng,org.json,org.wso2.carbon.databridge.commons.exception,com.google.g
+ son";version="1.0.0.SNAPSHOT",org.wso2.carbon.databridge.commons.exce
+ ption;version="1.0.0.SNAPSHOT"
+Built-By: dodan
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.databridge.commons
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.7.0_07
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1427281942808
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Description: org.wso2.carbon.agent.commons.thrift is the common
+  thrift objects used in Agent and        Agent Server communication
+Bundle-SymbolicName: org.wso2.carbon.databridge.commons
+Import-Package: com.google.gson;resolution:=optional;version="[2.1,3)"
+ ,org.apache.commons.logging;resolution:=optional;version="[1.2,2)",or
+ g.json;resolution:=optional;version="[2.0,3)",org.osgi.framework;vers
+ ion="[1.6,2)"
+Bundle-DocURL: http://www.wso2.org/
+
