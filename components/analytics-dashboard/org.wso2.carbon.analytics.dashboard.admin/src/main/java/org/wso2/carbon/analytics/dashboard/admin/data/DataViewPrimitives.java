@@ -16,11 +16,24 @@
 package org.wso2.carbon.analytics.dashboard.admin.data;
 
 /**
- * One of many Column definitions of a specific data-table/data-stream
+ * Primitive information of a DataView Object
+ * Points to a data-source which could be a BAM table or a CEP stream
  */
-public class Column {
+public class DataViewPrimitives {
+	private String id;
 	private String name;
 	private String type;
+	private String dataSource;
+	private Column[] columns;
+	private String filter;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -36,5 +49,29 @@ public class Column {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(String dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public Column[] getColumns() {
+		return columns;
+	}
+
+	public void setColumns(Column[] columns) {
+		this.columns = columns;
+	}
+
+	public String getFilter() {
+		return filter;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
 	}
 }

@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.analytics.dashboard.admin.data;
+package org.wso2.carbon.analytics.dashboard.admin.exception;
 
 /**
- * One of many Column definitions of a specific data-table/data-stream
+ * Exception thrown in case of an issue with a registry resource
  */
-public class Column {
-	private String name;
-	private String type;
+public class RegistryResourceException extends Exception {
 
-	public String getName() {
-		return name;
+	public RegistryResourceException(String message) {
+		super(message);
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public RegistryResourceException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public String getType() {
-		return type;
+	public RegistryResourceException(Throwable cause) {
+		super(cause);
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
 }

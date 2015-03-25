@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.analytics.dashboard.admin.data;
 
-import org.apache.axis2.AxisFault;
+import org.wso2.carbon.analytics.dashboard.admin.exception.InvalidRequestException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,23 +72,25 @@ public class Dashboard {
 		this.widgetInstances = widgetInstances;
 	}
 
-	public void addWidgetInstance(WidgetInstance widgetInstance) throws AxisFault {
+	public void addWidgetInstance(WidgetInstance widgetInstance) throws InvalidRequestException {
 		for (WidgetInstance existingWidget : widgetInstances) {
 			if (existingWidget.getWidgetID().equals(widgetInstance.getWidgetID())) {
-				throw new AxisFault("Widget Instance with given widget ID already exists in the dashboard");
+				throw new InvalidRequestException(
+						"Widget Instance with given widget ID already exists in the dashboard");
 			}
 		}
-		widgetInstances =Arrays.copyOf(widgetInstances, widgetInstances.length+1);
-		widgetInstances[widgetInstances.length-1]=widgetInstance;
+		widgetInstances = Arrays.copyOf(widgetInstances, widgetInstances.length + 1);
+		widgetInstances[widgetInstances.length - 1] = widgetInstance;
 	}
 
-	public boolean updateWidgetInstance(WidgetInstance widgetInstance) throws AxisFault {
+	public boolean updateWidgetInstance(WidgetInstance widgetInstance)
+			throws InvalidRequestException {
 		boolean updateStatus = deleteWidgetInstance(widgetInstance.getWidgetID());
 		addWidgetInstance(widgetInstance);
 		return updateStatus;
 	}
 
-	public boolean deleteWidgetInstance(String widgetID) throws AxisFault {
+	public boolean deleteWidgetInstance(String widgetID) {
 		List<WidgetInstance> instanceList = Arrays.asList(widgetInstances);
 		for (WidgetInstance existingInstance : instanceList) {
 			if (existingInstance.getWidgetID().equals(widgetID)) {
