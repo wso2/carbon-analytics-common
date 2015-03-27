@@ -15,8 +15,11 @@
  */
 package org.wso2.carbon.analytics.dashboard.admin;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dashboard.admin.Authentication.UserAdminClient;
 import org.wso2.carbon.analytics.dashboard.admin.data.*;
 import org.wso2.carbon.analytics.dashboard.admin.exception.InvalidRequestException;
 import org.wso2.carbon.analytics.dashboard.admin.exception.RegistryResourceException;
@@ -295,5 +298,23 @@ public class DashboardAdminService extends AbstractAdmin {
 		Dashboard dashboard = getDashboard(dashboardID);
 		dashboard.updateWidgetInstance(widgetInstance);
 		return updateDashboard(dashboard);
+	}
+
+	public boolean authenticateUser(String username,String password) {
+		boolean status = false;
+		String SEVER_URL = "https://localhost:9443/services/";//TODO update this
+		try {
+			ConfigurationContext configContext =
+					ConfigurationContextFactory.createConfigurationContextFromFileSystem(null, null);
+			UserAdminClient sampleUserAdminClient = new UserAdminClient(configContext, SEVER_URL);
+			if (status = sampleUserAdminClient.authenticate(username, password)) {
+				System.out.println("User is successfully authenticated");
+			} else {
+				System.out.println("User can not be authenticated");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
 	}
 }

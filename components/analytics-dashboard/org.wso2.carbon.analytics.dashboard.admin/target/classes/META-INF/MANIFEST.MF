@@ -5,8 +5,12 @@ Export-Package: org.wso2.carbon.analytics.dashboard.admin.exception;ve
  "1.0.0.SNAPSHOT",org.wso2.carbon.analytics.dashboard.admin;uses:="org
  .wso2.carbon.analytics.dashboard.admin.exception,org.apache.commons.l
  ogging,org.wso2.carbon.analytics.dashboard.admin.data,org.wso2.carbon
- .registry.api,org.wso2.carbon.core,org.wso2.carbon.context,com.google
- .gson";version="1.0.0.SNAPSHOT"
+ .registry.api,org.wso2.carbon.core,org.apache.axis2.context,org.wso2.
+ carbon.analytics.dashboard.admin.Authentication,org.wso2.carbon.conte
+ xt,com.google.gson";version="1.0.0.SNAPSHOT",org.wso2.carbon.analytic
+ s.dashboard.admin.Authentication;uses:="org.wso2.carbon.user.mgt.stub
+ ,org.apache.axis2.client,org.wso2.carbon.authenticator.stub,org.apach
+ e.axis2.context";version="1.0.0.SNAPSHOT"
 Built-By: dodan
 Tool: Bnd-1.43.0
 Bundle-Name: org.wso2.carbon.analytics.dashboard.admin
@@ -15,17 +19,21 @@ Bundle-Vendor: WSO2
 DynamicImport-Package: *
 Build-Jdk: 1.7.0_07
 Bundle-Version: 1.0.0.SNAPSHOT
-Bnd-LastModified: 1427281940219
+Bnd-LastModified: 1427426816400
 Bundle-ManifestVersion: 2
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
 Bundle-Description: Analytics Dashboard Admin
 Carbon-Component: UIBundle
 Bundle-SymbolicName: org.wso2.carbon.analytics.dashboard.admin
 Import-Package: com.google.gson;resolution:=optional;version="[1.7,2)"
- ,org.apache.commons.logging;resolution:=optional;version="[1.2,2)",or
- g.wso2.carbon.context;resolution:=optional;version="[4.3,5)",org.wso2
- .carbon.core;resolution:=optional;version="[4.3,5)",org.wso2.carbon.r
- egistry.api;resolution:=optional;version="[1.0,2)",org.wso2.carbon.ut
- ils;version="[4.3,5)"
+ ,org.apache.axis2.client;resolution:=optional;version="[1.6,2)",org.a
+ pache.axis2.context;resolution:=optional;version="[1.6,2)",org.apache
+ .commons.logging;resolution:=optional;version="[1.2,2)",org.wso2.carb
+ on.authenticator.stub;resolution:=optional;version="[3.2,4)",org.wso2
+ .carbon.context;resolution:=optional;version="[4.3,5)",org.wso2.carbo
+ n.core;resolution:=optional;version="[4.3,5)",org.wso2.carbon.registr
+ y.api;resolution:=optional;version="[1.0,2)",org.wso2.carbon.user.mgt
+ .stub;resolution:=optional;version="[3.2,4)",org.wso2.carbon.utils;ve
+ rsion="[4.3,5)"
 Bundle-DocURL: http://www.wso2.org/
 

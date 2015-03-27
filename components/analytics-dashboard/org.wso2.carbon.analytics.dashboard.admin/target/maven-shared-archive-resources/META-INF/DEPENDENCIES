@@ -73,7 +73,7 @@ From: 'an unknown organization'
 
   - axiom.wso2 (http://wso2.org) org.apache.ws.commons.axiom.wso2:axiom:bundle:1.2.11.wso2v5
 
-  - xmlschema.wso2 (http://wso2.org) org.apache.ws.commons.schema.wso2:XmlSchema:bundle:1.4.7.wso2v3
+  - xmlschema.wso2 (http://wso2.org) org.apache.ws.commons.schema.wso2:XmlSchema:bundle:1.4.7.wso2v1
 
   - Bouncy Castle Provider (http://www.bouncycastle.org/java.html) org.bouncycastle:bcprov-jdk15on:jar:1.49
     License: Bouncy Castle Licence  (http://www.bouncycastle.org/licence.html)
@@ -177,7 +177,7 @@ From: 'The Apache Software Foundation' (http://www.apache.org)
 From: 'The Apache Software Foundation' (http://www.apache.org/)
   - Commons IO (http://commons.apache.org/io/) commons-io:commons-io:jar:2.0
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
-  - Apache Commons Logging (http://commons.apache.org/proper/commons-logging/) commons-logging:commons-logging:jar:1.2
+  - Commons Logging (http://commons.apache.org/logging) commons-logging:commons-logging:jar:1.1.1
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
   - Commons Pool (http://commons.apache.org/pool/) commons-pool:commons-pool:jar:1.5
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)

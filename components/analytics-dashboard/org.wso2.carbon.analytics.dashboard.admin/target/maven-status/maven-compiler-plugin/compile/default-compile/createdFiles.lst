@@ -3,6 +3,7 @@ org/wso2/carbon/analytics/dashboard/admin/exception/RegistryResourceException.cl
 org/wso2/carbon/analytics/dashboard/admin/data/DataViewPrimitives.class
 org/wso2/carbon/analytics/dashboard/admin/data/WidgetInstance.class
 org/wso2/carbon/analytics/dashboard/admin/data/Column.class
+org/wso2/carbon/analytics/dashboard/admin/Authentication/UserAdminClient.class
 org/wso2/carbon/analytics/dashboard/admin/data/Dashboard.class
 org/wso2/carbon/analytics/dashboard/admin/RegistryUtils.class
 org/wso2/carbon/analytics/dashboard/admin/data/WidgetDimensions.class

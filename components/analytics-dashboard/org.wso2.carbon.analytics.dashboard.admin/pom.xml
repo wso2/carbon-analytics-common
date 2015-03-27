@@ -70,6 +70,21 @@
             <artifactId>gson</artifactId>
             <version>1.7.1</version>
         </dependency>
+
+        <!-- Authentication -->
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
+            <version>3.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
+            <version>3.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+
 	</dependencies>
 
 	<build>
