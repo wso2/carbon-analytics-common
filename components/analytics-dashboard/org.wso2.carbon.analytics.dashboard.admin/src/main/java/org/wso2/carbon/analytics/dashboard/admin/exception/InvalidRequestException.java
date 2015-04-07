@@ -13,39 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.analytics.dashboard.admin.data;
+package org.wso2.carbon.analytics.dashboard.admin.exception;
 
 /**
- * Holds information about a widget which is instantiated inside a DataView Object
+ * Exception thrown in case of a mismatch between request and response
  */
-public class Widget {
+public class InvalidRequestException extends Exception {
 
-	private String id;
-	private String title;
-	private String config;
-
-	public String getConfig() {
-		return config;
+	public InvalidRequestException(String message) {
+		super(message);
 	}
 
-	public void setConfig(String config) {
-		this.config = config;
+	public InvalidRequestException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public InvalidRequestException(Throwable cause) {
+		super(cause);
 	}
 
 }

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.analytics.dashboard.admin.exception.RegistryResourceException;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.registry.api.Collection;
@@ -86,15 +87,15 @@ public class RegistryUtils {
             logger.error("An error occurred while reading resource [" + url + "] from registry", e);
             throw e;
         } finally {
-            closeQuitely(contentStream);
-            closeQuitely(isr);
+            closeQuietly(contentStream);
+            closeQuietly(isr);
         }
     }
 
     /**
-     * Close colseables
+     * Close closeables
      */
-    private static void closeQuitely(Closeable closeable) {
+    private static void closeQuietly(Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();
@@ -109,43 +110,41 @@ public class RegistryUtils {
      *
      * @param url Resource url relative to the registry.
      * @return True if resource exists.
-     * @throws AxisFault .
+     * @throws RegistryException .
      */
     public static boolean isResourceExist(String url) throws RegistryException {
         return registry.resourceExists(url);
     }
 
-    /**
-     * Get all the resources in a directory url as a Collection.
-     *
-     * @param collectionURL Collection url relative to the registry.
-     * @return Collection.
-     * @throws AxisFault
-     */
-    public static Collection readCollection(String collectionURL) throws AxisFault {
+	/**
+	 * Get all the resources in a directory url as a Collection.
+	 *
+	 * @param collectionURL Collection url relative to the registry.
+	 * @return Collection.
+	 * @throws RegistryException
+	 */
+    public static Collection readCollection(String collectionURL) throws RegistryResourceException {
 
         try {
             return (Collection) registry.get(collectionURL);
         } catch (Exception e) {
             String errorMessage = "Unable to read resource collection from url:" + collectionURL;
             logger.error(errorMessage);
-            throw new AxisFault(errorMessage);
+            throw new RegistryResourceException(errorMessage);
         }
     }
 
-    /**
-     * @param url url of the resource to be deleted from the registry.
-     * @throws AxisFault
-     */
-    public static boolean deleteResource(String url) throws AxisFault {
-        try {
-            registry.delete(url);
-            return true;
-        } catch (Exception e) {
-            String errorMessage = "Unable to delete resource at url:" + url;
-            logger.error(errorMessage);
-            return false;
-        }
-    }
+	/**
+	 * @param url url of the resource to be deleted from the registry.
+	 */
+	public static boolean deleteResource(String url) {
+		try {
+			registry.delete(url);
+			return true;
+		} catch (RegistryException re) {
+			logger.error(re);
+			return false;
+		}
+	}
 
 }
