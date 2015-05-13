@@ -1,7 +1,0 @@
-org/wso2/carbon/event/output/adapter/email/EmailEventAdapterFactory.class
-org/wso2/carbon/event/output/adapter/email/EmailEventAdapter$EmailSender.class
-org/wso2/carbon/event/output/adapter/email/internal/ds/EmailEventAdapterServiceValueHolder.class
-org/wso2/carbon/event/output/adapter/email/internal/ds/EmailEventAdapterServiceDS.class
-org/wso2/carbon/event/output/adapter/email/internal/util/EmailEventAdapterConstants.class
-org/wso2/carbon/event/output/adapter/email/EmailEventAdapter.class
-org/wso2/carbon/event/output/adapter/email/EmailEventAdapter$1.class

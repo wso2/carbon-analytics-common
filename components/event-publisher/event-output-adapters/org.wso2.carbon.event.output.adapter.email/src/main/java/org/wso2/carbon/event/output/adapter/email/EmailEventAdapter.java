@@ -208,8 +208,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
                         eventAdapterConfiguration.getName() + " " + msg);
 
             }
-
-
         }
 
 
