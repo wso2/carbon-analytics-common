@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
+    <scr:component enabled="true" immediate="true" name="event.output.adapter.service">
+        <implementation class="org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceDS"/>
+        <property name="service.pid" value="event.output.adapter.service"/>
+        <reference name="output.event.adapter.tracker.service" interface="org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory" cardinality="0..n" policy="dynamic" bind="setEventAdapterType" unbind="unSetEventAdapterType"/>
+        <reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1" policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"/>
+    </scr:component>
+</components>

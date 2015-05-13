@@ -24,7 +24,10 @@ public class EmailEventAdapterConstants {
 
     public static final String ADAPTER_TYPE_EMAIL = "email";
     public static final String ADAPTER_MESSAGE_EMAIL_ADDRESS = "email.address";
+    public static final String ADAPTER_MESSAGE_EMAIL_ADDRESS_HINT="emailAddress.hint";
     public static final String ADAPTER_MESSAGE_EMAIL_SUBJECT = "email.subject";
+    public static final String APAPTER_MESSAGE_EMAIL_TYPE="email.type";
+    public static final String ADAPTER_MESSAGE_EMAIL_TYPE_HINT = "emailType.hint";
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String DEFAULT_KEEP_ALIVE_TIME_NAME = "defaultKeepAliveTime";
@@ -34,6 +37,16 @@ public class EmailEventAdapterConstants {
     public static final int MAX_THREAD = 100;
     public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
 
+
+    /** SMTP property constants. */
+
+    public static final String MAIL_SMTP_HOST="mail.smtp.host";
+    public static final String MAIL_SMTP_PORT="mail.smtp.port";
+
+    /** Email Adapter MIME types.*/
+
+    public static final String MAIL_TEXT_PLAIN="text/plain";
+    public static final String MAIL_TEXT_HTML="text/html";
 
 
 

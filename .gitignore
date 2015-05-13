@@ -14,3 +14,7 @@ hs_err_pid*
 #idea files
 .idea/
 *.iml
+
+#mac craps
+.DS_Store
+.DS_Store?

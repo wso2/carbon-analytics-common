@@ -55,11 +55,13 @@ public class EmailEventAdapterServiceDS {
 
     protected void setConfigurationContextService(
             ConfigurationContextService configurationContextService) {
+        log.debug("Setconfiguration service");
         EmailEventAdapterServiceValueHolder.registerConfigurationContextService(configurationContextService);
     }
 
     protected void unsetConfigurationContextService(
             ConfigurationContextService configurationContextService) {
+        log.debug("not Setconfiguration service");
 
     }
 

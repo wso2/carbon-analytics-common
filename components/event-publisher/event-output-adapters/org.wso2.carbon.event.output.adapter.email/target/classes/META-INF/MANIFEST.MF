@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.event.output.adapter.email;uses:="java
+ x.mail,org.apache.commons.logging,javax.mail.internet,org.wso2.carbon
+ .event.output.adapter.core,org.wso2.carbon.event.output.adapter.core.
+ exception";version="1.0.0.SNAPSHOT",org.wso2.carbon.event.output.adap
+ ter.email.i18n;version="1.0.0.SNAPSHOT"
+Service-Component: OSGI-INF/serviceComponents.xml
+Built-By: kasun
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.event.output.adapter.email
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: WSO2
+DynamicImport-Package: *
+Build-Jdk: 1.6.0_65
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1431493279946
+Bundle-ManifestVersion: 2
+Bundle-Description: org.wso2.carbon.event.output.adapter.email provide
+ s the back-end functionality of email event adapter
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-SymbolicName: org.wso2.carbon.event.output.adapter.email
+Import-Package: javax.mail;resolution:=optional;version="[1.4,2)",java
+ x.mail.internet;resolution:=optional;version="[1.4,2)",javax.xml.name
+ space;version="0.0.0",org.apache.commons.logging;resolution:=optional
+ ;version="[1.2,2)",org.osgi.framework;resolution:=optional;version="[
+ 1.6,2)",org.osgi.service.component;resolution:=optional;version="[1.2
+ ,2)",org.wso2.carbon.event.output.adapter.core;resolution:=optional;v
+ ersion="[1.0,2)",org.wso2.carbon.event.output.adapter.core.exception;
+ resolution:=optional;version="[1.0,2)",org.wso2.carbon.event.output.a
+ dapter.email;resolution:=optional,org.wso2.carbon.utils;resolution:=o
+ ptional;version="[4.3,5)"
+Bundle-DocURL: http://www.wso2.org/
+
