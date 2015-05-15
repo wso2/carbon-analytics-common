@@ -276,27 +276,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
             MimeMessage message = new MimeMessage(session);
 
-            StringBuilder stringBuilder = new StringBuilder();
-
-            if (type.equals(EmailEventAdapterConstants.MAIL_TEXT_PLAIN)) {
-
-                //parsing only text as the email body.
-
-                stringBuilder.append(body);
-
-            } else if (type.equals(EmailEventAdapterConstants.MAIL_TEXT_HTML)) {
-
-                //Append desired HTML tags to the email body here.
-
-                stringBuilder.append("<b>");
-                stringBuilder.append("<u>");
-                stringBuilder.append(body);
-                stringBuilder.append("</u>");
-                stringBuilder.append("</b>");
-            }
-
-            String finalString = stringBuilder.toString();
-
             //Setting up the Email attributes and Email payload.
 
             try {
@@ -306,7 +285,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
                 message.setSubject(subject);
                 message.setSentDate(new Date());
-                message.setContent(finalString, type);
+                message.setContent(body, type);
 
                 if (log.isDebugEnabled()) {
                     log.debug("Meta data of the email configured successfully");
