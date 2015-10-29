@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -127,7 +128,7 @@ public class EventHandler {
             TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(member.getHostName(), member.getPort());
             tcpEventServer = new TCPEventServer(tcpEventServerConfig, new StreamCallback() {
                 @Override
-                public void receive(String streamId, long timestamp, Object[] data) {
+                public void receive(String streamId, long timestamp, Object[] data, Map<String, String> arbitraryDataMap) {
                     int index = streamId.indexOf("/");
                     if (index != -1) {
                         int tenantId = Integer.parseInt(streamId.substring(0, index));

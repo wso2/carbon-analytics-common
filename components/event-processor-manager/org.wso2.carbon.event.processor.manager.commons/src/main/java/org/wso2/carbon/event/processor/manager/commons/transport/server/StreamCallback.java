@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.event.processor.manager.commons.transport.server;
 
+import java.util.Map;
+
 public interface StreamCallback {
 
     /**
@@ -25,5 +27,5 @@ public interface StreamCallback {
      * @param timestamp
      * @param event the event as an object array of attributes
      */
-    public void receive(String streamId, long timestamp, Object[] event);
+    public void receive(String streamId, long timestamp, Object[] event, Map<String, String> arbitraryMapData);
 }
