@@ -29,6 +29,8 @@ public abstract class AbstractInputEventDispatcher {
 
     public abstract void onEvent(Event event);
 
+    public abstract void onEvent(org.wso2.carbon.databridge.commons.Event event);
+
     public abstract void shutdown();
 
     public abstract byte[] getState();

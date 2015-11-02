@@ -137,7 +137,7 @@ public class EventReceiver implements EventProducer {
                 inputEventDispatcher = new QueueInputEventDispatcher(tenantId,
                         EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(),
                                 Manager.ManagerType.Receiver), readLock, exportedStreamDefinition,
-                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize());
+                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize(), true);
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
                 EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
             } else {
@@ -248,6 +248,20 @@ public class EventReceiver implements EventProducer {
     }
 
     protected void sendEvent(Event event) {
+        if (traceEnabled) {
+            trace.info(afterTracerPrefix + event);
+        }
+        if (statisticsEnabled) {
+            statisticsMonitor.incrementRequest();
+        }
+        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
+        if (sufficientToSend || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
+            this.inputEventDispatcher.onEvent(event);
+        }
+
+    }
+
+    protected void sendEvent(org.wso2.carbon.databridge.commons.Event event) {
         if (traceEnabled) {
             trace.info(afterTracerPrefix + event);
         }

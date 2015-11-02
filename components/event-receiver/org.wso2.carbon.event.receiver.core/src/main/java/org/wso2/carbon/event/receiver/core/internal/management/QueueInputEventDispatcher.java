@@ -31,7 +31,6 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -40,6 +39,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private final StreamDefinition streamDefinition;
     private Logger log = Logger.getLogger(AbstractInputEventDispatcher.class);
     private final BlockingEventQueue eventQueue;
+    private final BlockingWso2EventQueue wso2EventQueue;
     private Lock readLock;
     private String syncId;
     private int tenantId;
@@ -48,11 +48,17 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
                                      org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition,
-                                     int eventQueueSizeMb, int eventSyncQueueSize) {
+                                     int eventQueueSizeMb, int eventSyncQueueSize, boolean arbitraryMapsEnabled) {
         this.readLock = readLock;
         this.tenantId = tenantId;
         this.syncId = syncId;
-        this.eventQueue = new BlockingEventQueue(eventQueueSizeMb ,eventSyncQueueSize);
+        if (!arbitraryMapsEnabled) {
+            this.eventQueue = new BlockingEventQueue(eventQueueSizeMb, eventSyncQueueSize);
+            this.wso2EventQueue = null;
+        } else {
+            this.eventQueue = null;
+            this.wso2EventQueue = new BlockingWso2EventQueue(eventQueueSizeMb, eventSyncQueueSize);
+        }
         this.streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, exportedStreamDefinition);
         executorService.submit(new QueueInputEventDispatcherWorker());
     }
@@ -62,6 +68,17 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         try {
             threadBarrier.lock();
             eventQueue.put(event);
+            threadBarrier.unlock();
+        } catch (InterruptedException e) {
+            log.error("Interrupted while waiting to put the event to queue.", e);
+        }
+    }
+
+    @Override
+    public void onEvent(org.wso2.carbon.databridge.commons.Event event) {
+        try {
+            threadBarrier.lock();
+            wso2EventQueue.put(event);
             threadBarrier.unlock();
         } catch (InterruptedException e) {
             log.error("Interrupted while waiting to put the event to queue.", e);
@@ -129,6 +146,48 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         readLock.lock();
                         readLock.unlock();
                         Event event = eventQueue.take();
+                        readLock.lock();
+                        readLock.unlock();
+                        callBack.sendEvent(event);
+                        if (isSendToOther()) {
+                            EventReceiverServiceValueHolder.getEventManagementService().syncEvent(syncId, Manager.ManagerType.Receiver, event);
+                        }
+                    } catch (InterruptedException e) {
+                        log.error("Interrupted while waiting to get an event from queue.", e);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Error in dispatching events.");
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    class QueueInputWso2EventDispatcherWorker implements Runnable {
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p/>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run() {
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+                while (true) {
+                    try {
+                        readLock.lock();
+                        readLock.unlock();
+                        org.wso2.carbon.databridge.commons.Event event = wso2EventQueue.take();
                         readLock.lock();
                         readLock.unlock();
                         callBack.sendEvent(event);

@@ -55,6 +55,16 @@ public interface EventManagementService {
     void syncEvent(String syncId, Manager.ManagerType type, Event event);
 
     /**
+     * This method syncs a particular event with the other node. Depending on the node type and address, the events
+     * will be sent
+     *
+     * @param syncId stream id for which StreamRuntimeInfo needed in the StreamRuntimeInfo map
+     * @param type   syncing event type
+     * @param event  the event which is syncing with the other node
+     */
+    void syncEvent(String syncId, Manager.ManagerType type, org.wso2.carbon.databridge.commons.Event event);
+
+    /**
      * This method registers the events in the EventPublisher which needed to be synced
      *
      * @param eventSync contains the stream id

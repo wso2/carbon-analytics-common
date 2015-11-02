@@ -17,10 +17,23 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
-import com.hazelcast.core.*;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
+import com.hazelcast.core.MemberAttributeEvent;
+import com.hazelcast.core.MembershipEvent;
+import com.hazelcast.core.MembershipListener;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.event.processor.manager.core.*;
-import org.wso2.carbon.event.processor.manager.core.config.*;
+import org.wso2.carbon.event.processor.manager.core.EventManagementService;
+import org.wso2.carbon.event.processor.manager.core.EventProcessorManagementService;
+import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementService;
+import org.wso2.carbon.event.processor.manager.core.EventReceiverManagementService;
+import org.wso2.carbon.event.processor.manager.core.EventSync;
+import org.wso2.carbon.event.processor.manager.core.Manager;
+import org.wso2.carbon.event.processor.manager.core.config.DistributedConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
+import org.wso2.carbon.event.processor.manager.core.config.Mode;
+import org.wso2.carbon.event.processor.manager.core.config.PersistenceConfiguration;
 import org.wso2.carbon.event.processor.manager.core.exception.EventManagementException;
 import org.wso2.carbon.event.processor.manager.core.exception.ManagementConfigurationException;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
@@ -30,7 +43,11 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class CarbonEventManagementService implements EventManagementService {
 
@@ -260,6 +277,15 @@ public class CarbonEventManagementService implements EventManagementService {
 
     @Override
     public void syncEvent(String syncId, Manager.ManagerType type, Event event) {
+        if (type == Manager.ManagerType.Receiver) {
+            receiverEventHandler.syncEvent(syncId, event);
+        } else {
+            presenterEventHandler.syncEvent(syncId, event);
+        }
+    }
+
+    @Override
+    public void syncEvent(String syncId, Manager.ManagerType type, org.wso2.carbon.databridge.commons.Event event) {
         if (type == Manager.ManagerType.Receiver) {
             receiverEventHandler.syncEvent(syncId, event);
         } else {

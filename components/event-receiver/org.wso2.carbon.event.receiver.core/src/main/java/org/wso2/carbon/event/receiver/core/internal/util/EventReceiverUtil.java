@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class EventReceiverUtil {
 
@@ -40,10 +41,10 @@ public class EventReceiverUtil {
 
     static {
         String arch = System.getProperty(JVM_BIT_ARCH_SYSTEM_PROPERTY);
-        if (arch.equals("32")){
+        if (arch.equals("32")) {
             //32-bit architecture
             referenceSize = 4;
-        }else {
+        } else {
             referenceSize = 8;
         }
     }
@@ -241,16 +242,27 @@ public class EventReceiverUtil {
         return -1;
     }
 
-    public static int getSize(Event event){
+    public static int getSize(Event event) {
         int size = 8; // For long timestamp field
         size += getSize(event.getData());
         size += 1; // for expired field
         return size;
     }
 
-    private static int getSize(Object[] objects){
+    public static int getSize(org.wso2.carbon.databridge.commons.Event event) {
+        int size = 8; // For long timestamp field
+        size += getSize(event.getStreamId());
+        size += getSize(event.getMetaData());
+        size += getSize(event.getCorrelationData());
+        size += getSize(event.getPayloadData());
+        size += referenceSize; // for the arbitrary map reference
+        size += getSize(event.getArbitraryDataMap());
+        return size;
+    }
+
+    private static int getSize(Object[] objects) {
         int size = 0;
-        for (Object object : objects){
+        for (Object object : objects) {
             if (object != null) {
                 if (object instanceof Integer) {
                     size += 4;
@@ -271,13 +283,25 @@ public class EventReceiverUtil {
         return size;
     }
 
-    public static int getSize(String value){
+    public static int getSize(String value) {
         int size = 0;
         if (value != null) {
             try {
                 size = value.getBytes("UTF8").length;
             } catch (UnsupportedEncodingException e) {
                 size = value.getBytes().length;
+            }
+        }
+        return size;
+    }
+
+    private static int getSize(Map<String, String> arbitraryDataMap) {
+        int size = 0;
+        if (arbitraryDataMap != null) {
+            for (Map.Entry<String, String> entry : arbitraryDataMap.entrySet()) {
+                size += getSize(entry.getKey());
+                size += getSize(entry.getValue());
+                size += referenceSize * 2; // Two string references for key and value
             }
         }
         return size;

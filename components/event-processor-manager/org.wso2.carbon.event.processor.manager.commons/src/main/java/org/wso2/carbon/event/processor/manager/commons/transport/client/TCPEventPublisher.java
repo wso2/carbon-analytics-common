@@ -129,6 +129,16 @@ public class TCPEventPublisher {
         this.failureHandler = failureHandler;
     }
 
+    /**
+     * Send Events to the remote server. In synchronous mode this method call returns only after writing data to the socket
+     * in asynchronous mode disruptor pattern is used
+     *
+     * @param streamId  ID of the stream
+     * @param timestamp timestamp of the event
+     * @param eventData data to send
+     * @param flush     whether to flush the output stream in synchronous mode
+     * @throws IOException
+     */
     public void sendEvent(String streamId, long timestamp, Object[] eventData, boolean flush) throws IOException {
         sendEvent(streamId, timestamp, eventData, null, flush);
     }

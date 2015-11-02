@@ -20,6 +20,7 @@ package org.wso2.carbon.event.processor.manager.core.internal;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
@@ -93,6 +94,21 @@ public class EventHandler {
                 if (publisher != null) {
                     try {
                         publisher.sendEvent(syncId, event.getTimestamp(), event.getData(), true);
+                    } catch (IOException e) {
+                        log.error("Error sending sync events to " + syncId, e);
+                    }
+                }
+            }
+        }
+    }
+
+    public void syncEvent(String syncId, org.wso2.carbon.databridge.commons.Event event) {
+        if (allowEventSync) {
+            for (TCPEventPublisher publisher : tcpEventPublisherPool.values()) {
+                if (publisher != null) {
+                    try {
+                        Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
+                        publisher.sendEvent(syncId, event.getTimeStamp(), eventData, event.getArbitraryDataMap(), true);
                     } catch (IOException e) {
                         log.error("Error sending sync events to " + syncId, e);
                     }
