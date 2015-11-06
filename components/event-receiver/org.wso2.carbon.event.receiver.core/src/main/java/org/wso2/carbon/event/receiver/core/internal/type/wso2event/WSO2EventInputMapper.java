@@ -48,6 +48,7 @@ public class WSO2EventInputMapper implements InputMapper {
     private StreamDefinition exportedStreamDefinition = null;
     private StreamDefinition importedStreamDefinition = null;
     private Map<InputDataType, int[]> inputDataTypeSpecificPositionMap = null;
+    private boolean arbitraryMapsEnabled = false;
 
     public WSO2EventInputMapper(EventReceiverConfiguration eventReceiverConfiguration,
                                 StreamDefinition exportedStreamDefinition)
@@ -60,6 +61,7 @@ public class WSO2EventInputMapper implements InputMapper {
 
         String fromStreamName = wso2EventInputMapping.getFromEventName();
         String fromStreamVersion = wso2EventInputMapping.getFromEventVersion();
+        this.arbitraryMapsEnabled = wso2EventInputMapping.isArbitraryMapsEnabled();
 
         if (fromStreamName == null || fromStreamVersion == null || (fromStreamName.isEmpty()) || (fromStreamVersion.isEmpty())) {
             importedStreamDefinition = exportedStreamDefinition;
@@ -269,13 +271,17 @@ public class WSO2EventInputMapper implements InputMapper {
     public Object convertToTypedInputEvent(Object obj) throws EventReceiverProcessingException {
         org.wso2.siddhi.core.event.Event event = null;
         if (obj instanceof Event) {
-            event = new org.wso2.siddhi.core.event.Event();
-            Event inputEvent = (Event) obj;
-            Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
-                    , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
-            event.setData(ObjectArrays.concat
-                    (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class));
-            event.setTimestamp(inputEvent.getTimeStamp());
+            if (arbitraryMapsEnabled) {
+                return obj;
+            } else {
+                event = new org.wso2.siddhi.core.event.Event();
+                Event inputEvent = (Event) obj;
+                Object[] metaCorrArray = ObjectArrays.concat(inputEvent.getMetaData() != null ? inputEvent.getMetaData() : new Object[0]
+                        , inputEvent.getCorrelationData() != null ? inputEvent.getCorrelationData() : new Object[0], Object.class);
+                event.setData(ObjectArrays.concat
+                        (metaCorrArray, inputEvent.getPayloadData() != null ? inputEvent.getPayloadData() : new Object[0], Object.class));
+                event.setTimestamp(inputEvent.getTimeStamp());
+            }
         }
         return event;
     }
@@ -301,7 +307,7 @@ public class WSO2EventInputMapper implements InputMapper {
                 Object attributeObj = EventReceiverUtil.getConvertedAttributeObject(value, metaAttribute.getType());
                 metaData[i] = attributeObj;
             } else {
-                metaData[i] = inEvent.getMetaData()[i] != null ? inEvent.getMetaData()[i] : null;
+                metaData[i] = inEvent.getMetaData()[i];
             }
         }
         for (int i = 0; i < correlationData.length; i++) {
@@ -312,7 +318,7 @@ public class WSO2EventInputMapper implements InputMapper {
                 Object attributeObj = EventReceiverUtil.getConvertedAttributeObject(value, correlationAttribute.getType());
                 correlationData[i] = attributeObj;
             } else {
-                correlationData[i] = inEvent.getCorrelationData()[i] != null ? inEvent.getCorrelationData()[i] : null;
+                correlationData[i] = inEvent.getCorrelationData()[i];
             }
         }
         for (int i = 0; i < payloadData.length; i++) {
@@ -323,7 +329,7 @@ public class WSO2EventInputMapper implements InputMapper {
                 Object attributeObj = EventReceiverUtil.getConvertedAttributeObject(value, payloadAttribute.getType());
                 payloadData[i] = attributeObj;
             } else {
-                payloadData[i] = inEvent.getPayloadData()[i] != null ? inEvent.getPayloadData()[i] : null;
+                payloadData[i] = inEvent.getPayloadData()[i];
             }
         }
         int indexCount = 0;

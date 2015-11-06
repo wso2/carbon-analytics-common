@@ -66,6 +66,7 @@ public class EventReceiver implements EventProducer {
     private String afterTracerPrefix;
     private AbstractInputEventDispatcher inputEventDispatcher;
     private Mode mode;
+    private boolean arbitraryMapsEnabled = false;
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
                          StreamDefinition exportedStreamDefinition, Mode mode)
@@ -237,6 +238,8 @@ public class EventReceiver implements EventProducer {
                                 sendEvent(event);
                             }
                         }
+                    } else if (convertedEvent instanceof org.wso2.carbon.databridge.commons.Event) {
+                        sendEvent((org.wso2.carbon.databridge.commons.Event) convertedEvent);
                     } else {
                         sendEvent((Event) convertedEvent);
                     }
