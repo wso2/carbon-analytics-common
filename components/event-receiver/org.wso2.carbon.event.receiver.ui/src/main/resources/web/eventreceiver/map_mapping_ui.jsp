@@ -62,10 +62,16 @@
                             <input type="text" id="inputMapPropValueOf_<%=counter%>"
                                    value="<%=attributeDataValues[0]%>" readonly="true"/>
                         </td>
-                        <td><fmt:message key="event.receiver.property.type"/>:
-
+                        <td class="col-small"><fmt:message
+                                key="event.receiver.property.type"/>:</td>
+                        <td>
                             <input type="text" id="inputMapPropType_<%=counter%>"
                                    value="<%=attributeDataValues[1]%>" readonly="true"/>
+                        </td>
+                        <td class="col-small"><fmt:message
+                                key="event.receiver.property.default"/>:</td>
+                        <td>
+                            <input type="text" id="inputMapDefaultValue_<%=counter%>"/>
                         </td>
                     </tr>
                     <% counter++;
