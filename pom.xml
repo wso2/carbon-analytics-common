@@ -28,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>5.0.3</version>
+    <version>5.0.7-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -947,6 +947,16 @@
                 <artifactId>org.wso2.carbon.analytics.common.jmx.agent.stub</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xerces.xercesImpl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.smslib</groupId>
+                <artifactId>smslib</artifactId>
+                <version>${org.smslib.version}</version>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1071,7 +1081,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>v5.0.3-RC3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <pluginRepositories>
@@ -1152,21 +1162,32 @@
             <url>http://repo.marketcetera.org/maven/</url>
         </repository>
 
+        <repository>
+            <id>smslib.releases</id>
+            <name>smslib Repository</name>
+            <url>http://smslib.org/maven2/v3/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.0.3</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.0.7-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.4.1</carbon.kernel.version>
+        <carbon.kernel.version>4.4.2</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
 
-        <carbon.commons.version>4.4.7</carbon.commons.version>
+        <carbon.commons.version>4.4.8</carbon.commons.version>
         <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.0.2</siddhi.version>
+        <siddhi.version>3.0.4-SNAPSHOT</siddhi.version>
 
         <orbit.version.json>1.0.0.wso2v1</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
@@ -1206,6 +1227,7 @@
         <google.guava.version>15.0</google.guava.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
+        <xerces.xercesImpl.version>2.11.0</xerces.xercesImpl.version>
 
         <httpclient.httpcomponents.wso2.version>4.3.1.wso2v2</httpclient.httpcomponents.wso2.version>
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>
@@ -1220,7 +1242,7 @@
         <!-- Spark dependency versions start-->
         <spark.version>1.4.1.wso2v1</spark.version>
         <spark.imp.pkg.version>[1.4.1,1.5.0)</spark.imp.pkg.version>
-        <hadoop.client.version>2.6.0.wso2v1</hadoop.client.version>
+        <hadoop.client.version>2.6.0.wso2v2</hadoop.client.version>
         <json4s.jackson.version>3.2.10.wso2v1</json4s.jackson.version>
         <twitter.chill.version>0.5.0.wso2v1</twitter.chill.version>
         <clearspring.analytics.stream.version>2.2.0.wso2v1</clearspring.analytics.stream.version>
@@ -1256,6 +1278,7 @@
         <!-- Spark dependency versions end-->
 
         <wsdl4j.wso2.version>1.6.2.wso2v2</wsdl4j.wso2.version>
+        <org.smslib.version>3.4.5</org.smslib.version>
     </properties>
 
 </project>
