@@ -20,13 +20,13 @@ package org.wso2.carbon.event.receiver.core.internal.util;
 
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
 import org.wso2.carbon.event.receiver.core.config.InputMapping;
 import org.wso2.carbon.event.receiver.core.config.InputMappingAttribute;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
-import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -244,13 +244,6 @@ public class EventReceiverUtil {
 
     public static int getSize(Event event) {
         int size = 8; // For long timestamp field
-        size += getSize(event.getData());
-        size += 1; // for expired field
-        return size;
-    }
-
-    public static int getSize(org.wso2.carbon.databridge.commons.Event event) {
-        int size = 8; // For long timestamp field
         size += getSize(event.getStreamId());
         if (event.getMetaData() != null) {
             size += getSize(event.getMetaData());
@@ -322,5 +315,21 @@ public class EventReceiverUtil {
             }
         }
         return null;
+    }
+
+    public static Event getEventFromArray(Object[] outObjArray, StreamDefinition outStreamDefinition, Object[] metaDataArray, Object[] correlationDataArray, Object[] payloadDataArray) {
+        int attributeCount = 0;
+        int metaDataCount = metaDataArray.length;
+        int correlationDataCount = correlationDataArray.length;
+        for (Object attributeObject : outObjArray) {
+            if (attributeCount < metaDataCount) {
+                metaDataArray[attributeCount++] = attributeObject;
+            } else if (attributeCount < (metaDataCount + correlationDataCount)) {
+                correlationDataArray[attributeCount++ - metaDataCount] = attributeObject;
+            } else {
+                payloadDataArray[attributeCount++ - (metaDataCount + correlationDataCount)] = attributeObject;
+            }
+        }
+        return new Event(outStreamDefinition.getStreamId(), System.currentTimeMillis(), metaDataArray, correlationDataArray, payloadDataArray);
     }
 }

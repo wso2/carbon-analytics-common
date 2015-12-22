@@ -47,7 +47,7 @@ public class TCPEventServer {
     private StreamCallback streamCallback;
     private ConnectionCallback connectionCallback;
     private ServerWorker serverWorker;
-    private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<String, StreamRuntimeInfo>();
+    private Map<String, StreamRuntimeInfo> streamRuntimeInfoMap = new ConcurrentHashMap<>();
 
     public TCPEventServer(TCPEventServerConfig tcpeventserverconfig, StreamCallback streamCallback, ConnectionCallback connectionCallback) {
         this.tcpEventServerConfig = tcpeventserverconfig;
@@ -230,6 +230,7 @@ public class TCPEventServer {
                                 arbitraryMap.put(new String(keyStringData), new String(valueStringData));
                             }
                         }
+
                         streamCallback.receive(streamId, timestamp, eventData, arbitraryMap);
                     }
                 } catch (EOFException e) {
@@ -277,7 +278,6 @@ public class TCPEventServer {
                     }
                 }
             }
-
         }
     }
 }

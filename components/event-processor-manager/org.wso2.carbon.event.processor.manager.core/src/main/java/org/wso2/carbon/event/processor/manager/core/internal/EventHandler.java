@@ -23,15 +23,16 @@ import com.hazelcast.core.Member;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisherConfig;
 import org.wso2.carbon.event.processor.manager.commons.transport.server.StreamCallback;
 import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEventServer;
 import org.wso2.carbon.event.processor.manager.commons.transport.server.TCPEventServerConfig;
 import org.wso2.carbon.event.processor.manager.commons.utils.HostAndPort;
+import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
-import org.wso2.siddhi.core.event.Event;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -93,20 +94,6 @@ public class EventHandler {
             for (TCPEventPublisher publisher : tcpEventPublisherPool.values()) {
                 if (publisher != null) {
                     try {
-                        publisher.sendEvent(syncId, event.getTimestamp(), event.getData(), true);
-                    } catch (IOException e) {
-                        log.error("Error sending sync events to " + syncId, e);
-                    }
-                }
-            }
-        }
-    }
-
-    public void syncEvent(String syncId, org.wso2.carbon.databridge.commons.Event event) {
-        if (allowEventSync) {
-            for (TCPEventPublisher publisher : tcpEventPublisherPool.values()) {
-                if (publisher != null) {
-                    try {
                         Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
                         publisher.sendEvent(syncId, event.getTimeStamp(), eventData, event.getArbitraryDataMap(), true);
                     } catch (IOException e) {
@@ -118,12 +105,14 @@ public class EventHandler {
     }
 
     public void registerEventSync(EventSync eventSync) {
-        eventSyncMap.putIfAbsent(eventSync.getStreamDefinition().getId(), eventSync);
+        eventSyncMap.putIfAbsent(eventSync.getStreamDefinition().getStreamId(), eventSync);
         for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
-            tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
+            tcpEventPublisher.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+                    eventSync.getStreamDefinition()));
         }
         if (tcpEventServer != null) {
-            tcpEventServer.addStreamDefinition(eventSync.getStreamDefinition());
+            tcpEventServer.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+                    eventSync.getStreamDefinition()));
         }
     }
 
@@ -131,10 +120,11 @@ public class EventHandler {
         EventSync eventSync = eventSyncMap.remove(syncId);
         if (eventSync != null) {
             for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
-                tcpEventPublisher.removeStreamDefinition(eventSync.getStreamDefinition());
+                tcpEventPublisher.removeStreamDefinition(EventManagementUtil.constructStreamDefinition(
+                        eventSync.getStreamDefinition().getStreamId(), eventSync.getStreamDefinition()));
             }
             if (tcpEventServer != null) {
-                tcpEventServer.removeStreamDefinition(eventSync.getStreamDefinition().getId());
+                tcpEventServer.removeStreamDefinition(eventSync.getStreamDefinition().getStreamId());
             }
         }
     }
@@ -144,7 +134,7 @@ public class EventHandler {
             TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig(member.getHostName(), member.getPort());
             tcpEventServer = new TCPEventServer(tcpEventServerConfig, new StreamCallback() {
                 @Override
-                public void receive(String streamId, long timestamp, Object[] data, Map<String, String> arbitraryDataMap) {
+                public void receive(String streamId, long timestamp, Object[] event, Map<String, String> arbitraryMapData) {
                     int index = streamId.indexOf("/");
                     if (index != -1) {
                         int tenantId = Integer.parseInt(streamId.substring(0, index));
@@ -159,7 +149,7 @@ public class EventHandler {
                                 log.debug("Event Received to :" + streamId);
                             }
                             if (eventSync != null) {
-                                eventSync.process(new Event(timestamp, data));
+                                eventSync.process(EventManagementUtil.getWso2Event(eventSync.getStreamDefinition(), timestamp, event));
                             }
 
                         } catch (Exception e) {
@@ -171,7 +161,8 @@ public class EventHandler {
                 }
             }, null);
             for (EventSync eventSync : eventSyncMap.values()) {
-                tcpEventServer.addStreamDefinition(eventSync.getStreamDefinition());
+                tcpEventServer.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+                        eventSync.getStreamDefinition()));
             }
             try {
                 tcpEventServer.start();
@@ -209,7 +200,8 @@ public class EventHandler {
                 TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(),
                         localEventPublisherConfiguration, false, null);
                 for (EventSync eventSync : eventSyncMap.values()) {
-                    tcpEventPublisher.addStreamDefinition(eventSync.getStreamDefinition());
+                    tcpEventPublisher.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+                            eventSync.getStreamDefinition()));
                 }
                 tcpEventPublisherPool.putIfAbsent(member, tcpEventPublisher);
                 log.info("CEP sync publisher initiated to Member '" + member.getHostName() + ":" + member.getPort() + "'");

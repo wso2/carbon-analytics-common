@@ -16,8 +16,8 @@
 
 package org.wso2.carbon.event.processor.manager.core;
 
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
-import org.wso2.siddhi.core.event.Event;
 
 public interface EventManagementService {
 
@@ -55,20 +55,10 @@ public interface EventManagementService {
     void syncEvent(String syncId, Manager.ManagerType type, Event event);
 
     /**
-     * This method syncs a particular event with the other node. Depending on the node type and address, the events
-     * will be sent
-     *
-     * @param syncId stream id for which StreamRuntimeInfo needed in the StreamRuntimeInfo map
-     * @param type   syncing event type
-     * @param event  the event which is syncing with the other node
-     */
-    void syncEvent(String syncId, Manager.ManagerType type, org.wso2.carbon.databridge.commons.Event event);
-
-    /**
      * This method registers the events in the EventPublisher which needed to be synced
      *
      * @param eventSync contains the stream id
-     * @param type
+     * @param type the manager type {Receiver, Processor, Publisher}
      */
     void registerEventSync(EventSync eventSync, Manager.ManagerType type);
 
@@ -76,7 +66,7 @@ public interface EventManagementService {
      * This method unregisters the events in the EventPublisher which scheduled to be synced
      *
      * @param syncId id of the events to be synced by the EventPublisher
-     * @param type
+     * @param type the manager type {Receiver, Processor, Publisher}
      */
     void unregisterEventSync(String syncId, Manager.ManagerType type);
 

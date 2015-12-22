@@ -23,9 +23,11 @@ import java.util.Map;
 public interface StreamCallback {
 
     /**
-     *  @param streamId the stream id for the incoming event
-     * @param timestamp
-     * @param event the event as an object array of attributes
+     * @param streamId         the stream id for the incoming event
+     * @param timestamp        the timestamp of the event
+     * @param event            the event as an object array of attributes
+     * @param arbitraryMapData the arbitraryMap attributes
      */
-    public void receive(String streamId, long timestamp, Object[] event, Map<String, String> arbitraryMapData);
+    void receive(String streamId, long timestamp, Object[] event, Map<String, String> arbitraryMapData);
+
 }

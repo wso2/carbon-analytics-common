@@ -23,6 +23,7 @@ import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.processor.manager.core.EventProcessorManagementService;
 import org.wso2.carbon.event.processor.manager.core.EventPublisherManagementService;
@@ -40,7 +41,6 @@ import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementS
 import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
 import org.wso2.carbon.event.processor.manager.core.internal.util.ManagementModeConfigurationLoader;
 import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -125,15 +125,15 @@ public class CarbonEventManagementService implements EventManagementService {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             if (isWorkerNode) {
                 receiverEventHandler.init(ConfigurationConstants.RECEIVERS, haConfiguration.getEventSyncConfig(),
-                                          haConfiguration.constructEventSyncPublisherConfig(), isWorkerNode);
-                haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler,presenterEventHandler);
+                        haConfiguration.constructEventSyncPublisherConfig(), isWorkerNode);
+                haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler, presenterEventHandler);
                 haManager.init();
                 if (haEventPublisherTimeSyncMap == null) {
                     haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance().getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
                 }
             }
             presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(),
-                                       haConfiguration.constructPresenterPublisherConfig(), isPresenterNode && !isWorkerNode);
+                    haConfiguration.constructPresenterPublisherConfig(), isPresenterNode && !isWorkerNode);
             checkMemberUpdate();
         } else if (mode == Mode.Distributed) {
             if (stormReceiverCoordinator != null) {
@@ -271,21 +271,12 @@ public class CarbonEventManagementService implements EventManagementService {
         } else if (manager.getType() == Manager.ManagerType.Receiver) {
             this.receiverManager = null;
         } else if (manager.getType() == Manager.ManagerType.Publisher) {
-            this.publisherManager.remove((EventPublisherManagementService)manager);
+            this.publisherManager.remove(manager);
         }
     }
 
     @Override
     public void syncEvent(String syncId, Manager.ManagerType type, Event event) {
-        if (type == Manager.ManagerType.Receiver) {
-            receiverEventHandler.syncEvent(syncId, event);
-        } else {
-            presenterEventHandler.syncEvent(syncId, event);
-        }
-    }
-
-    @Override
-    public void syncEvent(String syncId, Manager.ManagerType type, org.wso2.carbon.databridge.commons.Event event) {
         if (type == Manager.ManagerType.Receiver) {
             receiverEventHandler.syncEvent(syncId, event);
         } else {

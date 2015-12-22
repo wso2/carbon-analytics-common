@@ -18,17 +18,12 @@
 
 package org.wso2.carbon.event.receiver.core.internal.management;
 
-import org.wso2.siddhi.core.event.Event;
+import org.wso2.carbon.databridge.commons.Event;
 
 public class InputEventDispatcher extends AbstractInputEventDispatcher {
 
     @Override
     public void onEvent(Event event) {
-        callBack.sendEvent(event);
-    }
-
-    @Override
-    public void onEvent(org.wso2.carbon.databridge.commons.Event event) {
         callBack.sendEvent(event);
     }
 

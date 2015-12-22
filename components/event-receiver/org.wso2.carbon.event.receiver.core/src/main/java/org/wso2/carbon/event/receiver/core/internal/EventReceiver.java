@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
@@ -44,7 +45,6 @@ import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverCon
 import org.wso2.carbon.event.statistics.EventStatisticsMonitor;
 import org.wso2.carbon.event.stream.core.EventProducer;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -142,7 +142,7 @@ public class EventReceiver implements EventProducer {
                 inputEventDispatcher = new QueueInputEventDispatcher(tenantId,
                         EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(),
                                 Manager.ManagerType.Receiver), readLock, exportedStreamDefinition,
-                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize(), arbitraryMapsEnabled);
+                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize());
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
                 EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
             } else {
@@ -242,8 +242,6 @@ public class EventReceiver implements EventProducer {
                                 sendEvent(event);
                             }
                         }
-                    } else if (convertedEvent instanceof org.wso2.carbon.databridge.commons.Event) {
-                        sendEvent((org.wso2.carbon.databridge.commons.Event) convertedEvent);
                     } else {
                         sendEvent((Event) convertedEvent);
                     }
@@ -255,20 +253,6 @@ public class EventReceiver implements EventProducer {
     }
 
     protected void sendEvent(Event event) {
-        if (traceEnabled) {
-            trace.info(afterTracerPrefix + event);
-        }
-        if (statisticsEnabled) {
-            statisticsMonitor.incrementRequest();
-        }
-        //in distributed mode if events are duplicated in cluster, send event only if the node is receiver coordinator. Also do not send if this is a manager node.
-        if (sufficientToSend || EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().isReceiverCoordinator()) {
-            this.inputEventDispatcher.onEvent(event);
-        }
-
-    }
-
-    protected void sendEvent(org.wso2.carbon.databridge.commons.Event event) {
         if (traceEnabled) {
             trace.info(afterTracerPrefix + event);
         }
@@ -317,7 +301,8 @@ public class EventReceiver implements EventProducer {
     public void destroy() {
         EventReceiverServiceValueHolder.getInputEventAdapterService().destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
         if (mode == Mode.HA && inputEventDispatcher instanceof EventSync) {
-            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(((EventSync) inputEventDispatcher).getStreamDefinition().getId(), Manager.ManagerType.Receiver);
+            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(
+                    ((EventSync) inputEventDispatcher).getStreamDefinition().getStreamId(), Manager.ManagerType.Receiver);
         }
     }
 

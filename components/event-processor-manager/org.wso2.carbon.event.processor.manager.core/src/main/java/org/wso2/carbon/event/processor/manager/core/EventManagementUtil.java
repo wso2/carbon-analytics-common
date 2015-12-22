@@ -16,6 +16,7 @@
 package org.wso2.carbon.event.processor.manager.core;
 
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.processor.manager.core.internal.util.ConfigurationConstants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -36,7 +37,7 @@ public class EventManagementUtil {
         org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = new org.wso2.siddhi.query.api.definition.StreamDefinition();
         streamDefinition.setId(syncId);
 
-        List<Attribute> attributes = new ArrayList<Attribute>();
+        List<Attribute> attributes = new ArrayList<>();
         if (inStreamDefinition.getMetaData() != null) {
             for (Attribute attr : inStreamDefinition.getMetaData()) {
                 attributes.add(new Attribute(ConfigurationConstants.PROPERTY_META_PREFIX + attr.getName(), attr.getType()));
@@ -54,5 +55,32 @@ public class EventManagementUtil {
             streamDefinition.attribute(attr.getName(), org.wso2.siddhi.query.api.definition.Attribute.Type.valueOf(attr.getType().toString()));
         }
         return streamDefinition;
+    }
+
+    public static org.wso2.carbon.databridge.commons.StreamDefinition constructDatabridgeStreamDefinition(String syncId, org.wso2.carbon.databridge.commons.StreamDefinition inStreamDefinition) {
+        org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition = new org.wso2.carbon.databridge.commons.StreamDefinition(syncId);
+        streamDefinition.setMetaData(inStreamDefinition.getMetaData());
+        streamDefinition.setCorrelationData(inStreamDefinition.getCorrelationData());
+        streamDefinition.setPayloadData(inStreamDefinition.getPayloadData());
+        return streamDefinition;
+    }
+
+    public static Event getWso2Event(org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition, long timestamp, Object[] data) {
+        int metaAttrCount = streamDefinition.getMetaData() != null ? streamDefinition.getMetaData().size() : 0;
+        int correlationAttrCount = streamDefinition.getCorrelationData() != null ? streamDefinition.getCorrelationData().size() : 0;
+        int payloadAttrCount = streamDefinition.getPayloadData() != null ? streamDefinition.getPayloadData().size() : 0;
+        Object[] metaAttrArray = new Object[metaAttrCount];
+        Object[] correlationAttrArray = new Object[correlationAttrCount];
+        Object[] payloadAttrArray = new Object[payloadAttrCount];
+        for (int i = 0; i < data.length; i++) {
+            if (i < metaAttrCount) {
+                metaAttrArray[i] = data[i];
+            } else if (i < metaAttrCount + correlationAttrCount) {
+                correlationAttrArray[i - metaAttrCount] = data[i];
+            } else {
+                payloadAttrArray[i - (metaAttrCount + correlationAttrCount)] = data[i];
+            }
+        }
+        return new Event(streamDefinition.getStreamId(), timestamp, metaAttrArray, correlationAttrArray, payloadAttrArray);
     }
 }
