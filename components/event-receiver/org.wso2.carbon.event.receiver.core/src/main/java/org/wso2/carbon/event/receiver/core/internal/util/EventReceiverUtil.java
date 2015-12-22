@@ -252,11 +252,19 @@ public class EventReceiverUtil {
     public static int getSize(org.wso2.carbon.databridge.commons.Event event) {
         int size = 8; // For long timestamp field
         size += getSize(event.getStreamId());
-        size += getSize(event.getMetaData());
-        size += getSize(event.getCorrelationData());
-        size += getSize(event.getPayloadData());
+        if (event.getMetaData() != null) {
+            size += getSize(event.getMetaData());
+        }
+        if (event.getCorrelationData() != null) {
+            size += getSize(event.getCorrelationData());
+        }
+        if (event.getPayloadData() != null) {
+            size += getSize(event.getPayloadData());
+        }
         size += referenceSize; // for the arbitrary map reference
-        size += getSize(event.getArbitraryDataMap());
+        if (event.getArbitraryDataMap() != null) {
+            size += getSize(event.getArbitraryDataMap());
+        }
         return size;
     }
 

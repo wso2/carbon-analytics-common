@@ -32,6 +32,7 @@ import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
+import org.wso2.carbon.event.receiver.core.config.mapping.WSO2EventInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
@@ -78,6 +79,9 @@ public class EventReceiver implements EventProducer {
             this.traceEnabled = eventReceiverConfiguration.isTraceEnabled();
             this.statisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled();
             this.customMappingEnabled = eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled();
+            if (eventReceiverConfiguration.getInputMapping() instanceof WSO2EventInputMapping) {
+                this.arbitraryMapsEnabled = ((WSO2EventInputMapping) eventReceiverConfiguration.getInputMapping()).isArbitraryMapsEnabled();
+            }
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
             this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType).constructInputMapper(this.eventReceiverConfiguration, exportedStreamDefinition);
 
@@ -121,7 +125,7 @@ public class EventReceiver implements EventProducer {
 
 
                 DistributedConfiguration distributedConfiguration = EventReceiverServiceValueHolder.getEventManagementService().getManagementModeInfo().getDistributedConfiguration();
-                if(distributedConfiguration != null){
+                if (distributedConfiguration != null) {
                     this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
                 sufficientToSend = mode != Mode.Distributed || (isWorkerNode && !isEventDuplicatedInCluster);
@@ -138,7 +142,7 @@ public class EventReceiver implements EventProducer {
                 inputEventDispatcher = new QueueInputEventDispatcher(tenantId,
                         EventManagementUtil.constructEventSyncId(tenantId, eventReceiverConfiguration.getEventReceiverName(),
                                 Manager.ManagerType.Receiver), readLock, exportedStreamDefinition,
-                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize(), true);
+                        haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(), haConfiguration.getEventSyncReceiverQueueSize(), arbitraryMapsEnabled);
                 inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
                 EventReceiverServiceValueHolder.getEventManagementService().registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
             } else {

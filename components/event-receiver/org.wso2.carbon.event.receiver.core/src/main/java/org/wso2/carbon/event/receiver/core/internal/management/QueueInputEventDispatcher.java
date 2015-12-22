@@ -28,7 +28,6 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
@@ -45,6 +44,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private int tenantId;
     private ReentrantLock threadBarrier = new ReentrantLock();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private boolean arbitraryMapsEnabled = false;
 
     public QueueInputEventDispatcher(int tenantId, String syncId, Lock readLock,
                                      org.wso2.carbon.databridge.commons.StreamDefinition exportedStreamDefinition,
@@ -52,6 +52,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         this.readLock = readLock;
         this.tenantId = tenantId;
         this.syncId = syncId;
+        this.arbitraryMapsEnabled = arbitraryMapsEnabled;
         if (!arbitraryMapsEnabled) {
             this.eventQueue = new BlockingEventQueue(eventQueueSizeMb, eventSyncQueueSize);
             this.wso2EventQueue = null;
@@ -60,7 +61,11 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
             this.wso2EventQueue = new BlockingWso2EventQueue(eventQueueSizeMb, eventSyncQueueSize);
         }
         this.streamDefinition = EventManagementUtil.constructStreamDefinition(syncId, exportedStreamDefinition);
-        executorService.submit(new QueueInputEventDispatcherWorker());
+        if (!arbitraryMapsEnabled) {
+            executorService.submit(new QueueInputEventDispatcherWorker());
+        } else {
+            executorService.submit(new QueueInputWso2EventDispatcherWorker());
+        }
     }
 
     @Override
@@ -93,19 +98,35 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     @Override
     public byte[] getState() {
         threadBarrier.lock();
-        byte[] state = ByteSerializer.OToB(eventQueue);
+        byte[] state;
+        if (!arbitraryMapsEnabled) {
+            state = ByteSerializer.OToB(eventQueue);
+        } else {
+            state = ByteSerializer.OToB(wso2EventQueue);
+        }
         threadBarrier.unlock();
         return state;
     }
 
     @Override
     public void syncState(byte[] bytes) {
-        BlockingQueue<Event> events = (BlockingQueue<Event>) ByteSerializer.BToO(bytes);
-        for (Event event : events) {
-            if (event.equals(eventQueue.peek())) {
-                eventQueue.poll();
-            } else {
-                break;
+        if (!arbitraryMapsEnabled) {
+            BlockingEventQueue events = (BlockingEventQueue) ByteSerializer.BToO(bytes);
+            while (events.peek() != null) {
+                if (events.poll().equals(eventQueue.peek())) {
+                    eventQueue.poll();
+                } else {
+                    break;
+                }
+            }
+        } else {
+            BlockingWso2EventQueue events = (BlockingWso2EventQueue) ByteSerializer.BToO(bytes);
+            while (events.peek() != null) {
+                if (events.poll().equals(wso2EventQueue.peek())) {
+                    wso2EventQueue.poll();
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -122,19 +143,8 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         return streamDefinition;
     }
 
-    class QueueInputEventDispatcherWorker implements Runnable {
+    private class QueueInputEventDispatcherWorker implements Runnable {
 
-        /**
-         * When an object implementing interface <code>Runnable</code> is used
-         * to create a thread, starting the thread causes the object's
-         * <code>run</code> method to be called in that separately executing
-         * thread.
-         * <p/>
-         * The general contract of the method <code>run</code> is that it may
-         * take any action whatsoever.
-         *
-         * @see Thread#run()
-         */
         @Override
         public void run() {
             try {
@@ -157,26 +167,15 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                     }
                 }
             } catch (Exception e) {
-                log.error("Error in dispatching events.");
+                log.error("Error in dispatching events:" + e.getMessage(), e);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
     }
 
-    class QueueInputWso2EventDispatcherWorker implements Runnable {
+    private class QueueInputWso2EventDispatcherWorker implements Runnable {
 
-        /**
-         * When an object implementing interface <code>Runnable</code> is used
-         * to create a thread, starting the thread causes the object's
-         * <code>run</code> method to be called in that separately executing
-         * thread.
-         * <p/>
-         * The general contract of the method <code>run</code> is that it may
-         * take any action whatsoever.
-         *
-         * @see Thread#run()
-         */
         @Override
         public void run() {
             try {
@@ -199,7 +198,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                     }
                 }
             } catch (Exception e) {
-                log.error("Error in dispatching events.");
+                log.error("Error in dispatching events:" + e.getMessage(), e);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
