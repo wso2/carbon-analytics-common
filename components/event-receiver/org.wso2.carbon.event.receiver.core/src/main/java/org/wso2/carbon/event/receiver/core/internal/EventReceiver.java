@@ -33,7 +33,6 @@ import org.wso2.carbon.event.processor.manager.core.config.Mode;
 import org.wso2.carbon.event.receiver.core.InputMapper;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConfiguration;
 import org.wso2.carbon.event.receiver.core.config.EventReceiverConstants;
-import org.wso2.carbon.event.receiver.core.config.mapping.WSO2EventInputMapping;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverProcessingException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
@@ -67,7 +66,6 @@ public class EventReceiver implements EventProducer {
     private String afterTracerPrefix;
     private AbstractInputEventDispatcher inputEventDispatcher;
     private Mode mode;
-    private boolean arbitraryMapsEnabled = false;
 
     public EventReceiver(EventReceiverConfiguration eventReceiverConfiguration,
                          StreamDefinition exportedStreamDefinition, Mode mode)
@@ -79,9 +77,6 @@ public class EventReceiver implements EventProducer {
             this.traceEnabled = eventReceiverConfiguration.isTraceEnabled();
             this.statisticsEnabled = eventReceiverConfiguration.isStatisticsEnabled();
             this.customMappingEnabled = eventReceiverConfiguration.getInputMapping().isCustomMappingEnabled();
-            if (eventReceiverConfiguration.getInputMapping() instanceof WSO2EventInputMapping) {
-                this.arbitraryMapsEnabled = ((WSO2EventInputMapping) eventReceiverConfiguration.getInputMapping()).isArbitraryMapsEnabled();
-            }
             String mappingType = this.eventReceiverConfiguration.getInputMapping().getMappingType();
             this.inputMapper = EventReceiverServiceValueHolder.getMappingFactoryMap().get(mappingType).constructInputMapper(this.eventReceiverConfiguration, exportedStreamDefinition);
 
@@ -155,9 +150,11 @@ public class EventReceiver implements EventProducer {
         }
     }
 
+/*
     public int getTenantId() {
         return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
+*/
 
     /**
      * Returns the stream definition that is exported by this event receiver.
@@ -270,6 +267,7 @@ public class EventReceiver implements EventProducer {
         return inputEventDispatcher;
     }
 
+/*
     protected void defineEventStream(Object definition) throws EventReceiverConfigurationException {
         if (log.isDebugEnabled()) {
             log.debug("EventReceiver: " + eventReceiverConfiguration.getEventReceiverName() + ", notifying event definition addition :" + definition.toString());
@@ -287,6 +285,7 @@ public class EventReceiver implements EventProducer {
         }
         this.inputMapper = null;
     }
+*/
 
     @Override
     public String getStreamId() {

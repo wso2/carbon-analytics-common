@@ -69,7 +69,7 @@ public class BlockingEventQueue {
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("current queue size in bytes : " + currentSize + ", remaining capacity : " +
+            log.debug("Current queue size in bytes : " + currentSize + ", remaining capacity : " +
                     this.queue.remainingCapacity());
         }
 
