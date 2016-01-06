@@ -105,13 +105,15 @@ public class EventHandler {
     }
 
     public void registerEventSync(EventSync eventSync) {
-        eventSyncMap.putIfAbsent(eventSync.getStreamDefinition().getStreamId(), eventSync);
+        eventSyncMap.putIfAbsent(EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()), eventSync);
         for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
-            tcpEventPublisher.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+            tcpEventPublisher.addStreamDefinition(EventManagementUtil.constructStreamDefinition(
+                    EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()),
                     eventSync.getStreamDefinition()));
         }
         if (tcpEventServer != null) {
-            tcpEventServer.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+            tcpEventServer.addStreamDefinition(EventManagementUtil.constructStreamDefinition(
+                    EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()),
                     eventSync.getStreamDefinition()));
         }
     }
@@ -121,10 +123,11 @@ public class EventHandler {
         if (eventSync != null) {
             for (TCPEventPublisher tcpEventPublisher : tcpEventPublisherPool.values()) {
                 tcpEventPublisher.removeStreamDefinition(EventManagementUtil.constructStreamDefinition(
-                        eventSync.getStreamDefinition().getStreamId(), eventSync.getStreamDefinition()));
+                        EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()),
+                        eventSync.getStreamDefinition()));
             }
             if (tcpEventServer != null) {
-                tcpEventServer.removeStreamDefinition(eventSync.getStreamDefinition().getStreamId());
+                tcpEventServer.removeStreamDefinition(EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()));
             }
         }
     }
@@ -161,7 +164,8 @@ public class EventHandler {
                 }
             }, null);
             for (EventSync eventSync : eventSyncMap.values()) {
-                tcpEventServer.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+                tcpEventServer.addStreamDefinition(EventManagementUtil.constructStreamDefinition(
+                        EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()),
                         eventSync.getStreamDefinition()));
             }
             try {
@@ -200,7 +204,8 @@ public class EventHandler {
                 TCPEventPublisher tcpEventPublisher = new TCPEventPublisher(member.getHostName() + ":" + member.getPort(),
                         localEventPublisherConfiguration, false, null);
                 for (EventSync eventSync : eventSyncMap.values()) {
-                    tcpEventPublisher.addStreamDefinition(EventManagementUtil.constructStreamDefinition(eventSync.getStreamDefinition().getStreamId(),
+                    tcpEventPublisher.addStreamDefinition(EventManagementUtil.constructStreamDefinition(
+                            EventManagementUtil.getSyncIdFromDatabridgeStream(eventSync.getStreamDefinition()),
                             eventSync.getStreamDefinition()));
                 }
                 tcpEventPublisherPool.putIfAbsent(member, tcpEventPublisher);

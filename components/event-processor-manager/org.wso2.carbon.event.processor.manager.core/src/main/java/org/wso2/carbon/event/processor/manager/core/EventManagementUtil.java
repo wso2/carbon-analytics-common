@@ -32,6 +32,16 @@ public class EventManagementUtil {
         return tenantId + "/" + type + "/" + name;
     }
 
+    public static String getSyncIdFromDatabridgeStream(org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition) {
+        String streamId = streamDefinition.getStreamId();
+        String[] streamIdComponents = streamId.split(":");
+        if (streamIdComponents.length > 1) {
+            return streamIdComponents[0];
+        }
+
+        return streamId;
+    }
+
     public static StreamDefinition constructStreamDefinition(String syncId, org.wso2.carbon.databridge.commons.StreamDefinition inStreamDefinition) {
 
         org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = new org.wso2.siddhi.query.api.definition.StreamDefinition();
