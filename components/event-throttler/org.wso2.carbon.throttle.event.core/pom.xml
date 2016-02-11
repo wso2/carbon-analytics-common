@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon.throttle</groupId>
+    <artifactId>org.wso2.carbon.throttle.event.core</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - Event Throttler Core</name>
+
+    <parent>
+        <artifactId>event-throttler</artifactId>
+        <groupId>org.wso2.carbon.throttle</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.databridge.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.databridge.agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
+        </dependency>
+    </dependencies>
+
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>1.7.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Private-Package>
+                            org.wso2.carbon.throttle.event.core.internal,
+                            org.wso2.carbon.throttle.event.core.internal.*
+                        </Private-Package>
+                        <Export-Package>
+                            !org.wso2.carbon.throttle.event.core.internal,
+                            !org.wso2.carbon.throttle.event.core.internal.*,
+                            org.wso2.carbon.throttle.event.*
+                        </Export-Package>
+                        <Import-Package>
+                            org.wso2.carbon.databridge.core,
+                            org.wso2.carbon.databridge.receiver.binary.*,
+                            org.wso2.carbon.databridge.agent,
+                            org.wso2.carbon.databridge.commons,
+                            org.wso2.siddhi.core.*,
+                            org.wso2.siddhi.query.api.*,
+                            org.wso2.siddhi.query.compiler.*,
+                            org.wso2.siddhi.extension.eventtable.*,
+                            org.wso2.siddhi.extension.string.*,
+                            *;resolution:=optional
+                        </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                        <Axis2Deployer>ThrottlingPolicyDeployer</Axis2Deployer>
+                        <Axis2RequiredServices>
+                            org.wso2.carbon.throttle.event.core.ThrottlerService
+                        </Axis2RequiredServices>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
