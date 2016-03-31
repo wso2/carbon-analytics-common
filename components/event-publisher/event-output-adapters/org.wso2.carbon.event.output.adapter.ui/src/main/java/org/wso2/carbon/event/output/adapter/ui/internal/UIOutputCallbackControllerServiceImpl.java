@@ -20,10 +20,10 @@
 package org.wso2.carbon.event.output.adapter.ui.internal;
 
 import com.google.gson.JsonObject;
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.ui.UIOutputCallbackControllerService;
 import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorServiceInternalValueHolder;
+import org.wso2.carbon.event.output.adapter.ui.internal.util.CEPWebSocketSession;
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
 
 import javax.websocket.Session;
@@ -37,12 +37,12 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackControllerService {
 
-    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, CopyOnWriteArrayList<Session>>>
+    private ConcurrentHashMap<Integer, ConcurrentHashMap<String, CopyOnWriteArrayList<CEPWebSocketSession>>>
             outputEventAdaptorSessionMap;
 
     public UIOutputCallbackControllerServiceImpl() {
         outputEventAdaptorSessionMap =
-                new ConcurrentHashMap<Integer, ConcurrentHashMap<String, CopyOnWriteArrayList<Session>>>();
+                new ConcurrentHashMap<Integer, ConcurrentHashMap<String, CopyOnWriteArrayList<CEPWebSocketSession>>>();
     }
 
 
@@ -62,22 +62,24 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
             version = UIEventAdapterConstants.ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION;
         }
         String streamId = streamName + UIEventAdapterConstants.ADAPTER_UI_COLON + version;
-        ConcurrentHashMap<String, CopyOnWriteArrayList<Session>> tenantSpecificAdaptorMap =
+        ConcurrentHashMap<String, CopyOnWriteArrayList<CEPWebSocketSession>> tenantSpecificAdaptorMap =
                 outputEventAdaptorSessionMap.get(tenantId);
         if (tenantSpecificAdaptorMap == null) {
-            tenantSpecificAdaptorMap = new ConcurrentHashMap<String, CopyOnWriteArrayList<Session>>();
+            tenantSpecificAdaptorMap = new ConcurrentHashMap<String, CopyOnWriteArrayList<CEPWebSocketSession>>();
             if (null != outputEventAdaptorSessionMap.putIfAbsent(tenantId, tenantSpecificAdaptorMap)) {
                 tenantSpecificAdaptorMap = outputEventAdaptorSessionMap.get(tenantId);
             }
         }
-        CopyOnWriteArrayList<Session> adapterSpecificSessions = tenantSpecificAdaptorMap.get(streamId);
+        CopyOnWriteArrayList<CEPWebSocketSession> adapterSpecificSessions = tenantSpecificAdaptorMap.get(streamId);
         if (adapterSpecificSessions == null) {
-            adapterSpecificSessions = new CopyOnWriteArrayList<Session>();
+            adapterSpecificSessions = new CopyOnWriteArrayList<CEPWebSocketSession>();
             if (null != tenantSpecificAdaptorMap.putIfAbsent(streamId, adapterSpecificSessions)) {
                 adapterSpecificSessions = tenantSpecificAdaptorMap.get(streamId);
             }
         }
-        adapterSpecificSessions.add(session);
+
+        CEPWebSocketSession cepWebSocketSession = new CEPWebSocketSession(session);
+        adapterSpecificSessions.add(cepWebSocketSession);
     }
 
     /**
@@ -87,8 +89,8 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
      * @param streamId - Stream name and version which user register to.
      * @return the sessions list.
      */
-    public CopyOnWriteArrayList<Session> getSessions(int tenantId, String streamId) {
-        ConcurrentHashMap<String, CopyOnWriteArrayList<Session>> tenantSpecificAdaptorMap = outputEventAdaptorSessionMap.get(tenantId);
+    public CopyOnWriteArrayList<CEPWebSocketSession> getSessions(int tenantId, String streamId) {
+        ConcurrentHashMap<String, CopyOnWriteArrayList<CEPWebSocketSession>> tenantSpecificAdaptorMap = outputEventAdaptorSessionMap.get(tenantId);
         if (tenantSpecificAdaptorMap != null) {
             return tenantSpecificAdaptorMap.get(streamId);
         }
@@ -131,15 +133,15 @@ public class UIOutputCallbackControllerServiceImpl implements UIOutputCallbackCo
             version = UIEventAdapterConstants.ADAPTER_UI_DEFAULT_OUTPUT_STREAM_VERSION;
         }
         String id = streamName + UIEventAdapterConstants.ADAPTER_UI_COLON + version;
-        ConcurrentHashMap<String, CopyOnWriteArrayList<Session>> tenantSpecificAdaptorMap = outputEventAdaptorSessionMap.get(tenantId);
+        ConcurrentHashMap<String, CopyOnWriteArrayList<CEPWebSocketSession>> tenantSpecificAdaptorMap = outputEventAdaptorSessionMap.get(tenantId);
         if (tenantSpecificAdaptorMap != null) {
-            CopyOnWriteArrayList<Session> adapterSpecificSessions = tenantSpecificAdaptorMap.get(id);
+            CopyOnWriteArrayList<CEPWebSocketSession> adapterSpecificSessions = tenantSpecificAdaptorMap.get(id);
             if (adapterSpecificSessions != null) {
-                Session sessionToRemove = null;
-                for (Iterator<Session> iterator = adapterSpecificSessions.iterator(); iterator.hasNext(); ) {
-                    Session thisSession = iterator.next();
-                    if (session.getId().equals(thisSession.getId())) {
-                        sessionToRemove = session;
+                CEPWebSocketSession sessionToRemove = null;
+                for (Iterator<CEPWebSocketSession> iterator = adapterSpecificSessions.iterator(); iterator.hasNext(); ) {
+                    CEPWebSocketSession cepWebSocketSession = iterator.next();
+                    if (session.getId().equals(cepWebSocketSession.getSession().getId())) {
+                        sessionToRemove = cepWebSocketSession;
                         break;
                     }
                 }
