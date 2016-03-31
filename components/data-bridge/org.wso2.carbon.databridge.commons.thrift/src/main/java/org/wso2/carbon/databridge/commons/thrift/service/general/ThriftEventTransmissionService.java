@@ -430,11 +430,16 @@ public class ThriftEventTransmissionService {
         super("defineStream");
       }
 
-      protected defineStream_args getEmptyArgsInstance() {
+      public defineStream_args getEmptyArgsInstance() {
         return new defineStream_args();
       }
 
-      protected defineStream_result getResult(I iface, defineStream_args args) throws org.apache.thrift.TException {
+      @Override
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public defineStream_result getResult(I iface, defineStream_args args) throws org.apache.thrift.TException {
         defineStream_result result = new defineStream_result();
         try {
           result.success = iface.defineStream(args.sessionId, args.streamDefinition);
@@ -456,11 +461,16 @@ public class ThriftEventTransmissionService {
         super("findStreamId");
       }
 
-      protected findStreamId_args getEmptyArgsInstance() {
+      public findStreamId_args getEmptyArgsInstance() {
         return new findStreamId_args();
       }
 
-      protected findStreamId_result getResult(I iface, findStreamId_args args) throws org.apache.thrift.TException {
+      @Override
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public findStreamId_result getResult(I iface, findStreamId_args args) throws org.apache.thrift.TException {
         findStreamId_result result = new findStreamId_result();
         try {
           result.success = iface.findStreamId(args.sessionId, args.streamName, args.streamVersion);
@@ -478,11 +488,16 @@ public class ThriftEventTransmissionService {
         super("publish");
       }
 
-      protected publish_args getEmptyArgsInstance() {
+      public publish_args getEmptyArgsInstance() {
         return new publish_args();
       }
 
-      protected publish_result getResult(I iface, publish_args args) throws org.apache.thrift.TException {
+      @Override
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public publish_result getResult(I iface, publish_args args) throws org.apache.thrift.TException {
         publish_result result = new publish_result();
         try {
           iface.publish(args.eventBundle);
@@ -500,11 +515,16 @@ public class ThriftEventTransmissionService {
         super("deleteStreamById");
       }
 
-      protected deleteStreamById_args getEmptyArgsInstance() {
+      public deleteStreamById_args getEmptyArgsInstance() {
         return new deleteStreamById_args();
       }
 
-      protected deleteStreamById_result getResult(I iface, deleteStreamById_args args) throws org.apache.thrift.TException {
+      @Override
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public deleteStreamById_result getResult(I iface, deleteStreamById_args args) throws org.apache.thrift.TException {
         deleteStreamById_result result = new deleteStreamById_result();
         try {
           result.success = iface.deleteStreamById(args.sessionId, args.streamId);
@@ -521,11 +541,16 @@ public class ThriftEventTransmissionService {
         super("deleteStreamByNameVersion");
       }
 
-      protected deleteStreamByNameVersion_args getEmptyArgsInstance() {
+      public deleteStreamByNameVersion_args getEmptyArgsInstance() {
         return new deleteStreamByNameVersion_args();
       }
 
-      protected deleteStreamByNameVersion_result getResult(I iface, deleteStreamByNameVersion_args args) throws org.apache.thrift.TException {
+      @Override
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public deleteStreamByNameVersion_result getResult(I iface, deleteStreamByNameVersion_args args) throws org.apache.thrift.TException {
         deleteStreamByNameVersion_result result = new deleteStreamByNameVersion_result();
         try {
           result.success = iface.deleteStreamByNameVersion(args.sessionId, args.streamName, args.streamVersion);
