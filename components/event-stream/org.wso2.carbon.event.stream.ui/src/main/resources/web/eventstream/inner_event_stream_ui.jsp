@@ -137,6 +137,7 @@
                                         <option value="float">float</option>
                                         <option value="string">string</option>
                                         <option value="bool">bool</option>
+                                        <option value="object">object</option>
                                     </select>
                                 </td>
                                 <td><input type="button" class="button"
@@ -182,6 +183,7 @@
                                         <option value="float">float</option>
                                         <option value="string">string</option>
                                         <option value="bool">bool</option>
+                                        <option value="object">object</option>
                                     </select>
                                 </td>
                                 <td><input type="button" class="button"
@@ -225,6 +227,7 @@
                                         <option value="float">float</option>
                                         <option value="string">string</option>
                                         <option value="bool">bool</option>
+                                        <option value="object">object</option>
                                     </select>
                                 </td>
                                 <td><input type="button" class="button"
