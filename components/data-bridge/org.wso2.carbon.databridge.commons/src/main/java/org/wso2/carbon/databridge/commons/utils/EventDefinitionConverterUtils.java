@@ -63,9 +63,14 @@ public final class EventDefinitionConverterUtils {
             throws MalformedStreamDefinitionException {
         try {
             StreamDefinition tempStreamDefinition = gson.fromJson(streamDefinition.
-                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)int('|\")", "'type':'INT'").replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)long('|\")", "'type':'LONG'").
-                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)float('|\")", "'type':'FLOAT'").replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)double('|\")", "'type':'DOUBLE'").
-                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)bool('|\")", "'type':'BOOL'").replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)string('|\")", "'type':'STRING'"), StreamDefinition.class);
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)int('|\")", "'type':'INT'").
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)long('|\")", "'type':'LONG'").
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)float('|\")", "'type':'FLOAT'").
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)double('|\")", "'type':'DOUBLE'").
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)bool('|\")", "'type':'BOOL'").
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)string('|\")", "'type':'STRING'").
+                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)object('|\")", "'type':'OBJECT'"),
+                    StreamDefinition.class);
 
             String name = tempStreamDefinition.getName();
             String version = tempStreamDefinition.getVersion();

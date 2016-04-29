@@ -21,5 +21,5 @@
 package org.wso2.carbon.databridge.commons;
 
 public enum AttributeType {
-    INT, LONG, FLOAT, DOUBLE, STRING, BOOL
+    INT, LONG, FLOAT, DOUBLE, STRING, BOOL, OBJECT
 }
