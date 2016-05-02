@@ -53,7 +53,8 @@ public class DefinitionConversionTest {
                             "          {'name':'price','type':'double'}," +
                             "          {'name':'volume','type':'int'}," +
                             "          {'name':'maxTemp','type':'double'}," +
-                            "          {'name':'minTemp','type':'double'}" +
+                            "          {'name':'minTemp','type':'double'}," +
+                            "          {'name':'rawData','type':'object'}" +
                             "  ]" +
                             "}";
 
@@ -73,6 +74,7 @@ public class DefinitionConversionTest {
         payload.add(new Attribute("volume", AttributeType.INT));
         payload.add(new Attribute("maxTemp", AttributeType.DOUBLE));
         payload.add(new Attribute("minTemp", AttributeType.DOUBLE));
+        payload.add(new Attribute("rawData", AttributeType.OBJECT));
         streamDefinition2.setPayloadData(payload);
 
         Assert.assertEquals(streamDefinition1, streamDefinition2);
