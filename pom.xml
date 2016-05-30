@@ -41,6 +41,7 @@
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
         <module>features/application-deployer</module>
+        <module>features/gadget-templates</module>
     </modules>
 
     <dependencyManagement>
