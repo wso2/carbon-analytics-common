@@ -30,6 +30,7 @@ import org.wso2.carbon.event.execution.manager.core.structure.configuration.Scen
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Artifact;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Domain;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Scenario;
+import org.wso2.carbon.event.execution.manager.core.structure.domain.Script;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.StreamMapping;
 import org.wso2.carbon.event.execution.manager.core.structure.domain.Template;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
@@ -39,17 +40,24 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class consist of the helper methods which are required to deal with domain templates stored in the file directory,
@@ -178,7 +186,7 @@ public class ExecutionManagerHelper {
      * @param configuration scenario configuration object, containing the parameters.
      */
     public static void deployArtifacts(ScenarioConfiguration configuration,
-                                       Domain domain)
+                                       Domain domain, ScriptEngine scriptEngine)
             throws TemplateDeploymentException {
         //make sure common artifacts are deployed
         if (domain.getCommonArtifacts() != null) {
@@ -223,7 +231,7 @@ public class ExecutionManagerHelper {
                     TemplateDeployer deployer = ExecutionManagerValueHolder.getTemplateDeployers().get(template.getType());
                     if (deployer != null) {
                             DeployableTemplate deployableTemplate = new DeployableTemplate();
-                            String updatedScript = updateArtifactParameters(configuration, template.getValue());
+                            String updatedScript = updateArtifactParameters(configuration, template.getValue(), scriptEngine);
                             deployableTemplate.setArtifact(updatedScript);
                             deployableTemplate.setConfiguration(configuration);
                             deployableTemplate.setArtifactId(artifactId);
@@ -238,15 +246,105 @@ public class ExecutionManagerHelper {
         }
     }
 
+    /**
+     * Create a JavaScript engine packed with given scripts. If two scripts have methods with same name,
+     * later method will override the previous method.
+     *
+     * @param domain
+     * @return JavaScript engine
+     * @throws TemplateDeploymentException if there are any errors in JavaScript evaluation
+     */
+    public static ScriptEngine createJavaScriptEngine(Domain domain) throws TemplateDeploymentException {
+
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+        ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(ExecutionManagerConstants.JAVASCRIPT_ENGINE);
+
+        if (domain != null && domain.getScripts() != null && domain.getScripts().getScript() != null) {
+            File scriptDirectory = new File(ExecutionManagerConstants.TEMPLATE_SCRIPT_PATH);
+            if (scriptDirectory.exists() && scriptDirectory.isDirectory()) {
+                for (Script script : domain.getScripts().getScript()) {
+                    String src = script.getSrc();
+                    String content = script.getContent();
+                    if (src != null) {
+                        File scriptFile = new File(scriptDirectory, src);
+                        if (scriptFile.exists() && scriptFile.isFile()) {
+                            try {
+                                scriptEngine.eval(new FileReader(scriptFile));
+                            } catch (ScriptException e) {
+                                throw new TemplateDeploymentException("Error in JavaScript " + scriptFile.getAbsolutePath() + ": " + e.getMessage(), e);
+                            } catch (FileNotFoundException e) {
+                                throw new TemplateDeploymentException("JavaScript file not exist at: " + scriptFile.getAbsolutePath());
+                            }
+                        } else {
+                            throw new TemplateDeploymentException("JavaScript file not exist at: " + scriptFile.getAbsolutePath());
+                        }
+                    }
+                    if (content != null) {
+                        try {
+                            scriptEngine.eval(content);
+                        } catch (ScriptException e) {
+                            throw new TemplateDeploymentException("JavaScript declared in " + domain.getName() + " has error", e);
+                        }
+                    }
+                }
+            } else {
+                log.warn("Script directory not found at: " + scriptDirectory.getAbsolutePath());
+            }
+        }
+
+        return scriptEngine;
+    }
+
+    /**
+     * This method searches for expressions matching {@link ExecutionManagerConstants#TEMPLATE_SCRIPT_REGEX}, evaluate them and
+     * replace them by the result of those expressions. If user make any syntax errors in expression and if it does
+     * not match with REGEX pattern, they will not be considered as an expression to evaluate.
+     * For example, ${toID('My Temperature')} will execute the 'toID' method and replace the value.
+     * ${toID('My Temperature)} will not be considered as an expression since the closing single quote is missing.
+     *
+     * @param content      actual template content to be checked
+     * @param scriptEngine JavaScript engine with pre-loaded scripts
+     * @return update content
+     * @throws TemplateDeploymentException if there are any errors in JavaScript function evaluation
+     */
+    private static String replaceScriptExpressions(String content, ScriptEngine scriptEngine) throws TemplateDeploymentException {
+
+        StringBuffer buffer = new StringBuffer();
+        Pattern pattern = Pattern.compile(ExecutionManagerConstants.TEMPLATE_SCRIPT_REGEX);
+        Matcher matcher = pattern.matcher(content);
+        final int scriptEvaluatorPrefixLength = ExecutionManagerConstants.SCRIPT_EVALUATOR_PREFIX.length();
+        final int scriptEvaluatorSuffixLength = ExecutionManagerConstants.SCRIPT_EVALUATOR_SUFFIX.length();
+        while (matcher.find()) {
+            String expression = matcher.group();
+            int expressionLength = expression.length();
+            String scriptToEvaluate = expression.substring(scriptEvaluatorPrefixLength, expressionLength - scriptEvaluatorSuffixLength);
+            String result = "";     // Empty string, if there is no output
+            try {
+                Object output = scriptEngine.eval(scriptToEvaluate);
+                if (output != null) {
+                    result = output.toString();
+                }
+            } catch (ScriptException e) {
+                throw new TemplateDeploymentException("Error in evaluating JavaScript expression: " + expression, e);
+            }
+            matcher.appendReplacement(buffer, result);
+        }
+        matcher.appendTail(buffer); // Append the remaining text
+
+        return buffer.toString();
+    }
 
     /**
      * Update given script by replacing undefined parameter values with configured parameter values
      *
      * @param config configurations which consists of parameters which will replace
      * @param script script which needs to be updated
+     * @param scriptEngine JavaScript engine with pre-loaded scripts
      * @return updated execution plan
+     * @throws TemplateDeploymentException if there are any errors in JavaScript function evaluation
      */
-    private static String updateArtifactParameters(ScenarioConfiguration config, String script) {
+    private static String updateArtifactParameters(ScenarioConfiguration config, String script, ScriptEngine scriptEngine)
+            throws TemplateDeploymentException {
         String updatedScript = script;
         //Script parameters will be replaced with given configuration parameters
         if (config.getParameterMap() != null && script != null) {
@@ -255,7 +353,8 @@ public class ExecutionManagerHelper {
                                                          + parameterMapEntry.getKey().toString(), parameterMapEntry.getValue().toString());
             }
         }
-        return updatedScript;
+
+        return replaceScriptExpressions(updatedScript, scriptEngine);
     }
 
     /**
@@ -277,10 +376,12 @@ public class ExecutionManagerHelper {
      *
      * @param configuration Scenario configuration, specified by the user, containing parameter values.
      * @param domain Domain object, containing the StreamMappings element
+     * @param scriptEngine JavaScript engine with pre-loaded scripts
      * @return List of Stream IDs
+     * @throws TemplateDeploymentException if there are any errors in JavaScript function evaluation
      */
     public static List<String> getStreamIDsToBeMapped(ScenarioConfiguration configuration,
-                                                      Domain domain) {
+                                                      Domain domain, ScriptEngine scriptEngine) throws TemplateDeploymentException {
         List<String> streamIdList = new ArrayList<>();
         for (Scenario scenario : domain.getScenarios().getScenario()){
             if (configuration.getScenario().equals(scenario.getType())) {
@@ -293,7 +394,7 @@ public class ExecutionManagerHelper {
                             toStream = toStream.replaceAll(ExecutionManagerConstants.REGEX_NAME_VALUE
                                                            + entry.getKey().toString(), entry.getValue().toString());
                         }
-                        streamIdList.add(toStream);
+                        streamIdList.add(replaceScriptExpressions(toStream, scriptEngine));
                     }
                     return streamIdList;
                 }

@@ -38,6 +38,12 @@ public class ExecutionManagerConstants {
                                                          + RegistryConstants.PATH_SEPARATOR + "components" + RegistryConstants.PATH_SEPARATOR
                                                          + "execution.manager.template.deployers";
 
+    // This directory is the parent for all external JavaScripts
+    public static final String TEMPLATE_SCRIPT_PATH = CarbonUtils.getCarbonConfigDirPath()
+            + File.separator + "template-manager" + File.separator + "scripts";
+
+    public static final String JAVASCRIPT_ENGINE = "Nashorn";
+
     public static final String CONFIG_NAME_SEPARATOR = "-";
 
     public static final String CONFIG_FILE_EXTENSION = ".xml";
@@ -45,6 +51,13 @@ public class ExecutionManagerConstants {
     public static final String DEFAULT_CHARSET = "UTF-8";
 
     public static final String REGEX_NAME_VALUE = "\\$";
+
+    public static final String SCRIPT_EVALUATOR_PREFIX = "${";
+
+    public static final String SCRIPT_EVALUATOR_SUFFIX = "}";
+
+    // Pattern ${methodName(<optional-parameters-separated-by-comma>)} where parameters can be any String literals ('...', "...") , numbers, true or false
+    public static final String TEMPLATE_SCRIPT_REGEX = "\\$\\{\\s*[a-zA-Z_][0-9a-zA-Z_]*\\s*\\(\\s*(((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false)\\s*(\\,\\s*((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false))*)?\\s*\\)\\s*\\}";
 
     public static final String STREAM_MAPPING_PLAN_SUFFIX = "StreamMappingPlan";
 
