@@ -56,8 +56,7 @@ public class ExecutionManagerConstants {
 
     public static final String SCRIPT_EVALUATOR_SUFFIX = "}";
 
-    // Pattern ${methodName(<optional-parameters-separated-by-comma>)} where parameters can be any String literals ('...', "...") , numbers, true or false
-    public static final String TEMPLATE_SCRIPT_REGEX = "\\$\\{\\s*[a-zA-Z_][0-9a-zA-Z_]*\\s*\\(\\s*(((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false)\\s*(\\,\\s*((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false))*)?\\s*\\)\\s*\\}";
+    public static final String TEMPLATE_SCRIPT_REGEX = "\\$\\{\\s*(([a-zA-Z_][0-9a-zA-Z_]*\\.)|(\\'[^\\']*\\'\\.)|(\\\"[^\\\"]*\\\"\\.)|(new\\s*))?[a-zA-Z_][0-9a-zA-Z_]*\\s*(\\(\\s*(((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false)\\s*(\\,\\s*((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false))*)?\\s*\\))?(\\.[a-zA-Z_][0-9a-zA-Z_]*\\s*(\\(\\s*(((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false)\\s*(\\,\\s*((\\'[^\\']*\\')|(\\\"[^\\\"]*\\\")|([+-]?\\d+(\\.\\d)?\\d*)|true|false))*)?\\s*\\))?)*\\s*\\;?\\}";
 
     public static final String STREAM_MAPPING_PLAN_SUFFIX = "StreamMappingPlan";
 
