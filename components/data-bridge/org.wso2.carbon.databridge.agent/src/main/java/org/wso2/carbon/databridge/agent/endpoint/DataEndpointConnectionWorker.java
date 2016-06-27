@@ -43,7 +43,8 @@ public class DataEndpointConnectionWorker implements Runnable {
                 connect();
                 dataEndpoint.activate();
             } catch (DataEndpointAuthenticationException e) {
-                log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage());
+                log.debug(e);
                 dataEndpoint.deactivate();
             }
         } else {
@@ -96,7 +97,7 @@ public class DataEndpointConnectionWorker implements Runnable {
                             dataEndpointConfiguration.getPassword());
             dataEndpointConfiguration.setSessionId(sessionId);
         } catch (Throwable e) {
-            log.error(e.getMessage(), e);
+            log.debug(e.getMessage(), e);
             throw new DataEndpointAuthenticationException("Cannot borrow client for " + dataEndpointConfiguration.getAuthURL(), e);
         } finally {
             try {
