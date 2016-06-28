@@ -23,7 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
@@ -31,13 +33,23 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
+import org.wso2.carbon.event.output.adapter.ui.internal.ds.OutputAdaptorEventStreamServiceValueHolder;
 import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorServiceInternalValueHolder;
+import org.wso2.carbon.event.output.adapter.ui.internal.util.CEPWebSocketSession;
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
+import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
 
-import javax.websocket.Session;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Contains the life cycle of executions regarding the UI Adapter
@@ -48,12 +60,17 @@ public class UIEventAdapter implements OutputEventAdapter {
     private static final Log log = LogFactory.getLog(UIEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
-    private String streamId;
     private int queueSize;
     private LinkedBlockingDeque<Object> streamSpecificEvents;
     private static ThreadPoolExecutor executorService;
     private int tenantId;
     private boolean doLogDroppedMessage;
+
+    private String streamId;
+    private StreamDefinition streamDefinition;
+    private List<Attribute> streamMetaAttributes;
+    private List<Attribute> streamCorrelationAttributes;
+    private List<Attribute> streamPayloadAttributes;
 
     public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
@@ -104,13 +121,21 @@ public class UIEventAdapter implements OutputEventAdapter {
             }
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(jobQueSize));
+                                                     new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
 
         streamId = eventAdapterConfiguration.getOutputStreamIdOfWso2eventMessageFormat();
         if (streamId == null || streamId.isEmpty()) {
             throw new OutputEventAdapterRuntimeException("UI event adapter needs a output stream id");
         }
+
+        // fetch the "streamDefinition" corresponding to the "streamId" and then fetch the different attribute types
+        // of the streamDefinition corresponding to the event's streamId. They are required when validating values in
+        // the events against the streamDef attributes.
+        streamDefinition = getStreamDefinition(streamId);
+        streamMetaAttributes = streamDefinition.getMetaData();
+        streamCorrelationAttributes = streamDefinition.getCorrelationData();
+        streamPayloadAttributes = streamDefinition.getPayloadData();
 
         ConcurrentHashMap<Integer, ConcurrentHashMap<String, String>> tenantSpecifcEventOutputAdapterMap =
                 UIEventAdaptorServiceInternalValueHolder.getTenantSpecificOutputEventStreamAdapterMap();
@@ -134,7 +159,8 @@ public class UIEventAdapter implements OutputEventAdapter {
 
             ConcurrentHashMap<Integer, ConcurrentHashMap<String, LinkedBlockingDeque<Object>>> tenantSpecificStreamMap =
                     UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap();
-            ConcurrentHashMap<String, LinkedBlockingDeque<Object>> streamSpecificEventsMap = tenantSpecificStreamMap.get(tenantId);
+            ConcurrentHashMap<String, LinkedBlockingDeque<Object>> streamSpecificEventsMap =
+                    tenantSpecificStreamMap.get(tenantId);
 
             if (streamSpecificEventsMap == null) {
                 streamSpecificEventsMap = new ConcurrentHashMap<String, LinkedBlockingDeque<Object>>();
@@ -154,7 +180,8 @@ public class UIEventAdapter implements OutputEventAdapter {
 
         if (globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME) != null) {
             try {
-                queueSize = Integer.parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME));
+                queueSize = Integer.parseInt(
+                        globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME));
             } catch (NumberFormatException e) {
                 log.error("String does not have the appropriate format for conversion." + e.getMessage());
                 queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
@@ -234,10 +261,14 @@ public class UIEventAdapter implements OutputEventAdapter {
         eventValues[UIEventAdapterConstants.INDEX_ONE] = System.currentTimeMillis();
         streamSpecificEvents.add(eventValues);
 
+        // fetch all valid sessions checked against any queryParameters provided when subscribing.
+        CopyOnWriteArrayList<CEPWebSocketSession> validSessions = getValidSessions(event);
+
         try {
-            executorService.execute(new WebSocketSender(eventString));
+            executorService.execute(new WebSocketSender(validSessions, eventString));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log,
+                                        tenantId);
         }
 
     }
@@ -261,7 +292,8 @@ public class UIEventAdapter implements OutputEventAdapter {
         ConcurrentHashMap<String, LinkedBlockingDeque<Object>> tenantSpecificStreamEventMap =
                 UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap().get(tenantId);
         if (tenantSpecificStreamEventMap != null && streamId != null) {
-            tenantSpecificStreamEventMap.remove(streamId);  //Removing the streamId and events registered for the output adapter
+            //Removing the streamId and events registered for the output adapter
+            tenantSpecificStreamEventMap.remove(streamId);
         }
     }
 
@@ -270,11 +302,124 @@ public class UIEventAdapter implements OutputEventAdapter {
         return true;
     }
 
+    /**
+     * Fetch the StreamDefinition corresponding to the given StreamId from the EventStreamService.
+     *
+     * @param streamId the streamId of this UIEventAdaptor.
+     * @return the "StreamDefinition" object corresponding to the streamId of this EventAdaptor.
+     * @throws OutputEventAdapterException if the "EventStreamService" OSGI service is unavailable/unregistered or if
+     *                                     the matching Steam-Definition for the given StreamId cannot be retrieved.
+     */
+    private StreamDefinition getStreamDefinition(String streamId) throws OutputEventAdapterException {
+        EventStreamService eventStreamService = OutputAdaptorEventStreamServiceValueHolder.getEventStreamService();
+        if (eventStreamService != null) {
+            try {
+                return eventStreamService.getStreamDefinition(streamId);
+            } catch (EventStreamConfigurationException e) {
+                String adaptorType = eventAdapterConfiguration.getType();
+                String adaptorName = eventAdapterConfiguration.getName();
+                String errorMsg = "Error while retrieving Stream-Definition for Stream with id [" + streamId + "] " +
+                        "for Adaptor [" + adaptorName + "] of type [" + adaptorType + "].";
+                log.error(errorMsg);
+                throw new OutputEventAdapterException(errorMsg, e);
+            }
+        }
+        throw new OutputEventAdapterException(
+                "Could not retrieve the EventStreamService whilst trying to fetch the Stream-Definition of Stream " +
+                        "with Id [" + streamId + "].");
+    }
+
+    /**
+     * Fetches all valid web-socket sessions from the entire pool of subscribed sessions. The validity is checked
+     * against any queryString provided when subscribing to the web-socket endpoint.
+     *
+     * @param event the current event received and that which needs to be published to subscribed sessions.
+     * @return a list of all validated web-socket sessions against the queryString values.
+     */
+    private CopyOnWriteArrayList<CEPWebSocketSession> getValidSessions(Event event) {
+        CopyOnWriteArrayList<CEPWebSocketSession> validSessions = new CopyOnWriteArrayList<>();
+        UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl =
+                UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
+        // get all subscribed web-socket sessions.
+        CopyOnWriteArrayList<CEPWebSocketSession> cepWebSocketSessions =
+                uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
+
+        for (CEPWebSocketSession cepWebSocketSession : cepWebSocketSessions) {
+            boolean isValidSession = validateEventAgainstSessionFilters(event, cepWebSocketSession);
+            if (isValidSession) {
+                validSessions.add(cepWebSocketSession);
+            }
+        }
+        return validSessions;
+    }
+
+
+    /**
+     * Processes the given session's validity to receive the current "event" against any queryParams that was used at
+     * the time when the web-socket-session is subscribed. This method can be extended to validate the event against
+     * any additional attribute of the given session too.
+     *
+     * @param event               the current event received and that which needs to be published to subscribed
+     *                            sessions.
+     * @param cepWebSocketSession the session which needs validated for its authenticity to receive this event.
+     * @return "true" if the session is valid to receive the event else "false".
+     */
+    private boolean validateEventAgainstSessionFilters(Event event, CEPWebSocketSession cepWebSocketSession) {
+
+        // fetch the queryString Key:Value pair map of the given session.
+        Map<String, String> queryParamValuePairs = cepWebSocketSession.getQueryParamValuePairs();
+        if (queryParamValuePairs != null) {
+            // fetch the different attribute values received as part of the current event.
+            Object[] eventMetaData = event.getMetaData();
+            Object[] eventCorrelationData = event.getCorrelationData();
+            Object[] eventPayloadData = event.getPayloadData();
+
+            if (streamMetaAttributes != null) {
+                for (int i = 0; i < streamMetaAttributes.size(); i++) {
+                    String attributeName = streamMetaAttributes.get(i).getName();
+                    String queryValue = queryParamValuePairs.get(attributeName);
+
+                    if (queryValue != null &&
+                            (eventMetaData == null || !eventMetaData[i].toString().equals(queryValue))) {
+                        return false;
+                    }
+                }
+            }
+
+            if (streamCorrelationAttributes != null) {
+                for (int i = 0; i < streamCorrelationAttributes.size(); i++) {
+                    String attributeName = streamCorrelationAttributes.get(i).getName();
+                    String queryValue = queryParamValuePairs.get(attributeName);
+
+                    if (queryValue != null &&
+                            (eventCorrelationData == null || !eventCorrelationData[i].toString().equals(queryValue))) {
+                        return false;
+                    }
+                }
+            }
+
+            if (streamPayloadAttributes != null) {
+                for (int i = 0; i < streamPayloadAttributes.size(); i++) {
+                    String attributeName = streamPayloadAttributes.get(i).getName();
+                    String queryValue = queryParamValuePairs.get(attributeName);
+
+                    if (queryValue != null && (eventPayloadData == null || !eventPayloadData[i].toString().equals(
+                            queryValue))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     private class WebSocketSender implements Runnable {
 
         private String message;
+        private CopyOnWriteArrayList<CEPWebSocketSession> cepWebSocketSessions;
 
-        public WebSocketSender(String message) {
+        public WebSocketSender(CopyOnWriteArrayList<CEPWebSocketSession> cepWebSocketSessions, String message) {
+            this.cepWebSocketSessions = cepWebSocketSessions;
             this.message = message;
         }
 
@@ -291,22 +436,21 @@ public class UIEventAdapter implements OutputEventAdapter {
          */
         @Override
         public void run() {
-
-            UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl = UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
-            CopyOnWriteArrayList<Session> sessions = uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
-            if (sessions != null) {
+            if (cepWebSocketSessions != null) {
                 doLogDroppedMessage = true;
-                for (Session session : sessions) {
-                    synchronized (session) {
+                for (CEPWebSocketSession cepWebSocketSession : cepWebSocketSessions) {
+                    synchronized (cepWebSocketSession) {
                         try {
-                            session.getBasicRemote().sendText(message);
+                            cepWebSocketSession.getSession().getBasicRemote().sendText(message);
                         } catch (IOException e) {
-                            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
+                            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message,
+                                                        "Cannot send to endpoint", e, log, tenantId);
                         }
                     }
                 }
             } else if (doLogDroppedMessage) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log,
+                                            tenantId);
                 doLogDroppedMessage = false;
             }
         }

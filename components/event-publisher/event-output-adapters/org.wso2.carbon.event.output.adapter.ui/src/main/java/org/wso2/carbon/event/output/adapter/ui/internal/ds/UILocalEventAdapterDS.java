@@ -22,15 +22,17 @@ package org.wso2.carbon.event.output.adapter.ui.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpService;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
-import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
 import org.wso2.carbon.event.output.adapter.ui.UIEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.ui.UIOutputCallbackControllerService;
-import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
  * @scr.component component.name="output.Ui.AdapterService.component" immediate="true"
+ * @scr.reference name="eventStreamService.service"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
 public class UILocalEventAdapterDS {
 
@@ -60,5 +62,19 @@ public class UILocalEventAdapterDS {
         } catch (RuntimeException e) {
             log.error("Can not create the output ui adapter service ", e);
         }
+    }
+
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting the EventStreamService reference for the UILocalEventAdaptor Service");
+        }
+        OutputAdaptorEventStreamServiceValueHolder.registerEventStreamService(eventStreamService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Un-Setting the EventStreamService reference for the UILocalEventAdaptor Service");
+        }
+        OutputAdaptorEventStreamServiceValueHolder.unregisterEventStreamService(eventStreamService);
     }
 }
