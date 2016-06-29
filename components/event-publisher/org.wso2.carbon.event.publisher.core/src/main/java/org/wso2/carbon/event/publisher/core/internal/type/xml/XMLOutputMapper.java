@@ -22,9 +22,11 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
@@ -33,7 +35,6 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
-import org.wso2.siddhi.core.event.Event;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -143,9 +144,7 @@ public class XMLOutputMapper implements OutputMapper {
         return actualMappingText;
     }
 
-    private String getPropertyValue(Event event, String mappingProperty) {
-        Object[] eventData = event.getData();
-        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
+    private String getPropertyValue(Object[] eventData, Map<String, String> arbitraryMap, String mappingProperty) {
         Integer position = propertyPositionMap.get(mappingProperty);
         Object data = null;
 
@@ -161,11 +160,12 @@ public class XMLOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Event event)
+    public Object convertToMappedOutputEvent(Event event)
             throws EventPublisherConfigurationException {
 
         // Retrieve resource at runtime if it is from registry
         XMLOutputMapping outputMapping = (XMLOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
         if (outputMapping.isRegistryResource()) {
             String path = outputMapping.getMappingXMLText();
             if (isCustomRegistryPath) {
@@ -177,7 +177,7 @@ public class XMLOutputMapper implements OutputMapper {
                     if (i % 2 == 0) {
                         pathBuilder.append(pathMappingTextList.get(i));
                     } else {
-                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
+                        pathBuilder.append(getPropertyValue(eventData, event.getArbitraryDataMap(), pathMappingTextList.get(i)));
                     }
                 }
                 path = pathBuilder.toString();
@@ -194,13 +194,13 @@ public class XMLOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                eventText.append(getPropertyValue(event, mappingTextList.get(i)));
+                eventText.append(getPropertyValue(eventData, event.getArbitraryDataMap(), mappingTextList.get(i)));
             }
         }
 
         String text = eventText.toString();
         if (!this.isCustomMappingEnabled) {
-            Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+            Map<String, String> arbitraryDataMap = event.getArbitraryDataMap();
             if (arbitraryDataMap != null && !arbitraryDataMap.isEmpty()) {
                 // Add arbitrary data map to the default template
                 try {
@@ -208,9 +208,9 @@ public class XMLOutputMapper implements OutputMapper {
                     OMElement compositeEventElement = AXIOMUtil.stringToOM(text);
                     OMElement parentPropertyElement = factory.createOMElement(new QName(EventPublisherConstants.EVENT_ARBITRARY_DATA_MAP_TAG));
 
-                    for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
+                    for (Map.Entry<String, String> entry : arbitraryDataMap.entrySet()) {
                         OMElement propertyElement = factory.createOMElement(new QName(entry.getKey()));
-                        propertyElement.setText(entry.getValue().toString());
+                        propertyElement.setText(entry.getValue());
                         parentPropertyElement.addChild(propertyElement);
                     }
                     compositeEventElement.getFirstElement().addChild(parentPropertyElement);
@@ -225,9 +225,9 @@ public class XMLOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Event event)
+    public Object convertToTypedOutputEvent(Event event)
             throws EventPublisherConfigurationException {
-        return convertToMappedInputEvent(event);
+        return convertToMappedOutputEvent(event);
     }
 
 
