@@ -194,9 +194,9 @@ public class ThriftDataReceiver {
             this.isDiscoveryEnabled = true;
             try {
                 this.mdnsServer = JmmDNS.Factory.getInstance();
-                ServiceInfo testService = ServiceInfo.create(ThriftDataReceiverConstants.MDNS_SERVICE_TYPE, hostname,
+                ServiceInfo thriftDiscoveryService = ServiceInfo.create(ThriftDataReceiverConstants.MDNS_SERVICE_TYPE, hostname,
                         port, ThriftDataReceiverConstants.MDNS_SERVICE_DESCRIPTION);
-                mdnsServer.registerService(testService);
+                mdnsServer.registerService(thriftDiscoveryService);
                 log.info("Multicast DNS service discovery for Thrift agent started");
             } catch (IOException e) {
                 throw new DataBridgeException("Failed to start multicast DNS service registration agent: " + e.getMessage(), e);
