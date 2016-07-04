@@ -68,6 +68,7 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.output.adapter.wso2event:${carbon.analytics.common.version}
                                 </bundleDef>
+                                <bundleDef>org.jmdns:jmdns</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}

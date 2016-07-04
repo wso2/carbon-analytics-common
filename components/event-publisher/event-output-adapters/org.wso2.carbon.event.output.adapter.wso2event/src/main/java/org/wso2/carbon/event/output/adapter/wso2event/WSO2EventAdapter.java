@@ -33,7 +33,14 @@ import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailable
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
+import org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants;
 
+import javax.jmdns.JmmDNS;
+import javax.jmdns.ServiceInfo;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Map;
 
 import static org.wso2.carbon.event.output.adapter.wso2event.internal.util.WSO2EventAdapterConstants.*;
@@ -47,12 +54,18 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
     private boolean isBlockingMode = false;
     private long timeout = 0;
     private int tenantId;
+    private boolean autoDiscoveryEnabled;
 
     public WSO2EventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                             Map<String, String> globalProperties) {
 
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+
+        String isDiscoveryEnabled = System.getProperty("receiverDiscoveryEnabled");
+        if (isDiscoveryEnabled != null && isDiscoveryEnabled.equalsIgnoreCase("true")) {
+            this.autoDiscoveryEnabled = true;
+        }
     }
 
     /**
@@ -95,6 +108,15 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
             timeout = Long.parseLong(timeoutString);
         }
 
+        if (this.autoDiscoveryEnabled) {
+            String discoveredUrl = this.autoDiscoverReceiver();
+            if (discoveredUrl != null) {
+                log.info("Replacing specified Thrift endpoint URL '" + receiverUrl +
+                        "' with auto-discovered Thrift endpoint '" + discoveredUrl + "'");
+                receiverUrl = discoveredUrl;
+            }
+        }
+
         try {
             if (authUrl != null && authUrl.length() > 0) {
                 dataPublisher = new DataPublisher(protocol, receiverUrl, authUrl, userName, password);
@@ -112,7 +134,6 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
         } catch (TransportException e) {
             throwConnectionException(receiverUrl, authUrl, protocol, userName, e);
         }
-
     }
 
     @Override
@@ -165,6 +186,38 @@ public final class WSO2EventAdapter implements OutputEventAdapter {
             } catch (NumberFormatException e){
                 throw new OutputEventAdapterException("Invalid value set for property 'Publishing Timeout': " + timeoutProperty, e);
             }
+        }
+    }
+
+    private String autoDiscoverReceiver() {
+        JmmDNS mDnsClient = JmmDNS.Factory.getInstance();
+        try {
+            ServiceInfo[] services = mDnsClient.list(WSO2EventAdapterConstants.MDNS_SERVICE_TYPE);
+            for (ServiceInfo service : services) {
+                int port = service.getPort();
+                InetAddress[] hosts = service.getInetAddresses();
+                for (InetAddress host : hosts) {
+                    if (isEndpointReachable(host, port, WSO2EventAdapterConstants.MDNS_CONNECTION_TIMEOUT)) {
+                        return "tcp://" + host.getCanonicalHostName() + ":" + port;
+                    }
+                }
+            }
+            return null;
+        } finally {
+            try {
+                mDnsClient.close();
+            } catch (IOException ignore) {
+
+            }
+        }
+    }
+
+    private boolean isEndpointReachable(InetAddress host, int port, int timeout){
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host, port), timeout);
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 
