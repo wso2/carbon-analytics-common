@@ -366,6 +366,11 @@
                 <artifactId>cassandra-thrift</artifactId>
                 <version>${cassandra.thrift.wso2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jmdns</groupId>
+                <artifactId>jmdns</artifactId>
+                <version>${jmdns.version}</version>
+            </dependency>
             <!--third party dependencies stop-->
 
             <!--carbon analytics common dependencies start-->
@@ -1300,6 +1305,7 @@
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
         <xerces.xercesImpl.version>2.11.0</xerces.xercesImpl.version>
+        <jmdns.version>3.5.0</jmdns.version>
 
         <httpclient.httpcomponents.wso2.version>4.3.1.wso2v2</httpclient.httpcomponents.wso2.version>
         <httpcore.httpcomponents.wso2.version>4.3.3.wso2v1</httpcore.httpcomponents.wso2.version>

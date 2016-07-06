@@ -65,6 +65,7 @@
 							</adviceFile>
 							<bundles>
                                 <bundleDef>org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.receiver.thrift</bundleDef>
+                                <bundleDef>org.jmdns:jmdns</bundleDef>
 							</bundles>
 							<importFeatures>
 							    <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>

@@ -48,6 +48,6 @@ public final class WSO2EventAdapterConstants {
 
     public static final String ADAPTER_CONF_PATH = "config.path";
 
-
-    ;
+    public static final String MDNS_SERVICE_TYPE = "_http._tcp.local.";
+    public static final int MDNS_CONNECTION_TIMEOUT = 2000;
 }

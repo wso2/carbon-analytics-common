@@ -35,9 +35,13 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
+import javax.jmdns.JmmDNS;
+import javax.jmdns.ServiceInfo;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -51,6 +55,9 @@ public class ThriftDataReceiver {
     private ThriftDataReceiverConfiguration thriftDataReceiverConfiguration;
     private TServer authenticationServer;
     private TServer dataReceiverServer;
+
+    private boolean isDiscoveryEnabled;
+    private JmmDNS mdnsServer;
 
     /**
      * Initialize Carbon Agent Server
@@ -100,6 +107,7 @@ public class ThriftDataReceiver {
             throws DataBridgeException {
         startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(), dataBridgeReceiverService);
         startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
+        startServiceDiscovery(hostName, thriftDataReceiverConfiguration.getDataReceiverPort());
     }
 
 
@@ -180,12 +188,35 @@ public class ThriftDataReceiver {
         }
     }
 
+    private void startServiceDiscovery(String hostname, int port) throws DataBridgeException {
+        String isDiscoveryEnabled = System.getProperty("receiverDiscoveryEnabled");
+        if (isDiscoveryEnabled != null && isDiscoveryEnabled.equalsIgnoreCase("true")) {
+            this.isDiscoveryEnabled = true;
+            try {
+                this.mdnsServer = JmmDNS.Factory.getInstance();
+                ServiceInfo thriftDiscoveryService = ServiceInfo.create(ThriftDataReceiverConstants.MDNS_SERVICE_TYPE, hostname,
+                        port, ThriftDataReceiverConstants.MDNS_SERVICE_DESCRIPTION);
+                mdnsServer.registerService(thriftDiscoveryService);
+                log.info("Multicast DNS service discovery for Thrift agent started");
+            } catch (IOException e) {
+                throw new DataBridgeException("Failed to start multicast DNS service registration agent: " + e.getMessage(), e);
+            }
+        }
+    }
+
     /**
      * To stop the server
      */
     public void stop() {
         authenticationServer.stop();
         dataReceiverServer.stop();
+        if (isDiscoveryEnabled) {
+            try {
+                mdnsServer.unregisterAllServices();
+                mdnsServer.close();
+            } catch (IOException ignore) {
+            }
+        }
     }
 
     static class ServerThread implements Runnable {
