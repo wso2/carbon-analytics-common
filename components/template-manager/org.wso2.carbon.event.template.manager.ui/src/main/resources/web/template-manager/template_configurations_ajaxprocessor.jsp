@@ -41,6 +41,7 @@
     <link href="css/custom.css" rel="stylesheet">
     <script src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/domain_config_update.js"></script>
+    <script type="text/javascript" src="../admin/js/csrfPrevention.js"></script>
     <!--[if lt IE 9]>
     <script src="js/html5shiv.min.js"></script>
     <script src="js/respond.min.js"></script>
