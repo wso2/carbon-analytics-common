@@ -14,13 +14,27 @@
  */
 package org.wso2.carbon.event.publisher.core.internal;
 
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
-import org.wso2.siddhi.core.event.Event;
 
 public interface OutputMapper {
 
-    public Object convertToMappedInputEvent(Event event) throws EventPublisherConfigurationException;
+    /**
+     * Converts the event according to the output mappings specified
+     *
+     * @param event the event to be converted
+     * @return converted output event as an Object
+     * @throws EventPublisherConfigurationException
+     */
+    Object convertToMappedOutputEvent(Event event) throws EventPublisherConfigurationException;
 
-    public Object convertToTypedInputEvent(Event event) throws EventPublisherConfigurationException;
+    /**
+     * Converts the event according to a predefined type with the exact structure of the event passed in
+     *
+     * @param event the event to be converted
+     * @return converted output event as an Object
+     * @throws EventPublisherConfigurationException
+     */
+    Object convertToTypedOutputEvent(Event event) throws EventPublisherConfigurationException;
 
 }

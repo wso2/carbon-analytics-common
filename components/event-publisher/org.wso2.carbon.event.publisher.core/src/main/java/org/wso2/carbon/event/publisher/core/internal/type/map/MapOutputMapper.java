@@ -14,7 +14,9 @@
  */
 package org.wso2.carbon.event.publisher.core.internal.type.map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventOutputProperty;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
@@ -23,7 +25,6 @@ import org.wso2.carbon.event.publisher.core.config.mapping.MapOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.Iterator;
 import java.util.List;
@@ -73,11 +74,11 @@ public class MapOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Event event)
+    public Object convertToMappedOutputEvent(Event event)
             throws EventPublisherConfigurationException {
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
-        Object[] eventData = event.getData();
-        Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+        Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
+        Map<String, String> arbitraryDataMap = event.getArbitraryDataMap();
 
         MapOutputMapping mapOutputMapping = (MapOutputMapping) eventPublisherConfiguration.getOutputMapping();
         List<EventOutputProperty> outputPropertyConfiguration = mapOutputMapping.getOutputPropertyConfiguration();
@@ -86,7 +87,7 @@ public class MapOutputMapper implements OutputMapper {
             for (EventOutputProperty eventOutputProperty : outputPropertyConfiguration) {
                 String valueOf = eventOutputProperty.getValueOf();
                 Integer position = propertyPositionMap.get(valueOf);
-                if(position != null) {
+                if (position != null) {
                     eventMapObject.put(eventOutputProperty.getName(), eventData[position]);
                 } else if (valueOf != null && arbitraryDataMap != null && valueOf.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX)) {
                     eventMapObject.put(eventOutputProperty.getName(), arbitraryDataMap.get(valueOf.replaceFirst(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX, "")));
@@ -97,11 +98,11 @@ public class MapOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Event event) throws EventPublisherConfigurationException {
+    public Object convertToTypedOutputEvent(Event event) throws EventPublisherConfigurationException {
 
         Map<Object, Object> eventMapObject = new TreeMap<Object, Object>();
         int counter = 0;
-        Object[] eventData = event.getData();
+        Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
         if (noOfMetaData > 0) {
             for (Attribute metaData : streamDefinition.getMetaData()) {
                 eventMapObject.put(EventPublisherConstants.PROPERTY_META_PREFIX + metaData.getName(), eventData[counter]);
@@ -123,9 +124,9 @@ public class MapOutputMapper implements OutputMapper {
             }
         }
 
-        Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
-        if(arbitraryDataMap != null) {
-            for (Map.Entry<String, Object> entry : arbitraryDataMap.entrySet()) {
+        Map<String, String> arbitraryDataMap = event.getArbitraryDataMap();
+        if (arbitraryDataMap != null) {
+            for (Map.Entry<String, String> entry : arbitraryDataMap.entrySet()) {
                 eventMapObject.put(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX + entry.getKey(), entry.getValue());
             }
         }

@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.publisher.core.internal;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
@@ -348,13 +349,13 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             eventCounter.inc();
         }
 
-        org.wso2.siddhi.core.event.Event siddhiEvent = EventPublisherUtil.convertToSiddhiEvent(event, inputStreamSize);
+        Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
 
         try {
             if (customMappingEnabled) {
-                outObject = outputMapper.convertToMappedInputEvent(siddhiEvent);
+                outObject = outputMapper.convertToMappedOutputEvent(event);
             } else {
-                outObject = outputMapper.convertToTypedInputEvent(siddhiEvent);
+                outObject = outputMapper.convertToTypedOutputEvent(event);
             }
         } catch (EventPublisherConfigurationException e) {
             log.error("Cannot send " + event + " from " + eventPublisherConfiguration.getEventPublisherName(), e);
@@ -366,7 +367,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         if (dynamicMessagePropertyEnabled) {
-            changeDynamicEventAdapterMessageProperties(siddhiEvent.getData(), dynamicProperties);
+            changeDynamicEventAdapterMessageProperties(eventData, dynamicProperties);
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();

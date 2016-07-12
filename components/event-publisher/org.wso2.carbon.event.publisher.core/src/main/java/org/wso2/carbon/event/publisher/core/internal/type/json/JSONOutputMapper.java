@@ -21,7 +21,9 @@ package org.wso2.carbon.event.publisher.core.internal.type.json;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.commons.lang.ArrayUtils;
 import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
@@ -30,7 +32,6 @@ import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfiguratio
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
-import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,11 +96,12 @@ public class JSONOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToMappedInputEvent(Event event)
+    public Object convertToMappedOutputEvent(Event event)
             throws EventPublisherConfigurationException {
 
         // Retrieve resource at runtime if it is from registry
         JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
+        Object[] eventData = ArrayUtils.addAll(ArrayUtils.addAll(event.getMetaData(), event.getCorrelationData()), event.getPayloadData());
         if (outputMapping.isRegistryResource()) {
             String path = outputMapping.getMappingText();
             if (isCustomRegistryPath) {
@@ -110,7 +112,7 @@ public class JSONOutputMapper implements OutputMapper {
                     if (i % 2 == 0) {
                         pathBuilder.append(pathMappingTextList.get(i));
                     } else {
-                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
+                        pathBuilder.append(getPropertyValue(eventData, event.getArbitraryDataMap(), pathMappingTextList.get(i)));
                     }
                 }
                 path = pathBuilder.toString();
@@ -125,7 +127,7 @@ public class JSONOutputMapper implements OutputMapper {
             if (i % 2 == 0) {
                 eventText.append(mappingTextList.get(i));
             } else {
-                Object propertyValue = getPropertyValue(event, mappingTextList.get(i));
+                Object propertyValue = getPropertyValue(eventData, event.getArbitraryDataMap(), mappingTextList.get(i));
                 if (propertyValue != null && propertyValue instanceof String) {
                     eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
                             .append(propertyValue)
@@ -138,7 +140,7 @@ public class JSONOutputMapper implements OutputMapper {
 
         String text = eventText.toString();
         if (!this.isCustomMappingEnabled) {
-            Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
+            Map<String, String> arbitraryDataMap = event.getArbitraryDataMap();
             if (arbitraryDataMap != null && !arbitraryDataMap.isEmpty()) {
                 Gson gson = new Gson();
                 JsonParser parser = new JsonParser();
@@ -152,9 +154,9 @@ public class JSONOutputMapper implements OutputMapper {
     }
 
     @Override
-    public Object convertToTypedInputEvent(Event event)
+    public Object convertToTypedOutputEvent(Event event)
             throws EventPublisherConfigurationException {
-        return convertToMappedInputEvent(event);
+        return convertToMappedOutputEvent(event);
     }
 
 
@@ -173,9 +175,7 @@ public class JSONOutputMapper implements OutputMapper {
         return actualMappingText;
     }
 
-    private Object getPropertyValue(Event event, String mappingProperty) {
-        Object[] eventData = event.getData();
-        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
+    private Object getPropertyValue(Object[] eventData, Map<String, String> arbitraryMap, String mappingProperty) {
         Integer position = propertyPositionMap.get(mappingProperty);
         Object data = null;
 
