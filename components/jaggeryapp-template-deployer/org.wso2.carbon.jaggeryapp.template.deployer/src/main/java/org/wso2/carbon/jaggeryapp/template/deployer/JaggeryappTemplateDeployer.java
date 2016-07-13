@@ -132,12 +132,12 @@ public class JaggeryappTemplateDeployer implements TemplateDeployer {
                     .getConfigSystemRegistry(tenantId);
             Resource resource;
             if (registry.resourceExists(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
-                // If same jaggeryapp for same artifact exist, remove them first
+
                 resource = registry.get(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH);
 
-                // Throw exception if this artifact exists
+                // If same artifact id exists it is an edit
                 if (resource.getProperty(artifactId) != null) {
-                    throw new JaggeryappTemplateDeployerException("Jaggeryapp with same artifactId " + artifactId + " already exists");
+                    undeployArtifact(artifactId);
                 }
                 // Throw exception if same jaggeryapp exists
                 if (destination.exists()){
