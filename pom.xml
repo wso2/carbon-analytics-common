@@ -46,6 +46,7 @@
         <module>components/template-manager</module>
         <module>components/gadget-template-deployer</module>
         <module>components/dashboard-template-deployer</module>
+        <module>components/jaggeryapp-template-deployer</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
