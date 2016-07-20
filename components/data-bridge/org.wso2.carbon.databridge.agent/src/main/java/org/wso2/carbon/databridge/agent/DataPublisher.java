@@ -87,7 +87,7 @@ public class DataPublisher {
             DataEndpointAuthenticationException, TransportException {
         dataEndpointAgent = AgentHolder.getInstance().getDefaultDataEndpointAgent();
         processEndpoints(dataEndpointAgent, receiverURLSet, DataPublisherUtil.
-                getDefaultAuthURLSet(receiverURLSet), username, password);
+                getDefaultAuthURLSet(receiverURLSet), username, password,false);
         dataEndpointAgent.addDataPublisher(this);
     }
 
@@ -123,10 +123,47 @@ public class DataPublisher {
         if (authURLSet == null) {
             authURLSet = DataPublisherUtil.getDefaultAuthURLSet(receiverURLSet);
         }
-        processEndpoints(dataEndpointAgent, receiverURLSet, authURLSet, username, password);
+        processEndpoints(dataEndpointAgent, receiverURLSet, authURLSet, username, password, false);
         dataEndpointAgent.addDataPublisher(this);
     }
 
+    /**
+     * Creates the DataPublisher instance for a specific user, and the it creates
+     * connection asynchronously to receiver endpoint.
+     *
+     * @param type           The Agent name from which the DataPublisher that needs to be created. By default Thrift,
+     *                       and Binary is supported. The type should match with the <Name>
+     *                       element in the <data-agent-config.xml>, if null is passed one of the default type will be picked
+     * @param receiverURLSet The receiving endpoint URL Set. This can be either load balancing URL set,
+     *                       or Failover URL set.
+     * @param authURLSet     The authenticating URL Set for the endpoints given in receiverURLSet parameter.
+     *                       This should be in the same format as receiverURL set parameter. If null is passed
+     *                       the authURLs will be offsetted by value of 100.
+     * @param username       Authorized username at receiver.
+     * @param password       The password of the username provided.
+     * @param isServerAuthEnabled To enable server to server authentication, then needs to provide super tenant credentials
+     * @throws DataEndpointAgentConfigurationException
+     * @throws DataEndpointException
+     * @throws DataEndpointConfigurationException
+     * @throws DataEndpointAuthenticationException
+     * @throws TransportException
+     */
+    public DataPublisher(String type, String receiverURLSet, String authURLSet, String username, String password,
+            boolean isServerAuthEnabled )
+            throws DataEndpointAgentConfigurationException,
+                   DataEndpointException, DataEndpointConfigurationException,
+                   DataEndpointAuthenticationException, TransportException {
+        if (type == null) {
+            dataEndpointAgent = AgentHolder.getInstance().getDefaultDataEndpointAgent();
+        } else {
+            dataEndpointAgent = AgentHolder.getInstance().getDataEndpointAgent(type);
+        }
+        if (authURLSet == null) {
+            authURLSet = DataPublisherUtil.getDefaultAuthURLSet(receiverURLSet);
+        }
+        processEndpoints(dataEndpointAgent, receiverURLSet, authURLSet, username, password, isServerAuthEnabled);
+        dataEndpointAgent.addDataPublisher(this);
+    }
 
     /**
      * This validates the input that are passed in the DataPublisher creation,
@@ -147,9 +184,10 @@ public class DataPublisher {
      * @throws TransportException
      */
     private void processEndpoints(DataEndpointAgent dataEndpointAgent,
-                                  String receiverURLSet, String authURLSet, String username, String password)
+                                  String receiverURLSet, String authURLSet, String username, String password,
+                                  boolean isServerAuthEnabled)
             throws DataEndpointConfigurationException, DataEndpointAgentConfigurationException,
-            DataEndpointException, DataEndpointAuthenticationException, TransportException {
+                   DataEndpointException, DataEndpointAuthenticationException, TransportException {
         ArrayList<Object[]> receiverURLGroups = DataPublisherUtil.getEndpointGroups(receiverURLSet);
         ArrayList<Object[]> authURLGroups = DataPublisherUtil.getEndpointGroups(authURLSet);
         DataPublisherUtil.validateURLs(receiverURLGroups, authURLGroups);
@@ -163,7 +201,7 @@ public class DataPublisher {
             if (failOver)
                 endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.FAILOVER, dataEndpointAgent);
             else endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE,
-                    dataEndpointAgent);
+                                                       dataEndpointAgent);
             /**
              * Since the first element holds the failover/LB settings
              * we need to start iterating from 2nd element.
@@ -171,12 +209,13 @@ public class DataPublisher {
             for (int j = 1; j < receiverGroup.length; j++) {
                 DataEndpointConfiguration endpointConfiguration =
                         new DataEndpointConfiguration((String) receiverGroup[j],
-                                (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
-                                dataEndpointAgent.getSecuredTransportPool(), dataEndpointAgent.
+                                                      (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
+                                                      dataEndpointAgent.getSecuredTransportPool(), dataEndpointAgent.
                                 getAgentConfiguration().getBatchSize(),
-                                dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
-                                dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
-                                dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool());
+                                                      dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
+                                                      dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
+                                                      dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
+                                                      isServerAuthEnabled);
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);
                 endpointGroup.addDataEndpoint(dataEndpoint);

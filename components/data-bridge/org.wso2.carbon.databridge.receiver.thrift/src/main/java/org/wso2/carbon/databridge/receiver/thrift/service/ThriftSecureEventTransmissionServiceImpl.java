@@ -52,7 +52,15 @@ public class ThriftSecureEventTransmissionServiceImpl
 
     public String connect(String username, String password) throws ThriftAuthenticationException {
         try {
-            return dataBridgeReceiverService.login(username, password);
+            return dataBridgeReceiverService.login(username, password, false);
+        } catch (AuthenticationException e) {
+            throw new ThriftAuthenticationException(e.getErrorMessage());
+        }
+    }
+
+    public String connectWithServerAuthentication(String username, String password, boolean isServerAuthEnabled) throws ThriftAuthenticationException {
+        try {
+            return dataBridgeReceiverService.login(username, password, isServerAuthEnabled);
         } catch (AuthenticationException e) {
             throw new ThriftAuthenticationException(e.getErrorMessage());
         }

@@ -5,6 +5,7 @@ public class Credentials {
     private final String password;
     private final String domainName;
     private int tenantId;
+    private boolean isServerAuthEnabled;
 
     public Credentials(String username, String password, String domainName) {
         this.username = username;
@@ -12,11 +13,12 @@ public class Credentials {
         this.domainName = domainName;
     }
 
-    public Credentials(String username, String password, String domainName, int tenantId) {
+    public Credentials(String username, String password, String domainName, int tenantId, boolean isServerAuthEnabled) {
         this.username = username;
         this.password = password;
         this.domainName = domainName;
         this.tenantId = tenantId;
+        this.isServerAuthEnabled = isServerAuthEnabled;
     }
 
     public String getUsername() {
@@ -33,6 +35,14 @@ public class Credentials {
 
     public int getTenantId() {
         return tenantId;
+    }
+
+    public boolean isServerAuthEnabled() {
+        return isServerAuthEnabled;
+    }
+
+    public void setServerAuthEnabled(boolean serverAuthEnabled) {
+        isServerAuthEnabled = serverAuthEnabled;
     }
 
     @Override

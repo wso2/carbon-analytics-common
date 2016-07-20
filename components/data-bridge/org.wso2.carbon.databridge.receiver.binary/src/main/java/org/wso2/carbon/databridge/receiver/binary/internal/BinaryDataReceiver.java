@@ -176,17 +176,27 @@ public class BinaryDataReceiver {
         ByteBuffer byteBuffer = ByteBuffer.wrap(message);
         int sessionIdLength;
         String sessionId;
+        boolean isServerAuthEnabled = false;
 
         switch (messageType) {
             case 0: //Login
                 int userNameLength = byteBuffer.getInt();
                 int passwordLength = byteBuffer.getInt();
+                int isServerAuthEnabledLength = byteBuffer.getInt();
+                String userName;
+                String password;
 
-                String userName = new String(message, 8, userNameLength);
-                String password = new String(message, 8 + userNameLength, passwordLength);
+                if(isServerAuthEnabledLength != 4 && isServerAuthEnabledLength != 5){
+                    userName = new String(message, 8, userNameLength);
+                    password = new String(message, 8 + userNameLength, passwordLength);
+                } else {
+                    userName = new String(message, 12, userNameLength);
+                    password = new String(message, 12 + userNameLength, passwordLength);
+                    isServerAuthEnabled = Boolean.parseBoolean(new String(message, 12 + userNameLength + passwordLength, isServerAuthEnabledLength));
+                }
 
                 try {
-                    sessionId = dataBridgeReceiverService.login(userName, password);
+                    sessionId = dataBridgeReceiverService.login(userName, password, isServerAuthEnabled);
 
                     ByteBuffer buffer = ByteBuffer.allocate(5 + sessionId.length());
                     buffer.put((byte) 2);

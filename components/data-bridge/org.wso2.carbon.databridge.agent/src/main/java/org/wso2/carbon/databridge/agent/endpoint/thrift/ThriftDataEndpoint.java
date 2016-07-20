@@ -38,11 +38,24 @@ import java.util.List;
  */
 public class ThriftDataEndpoint extends DataEndpoint {
 
+
     @Override
     protected synchronized String login(Object client, String userName, String password)
             throws DataEndpointAuthenticationException {
         try {
             return ((ThriftSecureEventTransmissionService.Client) client).connect(userName, password);
+        } catch (ThriftAuthenticationException e) {
+            throw new DataEndpointAuthenticationException("Thrift Authentication Exception", e);
+        } catch (TException e) {
+            throw new DataEndpointAuthenticationException("Thrift exception", e);
+        }
+    }
+
+    @Override
+    protected synchronized String login(Object client, String userName, String password, boolean isServerAuthEnabled)
+            throws DataEndpointAuthenticationException {
+        try {
+            return ((ThriftSecureEventTransmissionService.Client) client).connectWithServerAuthentication(userName, password, isServerAuthEnabled);
         } catch (ThriftAuthenticationException e) {
             throw new DataEndpointAuthenticationException("Thrift Authentication Exception", e);
         } catch (TException e) {

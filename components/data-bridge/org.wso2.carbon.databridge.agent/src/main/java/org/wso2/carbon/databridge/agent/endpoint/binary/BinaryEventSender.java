@@ -33,6 +33,7 @@ import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUt
  * This is a Util class which does the Binary message transformation for publish, login, logout operations.
  */
 public class BinaryEventSender {
+
     public static void sendBinaryLoginMessage(Socket socket, String userName, String password) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(13 + userName.length() + password.length());
         buf.put((byte) 0);
@@ -41,6 +42,25 @@ public class BinaryEventSender {
         buf.putInt(password.length());
         buf.put(userName.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         buf.put(password.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+
+        OutputStream outputStream = new BufferedOutputStream(socket.getOutputStream());
+        outputStream.write(buf.array());
+        outputStream.flush();
+    }
+
+    public static void sendBinaryLoginMessage(Socket socket, String userName, String password, boolean isServerAuthEnabled) throws IOException {
+
+        String serverAuthEnabledProperty = String.valueOf(isServerAuthEnabled);
+
+        ByteBuffer buf = ByteBuffer.allocate(17 + userName.length() + password.length() + serverAuthEnabledProperty.length());
+        buf.put((byte) 0);
+        buf.putInt(12 + userName.length() + password.length() + serverAuthEnabledProperty.length());
+        buf.putInt(userName.length());
+        buf.putInt(password.length());
+        buf.putInt(serverAuthEnabledProperty.length());
+        buf.put(userName.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+        buf.put(password.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+        buf.put(serverAuthEnabledProperty.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
 
         OutputStream outputStream = new BufferedOutputStream(socket.getOutputStream());
         outputStream.write(buf.array());
@@ -64,14 +84,20 @@ public class BinaryEventSender {
         List<byte[]> bytes = new ArrayList<byte[]>();
 
         for (Event event : events) {
-
+            int tenantId = event.getEventTenantId();
             int eventSize = getEventSize(event);
+            if(tenantId != 0){
+                eventSize += 4;
+            }
             messageSize += eventSize + 4;
             ByteBuffer eventDataBuffer = ByteBuffer.allocate(4 + eventSize);
             eventDataBuffer.putInt(eventSize);
             eventDataBuffer.putLong(event.getTimeStamp());
             eventDataBuffer.putInt(event.getStreamId().length());
             eventDataBuffer.put(event.getStreamId().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
+            if(tenantId != 0){
+                eventDataBuffer.putInt(event.getEventTenantId());
+            }
 
             if (event.getMetaData() != null && event.getMetaData().length != 0) {
                 for (Object aMetaData : event.getMetaData()) {

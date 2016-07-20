@@ -32,6 +32,7 @@ public class Event {
     private Object[] correlationData;
     private Object[] payloadData;
     private Map<String, String> arbitraryDataMap = null;
+    private int eventTenantId;
 
 
     public Event() {
@@ -60,6 +61,29 @@ public class Event {
         this.arbitraryDataMap = arbitraryDataMap;
     }
 
+    public Event(String streamId, long timeStamp, int eventTenantId, Object[] metaDataArray,
+                 Object[] correlationDataArray,
+                 Object[] payloadDataArray) {
+        this.streamId = streamId;
+        this.timeStamp = timeStamp;
+        this.eventTenantId = eventTenantId;
+        this.metaData = metaDataArray;
+        this.correlationData = correlationDataArray;
+        this.payloadData = payloadDataArray;
+    }
+
+    public Event(String streamId, long timeStamp, int eventTenantId, Object[] metaDataArray,
+                 Object[] correlationDataArray,
+                 Object[] payloadDataArray,
+                 Map<String, String> arbitraryDataMap) {
+        this.streamId = streamId;
+        this.timeStamp = timeStamp;
+        this.eventTenantId = eventTenantId;
+        this.metaData = metaDataArray;
+        this.correlationData = correlationDataArray;
+        this.payloadData = payloadDataArray;
+        this.arbitraryDataMap = arbitraryDataMap;
+    }
 
     public String getStreamId() {
         return streamId;
@@ -119,6 +143,14 @@ public class Event {
         }
     }
 
+    public int getEventTenantId() {
+        return eventTenantId;
+    }
+
+    public void setEventTenantId(int eventTenantId) {
+        this.eventTenantId = eventTenantId;
+    }
+
     @Override
     public String toString() {
         return "\nEvent{\n" +
@@ -141,6 +173,7 @@ public class Event {
         if (timeStamp != event.timeStamp) return false;
         if (arbitraryDataMap != null ? !arbitraryDataMap.equals(event.arbitraryDataMap) : event.arbitraryDataMap != null)
             return false;
+        if (eventTenantId != event.eventTenantId) return false;
         if (!Arrays.deepEquals(correlationData, event.correlationData)) return false;
         if (!Arrays.deepEquals(metaData, event.metaData)) return false;
         if (!Arrays.deepEquals(payloadData, event.payloadData)) return false;
@@ -157,6 +190,7 @@ public class Event {
         result = 31 * result + (correlationData != null ? Arrays.hashCode(correlationData) : 0);
         result = 31 * result + (payloadData != null ? Arrays.hashCode(payloadData) : 0);
         result = 31 * result + (arbitraryDataMap != null ? arbitraryDataMap.hashCode() : 0);
+        result = 31 * result + (int) (eventTenantId ^ (eventTenantId >>> 32));
         return result;
     }
 }

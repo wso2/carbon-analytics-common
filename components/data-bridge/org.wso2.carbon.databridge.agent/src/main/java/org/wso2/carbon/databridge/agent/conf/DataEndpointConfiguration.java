@@ -48,6 +48,8 @@ public class DataEndpointConfiguration {
 
     private int keepAliveTimeInPool;
 
+    private boolean isServerAuthEnabled;
+
     public enum Protocol {
         TCP, SSL;
 
@@ -60,7 +62,8 @@ public class DataEndpointConfiguration {
     public DataEndpointConfiguration(String receiverURL, String authURL, String username, String password,
                                      GenericKeyedObjectPool transportPool,
                                      GenericKeyedObjectPool securedTransportPool,
-                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool) {
+                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool,
+                                     boolean isServerAuthEnabled) {
         this.receiverURL = receiverURL;
         this.authURL = authURL;
         this.username = username;
@@ -75,6 +78,7 @@ public class DataEndpointConfiguration {
         this.corePoolSize = corePoolSize;
         this.maxPoolSize = maxPoolSize;
         this.keepAliveTimeInPool = keepAliveTimeInPool;
+        this.isServerAuthEnabled = isServerAuthEnabled;
     }
 
     public String getReceiverURL() {
@@ -137,6 +141,14 @@ public class DataEndpointConfiguration {
 
     public int getBatchSize() {
         return batchSize;
+    }
+
+    public boolean isServerAuthEnabled() {
+        return isServerAuthEnabled;
+    }
+
+    public void setServerAuthEnabled(boolean serverAuthEnabled) {
+        isServerAuthEnabled = serverAuthEnabled;
     }
 }
 

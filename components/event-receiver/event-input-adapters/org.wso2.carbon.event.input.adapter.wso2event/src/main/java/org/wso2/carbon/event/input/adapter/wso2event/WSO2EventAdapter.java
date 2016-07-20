@@ -51,16 +51,16 @@ public final class WSO2EventAdapter implements InputEventAdapter {
 
     @Override
     public void connect() {
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
         String streamId = eventAdapterConfiguration.getInputStreamIdOfWso2eventMessageFormat();
-        WSO2EventAdapterServiceValueHolder.registerAdapterService(tenantDomain,streamId, this);
+        WSO2EventAdapterServiceValueHolder.registerAdapterService(tenantId,streamId, this);
     }
 
     @Override
     public void disconnect() {
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
         String streamId = eventAdapterConfiguration.getInputStreamIdOfWso2eventMessageFormat();
-        WSO2EventAdapterServiceValueHolder.unregisterAdapterService(tenantDomain, streamId, this);
+        WSO2EventAdapterServiceValueHolder.unregisterAdapterService(tenantId, streamId, this);
     }
 
     @Override

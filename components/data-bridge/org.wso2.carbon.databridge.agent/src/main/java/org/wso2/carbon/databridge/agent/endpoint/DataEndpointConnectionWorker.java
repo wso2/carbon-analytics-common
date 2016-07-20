@@ -87,12 +87,22 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     private void connect() throws DataEndpointAuthenticationException {
         Object client = null;
+        String sessionId = null;
+
         try {
             client = this.dataEndpointConfiguration.getSecuredTransportPool().
                     borrowObject(dataEndpointConfiguration.getAuthKey());
-            String sessionId = this.dataEndpoint.
-                    login(client, dataEndpointConfiguration.getUsername(),
-                            dataEndpointConfiguration.getPassword());
+            boolean isServerAuthEnabled = dataEndpointConfiguration.isServerAuthEnabled();
+            if(isServerAuthEnabled){
+                sessionId = this.dataEndpoint.
+                        login(client, dataEndpointConfiguration.getUsername(),
+                                dataEndpointConfiguration.getPassword(),dataEndpointConfiguration.isServerAuthEnabled());
+            } else {
+                sessionId = this.dataEndpoint.
+                        login(client, dataEndpointConfiguration.getUsername(),
+                              dataEndpointConfiguration.getPassword());
+            }
+
             dataEndpointConfiguration.setSessionId(sessionId);
         } catch (Throwable e) {
             log.error(e.getMessage(), e);

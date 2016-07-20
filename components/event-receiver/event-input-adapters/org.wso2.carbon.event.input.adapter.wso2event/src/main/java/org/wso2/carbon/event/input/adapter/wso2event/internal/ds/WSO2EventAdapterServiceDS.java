@@ -81,24 +81,47 @@ public class WSO2EventAdapterServiceDS {
 
                 @Override
                 public void receive(List<Event> events, Credentials credentials) {
-                    try {
-                        PrivilegedCarbonContext.startTenantFlow();
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(credentials.getTenantId());
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(credentials.getDomainName());
-                        for (Event event : events) {
-                            ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(credentials.getDomainName(), event.getStreamId());
-                            if (adapters != null) {
-                                for (WSO2EventAdapter adapter : adapters.values()) {
-                                    adapter.getEventAdaptorListener().onEvent(event);
+                    if (!credentials.isServerAuthEnabled()) {
+                        try {
+                            PrivilegedCarbonContext.startTenantFlow();
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(credentials.getTenantId());
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(credentials.getDomainName());
+                            for (Event event : events) {
+                                ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(credentials.getTenantId(), event.getStreamId());
+                                if (adapters != null) {
+                                    for (WSO2EventAdapter adapter : adapters.values()) {
+                                        adapter.getEventAdaptorListener().onEvent(event);
+                                    }
+                                }
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Event received in wso2Event Adapter - " + event);
                                 }
                             }
-                            if (log.isDebugEnabled()) {
-                                log.debug("Event received in wso2Event Adapter - " + event);
-                            }
+                        } finally {
+                            PrivilegedCarbonContext.endTenantFlow();
                         }
-                    } finally {
-                        PrivilegedCarbonContext.endTenantFlow();
+                    } else {
+                        for (Event event : events) {
+                            try {
+                                PrivilegedCarbonContext.startTenantFlow();
+                                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(event.getEventTenantId());
+                                ConcurrentHashMap<String, WSO2EventAdapter> adapters = WSO2EventAdapterServiceValueHolder.getAdapterService(event.getEventTenantId(), event.getStreamId());
+                                if (adapters != null) {
+                                    for (WSO2EventAdapter adapter : adapters.values()) {
+                                        adapter.getEventAdaptorListener().onEvent(event);
+                                    }
+                                }
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Event received in wso2Event Adapter with server authentication - " + event);
+                                }
+                            } finally {
+                                PrivilegedCarbonContext.endTenantFlow();
+                            }
+
+                        }
+
                     }
+
                 }
             });
         }

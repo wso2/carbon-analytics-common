@@ -57,6 +57,10 @@ public final class ThriftEventConverter {
         thriftEventBundle = assignAttributes(thriftEventBundle, event.getCorrelationData());
         thriftEventBundle = assignAttributes(thriftEventBundle, event.getPayloadData());
         thriftEventBundle = assignMap(thriftEventBundle, event.getArbitraryDataMap());
+        if(event.getEventTenantId() != 0){
+            thriftEventBundle.addToIntAttributeList(event.getEventTenantId());
+        }
+
         thriftEventBundle.setEventNum(thriftEventBundle.getEventNum() + 1);
 
         return thriftEventBundle;

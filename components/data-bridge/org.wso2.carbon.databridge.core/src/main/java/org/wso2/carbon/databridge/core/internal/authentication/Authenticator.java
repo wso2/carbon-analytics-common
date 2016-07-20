@@ -28,6 +28,8 @@ import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.internal.authentication.session.SessionBean;
 import org.wso2.carbon.databridge.core.internal.authentication.session.SessionCache;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.UUID;
 
@@ -47,7 +49,7 @@ public final class Authenticator {
         sessionCache = new SessionCache(dataBridgeConfiguration.getClientTimeoutMin());
     }
 
-    public String authenticate(String userName, String password) throws AuthenticationException {
+    public String authenticate(String userName, String password, boolean isServerAuthEnabled) throws AuthenticationException {
 
         if (userName == null) {
             logAndAuthenticationException("Authentication request was missing the user name ");
@@ -78,10 +80,17 @@ public final class Authenticator {
             try {
                 String tenantDomain = authenticationHandler.getTenantDomain(userName);
                 tenantId = authenticationHandler.getTenantId(tenantDomain);
+
+                if(isServerAuthEnabled){
+                    if(! tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+                        logAndAuthenticationException("Authentication request needs to contain super tenant credentials " +
+                                                      "to enable server to server authentication");
+                    }
+                }
             } catch (UserStoreException e) {
                 logAndAuthenticationException("Could not resolve the user to a valid tenant.");
             }
-            Credentials credentials = new Credentials(userName, password, authenticationHandler.getTenantDomain(userName), tenantId);
+            Credentials credentials = new Credentials(userName, password, authenticationHandler.getTenantDomain(userName), tenantId, isServerAuthEnabled);
             sessionCache.getSession(new SessionBean(sessionId, credentials));
             return sessionId;
         }

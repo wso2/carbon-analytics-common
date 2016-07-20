@@ -85,9 +85,9 @@ public final class ThriftEventConverter implements EventConverter {
     }
 
     public List<Event> toEventList(Object eventBundle,
-                                   StreamTypeHolder streamTypeHolder) {
+                                   StreamTypeHolder streamTypeHolder, boolean isServerAuthEnabled) {
         if (eventBundle instanceof ThriftEventBundle) {
-            return createEventList((ThriftEventBundle) eventBundle, streamTypeHolder);
+            return createEventList((ThriftEventBundle) eventBundle, streamTypeHolder, isServerAuthEnabled);
         } else {
             throw new EventConversionException("Wrong type of event received " + eventBundle.getClass());
         }
@@ -139,13 +139,14 @@ public final class ThriftEventConverter implements EventConverter {
     }
 
     private List<Event> createEventList(ThriftEventBundle thriftEventBundle,
-                                        StreamTypeHolder streamTypeHolder) {
+                                        StreamTypeHolder streamTypeHolder, boolean isServerAuthEnabled) {
 
         IndexCounter indexCounter = new IndexCounter();
-        List<Event> eventList = new ArrayList<>(thriftEventBundle.getEventNum());
+        int numOfEvents =  thriftEventBundle.getEventNum();
+        List<Event> eventList = new ArrayList<>(numOfEvents);
         String streamId = null;
         try {
-            for (int i = 0; i < thriftEventBundle.getEventNum(); i++) {
+            for (int i = 0; i < numOfEvents; i++) {
                 Event event = new Event();
                 streamId = thriftEventBundle.getStringAttributeList().get(indexCounter.getStringCount());
                 indexCounter.incrementStringCount();
@@ -175,6 +176,15 @@ public final class ThriftEventConverter implements EventConverter {
                         event.setArbitraryDataMap(arbitraryData);
                     }
                 }
+
+                if(isServerAuthEnabled){
+                    int eventTenantId = thriftEventBundle.getIntAttributeList().get(indexCounter.getIntCount());
+                    indexCounter.incrementIntCount();
+                    event.setEventTenantId(eventTenantId);
+                } else {
+                    event.setEventTenantId(0);
+                }
+
                 eventList.add(event);
             }
         } catch (RuntimeException re) {
