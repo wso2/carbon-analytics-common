@@ -1,0 +1,50 @@
+<%
+    var log = new Log();
+
+    //Get current user
+    var currUser = session.get("user");
+
+
+    webSocket.ontext = function (data) {
+        //Check session has a valid user
+        if (currUser != null) {
+
+            //get subscribed stream from gadget
+             this.stream = data;
+             this.id = this.stream + "1";
+             log.info(this.id + " opened "+ currUser.username);
+
+             //Get current sessions of stream
+             var streamSessions = application.get(this.stream);
+
+             if (streamSessions  == null) {
+                streamSessions = [];
+             } else {
+                application.remove(this.stream);
+             }
+
+             //add current websocket session to stream and update session list
+             streamSessions.push(this);
+             application.put(this.stream, streamSessions);
+       }
+    };
+
+    webSocket.onclose = function(){
+      //Get current sessions of stream
+      var streamSessions = application.get(this.stream);
+
+      //search current session from the list and update list by removing it
+      for (var i = 0; i < streamSessions.length; i++) {
+          if(streamSessions[i].id == this.id) {
+              application.remove(this.stream);
+
+              streamSessions.splice(i, 1)
+              application.put(this.stream,streamSessions);
+              log.info(this.id + " closed "+ currUser.username);
+              break;
+          }
+      }
+
+
+    };
+%>
