@@ -1,65 +1,73 @@
 /*
- *
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an
- *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations
- *  under the License.
- *
- */
+*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 package org.wso2.carbon.event.output.adapter.ui;
 
+import org.apache.axiom.om.util.Base64;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.CarbonContext;
+import org.apache.http.HttpHost;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
-import org.wso2.carbon.event.output.adapter.ui.internal.UIOutputCallbackControllerServiceImpl;
-import org.wso2.carbon.event.output.adapter.ui.internal.ds.UIEventAdaptorServiceInternalValueHolder;
 import org.wso2.carbon.event.output.adapter.ui.internal.util.UIEventAdapterConstants;
 
-import javax.websocket.Session;
-import java.io.IOException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
-
-/**
- * Contains the life cycle of executions regarding the UI Adapter
- */
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class UIEventAdapter implements OutputEventAdapter {
-
-    private static final Log log = LogFactory.getLog(UIEventAdapter.class);
+    private static final Log log = LogFactory.getLog(OutputEventAdapter.class);
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
-    private String streamId;
-    private int queueSize;
-    private LinkedBlockingDeque<Object> streamSpecificEvents;
-    private static ThreadPoolExecutor executorService;
+    private static ExecutorService executorService;
+    private String clientMethod;
     private int tenantId;
-    private boolean doLogDroppedMessage;
 
-    public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
-            String> globalProperties) {
+    private String contentType;
+    private static HttpConnectionManager connectionManager;
+    private HttpClient httpClient = null;
+    private HostConfiguration hostConfiguration = null;
+
+    public UIEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
+                          Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-        this.doLogDroppedMessage = true;
+        this.clientMethod = eventAdapterConfiguration.getStaticProperties()
+                .get(UIEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
+
     }
 
     @Override
@@ -76,91 +84,57 @@ public class UIEventAdapter implements OutputEventAdapter {
 
             //If global properties are available those will be assigned else constant values will be assigned
             if (globalProperties.get(UIEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME) != null) {
-                minThread = Integer.parseInt(globalProperties.get(
-                        UIEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
+                minThread = Integer
+                        .parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE_NAME));
             } else {
                 minThread = UIEventAdapterConstants.ADAPTER_MIN_THREAD_POOL_SIZE;
             }
 
             if (globalProperties.get(UIEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME) != null) {
-                maxThread = Integer.parseInt(globalProperties.get(
-                        UIEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
+                maxThread = Integer
+                        .parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE_NAME));
             } else {
                 maxThread = UIEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
             }
 
             if (globalProperties.get(UIEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME) != null) {
-                defaultKeepAliveTime = Integer.parseInt(globalProperties.get(
-                        UIEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
+                defaultKeepAliveTime = Integer
+                        .parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_KEEP_ALIVE_TIME_NAME));
             } else {
                 defaultKeepAliveTime = UIEventAdapterConstants.DEFAULT_KEEP_ALIVE_TIME_IN_MILLIS;
             }
 
             if (globalProperties.get(UIEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME) != null) {
-                jobQueSize = Integer.parseInt(globalProperties.get(
-                        UIEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
+                jobQueSize = Integer
+                        .parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
             } else {
                 jobQueSize = UIEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE;
             }
-
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(jobQueSize));
-        }
 
-        streamId = eventAdapterConfiguration.getOutputStreamIdOfWso2eventMessageFormat();
-        if (streamId == null || streamId.isEmpty()) {
-            throw new OutputEventAdapterRuntimeException("UI event adapter needs a output stream id");
-        }
+            //configurations for the httpConnectionManager which will be shared by every http adapter
+            int defaultMaxConnectionsPerHost;
+            int maxTotalConnections;
 
-        ConcurrentHashMap<Integer, ConcurrentHashMap<String, String>> tenantSpecifcEventOutputAdapterMap =
-                UIEventAdaptorServiceInternalValueHolder.getTenantSpecificOutputEventStreamAdapterMap();
-
-        ConcurrentHashMap<String, String> streamSpecifAdapterMap = tenantSpecifcEventOutputAdapterMap.get(tenantId);
-
-        if (streamSpecifAdapterMap == null) {
-            streamSpecifAdapterMap = new ConcurrentHashMap<String, String>();
-            if (null != tenantSpecifcEventOutputAdapterMap.putIfAbsent(tenantId, streamSpecifAdapterMap)) {
-                streamSpecifAdapterMap = tenantSpecifcEventOutputAdapterMap.get(tenantId);
+            if (globalProperties.get(UIEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST) != null) {
+                defaultMaxConnectionsPerHost = Integer
+                        .parseInt(globalProperties.get(UIEventAdapterConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST));
+            } else {
+                defaultMaxConnectionsPerHost = UIEventAdapterConstants.DEFAULT_DEFAULT_MAX_CONNECTIONS_PER_HOST;
             }
-        }
 
-        String adapterName = streamSpecifAdapterMap.get(streamId);
-
-        if (adapterName != null) {
-            throw new OutputEventAdapterException(("An Output ui event adapter \"" + adapterName + "\" is already" +
-                    " exist for stream id \"" + streamId + "\""));
-        } else {
-            streamSpecifAdapterMap.put(streamId, eventAdapterConfiguration.getName());
-
-            ConcurrentHashMap<Integer, ConcurrentHashMap<String, LinkedBlockingDeque<Object>>> tenantSpecificStreamMap =
-                    UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap();
-            ConcurrentHashMap<String, LinkedBlockingDeque<Object>> streamSpecificEventsMap = tenantSpecificStreamMap.get(tenantId);
-
-            if (streamSpecificEventsMap == null) {
-                streamSpecificEventsMap = new ConcurrentHashMap<String, LinkedBlockingDeque<Object>>();
-                if (null != tenantSpecificStreamMap.putIfAbsent(tenantId, streamSpecificEventsMap)) {
-                    streamSpecificEventsMap = tenantSpecificStreamMap.get(tenantId);
-                }
+            if (globalProperties.get(UIEventAdapterConstants.MAX_TOTAL_CONNECTIONS) != null) {
+                maxTotalConnections = Integer
+                        .parseInt(globalProperties.get(UIEventAdapterConstants.MAX_TOTAL_CONNECTIONS));
+            } else {
+                maxTotalConnections = UIEventAdapterConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
             }
-            streamSpecificEvents = streamSpecificEventsMap.get(streamId);
 
-            if (streamSpecificEvents == null) {
-                streamSpecificEvents = new LinkedBlockingDeque<Object>();
-                if (null != streamSpecificEventsMap.putIfAbsent(streamId, streamSpecificEvents)) {
-                    streamSpecificEvents = streamSpecificEventsMap.get(streamId);
-                }
-            }
-        }
+            connectionManager = new MultiThreadedHttpConnectionManager();
+            connectionManager.getParams().setDefaultMaxConnectionsPerHost(defaultMaxConnectionsPerHost);
+            connectionManager.getParams().setMaxTotalConnections(maxTotalConnections);
 
-        if (globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME) != null) {
-            try {
-                queueSize = Integer.parseInt(globalProperties.get(UIEventAdapterConstants.ADAPTER_EVENT_QUEUE_SIZE_NAME));
-            } catch (NumberFormatException e) {
-                log.error("String does not have the appropriate format for conversion." + e.getMessage());
-                queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
-            }
-        } else {
-            queueSize = UIEventAdapterConstants.EVENTS_QUEUE_SIZE;
         }
     }
 
@@ -171,145 +145,197 @@ public class UIEventAdapter implements OutputEventAdapter {
 
     @Override
     public void connect() {
-        //Not needed
+        this.checkHTTPClientInit(eventAdapterConfiguration.getStaticProperties());
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-
-        Event event = (Event) message;
-        StringBuilder eventBuilder = new StringBuilder("[");
-
-        if (streamSpecificEvents.size() == queueSize) {
-            streamSpecificEvents.removeFirst();
-        }
-
-        eventBuilder.append(event.getTimeStamp());
-
-        if (event.getMetaData() != null) {
-            eventBuilder.append(",");
-            Object[] metaData = event.getMetaData();
-            for (int i = 0; i < metaData.length; i++) {
-                eventBuilder.append("\"");
-                eventBuilder.append(metaData[i]);
-                eventBuilder.append("\"");
-                if (i != (metaData.length - 1)) {
-                    eventBuilder.append(",");
-                }
-            }
-        }
-
-        if (event.getCorrelationData() != null) {
-            Object[] correlationData = event.getCorrelationData();
-
-            eventBuilder.append(",");
-
-            for (int i = 0; i < correlationData.length; i++) {
-                eventBuilder.append("\"");
-                eventBuilder.append(correlationData[i]);
-                eventBuilder.append("\"");
-                if (i != (correlationData.length - 1)) {
-                    eventBuilder.append(",");
-                }
-            }
-        }
-
-        if (event.getPayloadData() != null) {
-            Object[] payloadData = event.getPayloadData();
-            eventBuilder.append(",");
-            for (int i = 0; i < payloadData.length; i++) {
-                eventBuilder.append("\"");
-                eventBuilder.append(payloadData[i]);
-                eventBuilder.append("\"");
-                if (i != (payloadData.length - 1)) {
-                    eventBuilder.append(",");
-                }
-            }
-        }
-
-        eventBuilder.append("]");
-        String eventString = eventBuilder.toString();
-        Object[] eventValues = new Object[UIEventAdapterConstants.INDEX_TWO];
-        eventValues[UIEventAdapterConstants.INDEX_ZERO] = eventString;
-        eventValues[UIEventAdapterConstants.INDEX_ONE] = System.currentTimeMillis();
-        streamSpecificEvents.add(eventValues);
+        //Load dynamic properties
+        String url = dynamicProperties.get(UIEventAdapterConstants.ADAPTER_MESSAGE_URL);
+        String username = dynamicProperties.get(UIEventAdapterConstants.ADAPTER_USERNAME);
+        String password = dynamicProperties.get(UIEventAdapterConstants.ADAPTER_PASSWORD);
+        Map<String, String> headers = this
+                .extractHeaders(dynamicProperties.get(UIEventAdapterConstants.ADAPTER_HEADERS));
+        String payload = message.toString();
 
         try {
-            executorService.execute(new WebSocketSender(eventString));
+            executorService.submit(new HTTPSender(url, payload, username, password, headers, httpClient));
         } catch (RejectedExecutionException e) {
-            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
+            EventAdapterUtil
+                    .logAndDrop(eventAdapterConfiguration.getName(), message, "Job queue is full", e, log, tenantId);
         }
-
     }
 
     @Override
     public void disconnect() {
-        //Not needed
+        //not required
     }
 
     @Override
     public void destroy() {
-
-        int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        ConcurrentHashMap<String, String> tenantSpecificAdapterMap = UIEventAdaptorServiceInternalValueHolder
-                .getTenantSpecificOutputEventStreamAdapterMap().get(tenantId);
-        if (tenantSpecificAdapterMap != null && streamId != null) {
-            tenantSpecificAdapterMap.remove(streamId);      //Removing outputadapter and streamId
-        }
-
-        ConcurrentHashMap<String, LinkedBlockingDeque<Object>> tenantSpecificStreamEventMap =
-                UIEventAdaptorServiceInternalValueHolder.getTenantSpecificStreamEventMap().get(tenantId);
-        if (tenantSpecificStreamEventMap != null && streamId != null) {
-            tenantSpecificStreamEventMap.remove(streamId);  //Removing the streamId and events registered for the output adapter
-        }
+        //not required
     }
 
     @Override
     public boolean isPolled() {
-        return true;
+        return false;
     }
 
-    private class WebSocketSender implements Runnable {
+    private void checkHTTPClientInit(Map<String, String> staticProperties) {
 
-        private String message;
-
-        public WebSocketSender(String message) {
-            this.message = message;
+        if (this.httpClient != null) {
+            return;
         }
 
-        /**
-         * When an object implementing interface <code>Runnable</code> is used
-         * to create a thread, starting the thread causes the object's
-         * <code>run</code> method to be called in that separately executing
-         * thread.
-         * <p/>
-         * The general contract of the method <code>run</code> is that it may
-         * take any action whatsoever.
-         *
-         * @see Thread#run()
-         */
-        @Override
+        synchronized (UIEventAdapter.class) {
+            if (this.httpClient != null) {
+                return;
+            }
+
+            httpClient = new HttpClient(connectionManager);
+
+            String proxyHost = staticProperties.get(UIEventAdapterConstants.ADAPTER_PROXY_HOST);
+            String proxyPort = staticProperties.get(UIEventAdapterConstants.ADAPTER_PROXY_PORT);
+            if (proxyHost != null && proxyHost.trim().length() > 0) {
+                try {
+                    HttpHost host = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+                    this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, host);
+                } catch (NumberFormatException e) {
+                    log.error("Invalid proxy port: " + proxyPort + ", "
+                            + "ignoring proxy settings for HTTP output event adaptor...");
+                }
+            }
+
+            String messageFormat = eventAdapterConfiguration.getMessageFormat();
+            if (messageFormat.equalsIgnoreCase("json")) {
+                contentType = "application/json";
+            } else if (messageFormat.equalsIgnoreCase("text")) {
+                contentType = "text/plain";
+            } else {
+                contentType = "text/xml";
+            }
+
+        }
+
+    }
+
+    private Map<String, String> extractHeaders(String headers) {
+        if (headers == null || headers.trim().length() == 0) {
+            return null;
+        }
+
+        String[] entries = headers.split(UIEventAdapterConstants.HEADER_SEPARATOR);
+        String[] keyValue;
+        Map<String, String> result = new HashMap<String, String>();
+        for (String header : entries) {
+            try {
+                keyValue = header.split(UIEventAdapterConstants.ENTRY_SEPARATOR, 2);
+                result.put(keyValue[0].trim(), keyValue[1].trim());
+            } catch (Exception e) {
+                log.warn("Header property '" + header + "' is not defined in the correct format.", e);
+            }
+        }
+        return result;
+
+    }
+
+    /**
+     * This class represents a job to send an HTTP request to a target URL.
+     */
+    class HTTPSender implements Runnable {
+
+        private String url;
+
+        private String payload;
+
+        private String username;
+
+        private String password;
+
+        private Map<String, String> headers;
+
+        private HttpClient httpClient;
+
+        public HTTPSender(String url, String payload, String username, String password, Map<String, String> headers,
+                HttpClient httpClient) {
+            this.url = url;
+            this.payload = payload;
+            this.username = username;
+            this.password = password;
+            this.headers = headers;
+            this.httpClient = httpClient;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public String getPayload() {
+            return payload;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public Map<String, String> getHeaders() {
+            return headers;
+        }
+
+        public HttpClient getHttpClient() {
+            return httpClient;
+        }
+
         public void run() {
 
-            UIOutputCallbackControllerServiceImpl uiOutputCallbackControllerServiceImpl = UIEventAdaptorServiceInternalValueHolder.getUIOutputCallbackRegisterServiceImpl();
-            CopyOnWriteArrayList<Session> sessions = uiOutputCallbackControllerServiceImpl.getSessions(tenantId, streamId);
-            if (sessions != null) {
-                doLogDroppedMessage = true;
-                for (Session session : sessions) {
-                    synchronized (session) {
-                        try {
-                            session.getBasicRemote().sendText(message);
-                        } catch (IOException e) {
-                            EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to endpoint", e, log, tenantId);
-                        }
+            EntityEnclosingMethod method = null;
+
+            try {
+
+                if (clientMethod.equalsIgnoreCase(UIEventAdapterConstants.CONSTANT_HTTP_PUT)) {
+                    method = new PutMethod(this.getUrl());
+                } else {
+                    method = new PostMethod(this.getUrl());
+                }
+
+                if (hostConfiguration == null) {
+                    URL hostUrl = new URL(this.getUrl());
+                    hostConfiguration = new HostConfiguration();
+                    hostConfiguration.setHost(hostUrl.getHost(), hostUrl.getPort(), hostUrl.getProtocol());
+                }
+
+                method.setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
+
+                if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
+                    method.setRequestHeader("Authorization", "Basic " + Base64
+                            .encode((this.getUsername() + UIEventAdapterConstants.ENTRY_SEPARATOR + this
+                                            .getPassword()).getBytes()));
+                }
+
+                if (this.getHeaders() != null) {
+                    for (Map.Entry<String, String> header : this.getHeaders().entrySet()) {
+                        method.setRequestHeader(header.getKey(), header.getValue());
                     }
                 }
-            } else if (doLogDroppedMessage) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "No clients registered", log, tenantId);
-                doLogDroppedMessage = false;
+
+                this.getHttpClient().executeMethod(hostConfiguration, method);
+
+            } catch (UnknownHostException e) {
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
+                        "Cannot connect to " + this.getUrl(), e, log, tenantId);
+            } catch (Throwable e) {
+                EventAdapterUtil
+                        .logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), null, e, log, tenantId);
+            } finally {
+                if (method != null) {
+                    method.releaseConnection();
+                }
             }
         }
     }
-}
 
+}
