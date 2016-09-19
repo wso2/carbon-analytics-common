@@ -24,6 +24,6 @@ package org.wso2.carbon.event.publisher.core.config;
  */
 public interface CustomMapperFunction {
 
-    public String call(Object[] parameters);
+    public Object call(Object[] parameters);
 
 }
