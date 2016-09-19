@@ -20,9 +20,12 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.wso2.carbon.event.publisher.core.exception.CustomMapperFunctionException;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.core.EventStreamListenerImpl;
+import org.wso2.carbon.event.publisher.core.config.CustomMapperFunction;
+import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherManagementService;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherService;
@@ -30,9 +33,16 @@ import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -78,7 +88,10 @@ public class EventPublisherServiceDS {
 
             context.getBundleContext().registerService(EventStreamListener.class.getName(), new EventStreamListenerImpl(), null);
 
-        } catch (RuntimeException e) {
+            //set custom output mapper functions
+            EventPublisherServiceValueHolder.setCustomMapperFunctions(getCustomMappingFunctions());
+
+        } catch (Exception e) {
             log.error("Could not create EventPublisherService : " + e.getMessage(), e);
         }
     }
@@ -179,5 +192,25 @@ public class EventPublisherServiceDS {
 
     }
 
-
+    /**
+     * Loads the custom mapping function names and classes.
+     */
+    protected ConcurrentHashMap<String, CustomMapperFunction> getCustomMappingFunctions() throws CustomMapperFunctionException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+        String propertyFile = CarbonUtils.getCarbonConfigDirPath() + File.separator + EventPublisherConstants.OUTPUTMAPPER_CUSTOM_FUNCTION_FILE_NAME;
+        ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctions = new ConcurrentHashMap<>();
+        try (InputStream in = new FileInputStream(propertyFile)) {
+            Properties properties = new Properties();
+            properties.load(in);
+            for (String property : properties.stringPropertyNames()) {
+                String className = properties.getProperty(property);
+                Class<?> customFunctionClass = Class.forName(className);
+                if (CustomMapperFunction.class.isAssignableFrom(customFunctionClass)) {
+                    customMapperFunctions.put(property,(CustomMapperFunction) customFunctionClass.newInstance());
+                }
+            }
+        } catch (IOException e) {
+            throw new CustomMapperFunctionException("Cannot load config file: " + propertyFile + "due to: " + e.getMessage(), e);
+        }
+        return customMapperFunctions;
+    }
 }

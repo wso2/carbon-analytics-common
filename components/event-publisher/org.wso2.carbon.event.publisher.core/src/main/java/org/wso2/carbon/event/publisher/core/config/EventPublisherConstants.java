@@ -61,6 +61,7 @@ public final class EventPublisherConstants {
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
     public static final String PROPERTY_ARBITRARY_DATA_MAP_PREFIX = "arbitrary_";
+    public static final String OUTPUTMAPPER_CUSTOM_FUNCTION_FILE_NAME = "custom-outputmapper-function.properties";
 
     public static final Map<String, AttributeType> STRING_ATTRIBUTE_TYPE_MAP = Collections.unmodifiableMap(new HashMap<String, AttributeType>() {{
         put(ATTR_TYPE_BOOL, AttributeType.BOOL);
