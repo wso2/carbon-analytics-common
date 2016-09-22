@@ -101,6 +101,8 @@ public final class EventPublisherConstants {
     public static final String EVENT_DEFAULT_NAMESPACE = "http://wso2.org/carbon/events";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_PREFIX = "{{";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_POSTFIX = "}}";
+    public static final String CUSTOM_FUNCTION_CLOSING_BRACKET = ")";
+    public static final String CUSTOM_FUNCTION_OPENING_BRACKET = "(";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String EVENT_ATTRIBUTE_SEPARATOR = ",";
     public static final String DEFAULT_STREAM_VERSION = "1.0.0";

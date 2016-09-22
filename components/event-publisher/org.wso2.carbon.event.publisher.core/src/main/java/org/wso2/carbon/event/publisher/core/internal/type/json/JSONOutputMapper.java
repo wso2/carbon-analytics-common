@@ -23,22 +23,29 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.publisher.core.config.CustomMapperFunction;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.JSONOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
+import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
+import org.wso2.carbon.event.publisher.core.mapper.AttributeOutputMapperType;
+import org.wso2.carbon.event.publisher.core.mapper.FunctionOutputMapperType;
+import org.wso2.carbon.event.publisher.core.mapper.OutputMapperType;
+import org.wso2.carbon.event.publisher.core.mapper.TextOutputMapperType;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JSONOutputMapper implements OutputMapper {
 
-    private List<String> mappingTextList;
+    private List<OutputMapperType> mappingTextList;
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private Map<String, Integer> propertyPositionMap = null;
     private final StreamDefinition streamDefinition;
@@ -46,6 +53,7 @@ public class JSONOutputMapper implements OutputMapper {
     private final RuntimeResourceLoader runtimeResourceLoader;
     private final boolean isCustomMappingEnabled;
     private final String mappingText;
+    private final ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctions;
 
     public JSONOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -68,11 +76,12 @@ public class JSONOutputMapper implements OutputMapper {
         if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
             this.mappingTextList = generateMappingTextList(this.mappingText);
         }
+        this.customMapperFunctions = EventPublisherServiceValueHolder.getCustomMapperFunctions();
     }
 
-    private List<String> generateMappingTextList(String mappingText) throws EventPublisherConfigurationException {
+    private List<OutputMapperType> generateMappingTextList(String mappingText) throws EventPublisherConfigurationException {
 
-        List<String> mappingTextList = new ArrayList<String>();
+        List<OutputMapperType> mappingTextList = new ArrayList<>();
         String text = mappingText;
 
         int prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
@@ -80,8 +89,13 @@ public class JSONOutputMapper implements OutputMapper {
         while (prefixIndex > 0) {
             postFixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
             if (postFixIndex > prefixIndex) {
-                mappingTextList.add(text.substring(0, prefixIndex));
-                mappingTextList.add(text.substring(prefixIndex + 2, postFixIndex));
+                mappingTextList.add(new TextOutputMapperType(text.substring(0, prefixIndex)));
+                String mapText = text.substring(prefixIndex + 2, postFixIndex);
+                if (mapText.endsWith(")")) {
+                    mappingTextList.add(new FunctionOutputMapperType(mapText));
+                } else {
+                    mappingTextList.add(new AttributeOutputMapperType(mapText));
+                }
                 text = text.substring(postFixIndex + 2);
             } else {
                 throw new EventPublisherConfigurationException("Found template attribute prefix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX
@@ -89,7 +103,7 @@ public class JSONOutputMapper implements OutputMapper {
             }
             prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
         }
-        mappingTextList.add(text);
+        mappingTextList.add(new TextOutputMapperType(text));
         return mappingTextList;
     }
 
@@ -98,7 +112,7 @@ public class JSONOutputMapper implements OutputMapper {
             throws EventPublisherConfigurationException {
 
         if (this.isCustomMappingEnabled) {
-            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap());
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap(), customMapperFunctions);
         }
         // Retrieve resource at runtime if it is from registry
         JSONOutputMapping outputMapping = (JSONOutputMapping) eventPublisherConfiguration.getOutputMapping();
@@ -106,13 +120,13 @@ public class JSONOutputMapper implements OutputMapper {
             String path = outputMapping.getMappingText();
             if (isCustomRegistryPath) {
                 // Retrieve the actual path
-                List<String> pathMappingTextList = generateMappingTextList(path);
-                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
+                List<OutputMapperType> pathMappingTextList = generateMappingTextList(path);
+                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0).getValue(event, propertyPositionMap, customMapperFunctions).toString());
                 for (int i = 1; i < pathMappingTextList.size(); i++) {
                     if (i % 2 == 0) {
-                        pathBuilder.append(pathMappingTextList.get(i));
+                        pathBuilder.append(pathMappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions).toString());
                     } else {
-                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
+                        pathBuilder.append(pathMappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions).toString());
                     }
                 }
                 path = pathBuilder.toString();
@@ -122,12 +136,12 @@ public class JSONOutputMapper implements OutputMapper {
             this.mappingTextList = generateMappingTextList(actualMappingText);
         }
 
-        StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
+        StringBuilder eventText = new StringBuilder(mappingTextList.get(0).getValue(event, propertyPositionMap, customMapperFunctions).toString());
         for (int i = 1, size = mappingTextList.size(); i < size; i++) {
             if (i % 2 == 0) {
-                eventText.append(mappingTextList.get(i));
+                eventText.append(mappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions).toString());
             } else {
-                Object propertyValue = getPropertyValue(event, mappingTextList.get(i));
+                Object propertyValue = mappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions).toString();
                 if (propertyValue != null && propertyValue instanceof String) {
                     eventText.append(EventPublisherConstants.DOUBLE_QUOTE)
                             .append(propertyValue)
@@ -149,7 +163,6 @@ public class JSONOutputMapper implements OutputMapper {
                 text = gson.toJson(jsonObject);
             }
         }
-
         return text;
     }
 

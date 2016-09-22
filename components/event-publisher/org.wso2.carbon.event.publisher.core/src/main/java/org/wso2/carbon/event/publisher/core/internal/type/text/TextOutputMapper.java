@@ -99,7 +99,7 @@ public class TextOutputMapper implements OutputMapper {
         while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
             mappingTextList.add(new TextOutputMapperType(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX))));
             String mapText = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
-            if (mapText.endsWith(")")) {
+            if (mapText.endsWith(EventPublisherConstants.CUSTOM_FUNCTION_CLOSING_BRACKET)) {
                 mappingTextList.add(new FunctionOutputMapperType(mapText));
             } else {
                 mappingTextList.add(new AttributeOutputMapperType(mapText));
@@ -115,7 +115,7 @@ public class TextOutputMapper implements OutputMapper {
             throws EventPublisherConfigurationException {
 
         if (this.isCustomMappingEnabled) {
-//            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap());
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap(), customMapperFunctions);
         }
         // Retrieve resource at runtime if it is from registry
         TextOutputMapping outputMapping = (TextOutputMapping) eventPublisherConfiguration.getOutputMapping();

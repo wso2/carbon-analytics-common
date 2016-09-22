@@ -22,6 +22,7 @@
 package org.wso2.carbon.event.publisher.core.mapper;
 
 import org.wso2.carbon.event.publisher.core.config.CustomMapperFunction;
+import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.Map;
@@ -35,14 +36,17 @@ public class FunctionOutputMapperType extends OutputMapperType {
 
     @Override
     public Object getValue(Event event, Map<String, Integer> propertyPositionMap, ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctionsMap) {
-        String functionName = mappingText.substring(0, mappingText.indexOf("("));
-        String[] parameterAttributes = mappingText.substring(mappingText.indexOf("(") + 1, mappingText.indexOf(")")).split(",");
+        String functionName = mappingText.substring(0, mappingText.indexOf(EventPublisherConstants.CUSTOM_FUNCTION_OPENING_BRACKET));
+        String[] parameterAttributes = mappingText.substring(mappingText.indexOf(EventPublisherConstants.CUSTOM_FUNCTION_OPENING_BRACKET) + 1,
+                mappingText.indexOf(EventPublisherConstants.CUSTOM_FUNCTION_CLOSING_BRACKET)).split(",");
         Object[] parameterValues = new Object[parameterAttributes.length];
+        String attribute;
         for (int i = 0; i < parameterAttributes.length; i++) {
-            if (parameterAttributes[i].endsWith("'")) {
-                parameterValues[i] = parameterAttributes[i].replaceAll("'","");
+            attribute = parameterAttributes[i].trim();
+            if (attribute.startsWith("'") && attribute.endsWith("'")) {
+                parameterValues[i] = attribute.replaceAll("'","");
             } else {
-                parameterValues[i] = getPropertyValue(event, parameterAttributes[i], propertyPositionMap);
+                parameterValues[i] = getPropertyValue(event, attribute, propertyPositionMap);
             }
         }
         CustomMapperFunction customMapperFunction = customMapperFunctionsMap.get(functionName);
