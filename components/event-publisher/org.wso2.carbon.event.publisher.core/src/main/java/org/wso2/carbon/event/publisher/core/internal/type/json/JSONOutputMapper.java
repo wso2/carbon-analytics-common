@@ -80,10 +80,8 @@ public class JSONOutputMapper implements OutputMapper {
     }
 
     private List<OutputMapperType> generateMappingTextList(String mappingText) throws EventPublisherConfigurationException {
-
         List<OutputMapperType> mappingTextList = new ArrayList<>();
         String text = mappingText;
-
         int prefixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX);
         int postFixIndex;
         while (prefixIndex > 0) {
@@ -91,7 +89,7 @@ public class JSONOutputMapper implements OutputMapper {
             if (postFixIndex > prefixIndex) {
                 mappingTextList.add(new TextOutputMapperType(text.substring(0, prefixIndex)));
                 String mapText = text.substring(prefixIndex + 2, postFixIndex);
-                if (mapText.endsWith(")")) {
+                if (mapText.endsWith(EventPublisherConstants.CUSTOM_FUNCTION_CLOSING_BRACKET)) {
                     mappingTextList.add(new FunctionOutputMapperType(mapText));
                 } else {
                     mappingTextList.add(new AttributeOutputMapperType(mapText));
@@ -110,7 +108,6 @@ public class JSONOutputMapper implements OutputMapper {
     @Override
     public Object convertToMappedInputEvent(Event event)
             throws EventPublisherConfigurationException {
-
         if (this.isCustomMappingEnabled) {
             EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap(), customMapperFunctions);
         }
@@ -135,7 +132,6 @@ public class JSONOutputMapper implements OutputMapper {
             String actualMappingText = this.runtimeResourceLoader.getResourceContent(path);
             this.mappingTextList = generateMappingTextList(actualMappingText);
         }
-
         StringBuilder eventText = new StringBuilder(mappingTextList.get(0).getValue(event, propertyPositionMap, customMapperFunctions).toString());
         for (int i = 1, size = mappingTextList.size(); i < size; i++) {
             if (i % 2 == 0) {
@@ -151,7 +147,6 @@ public class JSONOutputMapper implements OutputMapper {
                 }
             }
         }
-
         String text = eventText.toString();
         if (!this.isCustomMappingEnabled) {
             Map<String, Object> arbitraryDataMap = event.getArbitraryDataMap();
@@ -186,20 +181,6 @@ public class JSONOutputMapper implements OutputMapper {
             }
         }
         return actualMappingText;
-    }
-
-    private Object getPropertyValue(Event event, String mappingProperty) {
-        Object[] eventData = event.getData();
-        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
-        Integer position = propertyPositionMap.get(mappingProperty);
-        Object data = null;
-
-        if (position != null && eventData.length != 0) {
-            data = eventData[position];
-        } else if (mappingProperty != null && arbitraryMap != null && arbitraryMap.containsKey(mappingProperty)) {
-            data = arbitraryMap.get(mappingProperty);
-        }
-        return data;
     }
 
     private String generateJsonEventTemplate(StreamDefinition streamDefinition) {
