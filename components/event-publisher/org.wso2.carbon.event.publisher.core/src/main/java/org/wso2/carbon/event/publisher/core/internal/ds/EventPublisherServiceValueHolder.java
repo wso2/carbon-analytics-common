@@ -48,6 +48,7 @@ public class EventPublisherServiceValueHolder {
     public static Set<String> outputEventAdapterTypes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
     private static ConfigurationContextService configurationContextService;
     private static boolean globalStatisticsEnabled = false;
+    private static boolean isLazyLoading;
 
     static {
         mappingFactoryMap.put(MessageType.MAP, new MapOutputMapperFactory());
@@ -150,5 +151,13 @@ public class EventPublisherServiceValueHolder {
 
     public static boolean isGlobalStatisticsEnabled() {
         return globalStatisticsEnabled;
+    }
+
+    public static boolean isLazyLoading() {
+        return isLazyLoading;
+    }
+
+    public static void setLazyLoading(boolean lazyLoading) {
+        isLazyLoading = lazyLoading;
     }
 }

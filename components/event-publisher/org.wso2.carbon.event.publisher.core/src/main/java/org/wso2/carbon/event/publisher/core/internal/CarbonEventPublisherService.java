@@ -19,6 +19,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterSchema;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
 
 public class CarbonEventPublisherService implements EventPublisherService {
 
@@ -377,30 +379,48 @@ public class CarbonEventPublisherService implements EventPublisherService {
     public void activateInactiveEventPublisherConfigurationsForAdapter(String eventAdapterType)
             throws EventPublisherConfigurationException {
 
-        List<EventPublisherConfigurationFile> fileList = new ArrayList<EventPublisherConfigurationFile>();
+        Map<Integer, List<EventPublisherConfigurationFile>> tenantSpecificFileMap = new HashMap<>();
 
         if (tenantSpecificEventPublisherConfigurationFileMap != null && tenantSpecificEventPublisherConfigurationFileMap.size() > 0) {
-            for (List<EventPublisherConfigurationFile> eventPublisherConfigurationFileList : tenantSpecificEventPublisherConfigurationFileMap.values()) {
-                if (eventPublisherConfigurationFileList != null) {
-                    for (EventPublisherConfigurationFile eventPublisherConfigurationFile : eventPublisherConfigurationFileList) {
+            if (EventPublisherServiceValueHolder.isLazyLoading()) {
+                List<EventPublisherConfigurationFile> tenantSpecificEventPublisherList = tenantSpecificEventPublisherConfigurationFileMap.get(MultitenantConstants.SUPER_TENANT_ID);
+                if (tenantSpecificEventPublisherList != null) {
+                    List<EventPublisherConfigurationFile> fileList = new ArrayList<>();
+                    for (EventPublisherConfigurationFile eventPublisherConfigurationFile : tenantSpecificEventPublisherList) {
                         if ((eventPublisherConfigurationFile.getStatus().equals(EventPublisherConfigurationFile.Status.WAITING_FOR_DEPENDENCY)) && eventPublisherConfigurationFile.getDependency().equalsIgnoreCase(eventAdapterType)) {
                             fileList.add(eventPublisherConfigurationFile);
                         }
                     }
+                    tenantSpecificFileMap.put(MultitenantConstants.SUPER_TENANT_ID, fileList);
+                }
+            } else {
+                for (Map.Entry<Integer, List<EventPublisherConfigurationFile>> entry : tenantSpecificEventPublisherConfigurationFileMap.entrySet()) {
+                    if (entry != null) {
+                        List<EventPublisherConfigurationFile> fileList = new ArrayList<>();
+                        for (EventPublisherConfigurationFile eventPublisherConfigurationFile : entry.getValue()) {
+                            if ((eventPublisherConfigurationFile.getStatus().equals(EventPublisherConfigurationFile.Status.WAITING_FOR_DEPENDENCY)) && eventPublisherConfigurationFile.getDependency().equalsIgnoreCase(eventAdapterType)) {
+                                fileList.add(eventPublisherConfigurationFile);
+                            }
+                        }
+                        tenantSpecificFileMap.put(entry.getKey(), fileList);
+                    }
                 }
             }
         }
-        for (EventPublisherConfigurationFile eventPublisherConfigurationFile : fileList) {
-            try {
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                carbonContext.setTenantId(eventPublisherConfigurationFile.getTenantId());
-                carbonContext.getTenantDomain(true);
-                EventPublisherConfigurationFilesystemInvoker.reload(eventPublisherConfigurationFile.getFilePath());
-            } catch (Exception e) {
-                log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + eventPublisherConfigurationFile.getFileName(), e);
-            } finally {
-                PrivilegedCarbonContext.endTenantFlow();
+
+        for (Map.Entry<Integer, List<EventPublisherConfigurationFile>> entry : tenantSpecificFileMap.entrySet()) {
+            for (EventPublisherConfigurationFile publisherConfigurationFile : entry.getValue()) {
+                try {
+                    try {
+                        PrivilegedCarbonContext.startTenantFlow();
+                        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(entry.getKey(), true);
+                        EventPublisherConfigurationFilesystemInvoker.reload(publisherConfigurationFile.getFilePath());
+                    } finally {
+                        PrivilegedCarbonContext.endTenantFlow();
+                    }
+                } catch (Exception e) {
+                    log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + publisherConfigurationFile.getFileName(), e);
+                }
             }
         }
     }

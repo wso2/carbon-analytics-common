@@ -47,6 +47,7 @@ public class EventReceiverServiceValueHolder {
     private static CarbonEventReceiverManagementService carbonEventReceiverManagementService;
     public static Set<String> inputEventAdapterTypes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
     private static RealmService realmService;
+    private static boolean isLazyLoading;
     private static boolean globalStatisticsEnabled = false;
 
     static {
@@ -149,6 +150,13 @@ public class EventReceiverServiceValueHolder {
         EventReceiverServiceValueHolder.globalStatisticsEnabled = globalStatisticsEnabled;
     }
 
+    public static boolean isLazyLoading() {
+        return isLazyLoading;
+    }
+
+    public static void setLazyLoading(boolean lazyLoading) {
+        isLazyLoading = lazyLoading;
+    }
     public static boolean isGlobalStatisticsEnabled() {
         return globalStatisticsEnabled;
     }
