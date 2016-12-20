@@ -25,61 +25,61 @@ import java.util.List;
  */
 public class MultipleDefinitionConversionTest {
     private String definition1 = "{" +
-                                 "  'name':'org.wso2.esb.MediatorStatistics'," +
-                                 "  'version':'2.3.0'," +
-                                 "  'nickName': 'Stock Quote Information'," +
-                                 "  'description': 'Some Desc'," +
-                                 "  'tags':['foo', 'bar']," +
-                                 "  'metaData':[" +
-                                 "          {'name':'ipAdd','type':'STRING'}" +
+                                 "  \"name\":\"org.wso2.esb.MediatorStatistics\"," +
+                                 "  \"version\":\"2.3.0\"," +
+                                 "  \"nickName\": \"Stock Quote Information\"," +
+                                 "  \"description\": \"Some Desc\"," +
+                                 "  \"tags\":[\"foo\", \"bar\"]," +
+                                 "  \"metaData\":[" +
+                                 "          {\"name\":\"ipAdd\",\"type\":\"STRING\"}" +
                                  "  ]," +
-                                 "  'payloadData':[" +
-                                 "          {'name':'symbol','type':'string'}," +
-                                 "          {'name':'price','type':'double'}," +
-                                 "          {'name':'volume','type':'int'}," +
-                                 "          {'name':'max','type':'double'}," +
-                                 "          {'name':'min','type':'double'}" +
+                                 "  \"payloadData\":[" +
+                                 "          {\"name\":\"symbol\",\"type\":\"string\"}," +
+                                 "          {\"name\":\"price\",\"type\":\"double\"}," +
+                                 "          {\"name\":\"volume\",\"type\":\"int\"}," +
+                                 "          {\"name\":\"max\",\"type\":\"double\"}," +
+                                 "          {\"name\":\"min\",\"type\":\"double\"}" +
                                  "  ]" +
                                  "}";
     private String definition2 = "{" +
-                                 "  'name':'org.wso2.esb.MediatorStatistics'," +
-                                 "  'version':'3.0.0'," +
-                                 "  'nickName': 'Stock Quote Information'," +
-                                 "  'description': 'Some Desc'," +
-                                 "  'tags':['foo', 'bar']," +
-                                 "  'metaData':[" +
-                                 "          {'name':'ipAdd','type':'STRING'}" +
+                                 "  \"name\":\"org.wso2.esb.MediatorStatistics\"," +
+                                 "  \"version\":\"3.0.0\"," +
+                                 "  \"nickName\": \"Stock Quote Information\"," +
+                                 "  \"description\": \"Some Desc\"," +
+                                 "  \"tags\":[\"foo\", \"bar\"]," +
+                                 "  \"metaData\":[" +
+                                 "          {\"name\":\"ipAdd\",\"type\":\"STRING\"}" +
                                  "  ]," +
-                                 "  'payloadData':[" +
-                                 "          {'name':'symbol','type':'float'}," +
-                                 "          {'name':'price','type':'float'}," +
-                                 "          {'name':'volume','type':'string'}," +
-                                 "          {'name':'max','type':'double'}," +
-                                 "          {'name':'min','type':'double'}" +
+                                 "  \"payloadData\":[" +
+                                 "          {\"name\":\"symbol\",\"type\":\"float\"}," +
+                                 "          {\"name\":\"price\",\"type\":\"float\"}," +
+                                 "          {\"name\":\"volume\",\"type\":\"string\"}," +
+                                 "          {\"name\":\"max\",\"type\":\"double\"}," +
+                                 "          {\"name\":\"min\",\"type\":\"double\"}" +
                                  "  ]," +
-                                 "  'correlationData':[" +
-                                 "          {'name':'symbol','type':'string'}," +
-                                 "          {'name':'price','type':'float'}" +
+                                 "  \"correlationData\":[" +
+                                 "          {\"name\":\"symbol\",\"type\":\"string\"}," +
+                                 "          {\"name\":\"price\",\"type\":\"float\"}" +
                                  "  ]" +
                                  "}";
     private String definition3 = "{" +
-                                 "  'name':'org.wso2.esb.MediatorStatistics'," +
-                                 "  'version':'2.3.1'," +
-                                 "  'nickName': 'Stock Quote Information'," +
-                                 "  'description': 'Some Desc'," +
-                                 "  'tags':['foo', 'bar']," +
-                                 "  'metaData':[" +
-                                 "          {'name':'ipAdd','type':'STRING'}" +
+                                 "  \"name\":\"org.wso2.esb.MediatorStatistics\"," +
+                                 "  \"version\":\"2.3.1\"," +
+                                 "  \"nickName\": \"Stock Quote Information\"," +
+                                 "  \"description\": \"Some Desc\"," +
+                                 "  \"tags\":[\"foo\", \"bar\"]," +
+                                 "  \"metaData\":[" +
+                                 "          {\"name\":\"ipAdd\",\"type\":\"STRING\"}" +
                                  "  ]," +
-                                 "  'payloadData':[" +
-                                 "          {'name':'symbol','type':'sTring'}," +
-                                 "          {'name':'price','type':'DOUBLE'}," +
-                                 "          {'name':'volume','type':'int'}," +
-                                 "          {'name':'max','type':'douBLE'}," +
-                                 "          {'name':'min','type':'double'}" +
+                                 "  \"payloadData\":[" +
+                                 "          {\"name\":\"symbol\",\"type\":\"sTring\"}," +
+                                 "          {\"name\":\"price\",\"type\":\"DOUBLE\"}," +
+                                 "          {\"name\":\"volume\",\"type\":\"int\"}," +
+                                 "          {\"name\":\"max\",\"type\":\"douBLE\"}," +
+                                 "          {\"name\":\"min\",\"type\":\"double\"}" +
 //            "  ]" +
                                  "  ]," +
-                                 "  'correlationData':[]" +
+                                 "  \"correlationData\":[]" +
                                  "}";
 
     @Test
