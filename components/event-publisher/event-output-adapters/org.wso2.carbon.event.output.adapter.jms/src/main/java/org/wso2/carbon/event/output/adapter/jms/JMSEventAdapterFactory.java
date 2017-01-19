@@ -118,6 +118,7 @@ public class JMSEventAdapterFactory extends OutputEventAdapterFactory {
         jmsSecuredProperties.setHint(resourceBundle.getString(JMSEventAdapterConstants.ADAPTER_SECURED_PROPERTIES_HINT));
         jmsSecuredProperties.setRequired(false);
         jmsSecuredProperties.setEncrypted(true);
+	jmsSecuredProperties.setSecured(true);
 
         staticPropertyList.add(initialContextProperty);
         staticPropertyList.add(javaNamingProviderUrlProperty);
