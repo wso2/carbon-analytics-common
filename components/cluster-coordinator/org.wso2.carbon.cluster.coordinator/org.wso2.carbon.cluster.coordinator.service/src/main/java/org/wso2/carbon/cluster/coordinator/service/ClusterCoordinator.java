@@ -15,6 +15,9 @@
 
 package org.wso2.carbon.cluster.coordinator.service;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.cluster.coordinator.commons.CoordinationStrategy;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.configs.CoordinationStrategyConfiguration;
@@ -25,9 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The OSGI service class for the coordinator algorithm.
+ * The OSGI service component for the coordinator algorithm.
  */
-public class ClusterCoordinator {
+@Component(name = "org.wso2.carbon.cluster.coordinator.commons.ClusterCoordinator", immediate = true, property = {
+        "componentName=wso2-cluster-coordinator-service" }) public class ClusterCoordinator {
 
     /**
      * Creates a new instance of the ClusterCoordinator class.
@@ -46,11 +50,14 @@ public class ClusterCoordinator {
             this.coordinationStrategy = (CoordinationStrategy) classLoader
                     .loadClass(coordinationStrategyConfiguration.getConfiguration()).newInstance();
         } catch (ClassNotFoundException e) {
-            throw new ClusterCoordinationException("Error while initializing cluster coordinator", e);
+            throw new ClusterCoordinationException("Error while initializing cluster coordinator",
+                    e);
         } catch (InstantiationException e) {
-            throw new ClusterCoordinationException("Error while initializing cluster coordinator", e);
+            throw new ClusterCoordinationException("Error while initializing cluster coordinator",
+                    e);
         } catch (IllegalAccessException e) {
-            throw new ClusterCoordinationException("Error while initializing cluster coordinator", e);
+            throw new ClusterCoordinationException("Error while initializing cluster coordinator",
+                    e);
         }
     }
 
@@ -61,6 +68,10 @@ public class ClusterCoordinator {
      */
     public static ClusterCoordinator getInstance() {
         return instance;
+    }
+
+    @Activate protected void activate(BundleContext bundleContext) {
+        // Nothing to do.
     }
 
     /**

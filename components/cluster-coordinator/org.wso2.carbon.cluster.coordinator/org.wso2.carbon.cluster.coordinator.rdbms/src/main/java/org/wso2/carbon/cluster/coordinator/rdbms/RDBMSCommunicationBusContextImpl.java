@@ -80,6 +80,9 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         createTables();
     }
 
+    /**
+     * Create the tables needed for RDBMS communication.
+     */
     private void createTables() {
         createLeaderStatusTable();
         createClusterNodeStatusTable();
@@ -87,6 +90,9 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         createRemovedMembersTable();
     }
 
+    /**
+     * Create Leader Status Table.
+     */
     private void createLeaderStatusTable() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -103,6 +109,9 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         }
     }
 
+    /**
+     * Create Cluster Node Status table.
+     */
     private void createClusterNodeStatusTable() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -119,6 +128,9 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         }
     }
 
+    /**
+     * Create Membership Event Table.
+     */
     private void createMembershipEventTable() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -135,6 +147,9 @@ public class RDBMSCommunicationBusContextImpl implements CommunicationBusContext
         }
     }
 
+    /**
+     * Create Removed Members Table.
+     */
     private void createRemovedMembersTable() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;

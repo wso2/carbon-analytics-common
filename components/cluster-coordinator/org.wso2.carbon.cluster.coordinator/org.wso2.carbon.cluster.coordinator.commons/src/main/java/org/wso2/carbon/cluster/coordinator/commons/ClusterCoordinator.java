@@ -50,11 +50,14 @@ public class ClusterCoordinator {
                         .newInstance();
             }
         } catch (ClassNotFoundException e) {
-            throw new ClusterCoordinationException("Error when initializing coordinator strategy", e);
+            throw new ClusterCoordinationException("Error when initializing coordinator strategy",
+                    e);
         } catch (InstantiationException e) {
-            throw new ClusterCoordinationException("Error when initializing coordinator strategy", e);
+            throw new ClusterCoordinationException("Error when initializing coordinator strategy",
+                    e);
         } catch (IllegalAccessException e) {
-            throw new ClusterCoordinationException("Error when initializing coordinator strategy", e);
+            throw new ClusterCoordinationException("Error when initializing coordinator strategy",
+                    e);
         }
     }
 

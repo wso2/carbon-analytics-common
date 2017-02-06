@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.cluster.coordinator.rdbms.test;
+package org.wso2.carbon.cluster.coordinator.rdbms;
 
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;

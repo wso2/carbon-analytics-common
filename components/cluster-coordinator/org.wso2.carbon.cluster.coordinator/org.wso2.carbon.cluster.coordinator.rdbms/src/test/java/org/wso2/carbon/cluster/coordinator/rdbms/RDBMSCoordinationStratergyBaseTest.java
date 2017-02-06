@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.cluster.coordinator.rdbms.test;
+package org.wso2.carbon.cluster.coordinator.rdbms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,9 +68,8 @@ public class RDBMSCoordinationStratergyBaseTest {
         try {
             Class.forName("org.h2.Driver");
             JdbcDataSource h2DataSource = new JdbcDataSource();
-            h2DataSource
-                    .setURL("jdbc:h2:./target/"
-                            + "ANALYTICS_EVENT_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=true");
+            h2DataSource.setURL("jdbc:h2:./target/"
+                    + "ANALYTICS_EVENT_STORE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=true");
             h2DataSource.setUser("wso2carbon");
             h2DataSource.setPassword("wso2carbon");
             this.dataSource = h2DataSource;

@@ -22,7 +22,6 @@ import org.wso2.carbon.cluster.coordinator.commons.exception.ClusterCoordination
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.commons.util.MemberEvent;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;

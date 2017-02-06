@@ -37,7 +37,6 @@ public class ZooKeeperService {
             final ZookeeperCoordinationStrategy.ProcessNodeWatcher processNodeWatcher)
             throws IOException {
         zooKeeper = new ZooKeeper(url, 3000, processNodeWatcher);
-        //zooKeeper = new ZooKeeper(url, )
     }
 
     /**
@@ -47,12 +46,14 @@ public class ZooKeeperService {
         try {
             zooKeeper.close();
         } catch (InterruptedException e) {
-            throw new ClusterCoordinationException("Error while stopping zookeeper leader election process", e);
+            throw new ClusterCoordinationException(
+                    "Error while stopping zookeeper leader election process", e);
         }
     }
 
     /**
      * Retrieve data of the a zookeeper node.
+     *
      * @param path path of the zookeeper node
      * @return
      * @throws KeeperException
@@ -64,9 +65,10 @@ public class ZooKeeperService {
 
     /**
      * Create a new zookeeper node.
-     * @param node path od the node
-     * @param data the data node keeps
-     * @param watch Should the nde be watched
+     *
+     * @param node      path od the node
+     * @param data      the data node keeps
+     * @param watch     Should the nde be watched
      * @param ephimeral The type of the node
      * @return the created node path
      */
@@ -93,9 +95,10 @@ public class ZooKeeperService {
 
     /**
      * Get the children under a specific path.
-     * @param node the node path
+     *
+     * @param node  the node path
      * @param watch Should the nodes be watched
-     * @return
+     * @return a list of children nodes
      */
     public List<String> getChildren(final String node, final boolean watch) {
 

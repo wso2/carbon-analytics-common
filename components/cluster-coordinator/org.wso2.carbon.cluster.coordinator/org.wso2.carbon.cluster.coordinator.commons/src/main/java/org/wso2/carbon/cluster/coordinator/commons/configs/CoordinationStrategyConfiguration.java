@@ -15,7 +15,7 @@
 
 package org.wso2.carbon.cluster.coordinator.commons.configs;
 
-import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.kernel.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -37,8 +37,8 @@ public class CoordinationStrategyConfiguration {
         Yaml yaml = new Yaml();
         InputStream in = null;
         try {
-            in = new FileInputStream(CarbonUtils.getCarbonConfigDirPath() + File.separator +
-                    File.separator + "coordinatorConfig.yaml");
+            in = new FileInputStream(Utils.getCarbonConfigHome() + File.separator + File.separator
+                    + "coordinatorConfig.yaml");
             config = yaml.loadAs(in, CoordinationStrategyConfigUtil.class);
             in.close();
         } catch (FileNotFoundException e) {

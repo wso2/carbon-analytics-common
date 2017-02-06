@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://wso2.com) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://wso2.com) All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,49 +15,28 @@
 
 package org.wso2.carbon.cluster.coordinator.rdbms.internal.ds;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 
 /**
- * @scr.reference name="datasource.service" interface="org.wso2.carbon.datasource.core.api.DataSourceService"
- * cardinality="1..1" policy="dynamic"  bind="setDataSourceService" unbind="unsetDataSourceService"
+ * RDBMS cluster coordinator data service.
  */
 public class RDBMSClusterCoordinatorDS {
-    /**
-     * The logger class.
-     */
-    private static final Log log = LogFactory.getLog(RDBMSClusterCoordinatorDS.class);
 
-    /**
-     * The activate method of the OSGI service.
-     *
-     * @param context Component context
-     */
-    protected void activate(ComponentContext context) {
-    }
-
-    /**
-     * The setter for the datasource service.
-     *
-     * @param dataSourceService The datasource service to be set.
-     */
+    @Reference(
+            name = "carbon.datasource.service",
+            service = DataSourceService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetDatasourceService"
+    )
     protected void setDataSourceService(DataSourceService dataSourceService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Setting the Datasource Service");
-        }
         RDBMSClusterCoordinatorServiceHolder.setDataSourceService(dataSourceService);
     }
 
-    /**
-     * The unsetter for the datasource service.
-     *
-     * @param dataSourceService The datasource service to unset
-     */
     protected void unsetDataSourceService(DataSourceService dataSourceService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Unsetting the DataSource Service");
-        }
+        RDBMSClusterCoordinatorServiceHolder.setDataSourceService(null);
     }
 }
