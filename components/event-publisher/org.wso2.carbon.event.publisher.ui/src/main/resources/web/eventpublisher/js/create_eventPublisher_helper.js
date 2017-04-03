@@ -69,16 +69,18 @@ function loadEventAdapterProperties(messageProperty, eventPublisherInputTable, p
 
     if (messageProperty.localOptions == '') {
 
+        var inputFieldStr = '<div class="' + classType + '"> <input style="width:75%"';
+        if (textPasswordType == "password") {
+            inputFieldStr = inputFieldStr + ' autocomplete="off"';
+        }
+        inputFieldStr = inputFieldStr + ' type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + messageProperty.localKey + '" value="' + defaultValue + '" class="initE"  />';
         if (hint != undefined) {
-            if(textPasswordType == "text"){
-                inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + messageProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> <br/> <div class="sectionHelp">' + hint + '</div></div>';
-            } else{
-                inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" autocomplete="off" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + messageProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> <br/> <div class="sectionHelp">' + hint + '</div></div>';
-            }
+            inputFieldStr = inputFieldStr + ' <br/> <div class="sectionHelp">' + hint + '</div></div>';
         }
         else {
-            inputField.innerHTML = '<div class="' + classType + '"> <input style="width:75%" type="' + textPasswordType + '" id="' + requiredElementId + propertyLoop + '" name="' + messageProperty.localKey + '" value="' + defaultValue + '" class="initE"  /> </div>';
+            inputFieldStr = inputFieldStr + ' </div>';
         }
+        inputField.innerHTML = inputFieldStr;
     } else {
 
         var option = '';
