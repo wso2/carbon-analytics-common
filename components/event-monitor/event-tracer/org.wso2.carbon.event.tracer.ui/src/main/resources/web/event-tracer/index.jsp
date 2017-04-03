@@ -53,7 +53,7 @@
             }
         } else {
             if (opeation.equals("search")) {
-                String key = Encode.forJavaScriptBlock(request.getParameter("key"));
+                String key = Encode.forHtml(request.getParameter("key"));
                 String ignoreCase = request.getParameter("ignoreCase");
 
                 if (key == null) {
@@ -221,7 +221,7 @@ function searchTraceLogsCallback() {
 
                     %>
                     <tr>
-                        <td><%=Encode.forHtmlContent(log.replaceAll("\\n","<br/>").replaceAll(" ","&nbsp;"))%>
+                        <td><%=Encode.forHtml(log)%>
                         </td>
                     </tr>
                     <%

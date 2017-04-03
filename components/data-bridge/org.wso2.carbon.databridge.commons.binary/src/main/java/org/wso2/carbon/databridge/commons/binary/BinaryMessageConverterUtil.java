@@ -49,7 +49,7 @@ public class BinaryMessageConverterUtil {
 
     public static int getSize(Object data) {
         if (data instanceof String) {
-            return 4 + ((String) data).length();
+            return 4 + ((String) data).getBytes().length;
         } else if (data instanceof Integer) {
             return 4;
         } else if (data instanceof Long) {
@@ -67,8 +67,8 @@ public class BinaryMessageConverterUtil {
 
     public static void assignData(Object data, ByteBuffer eventDataBuffer) throws IOException {
         if (data instanceof String) {
-            eventDataBuffer.putInt(((String) data).length());
-            eventDataBuffer.put((((String) data).getBytes(BinaryMessageConstants.DEFAULT_CHARSET)));
+            eventDataBuffer.putInt(((String) data).getBytes().length);
+            eventDataBuffer.put(((String) data).getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         } else if (data instanceof Integer) {
             eventDataBuffer.putInt((Integer) data);
         } else if (data instanceof Long) {

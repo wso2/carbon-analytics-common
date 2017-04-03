@@ -32,6 +32,9 @@ var initialScenario = true;
 var initialLayerSelected = false;
 var currentSelectedLevelLayer = "defaultLevel";
 var useDefaultValueLabel = "Use default";
+var schema;
+var REALTIME_PROVIDER_TYPE = "realtime";
+var BATCH_PROVIDER_TYPE = "batch";
 
 (function () {
 
@@ -84,6 +87,7 @@ var useDefaultValueLabel = "Use default";
      * @param data
      */
     draw = function (placeholder, chartConfig, _schema, data) {
+        schema = _schema;
         if (!mapInitialized) {
             mapInitialized = true;
             mapChartConfig = buildChartConfig(chartConfig);
@@ -93,9 +97,15 @@ var useDefaultValueLabel = "Use default";
                 setTimeout(function(){
                 }, 500);
             }
-            initMap(data, placeholder);
+            initMap(data);
         } else {
-            addDataToMap(data);
+            if(data != null && data.length > 0) {
+                if (null == data[0].id) {
+                    addDataToMap(convertRealtimeObject(data), REALTIME_PROVIDER_TYPE);
+                } else {
+                    addDataToMap(data, BATCH_PROVIDER_TYPE);
+                }
+            }
         }
     };
 
@@ -104,9 +114,22 @@ var useDefaultValueLabel = "Use default";
      * @param data
      */
     update = function (data) {
-        addDataToMap(data);
+        if(data != null && data.length > 0) {
+            if (null == data[0].id) {
+                addDataToMap(convertRealtimeObject(data), REALTIME_PROVIDER_TYPE);
+            } else {
+                addDataToMap(data, BATCH_PROVIDER_TYPE);
+            }
+        }
     };
 
+    function convertRealtimeObject (data) {
+        var convertedData = {};
+        for (var i=0; i<schema.length; i++) {
+            convertedData[schema[i]["fieldName"]] = data[0][i];
+        }
+        return convertedData;
+    }
 
     function initLayers() {
         //Add default map layer.
@@ -191,10 +214,15 @@ var useDefaultValueLabel = "Use default";
 
         var searchObject = L.control.search();
         map.addControl(searchObject);
-        if(data.length > 0) {
-            map.setView([data[0].latitude, data[0].longitude]);
+
+        if (data != null && null == data[0].id) {
+            var tempData = convertRealtimeObject(data)
+            map.setView(tempData.latitude, tempData.longitude);
+        } else if (data != null) {
+            if(data != null && data.length > 0) {
+                map.setView([data[0].latitude, data[0].longitude]);
+            }
         }
-        addDataToMap(data);
 
         map.on('overlayadd', onOverlayAdd);
         map.on('overlayremove', onOverlayRemove);
@@ -236,8 +264,8 @@ var useDefaultValueLabel = "Use default";
         }
     }
 
-    function addDataToMap(data) {
-        for (var i = 0; i < data.length; i++) {
+    function addDataToMap(data, providerType) {
+        if(data != null) {
             if(initialScenario && 1 == data.length) {
                 //if at the beginning, only single object is getting updated, it will be treated as single object and will get zoomed
                 mapChartConfig.single_marker_mode = true;
@@ -248,79 +276,87 @@ var useDefaultValueLabel = "Use default";
                 clearFocus();
                 initialScenario = false;
             }
-            var device = data[i];
-            var levelId;
-            var objectTypeId;
-
-            if (mapChartConfig.type) {
-                device.type = mapChartConfig.type;
-            } else {
-                device.type = device[mapChartConfig.type1];
-            }
-            if (mapChartConfig.state) {
-                device.state = mapChartConfig.state;
-            } else {
-                device.state = device[mapChartConfig.state1];
-            }
-            if (mapChartConfig.information) {
-                device.information = mapChartConfig.information;
-            } else {
-                device.information = device[mapChartConfig.information1];
-            }
-            if (mapChartConfig.speed) {
-                device.speed = mapChartConfig.speed;
-            } else {
-                device.speed = device[mapChartConfig.speed1];
-            }
-            if (mapChartConfig.heading) {
-                device.heading = mapChartConfig.heading;
-            } else {
-                device.heading = device[mapChartConfig.heading1];
-            }
-            if (mapChartConfig.level) {
-                device.level = mapChartConfig.level;
-            } else {
-                device.level = device[mapChartConfig.level1];
-            }
-
-            if(null == device.level){
-                levelId = "defaultLevel";
-            } else {
-                levelId = device.level;
-                if (!(levelId in level_groups)){
-                    console.log("new level added");
-                    addNewLevelLayer(levelId);
-                }
-            }
-
-            if(null == device.type){
-                objectTypeId = "default";
-            } else {
-                objectTypeId = device.type;
-                if (!(objectTypeId in object_type_groups)){
-                    console.log("new object type added");
-                    addNewObjectLayer(objectTypeId);
-                }
-            }
-
-            processPointMessage({
-                "id": device.id,
-                "levelId": levelId,
-                "objectTypeId": objectTypeId,
-                "type": "Feature",
-                "properties": {
-                    "name": objectTypeId,
-                    "state": device.state,
-                    "information": levelId + ": " + device.information,
-                    "speed": device.speed,
-                    "heading": device.heading
-                },
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [device.longitude, device.latitude]
-                }
-            });
         }
+        if(REALTIME_PROVIDER_TYPE == providerType && data != null) {
+            generatePointMessage(data);
+        } else {
+            for (var i = 0; data != null && i < data.length; i++) {
+                generatePointMessage(data[i]);
+            }
+        }
+    }
+
+    function generatePointMessage(device) {
+        var levelId;
+        var objectTypeId;
+        if (mapChartConfig.type) {
+            device.type = mapChartConfig.type;
+        } else {
+            device.type = device[mapChartConfig.type1];
+        }
+        if (mapChartConfig.state) {
+            device.state = mapChartConfig.state;
+        } else {
+            device.state = device[mapChartConfig.state1];
+        }
+        if (mapChartConfig.information) {
+            device.information = mapChartConfig.information;
+        } else {
+            device.information = device[mapChartConfig.information1];
+        }
+        if (mapChartConfig.speed) {
+            device.speed = mapChartConfig.speed;
+        } else {
+            device.speed = device[mapChartConfig.speed1];
+        }
+        if (mapChartConfig.heading) {
+            device.heading = mapChartConfig.heading;
+        } else {
+            device.heading = device[mapChartConfig.heading1];
+        }
+        if (mapChartConfig.level) {
+            device.level = mapChartConfig.level;
+        } else {
+            device.level = device[mapChartConfig.level1];
+        }
+
+        if(null == device.level){
+            levelId = "defaultLevel";
+        } else {
+            levelId = device.level;
+            if (!(levelId in level_groups)){
+                console.log("new level added");
+                addNewLevelLayer(levelId);
+            }
+        }
+
+        if(null == device.type){
+            objectTypeId = "default";
+        } else {
+            objectTypeId = device.type;
+            if (!(objectTypeId in object_type_groups)){
+                console.log("new object type added");
+                addNewObjectLayer(objectTypeId);
+            }
+        }
+
+        processPointMessage({
+            "id": device.id,
+            "levelId": levelId,
+            "objectTypeId": objectTypeId,
+            "type": "Feature",
+            "properties": {
+                "name": objectTypeId,
+                "state": device.state,
+                "information": levelId + ": " + device.information,
+                "speed": device.speed,
+                "heading": device.heading
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [device.longitude, device.latitude]
+            }
+        });
     }
 
     function processPointMessage(geoJson) {
