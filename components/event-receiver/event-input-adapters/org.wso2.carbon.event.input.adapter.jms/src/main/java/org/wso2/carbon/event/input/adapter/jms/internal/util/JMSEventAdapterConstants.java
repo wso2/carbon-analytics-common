@@ -48,6 +48,7 @@ public class JMSEventAdapterConstants {
     public static final int DEFAULT_JOB_IN_QUEUE_SIZE = 1000;
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+    public static final String ADAPTER_LISTENER_WAITING_TIME = "listenerWaitingTimeInMillis";
     public static final String ADAPTER_PROPERTIES = "jms.properties";
     public static final String ADAPTER_SECURED_PROPERTIES = "jms.secured.properties";
     public static final String ADAPTER_PROPERTIES_HINT = "jms.properties.hint";
