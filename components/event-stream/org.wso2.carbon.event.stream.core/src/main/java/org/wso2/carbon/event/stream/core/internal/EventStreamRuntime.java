@@ -17,7 +17,9 @@ package org.wso2.carbon.event.stream.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
@@ -78,8 +80,14 @@ public class EventStreamRuntime {
 
     public void publish(String streamId, Event event) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+            TenantAxisUtils.getTenantConfigurationContext(tenantDomain, EventStreamServiceValueHolder.
+                    getConfigurationContextService().getServerConfigContext());
+        }
+
         Map<String, EventJunction> eventJunctionMap = tenantSpecificEventJunctions.get(tenantId);
-        if(eventJunctionMap != null && eventJunctionMap.containsKey(streamId)) {
+        if (eventJunctionMap != null && eventJunctionMap.containsKey(streamId)) {
             EventJunction eventJunction = eventJunctionMap.get(streamId);
             eventJunction.sendEvent(event);
         } else {
