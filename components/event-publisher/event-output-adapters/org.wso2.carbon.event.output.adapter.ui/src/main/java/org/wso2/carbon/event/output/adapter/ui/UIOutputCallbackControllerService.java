@@ -22,7 +22,7 @@ package org.wso2.carbon.event.output.adapter.ui;
 
 import com.google.gson.JsonObject;
 
-import javax.websocket.Session;
+import java.util.Map;
 
 /**
  * This interface is exposed as an OSGI service, which will be invoked by the local websocket endpoint to inform new subscriptions; and do un-subscriptions..
@@ -37,17 +37,17 @@ public interface UIOutputCallbackControllerService {
      * @param session - Session which user registered.
      * @return
      */
-    public void subscribeWebsocket(String streamName, String version, Session session);
+    public void subscribeWebsocket(String streamName, String version, SessionHolder session);
 
     /**
      * Used to return events per streamId
      *
      * @param streamName - Stream name which user register to.
      * @param version - Stream version which user uses.
-     * @param session - Session which user subscribed to.
+     * @param sessionId - Session Id which user subscribed to.
      * @return the events list.
      */
-    public void unsubscribeWebsocket(String streamName, String version, Session session);
+    public void unsubscribeWebsocket(String streamName, String version, String sessionId);
 
     /**
      * Used to return events per http GET request.

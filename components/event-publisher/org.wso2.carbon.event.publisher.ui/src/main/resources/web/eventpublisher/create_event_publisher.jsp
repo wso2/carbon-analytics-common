@@ -280,6 +280,9 @@
 
             <% } else { %>
             <input type="<%=type%>"
+                    <% if("password".equals(type)) {%>
+                   autocomplete="off"
+                    <% }%>
                    name="<%=eventAdapterProperties[index].getKey()%>"
                    id="<%=propertyId%><%=index%>" class="initE"
                    style="width:75%"

@@ -31,13 +31,17 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
+import javax.net.ssl.SSLServerSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -98,33 +102,39 @@ public class ThriftDataReceiver {
      */
     public void start(String hostName)
             throws DataBridgeException {
-        startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(), dataBridgeReceiverService);
+        startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(),
+                thriftDataReceiverConfiguration.getSslProtocols(), thriftDataReceiverConfiguration.getCiphers(), dataBridgeReceiverService);
         startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
     }
 
 
-    private void startSecureEventTransmission(String hostName, int port,
+    private void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers,
                                               DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
-
-            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-            String keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
+            String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
             if (keyStore == null) {
-                keyStore = System.getProperty("Security.KeyStore.Location");
+                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+                keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    throw new DataBridgeException("Cannot start agent server, not valid Security.KeyStore.Location is null");
+                    keyStore = System.getProperty("Security.KeyStore.Location");
+                    if (keyStore == null) {
+                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Location is null");
+                    }
                 }
             }
-            String keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
+            String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
-                keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+                keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
                 if (keyStorePassword == null) {
-                    throw new DataBridgeException("Cannot start agent server, not valid Security.KeyStore.Password is null ");
+                    keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                    if (keyStorePassword == null) {
+                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Password is null ");
+                    }
                 }
             }
-
-            startSecureEventTransmission(hostName, port, keyStore, keyStorePassword, dataBridgeReceiverService);
+            startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
         } catch (TransportException e) {
             throw new DataBridgeException("Cannot start agent server on port " + port, e);
         } catch (UnknownHostException e) {
@@ -132,7 +142,7 @@ public class ThriftDataReceiver {
         }
     }
 
-    protected void startSecureEventTransmission(String hostName, int port, String keyStore,
+    protected void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers, String keyStore,
                                                 String keyStorePassword,
                                                 DataBridgeReceiverService dataBridgeReceiverService)
             throws TransportException, UnknownHostException {
@@ -145,6 +155,17 @@ public class ThriftDataReceiver {
             InetAddress inetAddress = InetAddress.getByName(hostName);
             serverTransport = TSSLTransportFactory.getServerSocket(
                     port, DataBridgeConstants.CLIENT_TIMEOUT_MS, inetAddress, params);
+            SSLServerSocket sslServerSocket = (javax.net.ssl.SSLServerSocket) serverTransport.getServerSocket();
+            if (sslProtocols != null && sslProtocols.length() != 0) {
+                String [] sslProtocolsArray = sslProtocols.split(",");
+                sslServerSocket.setEnabledProtocols(sslProtocolsArray);
+            }
+
+            if (ciphers != null && ciphers.length() != 0) {
+                String [] ciphersArray = ciphers.split(",");
+                sslServerSocket.setEnabledCipherSuites(ciphersArray);
+            }
+
             log.info("Thrift Server started at " + hostName);
         } catch (TTransportException e) {
             throw new TransportException("Thrift transport exception occurred ", e);

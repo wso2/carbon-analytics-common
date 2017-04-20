@@ -49,6 +49,7 @@ public class JMSListener implements Runnable {
     private static final Log log = LogFactory.getLog(JMSListener.class);
     private final String listenerName;
     private final JMSTaskManager jmsTaskManager;
+    private int waitingTime = 0;
 
     public JMSListener(String listenerName, JMSTaskManager jmsTaskManager) {
 
@@ -61,6 +62,15 @@ public class JMSListener implements Runnable {
      * Listen for JMS messages on behalf of the given service
      */
     private void start() {
+        if (waitingTime > 0){
+            try {
+                log.info("JMS listener " + listenerName + "  waiting for " + waitingTime + " milliseconds to start " +
+                        "listening");
+                Thread.sleep(waitingTime);
+            } catch (InterruptedException igonre) {
+            }
+        }
+
 
         JMSTaskManager stm = jmsTaskManager;
         boolean connected = false;
@@ -187,7 +197,8 @@ public class JMSListener implements Runnable {
         start();
     }
 
-    public void startListener() {
+    public void startListener(int waitingTime) {
+        this.waitingTime = waitingTime;
         new Thread(this).start();
     }
 }

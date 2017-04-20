@@ -17,20 +17,16 @@ package org.wso2.carbon.event.publisher.core.internal.util;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherStreamValidationException;
 import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -199,12 +195,12 @@ public class EventPublisherUtil {
         return event;
     }
 
-    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap)
+    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap, Map<String, Object> arbitraryDataMap)
             throws EventPublisherConfigurationException {
         List<String> mappingProperties = EventPublisherUtil.getOutputMappingPropertyList(actualMappingText);
         for (String property : mappingProperties) {
-            if (!propertyPositionMap.containsKey(property) && (property == null || !property.startsWith(EventPublisherConstants.PROPERTY_ARBITRARY_DATA_MAP_PREFIX))) {
-                throw new EventPublisherStreamValidationException("Property " + property + " is not in the input stream definition.");
+            if (!propertyPositionMap.containsKey(property) && (arbitraryDataMap == null || !arbitraryDataMap.containsKey(property))) {
+                throw new EventPublisherStreamValidationException("Property " + property + " is neither in the input stream attributes nor in runtime arbitrary data map.");
             }
         }
     }
@@ -230,18 +226,9 @@ public class EventPublisherUtil {
         return mappingTextList;
     }
 
-    public static void validateFilePath(String file) throws EventPublisherConfigurationException {
-
-        Path baseDirPath = Paths.get(EventAdapterUtil.getAxisConfiguration().getRepository().getPath() + File.separator + EventPublisherConstants.EF_CONFIG_DIRECTORY);
-        Path path = Paths.get(file);
-        Path resolvedPath = baseDirPath.resolve(path).normalize();
-
-        if (! resolvedPath.startsWith(baseDirPath)) {
-            // If not valid, test for tmp/carbonapps directory
-            baseDirPath = Paths.get(CarbonUtils.getTmpDir(), EventPublisherConstants.TEMP_CARBON_APPS_DIRECTORY);
-            if (! resolvedPath.startsWith(baseDirPath)) {
-                throw new EventPublisherConfigurationException("File name contains restricted path elements. " + file);
-            }
+    public static void validateFilePath(String fileName) throws EventPublisherConfigurationException {
+        if (fileName.contains("../") || fileName.contains("..\\")) {
+            throw new EventPublisherConfigurationException("File name contains restricted path elements. " + fileName);
         }
     }
 }

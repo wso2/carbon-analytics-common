@@ -49,7 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class EventPublisher implements WSO2EventConsumer, EventSync {
 
@@ -57,6 +56,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
     private final boolean traceEnabled;
     private final boolean statisticsEnabled;
+    private final boolean processingEnabled;
     private List<String> dynamicMessagePropertyList = new ArrayList<String>();
     private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
@@ -77,6 +77,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private boolean isContinue = false;
     private BlockingEventQueue eventQueue;
     private int inputStreamSize = 0;
+
 
 //    private volatile AtomicLong totalLatency = new AtomicLong();
 //    private volatile AtomicLong totalEvents = new AtomicLong();
@@ -138,9 +139,12 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             throw new EventPublisherStreamValidationException("Stream " + streamId + " does not exist", streamId);
         }
 
+
         this.traceEnabled = eventPublisherConfiguration.isTracingEnabled();
         this.statisticsEnabled = eventPublisherConfiguration.isStatisticsEnabled() &&
                 EventPublisherServiceValueHolder.isGlobalStatisticsEnabled();
+        this.processingEnabled = eventPublisherConfiguration.isProcessingEnabled();
+
         if (statisticsEnabled) {
             this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
@@ -155,6 +159,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                     eventPublisherConfiguration.getEventPublisherName() + ", after processing " +
                     System.getProperty("line.separator");
         }
+
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();
         try {
@@ -251,6 +256,13 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
     }
 
+    /**
+     * Create a map of property names and their position in the stream definition.
+     * Since this method is called during stream deployment, arbitrary data cannot
+     * be included into this map.
+     *
+     * @param streamDefinition
+     */
     private void createPropertyPositionMap(StreamDefinition streamDefinition) {
         List<Attribute> metaAttributeList = streamDefinition.getMetaData();
         List<Attribute> correlationAttributeList = streamDefinition.getCorrelationData();
@@ -307,26 +319,37 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         return dynamicMessagePropertyList;
     }
 
-    private void changeDynamicEventAdapterMessageProperties(Object[] eventData, Map<String, String> dynamicProperties) {
+    private void changeDynamicEventAdapterMessageProperties(Object[] eventData, Map<String, String> dynamicProperties, Map<String, Object> arbitraryDataMap) {
         for (String dynamicMessageProperty : dynamicMessagePropertyList) {
-            if (eventData.length != 0 && dynamicMessageProperty != null) {
-                int position = propertyPositionMap.get(dynamicMessageProperty);
-                changePropertyValue(position, dynamicMessageProperty, eventData, dynamicProperties);
+            if ((eventData.length != 0 || !arbitraryDataMap.isEmpty()) && dynamicMessageProperty != null) {
+                Integer position = propertyPositionMap.get(dynamicMessageProperty);
+                changePropertyValue(position, dynamicMessageProperty, eventData, dynamicProperties, arbitraryDataMap);
             }
         }
     }
 
-    private void changePropertyValue(int position, String messageProperty, Object[] eventData,
-                                     Map<String, String> dynamicProperties) {
+    private void changePropertyValue(Integer position, String messageProperty, Object[] eventData,
+                                     Map<String, String> dynamicProperties,
+                                     Map<String, Object> arbitraryDataMap) {
         for (Map.Entry<String, String> entry : dynamicProperties.entrySet()) {
             String mapValue = "{{" + messageProperty + "}}";
             String regexValue = "\\{\\{" + messageProperty + "\\}\\}";
             String entryValue = entry.getValue();
             if (entryValue != null && entryValue.contains(mapValue)) {
-                if (eventData[position] != null) {
-                    entry.setValue(entryValue.replaceAll(regexValue, eventData[position].toString()));
+                if (position == null) {
+                    // messageProperty is not included in propertyPositionMap, so it should be an arbitrary data map
+                    if (arbitraryDataMap == null || !arbitraryDataMap.containsKey(messageProperty)) {
+                        // Not found in arbitrary data map as well
+                        throw new EventPublisherStreamValidationException("Property " + messageProperty + " is neither in the input stream attributes nor in runtime arbitrary data map.");
+                    } else {
+                        entry.setValue(entryValue.replaceAll(regexValue, arbitraryDataMap.get(messageProperty).toString()));
+                    }
                 } else {
-                    entry.setValue(entryValue.replaceAll(regexValue, ""));
+                    if (eventData[position] != null) {
+                        entry.setValue(entryValue.replaceAll(regexValue, eventData[position].toString()));
+                    } else {
+                        entry.setValue(entryValue.replaceAll(regexValue, ""));
+                    }
                 }
             }
         }
@@ -354,6 +377,11 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             eventCounter.inc();
         }
 
+        if (!processingEnabled) {
+            return;
+
+        }
+
         org.wso2.siddhi.core.event.Event siddhiEvent = EventPublisherUtil.convertToSiddhiEvent(event, inputStreamSize);
 
         try {
@@ -372,7 +400,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         }
 
         if (dynamicMessagePropertyEnabled) {
-            changeDynamicEventAdapterMessageProperties(siddhiEvent.getData(), dynamicProperties);
+            changeDynamicEventAdapterMessageProperties(siddhiEvent.getData(), dynamicProperties, siddhiEvent.getArbitraryDataMap());
         }
 
         OutputEventAdapterService eventAdapterService = EventPublisherServiceValueHolder.getOutputEventAdapterService();

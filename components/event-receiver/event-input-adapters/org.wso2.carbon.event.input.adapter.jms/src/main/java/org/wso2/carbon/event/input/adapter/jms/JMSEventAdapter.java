@@ -45,6 +45,7 @@ public class JMSEventAdapter implements InputEventAdapter {
     private int maxThreadPoolSize;
     private int KeepAliveTimeInMillis;
     private int jobQueueSize;
+    private int waitingTime = 0;
 
 
     public JMSEventAdapter(InputEventAdapterConfiguration eventAdapterConfiguration,
@@ -64,6 +65,11 @@ public class JMSEventAdapter implements InputEventAdapter {
                     JMSEventAdapterConstants.ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME));
         } else {
             jobQueueSize = JMSEventAdapterConstants.DEFAULT_JOB_IN_QUEUE_SIZE;
+        }
+
+        if (globalProperties.get(JMSEventAdapterConstants.ADAPTER_LISTENER_WAITING_TIME) != null) {
+            waitingTime = Integer.parseInt(globalProperties.get(
+                            JMSEventAdapterConstants.ADAPTER_LISTENER_WAITING_TIME));
         }
 
         minThreadPoolSize = JMSEventAdapterConstants.DEFAULT_MIN_THREAD_POOL_SIZE;
@@ -175,7 +181,7 @@ public class JMSEventAdapter implements InputEventAdapter {
 
         jmsListener = new JMSListener(eventAdapterConfiguration.getName() + "#" + destination,
                 jmsTaskManager);
-        jmsListener.startListener();
+        jmsListener.startListener(waitingTime);
 
     }
 
