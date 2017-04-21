@@ -63,4 +63,14 @@ public interface InputEventAdapterService {
     boolean isEventDuplicatedInCluster(String inputEventAdapterName) throws InputEventAdapterException;
 
     void start(String inputEventAdapterName);
+
+    /**
+     * Returns the tenant specific input adapter runtime.
+     *
+     * @param tenantId         tenantId of the interested tenant
+     * @param eventAdapterName event adaptername
+     * @return
+     */
+    InputEventAdapterListener getInputAdapterRuntime(int tenantId, String eventAdapterName);
+
 }
