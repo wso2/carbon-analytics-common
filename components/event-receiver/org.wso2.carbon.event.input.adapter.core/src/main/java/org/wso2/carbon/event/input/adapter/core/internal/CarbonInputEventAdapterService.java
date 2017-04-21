@@ -17,7 +17,13 @@ package org.wso2.carbon.event.input.adapter.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.input.adapter.core.*;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSchema;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
+import org.wso2.carbon.event.input.adapter.core.InputEventAdapterSubscription;
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.core.internal.ds.InputEventAdapterServiceValueHolder;
@@ -171,7 +177,7 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
         return tenantSpecificEventAdapters;
     }
 
-    public InputEventAdapterListener getInputAdapterRuntime(int tenantId, String eventAdapterName){
+    public InputEventAdapterListener getInputAdapterRuntime(int tenantId, String eventAdapterName) {
         ConcurrentHashMap<String, InputAdapterRuntime> tenantRuntimes = tenantSpecificEventAdapters.get(tenantId);
         if (tenantRuntimes != null) {
             return tenantRuntimes.get(eventAdapterName);

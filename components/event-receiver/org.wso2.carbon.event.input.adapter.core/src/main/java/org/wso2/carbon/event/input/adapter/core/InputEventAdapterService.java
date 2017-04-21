@@ -66,10 +66,11 @@ public interface InputEventAdapterService {
 
     /**
      * Returns the tenant specific input adapter runtime.
-     * @param tenantId tenantId of the interested tenant
+     *
+     * @param tenantId         tenantId of the interested tenant
      * @param eventAdapterName event adaptername
      * @return
      */
     InputEventAdapterListener getInputAdapterRuntime(int tenantId, String eventAdapterName);
 
-    }
+}
