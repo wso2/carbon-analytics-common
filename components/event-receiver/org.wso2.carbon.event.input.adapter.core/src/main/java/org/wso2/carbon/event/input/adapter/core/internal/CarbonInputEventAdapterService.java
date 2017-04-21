@@ -171,6 +171,14 @@ public class CarbonInputEventAdapterService implements InputEventAdapterService 
         return tenantSpecificEventAdapters;
     }
 
+    public InputEventAdapterListener getInputAdapterRuntime(int tenantId, String eventAdapterName){
+        ConcurrentHashMap<String, InputAdapterRuntime> tenantRuntimes = tenantSpecificEventAdapters.get(tenantId);
+        if (tenantRuntimes != null) {
+            return tenantRuntimes.get(eventAdapterName);
+        }
+        return null;
+    }
+
     @Override
     public void startPolling() {
         startPollingTriggered = true;
