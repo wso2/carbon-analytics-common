@@ -21,23 +21,21 @@ package org.wso2.carbon.databridge.receiver.thrift;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.server.ServerContext;
 import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TSSLTransportFactory;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TTransportException;
+import org.apache.thrift.transport.*;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
-import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
-import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
@@ -176,6 +174,10 @@ public class ThriftDataReceiver {
                         new ThriftSecureEventTransmissionServiceImpl(dataBridgeReceiverService));
         authenticationServer = new TThreadPoolServer(
                 new TThreadPoolServer.Args(serverTransport).processor(processor));
+
+        if (log.isDebugEnabled()) {
+            authenticationServer.setServerEventHandler(new LoggingServerEventHandler());
+        }
         Thread thread = new Thread(new ServerThread(authenticationServer));
         log.info("Thrift SSL port : " + port);
         thread.start();
@@ -200,6 +202,36 @@ public class ThriftDataReceiver {
                                           " on host " + hostName, e);
         }
     }
+
+    /**
+     * This event handler for thrift servers is intended to log IP and port of the peers connected to the server
+     */
+    static class LoggingServerEventHandler implements TServerEventHandler {
+        @Override
+        public void preServe() {
+
+        }
+
+        @Override
+        public ServerContext createContext(TProtocol input, TProtocol output) {
+            log.debug("Client " +  ((TSocket)input.getTransport()).getSocket().getRemoteSocketAddress().toString()
+                    +" connected to thrift authentication service.");
+
+            return null;
+        }
+
+        @Override
+        public void deleteContext(ServerContext serverContext, TProtocol input, TProtocol output) {
+            log.debug("Client " +  ((TSocket)input.getTransport()).getSocket().getRemoteSocketAddress().toString()
+                    + " disconnected from thrift authentication service.");
+
+        }
+
+        @Override
+        public void processContext(ServerContext serverContext, TTransport inputTransport, TTransport outputTransport) {
+        }
+    }
+
 
     /**
      * To stop the server
