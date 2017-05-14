@@ -34,6 +34,7 @@ public class ThriftDataReceiverConfiguration {
     private String sslProtocols;
     private String ciphers;
     private String receiverHostName;
+    private int waitingTimeInMilliSeconds;
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort) {
         secureDataReceiverPort = defaultSslPort;
@@ -50,6 +51,8 @@ public class ThriftDataReceiverConfiguration {
                 CommonThriftConstants.DEFAULT_RECEIVER_PORT).toString()) + portOffset;
         receiverHostName = dataReceiver.getConfiguration(ThriftDataReceiverConstants.RECEIVER_HOST_NAME,
                 ThriftDataReceiverConstants.DEFAULT_HOSTNAME).toString();
+        waitingTimeInMilliSeconds = Integer.parseInt(dataReceiver.getConfiguration(ThriftDataReceiverConstants
+                                .WAITING_TIME_IN_MILISEONDS, 0).toString());
 
         Object sslProtocolObj = dataReceiver.getConfiguration(ThriftDataReceiverConstants.PROTOCOLS_ELEMENT, null);
         sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
@@ -96,6 +99,10 @@ public class ThriftDataReceiverConfiguration {
 
     public String getSslProtocols() {
         return sslProtocols;
+    }
+
+    public int getWaitingTimeInMilliSeconds(){
+        return waitingTimeInMilliSeconds;
     }
 
     public void setSslProtocols(String sslProtocols) {

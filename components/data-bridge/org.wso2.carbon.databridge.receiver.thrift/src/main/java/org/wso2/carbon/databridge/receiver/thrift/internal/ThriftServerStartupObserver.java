@@ -60,7 +60,8 @@ public class ThriftServerStartupObserver implements ServerStartupObserver {
                         }
                     }
                 }
-                ServiceHolder.getDataReceiver().start(hostName);
+                ServiceHolder.getDataReceiver().start(hostName, thriftDataReceiverConfiguration
+                        .getWaitingTimeInMilliSeconds());
                 ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor = new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
                         new ThriftEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
                 TCompactProtocol.Factory inProtFactory = new TCompactProtocol.Factory();
