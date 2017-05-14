@@ -53,6 +53,7 @@ public class ThriftDataReceiver {
     private ThriftDataReceiverConfiguration thriftDataReceiverConfiguration;
     private TServer authenticationServer;
     private TServer dataReceiverServer;
+    private int receiverStartupWaitingTime = 0;
 
     /**
      * Initialize Carbon Agent Server
@@ -98,8 +99,9 @@ public class ThriftDataReceiver {
      * @throws org.wso2.carbon.databridge.core.exception.DataBridgeException
      *          if the agent server cannot be started
      */
-    public void start(String hostName)
+    public void start(String hostName, int receiverStartupWaitingTime)
             throws DataBridgeException {
+        this.receiverStartupWaitingTime = receiverStartupWaitingTime;
         startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(),
                 thriftDataReceiverConfiguration.getSslProtocols(), thriftDataReceiverConfiguration.getCiphers(), dataBridgeReceiverService);
         startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
@@ -164,7 +166,7 @@ public class ThriftDataReceiver {
                 sslServerSocket.setEnabledCipherSuites(ciphersArray);
             }
 
-            log.info("Thrift Server started at " + hostName);
+            log.info("Thrift Server IP : " + hostName);
         } catch (TTransportException e) {
             throw new TransportException("Thrift transport exception occurred ", e);
         }
@@ -178,7 +180,8 @@ public class ThriftDataReceiver {
         if (log.isDebugEnabled()) {
             authenticationServer.setServerEventHandler(new LoggingServerEventHandler());
         }
-        Thread thread = new Thread(new ServerThread(authenticationServer));
+        String url = hostName + ":" + port;
+        Thread thread = new Thread(new ServerThread(authenticationServer, receiverStartupWaitingTime, url));
         log.info("Thrift SSL port : " + port);
         thread.start();
     }
@@ -194,7 +197,8 @@ public class ThriftDataReceiver {
                             new ThriftEventTransmissionServiceImpl(dataBridgeReceiverService));
             dataReceiverServer = new TThreadPoolServer(
                     new TThreadPoolServer.Args(serverTransport).processor(processor));
-            Thread thread = new Thread(new ServerThread(dataReceiverServer));
+            String url = hostName + ":" + port;
+            Thread thread = new Thread(new ServerThread(dataReceiverServer, receiverStartupWaitingTime, url));
             log.info("Thrift port : " + port);
             thread.start();
         } catch (TTransportException e) {
@@ -243,12 +247,23 @@ public class ThriftDataReceiver {
 
     static class ServerThread implements Runnable {
         private TServer server;
+        private int waitingTime;
+        private String url;
+        private static final Log log = LogFactory.getLog(ServerThread.class);
 
-        ServerThread(TServer server) {
+        ServerThread(TServer server, int waitingTime, String url) {
             this.server = server;
+            this.waitingTime = waitingTime;
+            this.url = url;
         }
 
         public void run() {
+            if (waitingTime > 0){
+                try {
+                    Thread.sleep(waitingTime);
+                } catch (InterruptedException ignore) {}
+            }
+            log.info("Thrift receiver started on " + url);
             this.server.serve();
         }
     }

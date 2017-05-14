@@ -1330,13 +1330,6 @@
             </releases>
         </repository>
 
-        <!--for kafka-->
-        <repository>
-            <id>MarketceteraRepo</id>
-            <name>MarketceteraRepoy</name>
-            <url>http://repo.marketcetera.org/maven/</url>
-        </repository>
-
     </repositories>
 
     <properties>

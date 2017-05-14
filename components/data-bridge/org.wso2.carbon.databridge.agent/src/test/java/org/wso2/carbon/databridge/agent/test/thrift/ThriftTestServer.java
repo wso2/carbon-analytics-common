@@ -131,7 +131,7 @@ public class ThriftTestServer {
 
             String address = "localhost";
             log.info("Test Server starting on " + address);
-            thriftDataReceiver.start(address);
+            thriftDataReceiver.start(address, 0);
             log.info("Test Server Started");
     }
 
@@ -192,7 +192,7 @@ public class ThriftTestServer {
 
             try {
                 if (thriftDataReceiver != null){
-                    thriftDataReceiver.start(DataPublisherTestUtil.LOCAL_HOST);
+                    thriftDataReceiver.start(DataPublisherTestUtil.LOCAL_HOST, 0);
                 }else {
                     start(port);
                 }
