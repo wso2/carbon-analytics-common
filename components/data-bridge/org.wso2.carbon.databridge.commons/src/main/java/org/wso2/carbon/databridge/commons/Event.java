@@ -20,10 +20,11 @@
 
 package org.wso2.carbon.databridge.commons;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 
-public class Event {
+public class Event implements Serializable {
     private String streamId;
 
     private long timeStamp;
