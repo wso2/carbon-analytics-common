@@ -107,6 +107,9 @@ public class ThriftDataReceiver {
         startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
     }
 
+    public void start(String hostName) throws DataBridgeException {
+        start(hostName, 0);
+    }
 
     private void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers,
                                               DataBridgeReceiverService dataBridgeReceiverService)
