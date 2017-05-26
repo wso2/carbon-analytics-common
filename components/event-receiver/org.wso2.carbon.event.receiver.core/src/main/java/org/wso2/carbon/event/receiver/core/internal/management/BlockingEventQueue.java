@@ -29,8 +29,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
+/**
+ * This implementation is mostly referenced from the Java LinkedBlockingQueue implementation http://grepcode
+ * .com/file/repository.grepcode.com/java/root/jdk/openjdk/8u40-b25/java/util/concurrent/LinkedBlockingQueue.java
+ */
 public class BlockingEventQueue implements Serializable {
+
     private static final Log log = LogFactory.getLog(BlockingEventQueue.class);
     private final ReentrantLock takeLock = new ReentrantLock();
     private final ReentrantLock putLock = new ReentrantLock();
@@ -63,10 +67,6 @@ public class BlockingEventQueue implements Serializable {
             this.queue.put(new WrappedEvent(this.currentEventSize, event));
             c = currentSize.getAndAdd(this.currentEventSize);
 
-            if (c + currentEventSize < maxSizeInBytes) {
-                // if the queue is still not reached the max size, signal it
-                notFull.signal();
-            }
         } finally {
             putLock.unlock();
         }
@@ -95,10 +95,6 @@ public class BlockingEventQueue implements Serializable {
             wrappedEvent = this.queue.take();
             c = currentSize.getAndAdd(-wrappedEvent.getSize());
 
-            if (currentSize.get() > 0) {
-                // if the queue is still not empty, signal that.
-                notEmpty.signal();
-            }
         } finally {
             takeLock.unlock();
         }
