@@ -26,8 +26,12 @@ import org.wso2.carbon.event.processor.manager.core.EventManagementUtil;
 import org.wso2.carbon.event.processor.manager.core.EventSync;
 import org.wso2.carbon.event.processor.manager.core.Manager;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
-import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
@@ -77,14 +81,14 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     @Override
     public byte[] getState() {
         threadBarrier.lock();
-        byte[] state = ByteSerializer.OToB(eventQueue);
+        byte[] state = objectToBytes(eventQueue);
         threadBarrier.unlock();
         return state;
     }
 
     @Override
     public void syncState(byte[] bytes) {
-        BlockingEventQueue events = (BlockingEventQueue) ByteSerializer.BToO(bytes);
+        BlockingEventQueue events = (BlockingEventQueue) bytesToObject(bytes);
         while (events.peek() != null) {
             if (events.poll().equals(eventQueue.peek())) {
                 eventQueue.poll();
@@ -121,6 +125,50 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     @Override
     public String getOriginalEventStreamId() {
         return originalEventStreamId;
+    }
+
+    private byte[] objectToBytes(Object obj) {
+        long start = System.currentTimeMillis();
+        byte[] out = null;
+        if (obj != null) {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(obj);
+                out = baos.toByteArray();
+            } catch (IOException e) {
+                log.error("Error when writing byte array. " + e.getMessage(), e);
+                return null;
+            }
+        }
+        long end = System.currentTimeMillis();
+        if (log.isDebugEnabled()) {
+            log.debug("Encoded in :" + (end - start) + " msec");
+        }
+        return out;
+    }
+
+    private Object bytesToObject(byte[] bytes) {
+        long start = System.currentTimeMillis();
+        Object out = null;
+        if (bytes != null) {
+            try {
+                ByteArrayInputStream bios = new ByteArrayInputStream(bytes);
+                ObjectInputStream ois = new ObjectInputStream(bios);
+                out = ois.readObject();
+            } catch (IOException e) {
+                log.error("Error when writing to object. " + e.getMessage(), e);
+                return null;
+            } catch (ClassNotFoundException e) {
+                log.error("Error when writing to object. " + e.getMessage(), e);
+                return null;
+            }
+        }
+        long end = System.currentTimeMillis();
+        if (log.isDebugEnabled()) {
+            log.debug("Decoded in :" + (end - start) + " msec");
+        }
+        return out;
     }
 
     class QueueInputEventDispatcherWorker implements Runnable {

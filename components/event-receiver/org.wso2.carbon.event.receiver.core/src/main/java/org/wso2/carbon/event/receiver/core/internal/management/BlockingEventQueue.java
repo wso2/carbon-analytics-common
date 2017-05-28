@@ -23,83 +23,119 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 
+import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+/**
+ * This implementation is mostly referenced from the Java LinkedBlockingQueue implementation http://grepcode
+ * .com/file/repository.grepcode.com/java/root/jdk/openjdk/8u40-b25/java/util/concurrent/LinkedBlockingQueue.java
+ */
+public class BlockingEventQueue implements Serializable {
 
-public class BlockingEventQueue {
     private static final Log log = LogFactory.getLog(BlockingEventQueue.class);
+    private final ReentrantLock takeLock = new ReentrantLock();
+    private final ReentrantLock putLock = new ReentrantLock();
+    private final Condition notFull = putLock.newCondition();
+    private final Condition notEmpty = takeLock.newCondition();
     private int maxSizeInBytes;
     private BlockingQueue<WrappedEvent> queue;
-    private Semaphore semaphore;
     private AtomicInteger currentSize;
-    private final Object lock;
     private int currentEventSize;
 
     public BlockingEventQueue(int maxSizeInMb, int maxNumOfEvents) {
         this.maxSizeInBytes = maxSizeInMb * 1000000; // to convert to bytes
         this.queue = new LinkedBlockingQueue<>(maxNumOfEvents);
-        this.semaphore = new Semaphore(1);
         this.currentSize = new AtomicInteger(0);
-        this.lock = new Object();
         this.currentEventSize = 0;
     }
 
-    public synchronized void put(Event event) throws InterruptedException {
-        this.currentEventSize = EventReceiverUtil.getSize(event) + 4; //for the int value for size field.
-        if (currentSize.get() >= maxSizeInBytes) {
-            try {
-                semaphore.acquire();
-                if (semaphore.availablePermits() == 0) {
-                    synchronized (lock) {
-                        if (semaphore.availablePermits() == 0) {
-                            semaphore.release();
-                        }
-                    }
-                }
-            } catch (InterruptedException ignored) {
+    public void put(Event event) throws InterruptedException {
+        final ReentrantLock putLock = this.putLock;
+        final AtomicInteger currentSize = this.currentSize;
+        int c = -1;
+
+        putLock.lockInterruptibly();
+        try {
+            this.currentEventSize = EventReceiverUtil.getSize(event) + 4; //for the int value for size field.
+            while (currentSize.get() >= maxSizeInBytes) {
+                // waits if the queue has exceeded the max size
+                notFull.await();
             }
+            this.queue.put(new WrappedEvent(this.currentEventSize, event));
+            c = currentSize.getAndAdd(this.currentEventSize);
+
+        } finally {
+            putLock.unlock();
         }
-        this.queue.put(new WrappedEvent(this.currentEventSize, event));
-        if (currentSize.addAndGet(this.currentEventSize) >= maxSizeInBytes) {
-            try {
-                semaphore.acquire();
-            } catch (InterruptedException ignored) {
-            }
+        if (c == 0) {
+            // if the queue was empty, signal that it is non-empty now
+            signalNotEmpty();
         }
         if (log.isDebugEnabled()) {
             log.debug("Current queue size in bytes : " + currentSize + ", remaining capacity : " +
                     this.queue.remainingCapacity());
         }
-
     }
 
     public Event take() throws InterruptedException {
-        WrappedEvent wrappedEvent = this.queue.take();
-        releaseEvent(wrappedEvent);
+        WrappedEvent wrappedEvent;
+        int c = -1;
+        final ReentrantLock takeLock = this.takeLock;
+        final AtomicInteger currentSize = this.currentSize;
+
+        takeLock.lockInterruptibly();
+        try {
+            while (currentSize.get() == 0) {
+                // waits if the queue is empty
+                notEmpty.await();
+            }
+            wrappedEvent = this.queue.take();
+            c = currentSize.getAndAdd(-wrappedEvent.getSize());
+
+        } finally {
+            takeLock.unlock();
+        }
+        if (c >= maxSizeInBytes) {
+            // if the queue previously had reached its max, signal that now it's not
+            signalNotFull();
+        }
         return wrappedEvent.getEvent();
     }
-
-    private void releaseEvent(WrappedEvent wrappedEvent) {
-        currentSize.addAndGet(-wrappedEvent.getSize());
-        if (semaphore.availablePermits() == 0 && ((currentEventSize + currentSize.get() < maxSizeInBytes) || queue.size() == 0)) {
-            synchronized (lock) {
-                if (semaphore.availablePermits() == 0 && ((currentEventSize + currentSize.get() < maxSizeInBytes) || queue.size() == 0)) {
-                    semaphore.release();
-                }
-            }
-        }
-    }
+    
 
     public Event poll() {
-        WrappedEvent wrappedEvent = this.queue.poll();
-        if (wrappedEvent != null) {
-            releaseEvent(wrappedEvent);
-            return wrappedEvent.getEvent();
-        } else {
+        final AtomicInteger currentSize = this.currentSize;
+        if (currentSize.get() == 0) {
             return null;
         }
+        WrappedEvent wrappedEvent = null;
+        int c = -1;
+        final ReentrantLock takeLock = this.takeLock;
+
+        takeLock.lock();
+        try {
+            if (currentSize.get() > 0) {
+                wrappedEvent = this.queue.poll();
+                if (wrappedEvent != null) {
+                    c = currentSize.getAndAdd(-wrappedEvent.getSize());
+
+                    if (currentSize.get() > 0) {
+                        // if the queue is still not empty, signal that.
+                        notEmpty.signal();
+                    }
+                }
+            }
+        } finally {
+            takeLock.unlock();
+        }
+        if (wrappedEvent != null && c >= maxSizeInBytes) {
+            // if the queue previously had reached its max, signal that now it's not
+            signalNotFull();
+        }
+        return wrappedEvent == null ? null : wrappedEvent.getEvent();
     }
 
     public Event peek() {
@@ -111,7 +147,34 @@ public class BlockingEventQueue {
         }
     }
 
-    private class WrappedEvent {
+    /**
+     * Signals a waiting take. Called only from put.
+     */
+    private void signalNotEmpty() {
+        final ReentrantLock takeLock = this.takeLock;
+        takeLock.lock();
+        try {
+            notEmpty.signal();
+        } finally {
+            takeLock.unlock();
+        }
+    }
+
+    /**
+     * Signals a waiting put. Called only from take/poll.
+     */
+    private void signalNotFull() {
+        final ReentrantLock putLock = this.putLock;
+        putLock.lock();
+        try {
+            notFull.signal();
+        } finally {
+            putLock.unlock();
+        }
+    }
+
+
+    private class WrappedEvent implements Serializable{
         private int size;
         private Event event;
 
