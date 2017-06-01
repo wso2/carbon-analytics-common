@@ -21,6 +21,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
+import org.wso2.carbon.event.input.adapter.core.internal.ds.InputEventAdapterServiceValueHolder;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.receiver.core.EventReceiverService;
 import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationException;
@@ -35,6 +36,7 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.tomcat.ext.valves.CarbonTomcatValve;
 import org.wso2.carbon.tomcat.ext.valves.TomcatValveContainer;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.ArrayList;
@@ -89,6 +91,11 @@ public class EventReceiverServiceDS {
             ArrayList<CarbonTomcatValve> valves = new ArrayList<CarbonTomcatValve>();
             valves.add(new TenantLazyLoaderValve());
             TomcatValveContainer.addValves(valves);
+
+            if(CarbonUtils.getServerConfiguration().getFirstProperty("Tenant.LoadingPolicy.LazyLoading.IdleTime") != null){
+                EventReceiverServiceValueHolder.setLazyLoading(true);
+            }
+
         } catch (Throwable e) {
             log.error("Could not create EventReceiverService or EventReceiver : " + e.getMessage(), e);
         }

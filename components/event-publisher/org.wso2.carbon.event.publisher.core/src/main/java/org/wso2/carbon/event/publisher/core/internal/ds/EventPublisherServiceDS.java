@@ -30,6 +30,7 @@ import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.Set;
@@ -77,6 +78,10 @@ public class EventPublisherServiceDS {
             activateInactiveEventPublisherConfigurations(carbonEventPublisherService);
 
             context.getBundleContext().registerService(EventStreamListener.class.getName(), new EventStreamListenerImpl(), null);
+
+            if(CarbonUtils.getServerConfiguration().getFirstProperty("Tenant.LoadingPolicy.LazyLoading.IdleTime") != null){
+                EventPublisherServiceValueHolder.setLazyLoading(true);
+            }
 
         } catch (RuntimeException e) {
             log.error("Could not create EventPublisherService : " + e.getMessage(), e);

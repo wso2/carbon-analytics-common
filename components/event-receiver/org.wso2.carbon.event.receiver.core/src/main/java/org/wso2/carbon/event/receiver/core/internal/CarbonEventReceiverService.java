@@ -20,6 +20,7 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
@@ -44,6 +45,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -372,24 +374,47 @@ public class CarbonEventReceiverService implements EventReceiverService {
 
     public void activateInactiveEventReceiverConfigurationsForAdapter(String eventAdapterName)
             throws EventReceiverConfigurationException {
-        List<EventReceiverConfigurationFile> fileList = new ArrayList<EventReceiverConfigurationFile>();
+        Map<Integer, List<EventReceiverConfigurationFile>> tenantSpecificFileMap = new HashMap<>();
 
         if (tenantSpecificEventReceiverConfigurationFileMap != null && tenantSpecificEventReceiverConfigurationFileMap.size() > 0) {
-            for (List<EventReceiverConfigurationFile> eventReceiverConfigurationFiles : tenantSpecificEventReceiverConfigurationFileMap.values()) {
-                if (eventReceiverConfigurationFiles != null) {
-                    for (EventReceiverConfigurationFile eventReceiverConfigurationFile : eventReceiverConfigurationFiles) {
+            if(EventReceiverServiceValueHolder.isLazyLoading()){
+                List<EventReceiverConfigurationFile> tenantSpecificEventReceiverList = tenantSpecificEventReceiverConfigurationFileMap.get(MultitenantConstants.SUPER_TENANT_ID);
+                if (tenantSpecificEventReceiverList != null) {
+                    List<EventReceiverConfigurationFile> fileList = new ArrayList<>();
+                    for (EventReceiverConfigurationFile eventReceiverConfigurationFile : tenantSpecificEventReceiverList) {
                         if ((eventReceiverConfigurationFile.getStatus().equals(EventReceiverConfigurationFile.Status.WAITING_FOR_DEPENDENCY)) && eventReceiverConfigurationFile.getDependency().equalsIgnoreCase(eventAdapterName)) {
                             fileList.add(eventReceiverConfigurationFile);
                         }
                     }
+                    tenantSpecificFileMap.put(MultitenantConstants.SUPER_TENANT_ID,fileList);
+                }
+            } else {
+                for (Map.Entry<Integer, List<EventReceiverConfigurationFile>> entry : tenantSpecificEventReceiverConfigurationFileMap.entrySet()){
+                    if (entry != null) {
+                        List<EventReceiverConfigurationFile> fileList = new ArrayList<>();
+                        for (EventReceiverConfigurationFile eventReceiverConfigurationFile : entry.getValue()) {
+                            if ((eventReceiverConfigurationFile.getStatus().equals(EventReceiverConfigurationFile.Status.WAITING_FOR_DEPENDENCY)) && eventReceiverConfigurationFile.getDependency().equalsIgnoreCase(eventAdapterName)) {
+                                fileList.add(eventReceiverConfigurationFile);
+                            }
+                        }
+                        tenantSpecificFileMap.put(entry.getKey(),fileList);
+                    }
                 }
             }
         }
-        for (EventReceiverConfigurationFile receiverConfigurationFile : fileList) {
-            try {
-                EventReceiverConfigurationFileSystemInvoker.reload(receiverConfigurationFile);
-            } catch (Exception e) {
-                log.error("Exception occurred while trying to deploy the Event Receiver configuration file: " + receiverConfigurationFile.getFileName(), e);
+        for (Map.Entry<Integer, List<EventReceiverConfigurationFile>> entry : tenantSpecificFileMap.entrySet()){
+            for (EventReceiverConfigurationFile receiverConfigurationFile : entry.getValue()) {
+                try {
+                    try{
+                        PrivilegedCarbonContext.startTenantFlow();
+                        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(entry.getKey(), true);
+                        EventReceiverConfigurationFileSystemInvoker.reload(receiverConfigurationFile);
+                    }finally {
+                        PrivilegedCarbonContext.endTenantFlow();
+                    }
+                } catch (Exception e) {
+                    log.error("Exception occurred while trying to deploy the Event Receiver configuration file: " + receiverConfigurationFile.getFileName(), e);
+                }
             }
         }
     }
