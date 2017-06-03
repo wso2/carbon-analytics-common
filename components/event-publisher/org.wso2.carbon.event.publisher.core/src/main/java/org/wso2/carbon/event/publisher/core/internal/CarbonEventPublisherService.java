@@ -24,6 +24,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterSchema;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.Property;
+import org.wso2.carbon.event.publisher.core.EventPublisherDeployer;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfigurationFile;
@@ -41,7 +42,6 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,16 +49,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.xml.stream.XMLStreamException;
+
 public class CarbonEventPublisherService implements EventPublisherService {
 
     private static final Log log = LogFactory.getLog(CarbonEventPublisherService.class);
     private Map<Integer, Map<String, EventPublisher>> tenantSpecificEventPublisherConfigurationMap;
     private Map<Integer, List<EventPublisherConfigurationFile>> tenantSpecificEventPublisherConfigurationFileMap;
-
+    private Map<Integer, EventPublisherDeployer> tenantSpecificDeployerMap;
 
     public CarbonEventPublisherService() {
         tenantSpecificEventPublisherConfigurationMap = new ConcurrentHashMap<Integer, Map<String, EventPublisher>>();
         tenantSpecificEventPublisherConfigurationFileMap = new ConcurrentHashMap<Integer, List<EventPublisherConfigurationFile>>();
+        tenantSpecificDeployerMap = new ConcurrentHashMap<Integer, EventPublisherDeployer>();
     }
 
     @Override
@@ -396,7 +399,8 @@ public class CarbonEventPublisherService implements EventPublisherService {
                 PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
                 carbonContext.setTenantId(eventPublisherConfigurationFile.getTenantId());
                 carbonContext.getTenantDomain(true);
-                EventPublisherConfigurationFilesystemInvoker.reload(eventPublisherConfigurationFile.getFilePath());
+                EventPublisherConfigurationFilesystemInvoker
+                        .reload(eventPublisherConfigurationFile.getFilePath());
             } catch (Exception e) {
                 log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + eventPublisherConfigurationFile.getFileName(), e);
             } finally {
@@ -428,7 +432,8 @@ public class CarbonEventPublisherService implements EventPublisherService {
                 PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
                 carbonContext.setTenantId(eventPublisherConfigurationFile.getTenantId());
                 carbonContext.getTenantDomain(true);
-                EventPublisherConfigurationFilesystemInvoker.reload(eventPublisherConfigurationFile.getFilePath());
+                EventPublisherConfigurationFilesystemInvoker
+                        .reload(eventPublisherConfigurationFile.getFilePath());
             } catch (Exception e) {
                 log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + new File(eventPublisherConfigurationFile.getFileName()).getName(), e);
             } finally {
@@ -460,7 +465,8 @@ public class CarbonEventPublisherService implements EventPublisherService {
         }
 
         for (EventPublisherConfigurationFile eventPublisherConfigurationFile : fileList) {
-            EventPublisherConfigurationFilesystemInvoker.reload(eventPublisherConfigurationFile.getFilePath());
+            EventPublisherConfigurationFilesystemInvoker
+                    .reload(eventPublisherConfigurationFile.getFilePath());
             log.info("Event publisher : " + eventPublisherConfigurationFile.getEventPublisherName() + "  is in inactive state because dependency could not be found : " + dependency);
         }
     }
@@ -488,7 +494,8 @@ public class CarbonEventPublisherService implements EventPublisherService {
         }
 
         for (EventPublisherConfigurationFile eventPublisherConfigurationFile : fileList) {
-            EventPublisherConfigurationFilesystemInvoker.reload(eventPublisherConfigurationFile.getFilePath());
+            EventPublisherConfigurationFilesystemInvoker
+                    .reload(eventPublisherConfigurationFile.getFilePath());
             log.info("Event publisher : " + eventPublisherConfigurationFile.getEventPublisherName() + "  is in inactive state because stream dependency could not be found : " + streamId);
         }
     }
@@ -522,8 +529,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
         }
         return false;
     }
-
-
+    
     //Private Methods are below
 
     private void editTracingStatisticsProcessing(
@@ -642,6 +648,10 @@ public class CarbonEventPublisherService implements EventPublisherService {
             }
         }
         return encryptedProperties;
+    }
+
+    public Map<Integer, EventPublisherDeployer> getTenantSpecificDeployerMap() {
+        return tenantSpecificDeployerMap;
     }
 
 }
