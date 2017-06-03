@@ -162,6 +162,7 @@ public class EventPublisherDeployer extends AbstractDeployer implements EventPro
         CarbonEventPublisherService carbonEventPublisherService = EventPublisherServiceValueHolder.getCarbonEventPublisherService();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         String eventPublisherName = "";
+        carbonEventPublisherService.getTenantSpecificDeployerMap().put(tenantId, this);
 
         if (!carbonEventPublisherService.isEventPublisherFileAlreadyExist(eventPublisherFile.getName(), tenantId)) {
             try {

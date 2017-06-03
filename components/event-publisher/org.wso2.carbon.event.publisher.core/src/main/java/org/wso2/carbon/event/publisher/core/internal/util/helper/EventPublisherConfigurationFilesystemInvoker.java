@@ -23,6 +23,7 @@ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoUtil;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.publisher.core.EventPublisherDeployer;
@@ -35,6 +36,7 @@ import javax.xml.namespace.QName;
 import java.io.*;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class used to do the file system related tasks
@@ -140,10 +142,10 @@ public class EventPublisherConfigurationFilesystemInvoker {
         return file.exists();
     }
 
-    public static void reload(String filePath)
+    public static void reload(String filePath, Map<Integer, EventPublisherDeployer> tenantSpecificDeployerMap)
             throws EventPublisherConfigurationException {
-       AxisConfiguration axisConfiguration= EventPublisherUtil.getAxisConfiguration();
-        EventPublisherDeployer deployer = (EventPublisherDeployer) getDeployer(axisConfiguration, EventPublisherConstants.EF_CONFIG_DIRECTORY);
+        EventPublisherDeployer deployer = tenantSpecificDeployerMap
+                .get(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true));
         try {
             deployer.processUndeployment(filePath);
             deployer.processDeployment(new DeploymentFileData(new File(filePath)));
