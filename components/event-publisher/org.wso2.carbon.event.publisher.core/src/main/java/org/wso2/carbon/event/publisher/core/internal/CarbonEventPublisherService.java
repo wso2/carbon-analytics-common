@@ -400,7 +400,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
                 carbonContext.setTenantId(eventPublisherConfigurationFile.getTenantId());
                 carbonContext.getTenantDomain(true);
                 EventPublisherConfigurationFilesystemInvoker
-                        .reload(eventPublisherConfigurationFile.getFilePath(), tenantSpecificDeployerMap);
+                        .reload(eventPublisherConfigurationFile.getFilePath());
             } catch (Exception e) {
                 log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + eventPublisherConfigurationFile.getFileName(), e);
             } finally {
@@ -433,7 +433,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
                 carbonContext.setTenantId(eventPublisherConfigurationFile.getTenantId());
                 carbonContext.getTenantDomain(true);
                 EventPublisherConfigurationFilesystemInvoker
-                        .reload(eventPublisherConfigurationFile.getFilePath(), tenantSpecificDeployerMap);
+                        .reload(eventPublisherConfigurationFile.getFilePath());
             } catch (Exception e) {
                 log.error("Exception occurred while trying to deploy the Event publisher configuration file : " + new File(eventPublisherConfigurationFile.getFileName()).getName(), e);
             } finally {
@@ -466,7 +466,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
 
         for (EventPublisherConfigurationFile eventPublisherConfigurationFile : fileList) {
             EventPublisherConfigurationFilesystemInvoker
-                    .reload(eventPublisherConfigurationFile.getFilePath(), tenantSpecificDeployerMap);
+                    .reload(eventPublisherConfigurationFile.getFilePath());
             log.info("Event publisher : " + eventPublisherConfigurationFile.getEventPublisherName() + "  is in inactive state because dependency could not be found : " + dependency);
         }
     }
@@ -495,7 +495,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
 
         for (EventPublisherConfigurationFile eventPublisherConfigurationFile : fileList) {
             EventPublisherConfigurationFilesystemInvoker
-                    .reload(eventPublisherConfigurationFile.getFilePath(), tenantSpecificDeployerMap);
+                    .reload(eventPublisherConfigurationFile.getFilePath());
             log.info("Event publisher : " + eventPublisherConfigurationFile.getEventPublisherName() + "  is in inactive state because stream dependency could not be found : " + streamId);
         }
     }

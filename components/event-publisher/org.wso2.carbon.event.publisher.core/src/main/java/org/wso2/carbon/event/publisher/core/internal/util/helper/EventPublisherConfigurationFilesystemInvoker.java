@@ -142,9 +142,11 @@ public class EventPublisherConfigurationFilesystemInvoker {
         return file.exists();
     }
 
-    public static void reload(String filePath, Map<Integer, EventPublisherDeployer> tenantSpecificDeployerMap)
+    public static void reload(String filePath)
             throws EventPublisherConfigurationException {
-        EventPublisherDeployer deployer = tenantSpecificDeployerMap
+        EventPublisherDeployer deployer = EventPublisherServiceValueHolder
+                .getCarbonEventPublisherService()
+                .getTenantSpecificDeployerMap()
                 .get(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true));
         try {
             deployer.processUndeployment(filePath);
