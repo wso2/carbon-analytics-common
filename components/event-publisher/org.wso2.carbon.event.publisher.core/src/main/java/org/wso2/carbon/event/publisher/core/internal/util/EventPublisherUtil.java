@@ -17,6 +17,7 @@ package org.wso2.carbon.event.publisher.core.internal.util;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.event.publisher.core.config.CustomMapperFunction;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
@@ -30,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventPublisherUtil {
 
@@ -195,11 +197,12 @@ public class EventPublisherUtil {
         return event;
     }
 
-    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap, Map<String, Object> arbitraryDataMap)
+    public static void validateStreamDefinitionWithOutputProperties(String actualMappingText, Map<String, Integer> propertyPositionMap,
+                                                                    Map<String, Object> arbitraryDataMap, ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctions)
             throws EventPublisherConfigurationException {
         List<String> mappingProperties = EventPublisherUtil.getOutputMappingPropertyList(actualMappingText);
         for (String property : mappingProperties) {
-            if (!propertyPositionMap.containsKey(property) && (arbitraryDataMap == null || !arbitraryDataMap.containsKey(property))) {
+            if (!(propertyPositionMap.containsKey(property) || customMapperFunctions.containsKey(property)) && (arbitraryDataMap == null || !arbitraryDataMap.containsKey(property))) {
                 throw new EventPublisherStreamValidationException("Property " + property + " is neither in the input stream attributes nor in runtime arbitrary data map.");
             }
         }
@@ -215,7 +218,14 @@ public class EventPublisherUtil {
         while (prefixIndex > 0) {
             postFixIndex = text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX);
             if (postFixIndex > prefixIndex) {
-                mappingTextList.add(text.substring(prefixIndex + 2, postFixIndex));
+                String subMappingText = text.substring(prefixIndex + 2, postFixIndex);
+                //if it's a function get the function name
+                if (subMappingText.endsWith(EventPublisherConstants.CUSTOM_FUNCTION_CLOSING_BRACKET)) {
+                    List<String> customFunctionMappingTokenList = getCustomFunctionMappingTokenList(subMappingText);
+                    mappingTextList.addAll(customFunctionMappingTokenList);
+                } else {
+                    mappingTextList.add(subMappingText);
+                }
                 text = text.substring(postFixIndex + 2);
             } else {
                 throw new EventPublisherConfigurationException("Found template attribute prefix " + EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX
@@ -230,5 +240,21 @@ public class EventPublisherUtil {
         if (fileName.contains("../") || fileName.contains("..\\")) {
             throw new EventPublisherConfigurationException("File name contains restricted path elements. " + fileName);
         }
+    }
+
+    private static List<String> getCustomFunctionMappingTokenList(String functionMappingText) {
+        List<String> resultingMappingList = new ArrayList<>();
+        String functionName = functionMappingText.substring(0, functionMappingText.indexOf(EventPublisherConstants.CUSTOM_FUNCTION_OPENING_BRACKET));
+        String[] attributes = functionMappingText.substring(functionMappingText.indexOf(EventPublisherConstants.CUSTOM_FUNCTION_OPENING_BRACKET) + 1,
+                functionMappingText.indexOf(EventPublisherConstants.CUSTOM_FUNCTION_CLOSING_BRACKET)).split(",");
+        resultingMappingList.add(functionName);
+        for (String attribute : attributes) {
+            // if it's a literal, ignore
+            attribute = attribute.trim();
+            if (!(attribute.startsWith("'") && attribute.endsWith("'"))) {
+                resultingMappingList.add(attribute);
+            }
+        }
+        return resultingMappingList;
     }
 }

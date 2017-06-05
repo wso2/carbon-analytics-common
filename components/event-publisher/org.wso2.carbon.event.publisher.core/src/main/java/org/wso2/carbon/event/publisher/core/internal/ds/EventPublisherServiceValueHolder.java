@@ -21,6 +21,7 @@ import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.core.config.OutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherManagementService;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherService;
+import org.wso2.carbon.event.publisher.core.config.CustomMapperFunction;
 import org.wso2.carbon.event.publisher.core.internal.type.json.JSONOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.map.MapOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.text.TextOutputMapperFactory;
@@ -45,6 +46,7 @@ public class EventPublisherServiceValueHolder {
     private static CarbonEventPublisherManagementService carbonEventPublisherManagementService;
     private static EventManagementService eventManagementService;
     private static ConcurrentHashMap<String, OutputMapperFactory> mappingFactoryMap = new ConcurrentHashMap<String, OutputMapperFactory>();
+    private static ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctions = new ConcurrentHashMap();
     public static Set<String> outputEventAdapterTypes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
     private static ConfigurationContextService configurationContextService;
     private static boolean globalStatisticsEnabled = false;
@@ -150,5 +152,13 @@ public class EventPublisherServiceValueHolder {
 
     public static boolean isGlobalStatisticsEnabled() {
         return globalStatisticsEnabled;
+    }
+
+    public static ConcurrentHashMap<String, CustomMapperFunction> getCustomMapperFunctions() {
+        return customMapperFunctions;
+    }
+
+    public static void setCustomMapperFunctions(ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctions) {
+        EventPublisherServiceValueHolder.customMapperFunctions = customMapperFunctions;
     }
 }

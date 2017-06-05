@@ -16,22 +16,29 @@ package org.wso2.carbon.event.publisher.core.internal.type.text;
 
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.event.publisher.core.config.CustomMapperFunction;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConstants;
 import org.wso2.carbon.event.publisher.core.config.mapping.TextOutputMapping;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 import org.wso2.carbon.event.publisher.core.internal.OutputMapper;
+import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceValueHolder;
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.publisher.core.internal.util.RuntimeResourceLoader;
+import org.wso2.carbon.event.publisher.core.mapper.AttributeOutputMapperType;
+import org.wso2.carbon.event.publisher.core.mapper.FunctionOutputMapperType;
+import org.wso2.carbon.event.publisher.core.mapper.OutputMapperType;
+import org.wso2.carbon.event.publisher.core.mapper.TextOutputMapperType;
 import org.wso2.siddhi.core.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TextOutputMapper implements OutputMapper {
 
-    private List<String> mappingTextList;
+    private List<OutputMapperType> mappingTextList;
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private Map<String, Integer> propertyPositionMap = null;
     private final StreamDefinition streamDefinition;
@@ -39,6 +46,7 @@ public class TextOutputMapper implements OutputMapper {
     private final RuntimeResourceLoader runtimeResourceLoader;
     private final boolean isCustomMappingEnabled;
     private String mappingText;
+    private final ConcurrentHashMap<String, CustomMapperFunction> customMapperFunctions;
 
     public TextOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
@@ -67,6 +75,7 @@ public class TextOutputMapper implements OutputMapper {
         if (!outputMapping.isRegistryResource()) {     // Store only if it is not from registry
             this.mappingTextList = generateMappingTextList(mappingText);
         }
+        this.customMapperFunctions = EventPublisherServiceValueHolder.getCustomMapperFunctions();
     }
 
     private List<String> getOutputMappingPropertyList(String mappingText) {
@@ -82,19 +91,22 @@ public class TextOutputMapper implements OutputMapper {
         return mappingTextList;
     }
 
-    private List<String> generateMappingTextList(String mappingText) {
-
-        List<String> mappingTextList = new ArrayList<String>();
+    private List<OutputMapperType> generateMappingTextList(String mappingText) {
+        List<OutputMapperType> mappingTextList = new ArrayList<>();
         String text = mappingText;
-
         mappingTextList.clear();
+        // adding the relevant mapping type objects
         while (text.contains(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) && text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) > 0) {
-            mappingTextList.add(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX)));
-            mappingTextList.add(text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX)));
+            mappingTextList.add(new TextOutputMapperType(text.substring(0, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX))));
+            String mapText = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_PREFIX) + 2, text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX));
+            if (mapText.endsWith(EventPublisherConstants.CUSTOM_FUNCTION_CLOSING_BRACKET)) {
+                mappingTextList.add(new FunctionOutputMapperType(mapText));
+            } else {
+                mappingTextList.add(new AttributeOutputMapperType(mapText));
+            }
             text = text.substring(text.indexOf(EventPublisherConstants.TEMPLATE_EVENT_ATTRIBUTE_POSTFIX) + 2);
         }
-        mappingTextList.add(text);
-
+        mappingTextList.add(new TextOutputMapperType(text));
         return mappingTextList;
     }
 
@@ -103,7 +115,7 @@ public class TextOutputMapper implements OutputMapper {
             throws EventPublisherConfigurationException {
 
         if (this.isCustomMappingEnabled) {
-            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap());
+            EventPublisherUtil.validateStreamDefinitionWithOutputProperties(mappingText, propertyPositionMap, event.getArbitraryDataMap(), customMapperFunctions);
         }
         // Retrieve resource at runtime if it is from registry
         TextOutputMapping outputMapping = (TextOutputMapping) eventPublisherConfiguration.getOutputMapping();
@@ -111,13 +123,13 @@ public class TextOutputMapper implements OutputMapper {
             String path = outputMapping.getMappingText();
             if (isCustomRegistryPath) {
                 // Retrieve the actual path
-                List<String> pathMappingTextList = generateMappingTextList(path);
-                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0));
+                List<OutputMapperType> pathMappingTextList = generateMappingTextList(path);
+                StringBuilder pathBuilder = new StringBuilder(pathMappingTextList.get(0).getValue(event, propertyPositionMap, customMapperFunctions).toString());
                 for (int i = 1; i < pathMappingTextList.size(); i++) {
                     if (i % 2 == 0) {
-                        pathBuilder.append(pathMappingTextList.get(i));
+                        pathBuilder.append(pathMappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions).toString());
                     } else {
-                        pathBuilder.append(getPropertyValue(event, pathMappingTextList.get(i)));
+                        pathBuilder.append(pathMappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions).toString());
                     }
                 }
                 path = pathBuilder.toString();
@@ -127,12 +139,12 @@ public class TextOutputMapper implements OutputMapper {
             this.mappingTextList = generateMappingTextList(actualMappingText);
         }
 
-        StringBuilder eventText = new StringBuilder(mappingTextList.get(0));
+        StringBuilder eventText = new StringBuilder(mappingTextList.get(0).getValue(event, propertyPositionMap, customMapperFunctions).toString());
         for (int i = 1; i < mappingTextList.size(); i++) {
             if (i % 2 == 0) {
-                eventText.append(mappingTextList.get(i));
+                eventText.append(mappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions));
             } else {
-                eventText.append(getPropertyValue(event, mappingTextList.get(i)));
+                eventText.append(mappingTextList.get(i).getValue(event, propertyPositionMap, customMapperFunctions));
             }
         }
 
@@ -154,24 +166,6 @@ public class TextOutputMapper implements OutputMapper {
     public Object convertToTypedInputEvent(Event event)
             throws EventPublisherConfigurationException {
         return convertToMappedInputEvent(event);
-    }
-
-
-    private String getPropertyValue(Event event, String mappingProperty) {
-        Object[] eventData = event.getData();
-        Map<String, Object> arbitraryMap = event.getArbitraryDataMap();
-        Integer position = propertyPositionMap.get(mappingProperty);
-        Object data = null;
-
-        if (position != null && eventData.length != 0) {
-            data = eventData[position];
-        } else if (mappingProperty != null && arbitraryMap != null && arbitraryMap.containsKey(mappingProperty)) {
-            data = arbitraryMap.get(mappingProperty);
-        }
-        if (data != null) {
-            return data.toString();
-        }
-        return "";
     }
 
     private String generateTemplateTextEvent(StreamDefinition streamDefinition) {

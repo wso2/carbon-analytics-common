@@ -61,6 +61,7 @@ public final class EventPublisherConstants {
     public static final String PROPERTY_META_PREFIX = "meta_";
     public static final String PROPERTY_CORRELATION_PREFIX = "correlation_";
     public static final String PROPERTY_ARBITRARY_DATA_MAP_PREFIX = "arbitrary_";
+    public static final String OUTPUTMAPPER_CUSTOM_FUNCTION_FILE_NAME = "custom-outputmapper-function.properties";
 
     public static final Map<String, AttributeType> STRING_ATTRIBUTE_TYPE_MAP = Collections.unmodifiableMap(new HashMap<String, AttributeType>() {{
         put(ATTR_TYPE_BOOL, AttributeType.BOOL);
@@ -100,6 +101,8 @@ public final class EventPublisherConstants {
     public static final String EVENT_DEFAULT_NAMESPACE = "http://wso2.org/carbon/events";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_PREFIX = "{{";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_POSTFIX = "}}";
+    public static final String CUSTOM_FUNCTION_CLOSING_BRACKET = ")";
+    public static final String CUSTOM_FUNCTION_OPENING_BRACKET = "(";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String EVENT_ATTRIBUTE_SEPARATOR = ",";
     public static final String DEFAULT_STREAM_VERSION = "1.0.0";
