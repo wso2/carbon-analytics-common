@@ -81,10 +81,10 @@ public class AgentSession {
                '}';
     }
 
-    public void setCredentials(String userName, String password, String domainName)
+    public void setCredentials(String userName, String password, String domainName, boolean isServerAuthEnabled)
             throws UserStoreException {
         int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(domainName);
-        this.credentials = new Credentials(userName, password, domainName, tenantId);
+        this.credentials = new Credentials(userName, password, domainName, tenantId, isServerAuthEnabled);
     }
 
     public Credentials getCredentials() {

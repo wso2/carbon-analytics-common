@@ -184,6 +184,19 @@ public abstract class DataEndpoint {
             throws DataEndpointAuthenticationException;
 
     /**
+     * Login to the endpoint and return the sessionId.
+     *
+     * @param client   The client which can be used to connect to the endpoint.
+     * @param userName The username which is used to login,
+     * @param password The password which is required for the login operation.
+     * @param isServerAuthEnabled To enable server to server authentication
+     * @return returns the sessionId
+     * @throws DataEndpointAuthenticationException
+     */
+    protected abstract String login(Object client, String userName, String password, boolean isServerAuthEnabled)
+            throws DataEndpointAuthenticationException;
+
+    /**
      * Logout from the endpoint.
      *
      * @param client    The client that is used to logout operation.

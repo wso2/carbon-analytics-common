@@ -26,7 +26,7 @@ public final class WSO2EventAdapterServiceValueHolder {
 
     private static DataBridgeSubscriberService dataBridgeSubscriberService;
 
-    private static ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>>> inputEventAdapterListenerMap = new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>>>();
+    private static ConcurrentHashMap<Integer, ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>>> inputEventAdapterListenerMap = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>>>();
 
     private WSO2EventAdapterServiceValueHolder() {
     }
@@ -40,13 +40,13 @@ public final class WSO2EventAdapterServiceValueHolder {
         return dataBridgeSubscriberService;
     }
 
-    public static synchronized void registerAdapterService(String tenantDomain, String streamId, WSO2EventAdapter wso2EventAdapter) {
+    public static synchronized void registerAdapterService(int tenantId, String streamId, WSO2EventAdapter wso2EventAdapter) {
 
-        ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>> tenantSpecificInputEventAdapterListenerMap = inputEventAdapterListenerMap.get(tenantDomain);
+        ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>> tenantSpecificInputEventAdapterListenerMap = inputEventAdapterListenerMap.get(tenantId);
 
         if (tenantSpecificInputEventAdapterListenerMap == null) {
             tenantSpecificInputEventAdapterListenerMap = new ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>>();
-            inputEventAdapterListenerMap.put(tenantDomain, tenantSpecificInputEventAdapterListenerMap);
+            inputEventAdapterListenerMap.put(tenantId, tenantSpecificInputEventAdapterListenerMap);
         }
         ConcurrentHashMap<String, WSO2EventAdapter> streamSpecificInputEventAdapterListenerMap = tenantSpecificInputEventAdapterListenerMap.get(streamId);
         if (streamSpecificInputEventAdapterListenerMap == null) {
@@ -58,8 +58,8 @@ public final class WSO2EventAdapterServiceValueHolder {
 
     }
 
-    public static void unregisterAdapterService(String tenantDomain, String streamId, WSO2EventAdapter wso2EventAdapter) {
-        ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>> tenantSpecificInputEventAdapterListenerMap = inputEventAdapterListenerMap.get(tenantDomain);
+    public static void unregisterAdapterService(int tenantId, String streamId, WSO2EventAdapter wso2EventAdapter) {
+        ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>> tenantSpecificInputEventAdapterListenerMap = inputEventAdapterListenerMap.get(tenantId);
 
         if (tenantSpecificInputEventAdapterListenerMap != null) {
             ConcurrentHashMap<String, WSO2EventAdapter> streamSpecificInputEventAdapterListenerMap = tenantSpecificInputEventAdapterListenerMap.get(streamId);
@@ -69,8 +69,8 @@ public final class WSO2EventAdapterServiceValueHolder {
         }
     }
 
-    public static ConcurrentHashMap<String, WSO2EventAdapter> getAdapterService(String tenantDomain, String streamId) {
-        ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>> tenantSpecificInputEventAdapterListenerMap = inputEventAdapterListenerMap.get(tenantDomain);
+    public static ConcurrentHashMap<String, WSO2EventAdapter> getAdapterService(int tenantId, String streamId) {
+        ConcurrentHashMap<String, ConcurrentHashMap<String, WSO2EventAdapter>> tenantSpecificInputEventAdapterListenerMap = inputEventAdapterListenerMap.get(tenantId);
         if (tenantSpecificInputEventAdapterListenerMap != null) {
             return tenantSpecificInputEventAdapterListenerMap.get(streamId);
         }

@@ -19,6 +19,7 @@ package org.wso2.carbon.databridge.core.internal.queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.core.AgentCallback;
 import org.wso2.carbon.databridge.core.RawDataAgentCallback;
@@ -58,6 +59,7 @@ public class QueueWorker implements Runnable {
                         Thread.currentThread().getName() + " worker has polled queue");
             }
             EventComposite eventComposite = eventQueue.poll();
+            Credentials credentials = eventComposite.getAgentSession().getCredentials();
 
             if (rawDataSubscribers.size() > 0) {
                 for (RawDataAgentCallback agentCallback : rawDataSubscribers) {
@@ -71,14 +73,14 @@ public class QueueWorker implements Runnable {
             if (subscribers.size() > 0) {
                 try {
                     eventList = eventComposite.getEventConverter().toEventList(eventComposite.getEventBundle(),
-                            eventComposite.getStreamTypeHolder());
+                            eventComposite.getStreamTypeHolder(), credentials.isServerAuthEnabled());
 
                     if (log.isDebugEnabled()) {
                         log.debug("Dispatching event to " + subscribers.size() + " subscriber(s)");
                     }
                     for (AgentCallback agentCallback : subscribers) {
                         try {
-                            agentCallback.receive(eventList, eventComposite.getAgentSession().getCredentials());
+                            agentCallback.receive(eventList, credentials);
                         } catch (Throwable e) {
                             log.error("Error in passing event eventList " + eventList + " to subscriber " + agentCallback, e);
                         }

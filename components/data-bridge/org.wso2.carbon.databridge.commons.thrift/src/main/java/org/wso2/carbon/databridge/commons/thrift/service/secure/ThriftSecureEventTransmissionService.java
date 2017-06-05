@@ -36,37 +36,41 @@ public class ThriftSecureEventTransmissionService {
 
   public interface Iface {
 
-    public String connect(String userName, String password) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, TException;
+    public String connect(String userName, String password) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException;
 
-    public void disconnect(String sessionId) throws TException;
+    public String connectWithServerAuthentication(String userName, String password, boolean isServerAuthEnabled) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException;
 
-    public String defineStream(String sessionId, String streamDefinition) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException;
+    public void disconnect(String sessionId) throws org.apache.thrift.TException;
 
-    public String findStreamId(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException;
+    public String defineStream(String sessionId, String streamDefinition) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException;
 
-    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException;
+    public String findStreamId(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException;
 
-    public boolean deleteStreamById(String sessionId, String streamId) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException;
+    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException;
 
-    public boolean deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException;
+    public boolean deleteStreamById(String sessionId, String streamId) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException;
+
+    public boolean deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void connect(String userName, String password, AsyncMethodCallback resultHandler) throws TException;
+    public void connect(String userName, String password, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void disconnect(String sessionId, AsyncMethodCallback resultHandler) throws TException;
+    public void connectWithServerAuthentication(String userName, String password, boolean isServerAuthEnabled, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void defineStream(String sessionId, String streamDefinition, AsyncMethodCallback resultHandler) throws TException;
+    public void disconnect(String sessionId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void findStreamId(String sessionId, String streamName, String streamVersion, AsyncMethodCallback resultHandler) throws TException;
+    public void defineStream(String sessionId, String streamDefinition, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle, AsyncMethodCallback resultHandler) throws TException;
+    public void findStreamId(String sessionId, String streamName, String streamVersion, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void deleteStreamById(String sessionId, String streamId, AsyncMethodCallback resultHandler) throws TException;
+    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion, AsyncMethodCallback resultHandler) throws TException;
+    public void deleteStreamById(String sessionId, String streamId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+
+    public void deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -90,13 +94,13 @@ public class ThriftSecureEventTransmissionService {
       super(iprot, oprot);
     }
 
-    public String connect(String userName, String password) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, TException
+    public String connect(String userName, String password) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException
     {
       send_connect(userName, password);
       return recv_connect();
     }
 
-    public void send_connect(String userName, String password) throws TException
+    public void send_connect(String userName, String password) throws org.apache.thrift.TException
     {
       connect_args args = new connect_args();
       args.setUserName(userName);
@@ -104,7 +108,7 @@ public class ThriftSecureEventTransmissionService {
       sendBase("connect", args);
     }
 
-    public String recv_connect() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, TException
+    public String recv_connect() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException
     {
       connect_result result = new connect_result();
       receiveBase(result, "connect");
@@ -117,33 +121,61 @@ public class ThriftSecureEventTransmissionService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "connect failed: unknown result");
     }
 
-    public void disconnect(String sessionId) throws TException
+    public String connectWithServerAuthentication(String userName, String password, boolean isServerAuthEnabled) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException
+    {
+      send_connectWithServerAuthentication(userName, password, isServerAuthEnabled);
+      return recv_connectWithServerAuthentication();
+    }
+
+    public void send_connectWithServerAuthentication(String userName, String password, boolean isServerAuthEnabled) throws org.apache.thrift.TException
+    {
+      connectWithServerAuthentication_args args = new connectWithServerAuthentication_args();
+      args.setUserName(userName);
+      args.setPassword(password);
+      args.setIsServerAuthEnabled(isServerAuthEnabled);
+      sendBase("connectWithServerAuthentication", args);
+    }
+
+    public String recv_connectWithServerAuthentication() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException
+    {
+      connectWithServerAuthentication_result result = new connectWithServerAuthentication_result();
+      receiveBase(result, "connectWithServerAuthentication");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.ae != null) {
+        throw result.ae;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "connectWithServerAuthentication failed: unknown result");
+    }
+
+    public void disconnect(String sessionId) throws org.apache.thrift.TException
     {
       send_disconnect(sessionId);
       recv_disconnect();
     }
 
-    public void send_disconnect(String sessionId) throws TException
+    public void send_disconnect(String sessionId) throws org.apache.thrift.TException
     {
       disconnect_args args = new disconnect_args();
       args.setSessionId(sessionId);
       sendBase("disconnect", args);
     }
 
-    public void recv_disconnect() throws TException
+    public void recv_disconnect() throws org.apache.thrift.TException
     {
       disconnect_result result = new disconnect_result();
       receiveBase(result, "disconnect");
       return;
     }
 
-    public String defineStream(String sessionId, String streamDefinition) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public String defineStream(String sessionId, String streamDefinition) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       send_defineStream(sessionId, streamDefinition);
       return recv_defineStream();
     }
 
-    public void send_defineStream(String sessionId, String streamDefinition) throws TException
+    public void send_defineStream(String sessionId, String streamDefinition) throws org.apache.thrift.TException
     {
       defineStream_args args = new defineStream_args();
       args.setSessionId(sessionId);
@@ -151,7 +183,7 @@ public class ThriftSecureEventTransmissionService {
       sendBase("defineStream", args);
     }
 
-    public String recv_defineStream() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public String recv_defineStream() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       defineStream_result result = new defineStream_result();
       receiveBase(result, "defineStream");
@@ -173,13 +205,13 @@ public class ThriftSecureEventTransmissionService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "defineStream failed: unknown result");
     }
 
-    public String findStreamId(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public String findStreamId(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       send_findStreamId(sessionId, streamName, streamVersion);
       return recv_findStreamId();
     }
 
-    public void send_findStreamId(String sessionId, String streamName, String streamVersion) throws TException
+    public void send_findStreamId(String sessionId, String streamName, String streamVersion) throws org.apache.thrift.TException
     {
       findStreamId_args args = new findStreamId_args();
       args.setSessionId(sessionId);
@@ -188,7 +220,7 @@ public class ThriftSecureEventTransmissionService {
       sendBase("findStreamId", args);
     }
 
-    public String recv_findStreamId() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public String recv_findStreamId() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       findStreamId_result result = new findStreamId_result();
       receiveBase(result, "findStreamId");
@@ -204,20 +236,20 @@ public class ThriftSecureEventTransmissionService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "findStreamId failed: unknown result");
     }
 
-    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       send_publish(eventBundle);
       recv_publish();
     }
 
-    public void send_publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle) throws TException
+    public void send_publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle) throws org.apache.thrift.TException
     {
       publish_args args = new publish_args();
       args.setEventBundle(eventBundle);
       sendBase("publish", args);
     }
 
-    public void recv_publish() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public void recv_publish() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       publish_result result = new publish_result();
       receiveBase(result, "publish");
@@ -230,13 +262,13 @@ public class ThriftSecureEventTransmissionService {
       return;
     }
 
-    public boolean deleteStreamById(String sessionId, String streamId) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public boolean deleteStreamById(String sessionId, String streamId) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       send_deleteStreamById(sessionId, streamId);
       return recv_deleteStreamById();
     }
 
-    public void send_deleteStreamById(String sessionId, String streamId) throws TException
+    public void send_deleteStreamById(String sessionId, String streamId) throws org.apache.thrift.TException
     {
       deleteStreamById_args args = new deleteStreamById_args();
       args.setSessionId(sessionId);
@@ -244,7 +276,7 @@ public class ThriftSecureEventTransmissionService {
       sendBase("deleteStreamById", args);
     }
 
-    public boolean recv_deleteStreamById() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public boolean recv_deleteStreamById() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       deleteStreamById_result result = new deleteStreamById_result();
       receiveBase(result, "deleteStreamById");
@@ -257,13 +289,13 @@ public class ThriftSecureEventTransmissionService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "deleteStreamById failed: unknown result");
     }
 
-    public boolean deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public boolean deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion) throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       send_deleteStreamByNameVersion(sessionId, streamName, streamVersion);
       return recv_deleteStreamByNameVersion();
     }
 
-    public void send_deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion) throws TException
+    public void send_deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion) throws org.apache.thrift.TException
     {
       deleteStreamByNameVersion_args args = new deleteStreamByNameVersion_args();
       args.setSessionId(sessionId);
@@ -272,7 +304,7 @@ public class ThriftSecureEventTransmissionService {
       sendBase("deleteStreamByNameVersion", args);
     }
 
-    public boolean recv_deleteStreamByNameVersion() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException
+    public boolean recv_deleteStreamByNameVersion() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException
     {
       deleteStreamByNameVersion_result result = new deleteStreamByNameVersion_result();
       receiveBase(result, "deleteStreamByNameVersion");
@@ -303,7 +335,7 @@ public class ThriftSecureEventTransmissionService {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void connect(String userName, String password, AsyncMethodCallback resultHandler) throws TException {
+    public void connect(String userName, String password, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       connect_call method_call = new connect_call(userName, password, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -313,13 +345,13 @@ public class ThriftSecureEventTransmissionService {
     public static class connect_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String userName;
       private String password;
-      public connect_call(String userName, String password, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public connect_call(String userName, String password, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.userName = userName;
         this.password = password;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("connect", org.apache.thrift.protocol.TMessageType.CALL, 0));
         connect_args args = new connect_args();
         args.setUserName(userName);
@@ -328,8 +360,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, TException {
-        if (getState() != State.RESPONSE_READ) {
+      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -338,7 +370,45 @@ public class ThriftSecureEventTransmissionService {
       }
     }
 
-    public void disconnect(String sessionId, AsyncMethodCallback resultHandler) throws TException {
+    public void connectWithServerAuthentication(String userName, String password, boolean isServerAuthEnabled, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      connectWithServerAuthentication_call method_call = new connectWithServerAuthentication_call(userName, password, isServerAuthEnabled, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class connectWithServerAuthentication_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String userName;
+      private String password;
+      private boolean isServerAuthEnabled;
+      public connectWithServerAuthentication_call(String userName, String password, boolean isServerAuthEnabled, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.userName = userName;
+        this.password = password;
+        this.isServerAuthEnabled = isServerAuthEnabled;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("connectWithServerAuthentication", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        connectWithServerAuthentication_args args = new connectWithServerAuthentication_args();
+        args.setUserName(userName);
+        args.setPassword(password);
+        args.setIsServerAuthEnabled(isServerAuthEnabled);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_connectWithServerAuthentication();
+      }
+    }
+
+    public void disconnect(String sessionId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       disconnect_call method_call = new disconnect_call(sessionId, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -347,12 +417,12 @@ public class ThriftSecureEventTransmissionService {
 
     public static class disconnect_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String sessionId;
-      public disconnect_call(String sessionId, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public disconnect_call(String sessionId, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.sessionId = sessionId;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("disconnect", org.apache.thrift.protocol.TMessageType.CALL, 0));
         disconnect_args args = new disconnect_args();
         args.setSessionId(sessionId);
@@ -360,8 +430,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public void getResult() throws TException {
-        if (getState() != State.RESPONSE_READ) {
+      public void getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -370,7 +440,7 @@ public class ThriftSecureEventTransmissionService {
       }
     }
 
-    public void defineStream(String sessionId, String streamDefinition, AsyncMethodCallback resultHandler) throws TException {
+    public void defineStream(String sessionId, String streamDefinition, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       defineStream_call method_call = new defineStream_call(sessionId, streamDefinition, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -380,13 +450,13 @@ public class ThriftSecureEventTransmissionService {
     public static class defineStream_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String sessionId;
       private String streamDefinition;
-      public defineStream_call(String sessionId, String streamDefinition, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public defineStream_call(String sessionId, String streamDefinition, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.sessionId = sessionId;
         this.streamDefinition = streamDefinition;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("defineStream", org.apache.thrift.protocol.TMessageType.CALL, 0));
         defineStream_args args = new defineStream_args();
         args.setSessionId(sessionId);
@@ -395,8 +465,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException {
-        if (getState() != State.RESPONSE_READ) {
+      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftDifferentStreamDefinitionAlreadyDefinedException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftMalformedStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftStreamDefinitionException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -405,7 +475,7 @@ public class ThriftSecureEventTransmissionService {
       }
     }
 
-    public void findStreamId(String sessionId, String streamName, String streamVersion, AsyncMethodCallback resultHandler) throws TException {
+    public void findStreamId(String sessionId, String streamName, String streamVersion, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       findStreamId_call method_call = new findStreamId_call(sessionId, streamName, streamVersion, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -416,14 +486,14 @@ public class ThriftSecureEventTransmissionService {
       private String sessionId;
       private String streamName;
       private String streamVersion;
-      public findStreamId_call(String sessionId, String streamName, String streamVersion, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public findStreamId_call(String sessionId, String streamName, String streamVersion, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.sessionId = sessionId;
         this.streamName = streamName;
         this.streamVersion = streamVersion;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("findStreamId", org.apache.thrift.protocol.TMessageType.CALL, 0));
         findStreamId_args args = new findStreamId_args();
         args.setSessionId(sessionId);
@@ -433,8 +503,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException {
-        if (getState() != State.RESPONSE_READ) {
+      public String getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftNoStreamDefinitionExistException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -443,7 +513,7 @@ public class ThriftSecureEventTransmissionService {
       }
     }
 
-    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle, AsyncMethodCallback resultHandler) throws TException {
+    public void publish(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       publish_call method_call = new publish_call(eventBundle, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -452,12 +522,12 @@ public class ThriftSecureEventTransmissionService {
 
     public static class publish_call extends org.apache.thrift.async.TAsyncMethodCall {
       private org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle;
-      public publish_call(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public publish_call(org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle eventBundle, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.eventBundle = eventBundle;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("publish", org.apache.thrift.protocol.TMessageType.CALL, 0));
         publish_args args = new publish_args();
         args.setEventBundle(eventBundle);
@@ -465,8 +535,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public void getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException {
-        if (getState() != State.RESPONSE_READ) {
+      public void getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventTypeException, org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -475,7 +545,7 @@ public class ThriftSecureEventTransmissionService {
       }
     }
 
-    public void deleteStreamById(String sessionId, String streamId, AsyncMethodCallback resultHandler) throws TException {
+    public void deleteStreamById(String sessionId, String streamId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       deleteStreamById_call method_call = new deleteStreamById_call(sessionId, streamId, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -485,13 +555,13 @@ public class ThriftSecureEventTransmissionService {
     public static class deleteStreamById_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String sessionId;
       private String streamId;
-      public deleteStreamById_call(String sessionId, String streamId, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public deleteStreamById_call(String sessionId, String streamId, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.sessionId = sessionId;
         this.streamId = streamId;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("deleteStreamById", org.apache.thrift.protocol.TMessageType.CALL, 0));
         deleteStreamById_args args = new deleteStreamById_args();
         args.setSessionId(sessionId);
@@ -500,8 +570,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public boolean getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException {
-        if (getState() != State.RESPONSE_READ) {
+      public boolean getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -510,7 +580,7 @@ public class ThriftSecureEventTransmissionService {
       }
     }
 
-    public void deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion, AsyncMethodCallback resultHandler) throws TException {
+    public void deleteStreamByNameVersion(String sessionId, String streamName, String streamVersion, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
       deleteStreamByNameVersion_call method_call = new deleteStreamByNameVersion_call(sessionId, streamName, streamVersion, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -521,14 +591,14 @@ public class ThriftSecureEventTransmissionService {
       private String sessionId;
       private String streamName;
       private String streamVersion;
-      public deleteStreamByNameVersion_call(String sessionId, String streamName, String streamVersion, AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws TException {
+      public deleteStreamByNameVersion_call(String sessionId, String streamName, String streamVersion, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.sessionId = sessionId;
         this.streamName = streamName;
         this.streamVersion = streamVersion;
       }
 
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws TException {
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("deleteStreamByNameVersion", org.apache.thrift.protocol.TMessageType.CALL, 0));
         deleteStreamByNameVersion_args args = new deleteStreamByNameVersion_args();
         args.setSessionId(sessionId);
@@ -538,8 +608,8 @@ public class ThriftSecureEventTransmissionService {
         prot.writeMessageEnd();
       }
 
-      public boolean getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, TException {
-        if (getState() != State.RESPONSE_READ) {
+      public boolean getResult() throws org.wso2.carbon.databridge.commons.thrift.exception.ThriftSessionExpiredException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
@@ -562,6 +632,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
       processMap.put("connect", new connect());
+      processMap.put("connectWithServerAuthentication", new connectWithServerAuthentication());
       processMap.put("disconnect", new disconnect());
       processMap.put("defineStream", new defineStream());
       processMap.put("findStreamId", new findStreamId());
@@ -584,10 +655,34 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public connect_result getResult(I iface, connect_args args) throws TException {
+      public connect_result getResult(I iface, connect_args args) throws org.apache.thrift.TException {
         connect_result result = new connect_result();
         try {
           result.success = iface.connect(args.userName, args.password);
+        } catch (org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException ae) {
+          result.ae = ae;
+        }
+        return result;
+      }
+    }
+
+    public static class connectWithServerAuthentication<I extends Iface> extends org.apache.thrift.ProcessFunction<I, connectWithServerAuthentication_args> {
+      public connectWithServerAuthentication() {
+        super("connectWithServerAuthentication");
+      }
+
+      public connectWithServerAuthentication_args getEmptyArgsInstance() {
+        return new connectWithServerAuthentication_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public connectWithServerAuthentication_result getResult(I iface, connectWithServerAuthentication_args args) throws org.apache.thrift.TException {
+        connectWithServerAuthentication_result result = new connectWithServerAuthentication_result();
+        try {
+          result.success = iface.connectWithServerAuthentication(args.userName, args.password, args.isServerAuthEnabled);
         } catch (org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException ae) {
           result.ae = ae;
         }
@@ -608,7 +703,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public disconnect_result getResult(I iface, disconnect_args args) throws TException {
+      public disconnect_result getResult(I iface, disconnect_args args) throws org.apache.thrift.TException {
         disconnect_result result = new disconnect_result();
         iface.disconnect(args.sessionId);
         return result;
@@ -628,7 +723,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public defineStream_result getResult(I iface, defineStream_args args) throws TException {
+      public defineStream_result getResult(I iface, defineStream_args args) throws org.apache.thrift.TException {
         defineStream_result result = new defineStream_result();
         try {
           result.success = iface.defineStream(args.sessionId, args.streamDefinition);
@@ -658,7 +753,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public findStreamId_result getResult(I iface, findStreamId_args args) throws TException {
+      public findStreamId_result getResult(I iface, findStreamId_args args) throws org.apache.thrift.TException {
         findStreamId_result result = new findStreamId_result();
         try {
           result.success = iface.findStreamId(args.sessionId, args.streamName, args.streamVersion);
@@ -684,7 +779,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public publish_result getResult(I iface, publish_args args) throws TException {
+      public publish_result getResult(I iface, publish_args args) throws org.apache.thrift.TException {
         publish_result result = new publish_result();
         try {
           iface.publish(args.eventBundle);
@@ -710,7 +805,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public deleteStreamById_result getResult(I iface, deleteStreamById_args args) throws TException {
+      public deleteStreamById_result getResult(I iface, deleteStreamById_args args) throws org.apache.thrift.TException {
         deleteStreamById_result result = new deleteStreamById_result();
         try {
           result.success = iface.deleteStreamById(args.sessionId, args.streamId);
@@ -735,7 +830,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public deleteStreamByNameVersion_result getResult(I iface, deleteStreamByNameVersion_args args) throws TException {
+      public deleteStreamByNameVersion_result getResult(I iface, deleteStreamByNameVersion_args args) throws org.apache.thrift.TException {
         deleteStreamByNameVersion_result result = new deleteStreamByNameVersion_result();
         try {
           result.success = iface.deleteStreamByNameVersion(args.sessionId, args.streamName, args.streamVersion);
@@ -761,6 +856,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static <I extends AsyncIface> Map<String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase,?>> getProcessMap(Map<String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase, ?>> processMap) {
       processMap.put("connect", new connect());
+      processMap.put("connectWithServerAuthentication", new connectWithServerAuthentication());
       processMap.put("disconnect", new disconnect());
       processMap.put("defineStream", new defineStream());
       processMap.put("findStreamId", new findStreamId());
@@ -822,8 +918,65 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, connect_args args, AsyncMethodCallback<String> resultHandler) throws TException {
+      public void start(I iface, connect_args args, org.apache.thrift.async.AsyncMethodCallback<String> resultHandler) throws TException {
         iface.connect(args.userName, args.password,resultHandler);
+      }
+    }
+
+    public static class connectWithServerAuthentication<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, connectWithServerAuthentication_args, String> {
+      public connectWithServerAuthentication() {
+        super("connectWithServerAuthentication");
+      }
+
+      public connectWithServerAuthentication_args getEmptyArgsInstance() {
+        return new connectWithServerAuthentication_args();
+      }
+
+      public AsyncMethodCallback<String> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+        final org.apache.thrift.AsyncProcessFunction fcall = this;
+        return new AsyncMethodCallback<String>() { 
+          public void onComplete(String o) {
+            connectWithServerAuthentication_result result = new connectWithServerAuthentication_result();
+            result.success = o;
+            try {
+              fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
+              return;
+            } catch (Exception e) {
+              LOGGER.error("Exception writing to internal frame buffer", e);
+            }
+            fb.close();
+          }
+          public void onError(Exception e) {
+            byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+            org.apache.thrift.TBase msg;
+            connectWithServerAuthentication_result result = new connectWithServerAuthentication_result();
+            if (e instanceof org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException) {
+                        result.ae = (org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException) e;
+                        result.setAeIsSet(true);
+                        msg = result;
+            }
+             else 
+            {
+              msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
+              msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
+            }
+            try {
+              fcall.sendResponse(fb,msg,msgType,seqid);
+              return;
+            } catch (Exception ex) {
+              LOGGER.error("Exception writing to internal frame buffer", ex);
+            }
+            fb.close();
+          }
+        };
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public void start(I iface, connectWithServerAuthentication_args args, org.apache.thrift.async.AsyncMethodCallback<String> resultHandler) throws TException {
+        iface.connectWithServerAuthentication(args.userName, args.password, args.isServerAuthEnabled,resultHandler);
       }
     }
 
@@ -872,7 +1025,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, disconnect_args args, AsyncMethodCallback<Void> resultHandler) throws TException {
+      public void start(I iface, disconnect_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws TException {
         iface.disconnect(args.sessionId,resultHandler);
       }
     }
@@ -944,7 +1097,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, defineStream_args args, AsyncMethodCallback<String> resultHandler) throws TException {
+      public void start(I iface, defineStream_args args, org.apache.thrift.async.AsyncMethodCallback<String> resultHandler) throws TException {
         iface.defineStream(args.sessionId, args.streamDefinition,resultHandler);
       }
     }
@@ -1006,7 +1159,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, findStreamId_args args, AsyncMethodCallback<String> resultHandler) throws TException {
+      public void start(I iface, findStreamId_args args, org.apache.thrift.async.AsyncMethodCallback<String> resultHandler) throws TException {
         iface.findStreamId(args.sessionId, args.streamName, args.streamVersion,resultHandler);
       }
     }
@@ -1067,7 +1220,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, publish_args args, AsyncMethodCallback<Void> resultHandler) throws TException {
+      public void start(I iface, publish_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws TException {
         iface.publish(args.eventBundle,resultHandler);
       }
     }
@@ -1125,7 +1278,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, deleteStreamById_args args, AsyncMethodCallback<Boolean> resultHandler) throws TException {
+      public void start(I iface, deleteStreamById_args args, org.apache.thrift.async.AsyncMethodCallback<Boolean> resultHandler) throws TException {
         iface.deleteStreamById(args.sessionId, args.streamId,resultHandler);
       }
     }
@@ -1183,7 +1336,7 @@ public class ThriftSecureEventTransmissionService {
         return false;
       }
 
-      public void start(I iface, deleteStreamByNameVersion_args args, AsyncMethodCallback<Boolean> resultHandler) throws TException {
+      public void start(I iface, deleteStreamByNameVersion_args args, org.apache.thrift.async.AsyncMethodCallback<Boolean> resultHandler) throws TException {
         iface.deleteStreamByNameVersion(args.sessionId, args.streamName, args.streamVersion,resultHandler);
       }
     }
@@ -1482,11 +1635,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -1514,7 +1667,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -1522,7 +1675,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -1530,7 +1683,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -1543,7 +1696,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class connect_argsStandardScheme extends StandardScheme<connect_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, connect_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, connect_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -1580,7 +1733,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, connect_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, connect_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -1609,7 +1762,7 @@ public class ThriftSecureEventTransmissionService {
     private static class connect_argsTupleScheme extends TupleScheme<connect_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, connect_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, connect_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetUserName()) {
@@ -1628,7 +1781,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, connect_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, connect_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -1936,11 +2089,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -1968,7 +2121,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -1976,7 +2129,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -1984,7 +2137,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -1997,7 +2150,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class connect_resultStandardScheme extends StandardScheme<connect_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, connect_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, connect_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -2035,7 +2188,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, connect_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, connect_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -2064,7 +2217,7 @@ public class ThriftSecureEventTransmissionService {
     private static class connect_resultTupleScheme extends TupleScheme<connect_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, connect_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, connect_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -2083,7 +2236,1015 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, connect_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, connect_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.ae = new org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException();
+          struct.ae.read(iprot);
+          struct.setAeIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class connectWithServerAuthentication_args implements org.apache.thrift.TBase<connectWithServerAuthentication_args, connectWithServerAuthentication_args._Fields>, java.io.Serializable, Cloneable, Comparable<connectWithServerAuthentication_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("connectWithServerAuthentication_args");
+
+    private static final org.apache.thrift.protocol.TField USER_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("userName", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField PASSWORD_FIELD_DESC = new org.apache.thrift.protocol.TField("password", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField IS_SERVER_AUTH_ENABLED_FIELD_DESC = new org.apache.thrift.protocol.TField("isServerAuthEnabled", org.apache.thrift.protocol.TType.BOOL, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new connectWithServerAuthentication_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new connectWithServerAuthentication_argsTupleSchemeFactory());
+    }
+
+    public String userName; // required
+    public String password; // required
+    public boolean isServerAuthEnabled; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      USER_NAME((short)1, "userName"),
+      PASSWORD((short)2, "password"),
+      IS_SERVER_AUTH_ENABLED((short)3, "isServerAuthEnabled");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // USER_NAME
+            return USER_NAME;
+          case 2: // PASSWORD
+            return PASSWORD;
+          case 3: // IS_SERVER_AUTH_ENABLED
+            return IS_SERVER_AUTH_ENABLED;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __ISSERVERAUTHENABLED_ISSET_ID = 0;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.USER_NAME, new org.apache.thrift.meta_data.FieldMetaData("userName", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.PASSWORD, new org.apache.thrift.meta_data.FieldMetaData("password", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.IS_SERVER_AUTH_ENABLED, new org.apache.thrift.meta_data.FieldMetaData("isServerAuthEnabled", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(connectWithServerAuthentication_args.class, metaDataMap);
+    }
+
+    public connectWithServerAuthentication_args() {
+    }
+
+    public connectWithServerAuthentication_args(
+      String userName,
+      String password,
+      boolean isServerAuthEnabled)
+    {
+      this();
+      this.userName = userName;
+      this.password = password;
+      this.isServerAuthEnabled = isServerAuthEnabled;
+      setIsServerAuthEnabledIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public connectWithServerAuthentication_args(connectWithServerAuthentication_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      if (other.isSetUserName()) {
+        this.userName = other.userName;
+      }
+      if (other.isSetPassword()) {
+        this.password = other.password;
+      }
+      this.isServerAuthEnabled = other.isServerAuthEnabled;
+    }
+
+    public connectWithServerAuthentication_args deepCopy() {
+      return new connectWithServerAuthentication_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.userName = null;
+      this.password = null;
+      setIsServerAuthEnabledIsSet(false);
+      this.isServerAuthEnabled = false;
+    }
+
+    public String getUserName() {
+      return this.userName;
+    }
+
+    public connectWithServerAuthentication_args setUserName(String userName) {
+      this.userName = userName;
+      return this;
+    }
+
+    public void unsetUserName() {
+      this.userName = null;
+    }
+
+    /** Returns true if field userName is set (has been assigned a value) and false otherwise */
+    public boolean isSetUserName() {
+      return this.userName != null;
+    }
+
+    public void setUserNameIsSet(boolean value) {
+      if (!value) {
+        this.userName = null;
+      }
+    }
+
+    public String getPassword() {
+      return this.password;
+    }
+
+    public connectWithServerAuthentication_args setPassword(String password) {
+      this.password = password;
+      return this;
+    }
+
+    public void unsetPassword() {
+      this.password = null;
+    }
+
+    /** Returns true if field password is set (has been assigned a value) and false otherwise */
+    public boolean isSetPassword() {
+      return this.password != null;
+    }
+
+    public void setPasswordIsSet(boolean value) {
+      if (!value) {
+        this.password = null;
+      }
+    }
+
+    public boolean isIsServerAuthEnabled() {
+      return this.isServerAuthEnabled;
+    }
+
+    public connectWithServerAuthentication_args setIsServerAuthEnabled(boolean isServerAuthEnabled) {
+      this.isServerAuthEnabled = isServerAuthEnabled;
+      setIsServerAuthEnabledIsSet(true);
+      return this;
+    }
+
+    public void unsetIsServerAuthEnabled() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __ISSERVERAUTHENABLED_ISSET_ID);
+    }
+
+    /** Returns true if field isServerAuthEnabled is set (has been assigned a value) and false otherwise */
+    public boolean isSetIsServerAuthEnabled() {
+      return EncodingUtils.testBit(__isset_bitfield, __ISSERVERAUTHENABLED_ISSET_ID);
+    }
+
+    public void setIsServerAuthEnabledIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __ISSERVERAUTHENABLED_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case USER_NAME:
+        if (value == null) {
+          unsetUserName();
+        } else {
+          setUserName((String)value);
+        }
+        break;
+
+      case PASSWORD:
+        if (value == null) {
+          unsetPassword();
+        } else {
+          setPassword((String)value);
+        }
+        break;
+
+      case IS_SERVER_AUTH_ENABLED:
+        if (value == null) {
+          unsetIsServerAuthEnabled();
+        } else {
+          setIsServerAuthEnabled((Boolean)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case USER_NAME:
+        return getUserName();
+
+      case PASSWORD:
+        return getPassword();
+
+      case IS_SERVER_AUTH_ENABLED:
+        return Boolean.valueOf(isIsServerAuthEnabled());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case USER_NAME:
+        return isSetUserName();
+      case PASSWORD:
+        return isSetPassword();
+      case IS_SERVER_AUTH_ENABLED:
+        return isSetIsServerAuthEnabled();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof connectWithServerAuthentication_args)
+        return this.equals((connectWithServerAuthentication_args)that);
+      return false;
+    }
+
+    public boolean equals(connectWithServerAuthentication_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_userName = true && this.isSetUserName();
+      boolean that_present_userName = true && that.isSetUserName();
+      if (this_present_userName || that_present_userName) {
+        if (!(this_present_userName && that_present_userName))
+          return false;
+        if (!this.userName.equals(that.userName))
+          return false;
+      }
+
+      boolean this_present_password = true && this.isSetPassword();
+      boolean that_present_password = true && that.isSetPassword();
+      if (this_present_password || that_present_password) {
+        if (!(this_present_password && that_present_password))
+          return false;
+        if (!this.password.equals(that.password))
+          return false;
+      }
+
+      boolean this_present_isServerAuthEnabled = true;
+      boolean that_present_isServerAuthEnabled = true;
+      if (this_present_isServerAuthEnabled || that_present_isServerAuthEnabled) {
+        if (!(this_present_isServerAuthEnabled && that_present_isServerAuthEnabled))
+          return false;
+        if (this.isServerAuthEnabled != that.isServerAuthEnabled)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    @Override
+    public int compareTo(connectWithServerAuthentication_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetUserName()).compareTo(other.isSetUserName());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUserName()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.userName, other.userName);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPassword()).compareTo(other.isSetPassword());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPassword()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.password, other.password);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetIsServerAuthEnabled()).compareTo(other.isSetIsServerAuthEnabled());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIsServerAuthEnabled()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.isServerAuthEnabled, other.isServerAuthEnabled);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("connectWithServerAuthentication_args(");
+      boolean first = true;
+
+      sb.append("userName:");
+      if (this.userName == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.userName);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("password:");
+      if (this.password == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.password);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("isServerAuthEnabled:");
+      sb.append(this.isServerAuthEnabled);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class connectWithServerAuthentication_argsStandardSchemeFactory implements SchemeFactory {
+      public connectWithServerAuthentication_argsStandardScheme getScheme() {
+        return new connectWithServerAuthentication_argsStandardScheme();
+      }
+    }
+
+    private static class connectWithServerAuthentication_argsStandardScheme extends StandardScheme<connectWithServerAuthentication_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, connectWithServerAuthentication_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // USER_NAME
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.userName = iprot.readString();
+                struct.setUserNameIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // PASSWORD
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.password = iprot.readString();
+                struct.setPasswordIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // IS_SERVER_AUTH_ENABLED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.isServerAuthEnabled = iprot.readBool();
+                struct.setIsServerAuthEnabledIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, connectWithServerAuthentication_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.userName != null) {
+          oprot.writeFieldBegin(USER_NAME_FIELD_DESC);
+          oprot.writeString(struct.userName);
+          oprot.writeFieldEnd();
+        }
+        if (struct.password != null) {
+          oprot.writeFieldBegin(PASSWORD_FIELD_DESC);
+          oprot.writeString(struct.password);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(IS_SERVER_AUTH_ENABLED_FIELD_DESC);
+        oprot.writeBool(struct.isServerAuthEnabled);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class connectWithServerAuthentication_argsTupleSchemeFactory implements SchemeFactory {
+      public connectWithServerAuthentication_argsTupleScheme getScheme() {
+        return new connectWithServerAuthentication_argsTupleScheme();
+      }
+    }
+
+    private static class connectWithServerAuthentication_argsTupleScheme extends TupleScheme<connectWithServerAuthentication_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, connectWithServerAuthentication_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetUserName()) {
+          optionals.set(0);
+        }
+        if (struct.isSetPassword()) {
+          optionals.set(1);
+        }
+        if (struct.isSetIsServerAuthEnabled()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetUserName()) {
+          oprot.writeString(struct.userName);
+        }
+        if (struct.isSetPassword()) {
+          oprot.writeString(struct.password);
+        }
+        if (struct.isSetIsServerAuthEnabled()) {
+          oprot.writeBool(struct.isServerAuthEnabled);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, connectWithServerAuthentication_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.userName = iprot.readString();
+          struct.setUserNameIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.password = iprot.readString();
+          struct.setPasswordIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.isServerAuthEnabled = iprot.readBool();
+          struct.setIsServerAuthEnabledIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class connectWithServerAuthentication_result implements org.apache.thrift.TBase<connectWithServerAuthentication_result, connectWithServerAuthentication_result._Fields>, java.io.Serializable, Cloneable, Comparable<connectWithServerAuthentication_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("connectWithServerAuthentication_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+    private static final org.apache.thrift.protocol.TField AE_FIELD_DESC = new org.apache.thrift.protocol.TField("ae", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new connectWithServerAuthentication_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new connectWithServerAuthentication_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+    public org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException ae; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      AE((short)1, "ae");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // AE
+            return AE;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.AE, new org.apache.thrift.meta_data.FieldMetaData("ae", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(connectWithServerAuthentication_result.class, metaDataMap);
+    }
+
+    public connectWithServerAuthentication_result() {
+    }
+
+    public connectWithServerAuthentication_result(
+      String success,
+      org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException ae)
+    {
+      this();
+      this.success = success;
+      this.ae = ae;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public connectWithServerAuthentication_result(connectWithServerAuthentication_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+      if (other.isSetAe()) {
+        this.ae = new org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException(other.ae);
+      }
+    }
+
+    public connectWithServerAuthentication_result deepCopy() {
+      return new connectWithServerAuthentication_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.ae = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public connectWithServerAuthentication_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException getAe() {
+      return this.ae;
+    }
+
+    public connectWithServerAuthentication_result setAe(org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException ae) {
+      this.ae = ae;
+      return this;
+    }
+
+    public void unsetAe() {
+      this.ae = null;
+    }
+
+    /** Returns true if field ae is set (has been assigned a value) and false otherwise */
+    public boolean isSetAe() {
+      return this.ae != null;
+    }
+
+    public void setAeIsSet(boolean value) {
+      if (!value) {
+        this.ae = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      case AE:
+        if (value == null) {
+          unsetAe();
+        } else {
+          setAe((org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      case AE:
+        return getAe();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      case AE:
+        return isSetAe();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof connectWithServerAuthentication_result)
+        return this.equals((connectWithServerAuthentication_result)that);
+      return false;
+    }
+
+    public boolean equals(connectWithServerAuthentication_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_ae = true && this.isSetAe();
+      boolean that_present_ae = true && that.isSetAe();
+      if (this_present_ae || that_present_ae) {
+        if (!(this_present_ae && that_present_ae))
+          return false;
+        if (!this.ae.equals(that.ae))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    @Override
+    public int compareTo(connectWithServerAuthentication_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(other.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, other.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetAe()).compareTo(other.isSetAe());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetAe()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.ae, other.ae);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("connectWithServerAuthentication_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("ae:");
+      if (this.ae == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.ae);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class connectWithServerAuthentication_resultStandardSchemeFactory implements SchemeFactory {
+      public connectWithServerAuthentication_resultStandardScheme getScheme() {
+        return new connectWithServerAuthentication_resultStandardScheme();
+      }
+    }
+
+    private static class connectWithServerAuthentication_resultStandardScheme extends StandardScheme<connectWithServerAuthentication_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, connectWithServerAuthentication_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 1: // AE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.ae = new org.wso2.carbon.databridge.commons.thrift.exception.ThriftAuthenticationException();
+                struct.ae.read(iprot);
+                struct.setAeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, connectWithServerAuthentication_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        if (struct.ae != null) {
+          oprot.writeFieldBegin(AE_FIELD_DESC);
+          struct.ae.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class connectWithServerAuthentication_resultTupleSchemeFactory implements SchemeFactory {
+      public connectWithServerAuthentication_resultTupleScheme getScheme() {
+        return new connectWithServerAuthentication_resultTupleScheme();
+      }
+    }
+
+    private static class connectWithServerAuthentication_resultTupleScheme extends TupleScheme<connectWithServerAuthentication_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, connectWithServerAuthentication_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        if (struct.isSetAe()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+        if (struct.isSetAe()) {
+          struct.ae.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, connectWithServerAuthentication_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -2323,11 +3484,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -2347,7 +3508,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -2355,7 +3516,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -2363,7 +3524,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -2376,7 +3537,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class disconnect_argsStandardScheme extends StandardScheme<disconnect_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, disconnect_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, disconnect_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -2405,7 +3566,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, disconnect_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, disconnect_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -2429,7 +3590,7 @@ public class ThriftSecureEventTransmissionService {
     private static class disconnect_argsTupleScheme extends TupleScheme<disconnect_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, disconnect_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, disconnect_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSessionId()) {
@@ -2442,7 +3603,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, disconnect_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, disconnect_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
@@ -2602,11 +3763,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -2619,7 +3780,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -2627,7 +3788,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -2635,7 +3796,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -2648,7 +3809,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class disconnect_resultStandardScheme extends StandardScheme<disconnect_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, disconnect_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, disconnect_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -2669,7 +3830,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, disconnect_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, disconnect_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -2688,12 +3849,12 @@ public class ThriftSecureEventTransmissionService {
     private static class disconnect_resultTupleScheme extends TupleScheme<disconnect_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, disconnect_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, disconnect_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, disconnect_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, disconnect_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
       }
     }
@@ -2992,11 +4153,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -3024,7 +4185,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -3032,7 +4193,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -3040,7 +4201,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -3053,7 +4214,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class defineStream_argsStandardScheme extends StandardScheme<defineStream_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, defineStream_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, defineStream_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -3090,7 +4251,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, defineStream_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, defineStream_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -3119,7 +4280,7 @@ public class ThriftSecureEventTransmissionService {
     private static class defineStream_argsTupleScheme extends TupleScheme<defineStream_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, defineStream_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, defineStream_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSessionId()) {
@@ -3138,7 +4299,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, defineStream_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, defineStream_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -3653,11 +4814,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -3709,7 +4870,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -3717,7 +4878,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -3725,7 +4886,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -3738,7 +4899,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class defineStream_resultStandardScheme extends StandardScheme<defineStream_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, defineStream_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, defineStream_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -3803,7 +4964,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, defineStream_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, defineStream_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -3847,7 +5008,7 @@ public class ThriftSecureEventTransmissionService {
     private static class defineStream_resultTupleScheme extends TupleScheme<defineStream_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, defineStream_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, defineStream_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -3884,7 +5045,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, defineStream_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, defineStream_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(5);
         if (incoming.get(0)) {
@@ -4277,11 +5438,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -4317,7 +5478,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -4325,7 +5486,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -4333,7 +5494,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -4346,7 +5507,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class findStreamId_argsStandardScheme extends StandardScheme<findStreamId_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, findStreamId_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, findStreamId_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -4391,7 +5552,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, findStreamId_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, findStreamId_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -4425,7 +5586,7 @@ public class ThriftSecureEventTransmissionService {
     private static class findStreamId_argsTupleScheme extends TupleScheme<findStreamId_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, findStreamId_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, findStreamId_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSessionId()) {
@@ -4450,7 +5611,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, findStreamId_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, findStreamId_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(3);
         if (incoming.get(0)) {
@@ -4831,11 +5992,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -4871,7 +6032,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -4879,7 +6040,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -4887,7 +6048,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -4900,7 +6061,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class findStreamId_resultStandardScheme extends StandardScheme<findStreamId_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, findStreamId_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, findStreamId_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -4947,7 +6108,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, findStreamId_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, findStreamId_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -4981,7 +6142,7 @@ public class ThriftSecureEventTransmissionService {
     private static class findStreamId_resultTupleScheme extends TupleScheme<findStreamId_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, findStreamId_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, findStreamId_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -5006,7 +6167,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, findStreamId_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, findStreamId_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(3);
         if (incoming.get(0)) {
@@ -5251,11 +6412,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -5275,7 +6436,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
       if (eventBundle != null) {
@@ -5286,7 +6447,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -5294,7 +6455,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -5307,7 +6468,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class publish_argsStandardScheme extends StandardScheme<publish_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, publish_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, publish_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -5337,7 +6498,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, publish_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, publish_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -5361,7 +6522,7 @@ public class ThriftSecureEventTransmissionService {
     private static class publish_argsTupleScheme extends TupleScheme<publish_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, publish_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, publish_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetEventBundle()) {
@@ -5374,7 +6535,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, publish_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, publish_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
@@ -5679,11 +6840,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -5711,7 +6872,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -5719,7 +6880,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -5727,7 +6888,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -5740,7 +6901,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class publish_resultStandardScheme extends StandardScheme<publish_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, publish_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, publish_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -5779,7 +6940,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, publish_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, publish_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -5808,7 +6969,7 @@ public class ThriftSecureEventTransmissionService {
     private static class publish_resultTupleScheme extends TupleScheme<publish_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, publish_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, publish_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetUe()) {
@@ -5827,7 +6988,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, publish_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, publish_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -6137,11 +7298,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -6169,7 +7330,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -6177,7 +7338,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -6185,7 +7346,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -6198,7 +7359,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class deleteStreamById_argsStandardScheme extends StandardScheme<deleteStreamById_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamById_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamById_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -6235,7 +7396,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamById_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamById_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -6264,7 +7425,7 @@ public class ThriftSecureEventTransmissionService {
     private static class deleteStreamById_argsTupleScheme extends TupleScheme<deleteStreamById_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSessionId()) {
@@ -6283,7 +7444,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -6593,11 +7754,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -6621,7 +7782,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -6629,7 +7790,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -6639,7 +7800,7 @@ public class ThriftSecureEventTransmissionService {
         // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
         __isset_bitfield = 0;
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -6652,7 +7813,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class deleteStreamById_resultStandardScheme extends StandardScheme<deleteStreamById_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamById_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamById_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -6690,7 +7851,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamById_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamById_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -6719,7 +7880,7 @@ public class ThriftSecureEventTransmissionService {
     private static class deleteStreamById_resultTupleScheme extends TupleScheme<deleteStreamById_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -6738,7 +7899,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamById_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
@@ -7116,11 +8277,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
     }
 
@@ -7156,7 +8317,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -7164,7 +8325,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -7172,7 +8333,7 @@ public class ThriftSecureEventTransmissionService {
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -7185,7 +8346,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class deleteStreamByNameVersion_argsStandardScheme extends StandardScheme<deleteStreamByNameVersion_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamByNameVersion_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamByNameVersion_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -7230,7 +8391,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamByNameVersion_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamByNameVersion_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -7264,7 +8425,7 @@ public class ThriftSecureEventTransmissionService {
     private static class deleteStreamByNameVersion_argsTupleScheme extends TupleScheme<deleteStreamByNameVersion_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_args struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSessionId()) {
@@ -7289,7 +8450,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_args struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(3);
         if (incoming.get(0)) {
@@ -7603,11 +8764,11 @@ public class ThriftSecureEventTransmissionService {
       return _Fields.findByThriftId(fieldId);
     }
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
       schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
       }
 
@@ -7631,7 +8792,7 @@ public class ThriftSecureEventTransmissionService {
       return sb.toString();
     }
 
-    public void validate() throws TException {
+    public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
     }
@@ -7639,7 +8800,7 @@ public class ThriftSecureEventTransmissionService {
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -7649,7 +8810,7 @@ public class ThriftSecureEventTransmissionService {
         // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
         __isset_bitfield = 0;
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (TException te) {
+      } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
       }
     }
@@ -7662,7 +8823,7 @@ public class ThriftSecureEventTransmissionService {
 
     private static class deleteStreamByNameVersion_resultStandardScheme extends StandardScheme<deleteStreamByNameVersion_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamByNameVersion_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, deleteStreamByNameVersion_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -7700,7 +8861,7 @@ public class ThriftSecureEventTransmissionService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamByNameVersion_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, deleteStreamByNameVersion_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -7729,7 +8890,7 @@ public class ThriftSecureEventTransmissionService {
     private static class deleteStreamByNameVersion_resultTupleScheme extends TupleScheme<deleteStreamByNameVersion_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_result struct) throws TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -7748,7 +8909,7 @@ public class ThriftSecureEventTransmissionService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_result struct) throws TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, deleteStreamByNameVersion_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {

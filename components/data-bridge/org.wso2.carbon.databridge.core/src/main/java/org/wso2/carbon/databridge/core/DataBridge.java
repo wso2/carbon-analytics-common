@@ -306,10 +306,9 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
     }
 
-
-    public String login(String username, String password) throws AuthenticationException {
+    public String login(String username, String password, boolean isServerAuthEnabled) throws AuthenticationException {
         log.info("user " + username + " connected");
-        return authenticator.authenticate(username, password);
+        return authenticator.authenticate(username, password, isServerAuthEnabled);
     }
 
 

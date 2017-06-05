@@ -72,8 +72,8 @@ public abstract class AbstractDataReceiver implements DataBridgeReceiverService 
     }
 
     @Override
-    public String login(String username, String password) throws AuthenticationException {
-        return getDatabridgeReceiver().login(username, password);
+    public String login(String username, String password, boolean isServerAuthEnabled) throws AuthenticationException {
+        return getDatabridgeReceiver().login(username, password, isServerAuthEnabled);
     }
 
     @Override

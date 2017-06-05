@@ -44,7 +44,7 @@ public class BinaryEventConverter implements EventConverter {
     }
 
     @Override
-    public List<Event> toEventList(Object eventBundle, StreamTypeHolder streamTypeHolder) {
+    public List<Event> toEventList(Object eventBundle, StreamTypeHolder streamTypeHolder, boolean isServerAuthEnabled) {
 
         ByteBuffer byteBuffer = ByteBuffer.wrap((byte[]) eventBundle);
         int sessionIdSize = byteBuffer.getInt();
@@ -57,7 +57,7 @@ public class BinaryEventConverter implements EventConverter {
             byte[] bytes= new byte[eventSize];
             byteBuffer.get(bytes);
             ByteBuffer eventByteBuffer = ByteBuffer.wrap(bytes);
-            eventList.add(getEvent(eventByteBuffer, streamTypeHolder));
+            eventList.add(getEvent(eventByteBuffer, streamTypeHolder, isServerAuthEnabled));
         }
         return eventList;
     }
@@ -75,13 +75,21 @@ public class BinaryEventConverter implements EventConverter {
         return byteBuffer.getInt();
     }
 
-    public Event getEvent(ByteBuffer byteBuffer, StreamTypeHolder streamTypeHolder) throws MalformedEventException {
+    public Event getEvent(ByteBuffer byteBuffer, StreamTypeHolder streamTypeHolder, boolean isServerAuthEnabled)
+            throws MalformedEventException {
         long timeStamp = byteBuffer.getLong();
         int streamIdSize = byteBuffer.getInt();
         String streamId = BinaryMessageConverterUtil.getString(byteBuffer, streamIdSize);
 
         Event event = new Event();
         event.setStreamId(streamId);
+
+        if(isServerAuthEnabled){
+            event.setEventTenantId(byteBuffer.getInt());
+        } else {
+            event.setEventTenantId(0);
+        }
+
         event.setTimeStamp(timeStamp);
 
         AttributeType[][] attributeTypeOrder = streamTypeHolder.getDataType(event.getStreamId());

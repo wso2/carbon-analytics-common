@@ -6,6 +6,8 @@ include "Exception.thrift"
 service ThriftSecureEventTransmissionService {
    string connect(1:string userName, 2:string password) throws
                                            (1:Exception.ThriftAuthenticationException ae),
+   string connectWithServerAuthentication(1:string userName, 2:string password, 3:bool isServerAuthEnabled) throws
+                                           (1:Exception.ThriftAuthenticationException ae),
    void disconnect(1:string sessionId),
 
    string defineStream(1: string sessionId, 2: string streamDefinition) throws (1:Exception.ThriftDifferentStreamDefinitionAlreadyDefinedException ade, 2:Exception.ThriftMalformedStreamDefinitionException mtd, 3:Exception.ThriftStreamDefinitionException tde,4:Exception.ThriftSessionExpiredException se ),

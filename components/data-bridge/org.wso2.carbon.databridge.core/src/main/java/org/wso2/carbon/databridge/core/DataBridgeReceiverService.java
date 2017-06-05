@@ -69,8 +69,7 @@ public interface DataBridgeReceiverService {
             throws SessionTimeoutException, StreamDefinitionStoreException,
                    DifferentStreamDefinitionAlreadyDefinedException;
 
-
-    public String login(String username, String password) throws AuthenticationException;
+    public String login(String username, String password, boolean isServerAuthEnabled) throws AuthenticationException;
 
     public void logout(String sessionId) throws Exception;
 

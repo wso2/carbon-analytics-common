@@ -45,6 +45,22 @@ public class BinaryDataEndpoint extends DataEndpoint {
                 throw (DataEndpointAuthenticationException) e;
             } else {
                 throw new DataEndpointAuthenticationException("Error while trying to login to data receiver :"
+                                                              + socket.getRemoteSocketAddress().toString(), e);
+            }
+        }
+    }
+
+    @Override
+    protected String login(Object client, String userName, String password, boolean isServerAuthEnabled) throws DataEndpointAuthenticationException {
+        Socket socket = (Socket) client;
+        try {
+            sendBinaryLoginMessage(socket, userName, password, isServerAuthEnabled);
+            return processResponse(socket);
+        } catch (Exception e) {
+            if (e instanceof DataEndpointAuthenticationException) {
+                throw (DataEndpointAuthenticationException) e;
+            } else {
+                throw new DataEndpointAuthenticationException("Error while trying to login to data receiver :"
                         + socket.getRemoteSocketAddress().toString(), e);
             }
         }
