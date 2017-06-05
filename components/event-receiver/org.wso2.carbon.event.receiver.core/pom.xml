@@ -126,6 +126,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
+                            org.json;version="${orbit.version.json}",
                             org.wso2.carbon.event.input.adapter.core.*,
                             *;resolution:=optional
                         </Import-Package>
