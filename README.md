@@ -1,4 +1,4 @@
-# Carbon Analytics
+# Carbon Analytics Common
 ---
 
 |  Branch | Build Status |
@@ -9,7 +9,7 @@
 
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 
-#### Carbon Analytics repo contains following components:
+#### Carbon Analytics Common repo contains following components:
 
 * data-bridge      
 
