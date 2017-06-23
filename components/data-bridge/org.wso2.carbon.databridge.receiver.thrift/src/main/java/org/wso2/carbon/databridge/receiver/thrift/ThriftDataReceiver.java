@@ -1,16 +1,15 @@
 /**
- *
  * Copyright (c) WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,18 +29,14 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
-import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
-import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.net.ssl.SSLServerSocket;
-import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -125,7 +120,7 @@ public class ThriftDataReceiver {
                 keyStore = System.getProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
                     throw new DataBridgeException("Cannot start thrift agent server, not valid " +
-                                                  "Security.KeyStore.Location is null");
+                            "Security.KeyStore.Location is null");
                 }
                 // }
             }
@@ -137,7 +132,7 @@ public class ThriftDataReceiver {
                     keyStorePassword = System.getProperty("Security.KeyStore.Password");
                     if (keyStorePassword == null) {
                         throw new DataBridgeException("Cannot start thrift agent server, not valid" +
-                                                      " Security.KeyStore.Password is null ");
+                                " Security.KeyStore.Password is null ");
                     }
                 }
             }
@@ -165,12 +160,12 @@ public class ThriftDataReceiver {
                     port, DataBridgeConstants.CLIENT_TIMEOUT_MS, inetAddress, params);
             SSLServerSocket sslServerSocket = (javax.net.ssl.SSLServerSocket) serverTransport.getServerSocket();
             if (sslProtocols != null && sslProtocols.length() != 0) {
-                String [] sslProtocolsArray = sslProtocols.split(",");
+                String[] sslProtocolsArray = sslProtocols.split(",");
                 sslServerSocket.setEnabledProtocols(sslProtocolsArray);
             }
 
             if (ciphers != null && ciphers.length() != 0) {
-                String [] ciphersArray = ciphers.split(",");
+                String[] ciphersArray = ciphers.split(",");
                 sslServerSocket.setEnabledCipherSuites(ciphersArray);
             }
 
@@ -205,7 +200,7 @@ public class ThriftDataReceiver {
             thread.start();
         } catch (TTransportException e) {
             throw new DataBridgeException("Cannot start Thrift server on port " + port +
-                                          " on host " + hostName, e);
+                    " on host " + hostName, e);
         }
     }
 

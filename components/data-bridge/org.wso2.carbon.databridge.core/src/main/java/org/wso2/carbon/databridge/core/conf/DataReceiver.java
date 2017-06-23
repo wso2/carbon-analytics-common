@@ -18,8 +18,10 @@
 package org.wso2.carbon.databridge.core.conf;
 
 
-import org.wso2.carbon.kernel.annotations.Configuration;
-import org.wso2.carbon.kernel.annotations.Element;
+
+
+import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
 import java.util.LinkedHashMap;
 

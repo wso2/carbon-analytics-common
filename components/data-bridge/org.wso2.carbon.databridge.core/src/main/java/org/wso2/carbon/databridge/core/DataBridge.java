@@ -39,7 +39,7 @@ import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
-import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.bind.JAXBException;

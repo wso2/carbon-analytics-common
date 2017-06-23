@@ -20,7 +20,7 @@ package org.wso2.carbon.databridge.core.internal.utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
-import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
