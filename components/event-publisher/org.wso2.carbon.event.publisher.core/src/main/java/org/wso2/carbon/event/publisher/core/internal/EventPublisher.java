@@ -248,8 +248,10 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                     long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
                             .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
 
-                    while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMillis() <= lastProcessedTime) {
-                        eventQueue.remove();
+                    synchronized (this) {
+                        while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMillis() <= lastProcessedTime) {
+                            eventQueue.remove();
+                        }
                     }
                 }
             }
