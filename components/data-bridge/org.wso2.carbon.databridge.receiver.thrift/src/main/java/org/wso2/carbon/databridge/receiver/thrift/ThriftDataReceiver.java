@@ -80,7 +80,6 @@ public class ThriftDataReceiver {
      * Initialize Carbon Agent Server
      *
      * @param thriftDataReceiverConfiguration
-     *
      * @param dataBridgeReceiverService
      */
     public ThriftDataReceiver(ThriftDataReceiverConfiguration thriftDataReceiverConfiguration,
@@ -92,8 +91,7 @@ public class ThriftDataReceiver {
     /**
      * To start the Agent server
      *
-     * @throws org.wso2.carbon.databridge.core.exception.DataBridgeException
-     *          if the agent server cannot be started
+     * @throws org.wso2.carbon.databridge.core.exception.DataBridgeException if the agent server cannot be started
      */
     public void start(String hostName)
             throws DataBridgeException {
@@ -107,33 +105,21 @@ public class ThriftDataReceiver {
                                               DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
-
-            //TODO Find a way to get this info from carbon and use in default case.
             String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
             if (keyStore == null) {
-//            String carbonHome = Utils.getCarbonHome().toString();
-//            if(carbonHome != null){
-//                keyStore = carbonHome + File.separator + "resources"+ File.separator +
-//                           "resources/security" +File.separator + "wso2carbon.jks";
-//
-//            } else {
                 keyStore = System.getProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
                     throw new DataBridgeException("Cannot start thrift agent server, not valid " +
                             "Security.KeyStore.Location is null");
                 }
-                // }
             }
 
             String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
-                keyStorePassword = "wso2carbon";
+                keyStorePassword = System.getProperty("Security.KeyStore.Password");
                 if (keyStorePassword == null) {
-                    keyStorePassword = System.getProperty("Security.KeyStore.Password");
-                    if (keyStorePassword == null) {
-                        throw new DataBridgeException("Cannot start thrift agent server, not valid" +
-                                " Security.KeyStore.Password is null ");
-                    }
+                    throw new DataBridgeException("Cannot start thrift agent server, not valid" +
+                            " Security.KeyStore.Password is null ");
                 }
             }
 
