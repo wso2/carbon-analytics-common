@@ -1,11 +1,9 @@
-# carbon-analytics-common
+# Carbon Analytics
 ---
 
 |  Branch | Build Status |
 | :------------ |:-------------
-| master      | [![Build Status](https://wso2.org/jenkins/job/carbon-analytics-common/badge/icon)](https://wso2.org/jenkins/job/carbon-analytics-common) |
-| master-java8    | [![Build Status](https://wso2.org/jenkins/job/carbon-analytics-common/badge/icon)](https://wso2.org/jenkins/job/carbon-analytics-common__java8/) |
-
+| master      | [![Build Status](https://wso2.org/jenkins/job/platform-builds/job/carbon-analytics/badge/icon)](https://wso2.org/jenkins/job/platform-builds/job/carbon-analytics/) |
 
 ---
 
@@ -13,7 +11,7 @@ Latest Released Version v5.0.11.
 
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 
-#### carbon-analytics-common repo contains following components.
+#### Carbon Analytics repo contains following components:
 
 * event-streams      
 * event-recevier

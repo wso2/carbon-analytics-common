@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>data-bridge-feature</artifactId>
-        <version>5.1.20-SNAPSHOT</version>
+        <version>5.1.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -71,16 +71,16 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.server.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.databridge.commons.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.databridge.commons.thrift.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.commons.binary.server.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.databridge.commons.binary.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                                 <includedFeatureDef>
-                                    org.wso2.carbon.analytics-common:org.wso2.carbon.databridge.agent.server.feature:${carbon.analytics.common.version}
+                                    org.wso2.carbon.analytics:org.wso2.carbon.databridge.agent.server.feature:${carbon.analytics.common.version}
                                 </includedFeatureDef>
                             </includedFeatures>
                         </configuration>

@@ -16,105 +16,81 @@
 
 package org.wso2.carbon.databridge.core.internal;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.DataBridge;
+import org.wso2.carbon.databridge.core.DataBridgeStreamStore;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
 import org.wso2.carbon.databridge.core.DataBridgeSubscriberService;
-import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
-import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
-import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
+import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
+import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.internal.authentication.CarbonAuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeCoreBuilder;
-import org.wso2.carbon.identity.authentication.AuthenticationService;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.carbon.utils.ServerConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * @scr.component name="databridge.component" immediate="true"
- * @scr.reference name="org.wso2.carbon.identity.authentication.internal.AuthenticationServiceComponent"
- * interface="org.wso2.carbon.identity.authentication.AuthenticationService"
- * cardinality="1..1" policy="dynamic" bind="setAuthenticationService"  unbind="unsetAuthenticationService"
- * @scr.reference name="user.realmservice.default" interface="org.wso2.carbon.user.core.service.RealmService"
- * cardinality="1..1" policy="dynamic" bind="setRealmService"  unbind="unsetRealmService"
- * @scr.reference name="stream.definitionStore.service"
- * interface="org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamStoreService" unbind="unsetEventStreamStoreService"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1"
- * policy="dynamic"  bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
+ * Service component to consume CarbonRuntime instance which has been registered as an OSGi service
+ * by Carbon Kernel.
+ *
+ * @since 1.0.0
  */
+@Component(
+        name = "org.wso2.carbon.databridge.core.internal.DataBridgeDS",
+        immediate = true
+)
 public class DataBridgeDS {
     private static final Log log = LogFactory.getLog(DataBridgeDS.class);
-    private AuthenticationService authenticationService;
     private ServiceRegistration receiverServiceRegistration;
     private ServiceRegistration subscriberServiceRegistration;
+    private ServiceRegistration dataBridgeEventStreamServiceRegistration;
     private DataBridge databridge;
-    private ServiceRegistration databridgeRegistration;
 
     /**
-     * initialize the agent server here.
+     * This is the activation method of DataBridge declarative service. This will be called when its references are
+     * satisfied. Agent server is initialized here
      *
-     * @param context
+     * @param bundleContext the bundle context instance of this bundle.
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
      */
-    protected void activate(ComponentContext context) {
+    @Activate
+    protected void start(BundleContext bundleContext) throws Exception {
         try {
             if (databridge == null) {
-                AbstractStreamDefinitionStore streamDefinitionStore = DataBridgeServiceValueHolder.getStreamDefinitionStore();
-                databridge = new DataBridge(new CarbonAuthenticationHandler(authenticationService),
-                        streamDefinitionStore, DataBridgeCoreBuilder.getDatabridgeConfigPath());
+                InMemoryStreamDefinitionStore streamDefinitionStore = new InMemoryStreamDefinitionStore();
+                DataBridgeServiceValueHolder.setStreamDefinitionStore(streamDefinitionStore);
+                databridge = new DataBridge(new CarbonAuthenticationHandler(),
+                        streamDefinitionStore, DatabridgeConfigurationFileResolver.
+                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) DataBridgeServiceValueHolder.
+                                getConfigProvider().
+                                getConfigurationMap(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE)));
+
+
                 try {
-                    List<String[]> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
-                    for (String[] streamDefinitionString : streamDefinitionStrings) {
+                    List<String> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
+                    for (String streamDefinitionString : streamDefinitionStrings) {
                         try {
-                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString[1]);
-                            int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(streamDefinitionString[0]);
-                            if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
-                                log.warn("Tenant " + streamDefinitionString[0] + " does not exist, Error in defining event stream " + streamDefinitionString[1]);
-                                continue;
-                            }
+                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString);
+                            streamDefinitionStore.saveStreamDefinition(streamDefinition);
 
-                            try {
-                                PrivilegedCarbonContext.startTenantFlow();
-                                PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                                privilegedCarbonContext.setTenantId(tenantId);
-                                privilegedCarbonContext.setTenantDomain(streamDefinitionString[0]);
-
-                                streamDefinitionStore.saveStreamDefinition(streamDefinition, tenantId);
-
-                            } catch (DifferentStreamDefinitionAlreadyDefinedException e) {
-                                log.warn("Error redefining event stream of " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                            } catch (RuntimeException e) {
-                                log.error("Error in defining event stream " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                            } catch (StreamDefinitionStoreException e) {
-                                log.error("Error in defining event stream in store " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                            } finally {
-                                PrivilegedCarbonContext.endTenantFlow();
-                            }
                         } catch (MalformedStreamDefinitionException e) {
-                            log.error("Malformed Stream Definition for " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                        } catch (UserStoreException e) {
-                            log.error("Error in identifying tenant event stream " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
+                            log.error("Malformed Stream Definition for " + streamDefinitionString, e);
                         }
                     }
                 } catch (Throwable t) {
@@ -122,61 +98,76 @@ public class DataBridgeDS {
                 }
 
 
-                receiverServiceRegistration = context.getBundleContext().
+                receiverServiceRegistration = bundleContext.
                         registerService(DataBridgeReceiverService.class.getName(), databridge, null);
-                subscriberServiceRegistration = context.getBundleContext().
+                subscriberServiceRegistration = bundleContext.
                         registerService(DataBridgeSubscriberService.class.getName(), databridge, null);
-//                databridgeRegistration =
-//                        context.getBundleContext().registerService(DataBridge.class.getName(), databridge, null);
+                dataBridgeEventStreamServiceRegistration = bundleContext.
+                        registerService(DataBridgeStreamStore.class.getName(),
+                                new DataBridgeStreamStore(), null);
+
                 log.info("Successfully deployed Agent Server ");
             }
-        }  catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             log.error("Error in starting Agent Server ", e);
         }
     }
 
-
-    protected void deactivate(ComponentContext context) {
-        context.getBundleContext().ungetService(receiverServiceRegistration.getReference());
-        context.getBundleContext().ungetService(subscriberServiceRegistration.getReference());
-//        databridgeRegistration.unregister();
+    /**
+     * This is the deactivation method of DataBridge data service. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+        receiverServiceRegistration.unregister();
+        subscriberServiceRegistration.unregister();
+        dataBridgeEventStreamServiceRegistration.unregister();
         if (log.isDebugEnabled()) {
             log.debug("Successfully stopped agent server");
         }
     }
 
-    protected void setAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    /**
+     * This bind method will be called when CarbonRuntime OSGi service is registered.
+     *
+     * @param carbonRuntime The CarbonRuntime instance registered by Carbon Kernel as an OSGi service
+     */
+    @Reference(
+            name = "carbon.runtime.service",
+            service = CarbonRuntime.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetCarbonRuntime"
+    )
+    protected void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        DataBridgeServiceValueHolder.setCarbonRuntime(carbonRuntime);
     }
 
-    protected void unsetAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = null;
+    /**
+     * This is the unbind method which gets called at the un-registration of CarbonRuntime OSGi service.
+     *
+     * @param carbonRuntime The CarbonRuntime instance registered by Carbon Kernel as an OSGi service
+     */
+    protected void unsetCarbonRuntime(CarbonRuntime carbonRuntime) {
+        DataBridgeServiceValueHolder.setCarbonRuntime(null);
     }
 
-    protected void setRealmService(RealmService realmService) {
-        DataBridgeServiceValueHolder.setRealmService(realmService);
+
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) {
+        DataBridgeServiceValueHolder.setConfigProvider(configProvider);
     }
 
-    protected void unsetRealmService(RealmService realmService) {
-        DataBridgeServiceValueHolder.setRealmService(null);
-    }
-
-    protected void setEventStreamStoreService(
-            AbstractStreamDefinitionStore abstractStreamDefinitionStore) {
-        DataBridgeServiceValueHolder.setStreamDefinitionStore(abstractStreamDefinitionStore);
-    }
-
-    protected void unsetEventStreamStoreService(
-            AbstractStreamDefinitionStore abstractStreamDefinitionStore) {
-        DataBridgeServiceValueHolder.setStreamDefinitionStore(null);
-    }
-
-    protected void setConfigurationContextService(ConfigurationContextService contextService) {
-        DataBridgeServiceValueHolder.setConfigurationContextService(contextService);
-    }
-
-    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
-        DataBridgeServiceValueHolder.setConfigurationContextService(null);
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        DataBridgeServiceValueHolder.setConfigProvider(null);
     }
 
 }

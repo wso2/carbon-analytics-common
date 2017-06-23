@@ -1,23 +1,20 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package org.wso2.carbon.databridge.commons.utils;
-
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,14 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * the util class that converts Events and its definitions in to various forms
+ * Util class that converts Events and its definitions in to various forms
  */
 public final class EventDefinitionConverterUtils {
-    public final static String nullString = "_null";
-    private static Gson gson =new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
+    public static final String NULL_STRING = "_null";
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private EventDefinitionConverterUtils() {
 
@@ -55,25 +49,26 @@ public final class EventDefinitionConverterUtils {
             }
             return attributeTypes;
         } else {
-            return null;  //to improve performance
+            return null; // to improve performance
         }
     }
 
-
-    public static StreamDefinition convertFromJson(String streamDefinition)
-            throws MalformedStreamDefinitionException {
+    public static StreamDefinition convertFromJson(String streamDefinition) throws MalformedStreamDefinitionException {
         try {
-            StreamDefinition tempStreamDefinition = gson.fromJson(streamDefinition.
-                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)int('|\")", "'type':'INT'").replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)long('|\")", "'type':'LONG'").
-                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)float('|\")", "'type':'FLOAT'").replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)double('|\")", "'type':'DOUBLE'").
-                    replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)bool('|\")", "'type':'BOOL'").replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)string('|\")", "'type':'STRING'"), StreamDefinition.class);
+            StreamDefinition tempStreamDefinition = gson.fromJson(
+                    streamDefinition.replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)int('|\")", "'type':'INT'")
+                            .replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)long('|\")", "'type':'LONG'")
+                            .replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)float('|\")", "'type':'FLOAT'")
+                            .replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)double('|\")", "'type':'DOUBLE'")
+                            .replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)bool('|\")", "'type':'BOOL'")
+                            .replaceAll("('|\")type('|\")\\W*:\\W*('|\")(?i)string('|\")", "'type':'STRING'"),
+                    StreamDefinition.class);
 
             String name = tempStreamDefinition.getName();
             String version = tempStreamDefinition.getVersion();
 
-
             if (version == null) {
-                version = "1.0.0";  //when populating the object using google gson the defaults are getting null values
+                version = "1.0.0"; // when populating the object using google gson the defaults are getting null values
             }
             if (name == null) {
                 throw new MalformedStreamDefinitionException("stream name is null");
@@ -91,7 +86,8 @@ public final class EventDefinitionConverterUtils {
                 newStreamDefinition.setMetaData(metaList);
             }
             List<Attribute> correlationList = tempStreamDefinition.getCorrelationData();
-            validAttributeList = EventDefinitionConverterUtils.checkInvalidAttributeType(correlationList, "Correlation");
+            validAttributeList = EventDefinitionConverterUtils.checkInvalidAttributeType(correlationList,
+                    "Correlation");
             if (correlationList != null && correlationList.size() > 0 && validAttributeList) {
                 newStreamDefinition.setCorrelationData(correlationList);
             }
@@ -145,20 +141,23 @@ public final class EventDefinitionConverterUtils {
 
     }
 
-    private static boolean checkInvalidAttributeType(List<Attribute> attributeList, String attributeType)throws MalformedStreamDefinitionException {
-        if(attributeList!=null){
-            for(int i=0; i<attributeList.size(); i++){
-                if(attributeList.get(i).getType() != null){
+    private static boolean checkInvalidAttributeType(List<Attribute> attributeList, String attributeType)
+            throws MalformedStreamDefinitionException {
+        if (attributeList != null) {
+            for (int i = 0; i < attributeList.size(); i++) {
+                if (attributeList.get(i).getType() != null) {
                     return true;
-                }else{
-                    throw new MalformedStreamDefinitionException(" Malformed stream definition, Invalid type assigned to attribute name \"" + attributeList.get(i).getName() + "\" in " + attributeType + " data attributes" );
+                } else {
+                    throw new MalformedStreamDefinitionException(
+                            " Malformed stream definition, " + "Invalid type assigned to attribute name \""
+                                    + attributeList.get(i).getName() + "\" in " + attributeType + " data attributes");
                 }
             }
         }
         return false;
     }
 
-    private static class  StreamDefinitionTemplate{
+    private static class StreamDefinitionTemplate {
 
         private String name;
         private String version = "1.0.0";
@@ -169,7 +168,6 @@ public final class EventDefinitionConverterUtils {
         private List<Attribute> metaData;
         private List<Attribute> correlationData;
         private List<Attribute> payloadData;
-
 
         public StreamDefinitionTemplate(StreamDefinition existingDefinition) {
 
@@ -182,7 +180,6 @@ public final class EventDefinitionConverterUtils {
             this.correlationData = existingDefinition.getCorrelationData();
             this.payloadData = existingDefinition.getPayloadData();
         }
-
 
         public String getName() {
             return name;

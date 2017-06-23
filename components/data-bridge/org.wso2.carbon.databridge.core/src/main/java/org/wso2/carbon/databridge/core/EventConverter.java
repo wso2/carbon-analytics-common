@@ -20,7 +20,6 @@ package org.wso2.carbon.databridge.core;
 
 
 import org.wso2.carbon.databridge.commons.Event;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ import java.util.List;
 public interface EventConverter {
 
     List<Event> toEventList(Object eventBundle,
-                                   StreamTypeHolder streamTypeHolder);
+                            StreamTypeHolder streamTypeHolder);
 
     int getSize(Object eventBundle);
 

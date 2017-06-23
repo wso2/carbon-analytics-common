@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.thrift;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -40,7 +40,7 @@ import java.net.SocketException;
 public class ServerOfflineSyncThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
-    private String agentConfigFileName = "sync-data-agent-config.xml";
+    private String agentConfigFileName = "sync.data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -70,7 +70,7 @@ public class ServerOfflineSyncThriftTest {
 
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
                 "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -122,7 +122,7 @@ public class ServerOfflineSyncThriftTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         thriftTestServer = new ThriftTestServer();
-        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN);
         thriftTestServer.stopAndStartDuration(7642, 4000, 1000);
 
         DataPublisherTestUtil.setKeyStoreParams();
@@ -144,7 +144,7 @@ public class ServerOfflineSyncThriftTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize + 1000, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), queueSize + 1000);
         dataPublisher.shutdown();
         thriftTestServer.stop();
         try {
@@ -167,7 +167,7 @@ public class ServerOfflineSyncThriftTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         thriftTestServer = new ThriftTestServer();
-        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN);
         thriftTestServer.stopAndStartDuration(7652, 7000, 1000);
 
         DataPublisherTestUtil.setKeyStoreParams();
@@ -184,7 +184,7 @@ public class ServerOfflineSyncThriftTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(0, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), 0);
         dataPublisher.shutdown();
         thriftTestServer.stop();
         try {

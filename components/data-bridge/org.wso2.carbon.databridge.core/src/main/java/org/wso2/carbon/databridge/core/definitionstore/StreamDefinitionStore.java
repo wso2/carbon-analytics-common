@@ -28,19 +28,19 @@ import java.util.Collection;
 public interface StreamDefinitionStore {
 
     public StreamDefinition getStreamDefinition(String streamName,
-                                                String streamVersion, int tenantId)
+                                                String streamVersion)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException;
 
-    public StreamDefinition getStreamDefinition(String streamId, int tenantId)
+    public StreamDefinition getStreamDefinition(String streamId)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException;
 
 
-    public Collection<StreamDefinition> getAllStreamDefinitions(int tenantId);
+    public Collection<StreamDefinition> getAllStreamDefinitions();
 
-    public void saveStreamDefinition(StreamDefinition streamDefinition, int tenantId)
+    public void saveStreamDefinition(StreamDefinition streamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException, StreamDefinitionStoreException;
 
-    public boolean deleteStreamDefinition(String streamName, String streamVersion, int tenantId);
+    public boolean deleteStreamDefinition(String streamName, String streamVersion);
 
     public void subscribe(StreamAddRemoveListener streamAddRemoveListener);
 

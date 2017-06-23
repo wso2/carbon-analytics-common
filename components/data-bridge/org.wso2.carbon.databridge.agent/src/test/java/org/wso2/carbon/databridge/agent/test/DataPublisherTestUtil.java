@@ -80,7 +80,7 @@ public class DataPublisherTestUtil {
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
         }
-        return filePath.getAbsolutePath() + File.separator + "data-bridge-config.xml";
+        return filePath.getAbsolutePath() + File.separator + "databridge.config.yaml";
     }
 
 }

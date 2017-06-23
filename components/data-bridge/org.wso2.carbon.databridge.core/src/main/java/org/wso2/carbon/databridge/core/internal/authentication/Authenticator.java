@@ -27,7 +27,6 @@ import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.internal.authentication.session.SessionBean;
 import org.wso2.carbon.databridge.core.internal.authentication.session.SessionCache;
-import org.wso2.carbon.user.api.UserStoreException;
 
 import java.util.UUID;
 
@@ -37,7 +36,6 @@ import java.util.UUID;
 public final class Authenticator {
 
     private static final Log log = LogFactory.getLog(Authenticator.class);
-
     private SessionCache sessionCache;
     private AuthenticationHandler authenticationHandler;
 
@@ -67,21 +65,14 @@ public final class Authenticator {
 
         boolean isSuccessful = false;
         try {
-        	isSuccessful = authenticationHandler.authenticate(userName, password);
-		} catch (Exception e) {
-			throw new AuthenticationException(e);
-		}
+            isSuccessful = authenticationHandler.authenticate(userName, password);
+        } catch (Exception e) {
+            throw new AuthenticationException(e);
+        }
 
         if (isSuccessful) {
             String sessionId = UUID.randomUUID().toString();
-            int tenantId = 0;
-            try {
-                String tenantDomain = authenticationHandler.getTenantDomain(userName);
-                tenantId = authenticationHandler.getTenantId(tenantDomain);
-            } catch (UserStoreException e) {
-                logAndAuthenticationException("Could not resolve the user to a valid tenant.");
-            }
-            Credentials credentials = new Credentials(userName, password, authenticationHandler.getTenantDomain(userName), tenantId);
+            Credentials credentials = new Credentials(userName, password);
             sessionCache.getSession(new SessionBean(sessionId, credentials));
             return sessionId;
         }

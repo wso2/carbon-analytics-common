@@ -18,11 +18,8 @@
 
 package org.wso2.carbon.databridge.core;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
@@ -32,6 +29,7 @@ import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
+import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.definitionstore.StreamAddRemoveListener;
 import org.wso2.carbon.databridge.core.definitionstore.StreamDefinitionStore;
@@ -41,19 +39,27 @@ import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
-import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.securevault.SecretResolver;
-import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.carbon.kernel.utils.Utils;
+import org.yaml.snakeyaml.Yaml;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * this class represents as the interface between the agent server and agent
@@ -61,7 +67,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiverService {
 
-    private static final Log log = LogFactory.getLog(DataBridge.class);
+    private static final Logger log = Logger.getLogger(DataBridge.class);
     private StreamDefinitionStore streamDefinitionStore;
     private EventDispatcher eventDispatcher;
     private Authenticator authenticator;
@@ -76,6 +82,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public DataBridge(AuthenticationHandler authenticationHandler,
                       AbstractStreamDefinitionStore streamDefinitionStore,
                       DataBridgeConfiguration dataBridgeConfiguration) {
+
+        this.setInitialConfig(dataBridgeConfiguration);
         this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
         this.streamDefinitionStore = streamDefinitionStore;
         authenticatorHandler = authenticationHandler;
@@ -97,21 +105,21 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             dataBridgeConfiguration = createDataBridgeConfiguration(dataBridgeConfigPath);
         } catch (FileNotFoundException e) {
             log.error("Error while loading the data bridge configuration file : " + dataBridgeConfigPath, e);
-        } catch (XMLStreamException | JAXBException |IOException e) {
+        } catch (XMLStreamException | JAXBException | IOException e) {
             log.error("Error while reading the data bridge configuration file", e);
         }
         this.setInitialConfig(dataBridgeConfiguration);
-            this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
-            this.streamDefinitionStore = streamDefinitionStore;
-            authenticatorHandler = authenticationHandler;
-            authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
-            String profileReceiver = System.getProperty("profileReceiver");
-            if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
-                isProfileReceiver = true;
-                eventsReceived = new AtomicInteger();
-                totalEventCounter = new AtomicInteger();
-                startTime = 0;
-            }
+        this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
+        this.streamDefinitionStore = streamDefinitionStore;
+        authenticatorHandler = authenticationHandler;
+        authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
+        String profileReceiver = System.getProperty("profileReceiver");
+        if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
+            isProfileReceiver = true;
+            eventsReceived = new AtomicInteger();
+            totalEventCounter = new AtomicInteger();
+            startTime = 0;
+        }
     }
 
     public String defineStream(String sessionId, String streamDefinition)
@@ -130,9 +138,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             authenticatorHandler.initContext(agentSession);
             String streamId = eventDispatcher.defineStream(streamDefinition, agentSession);
             if (streamId != null) {
-                int tenantId = agentSession.getCredentials().getTenantId();
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-                    streamAddRemoveListener.streamAdded(tenantId, streamId);
+                    streamAddRemoveListener.streamAdded(streamId);
                 }
             }
             return streamId;
@@ -163,9 +170,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             authenticatorHandler.initContext(agentSession);
             String streamId = eventDispatcher.defineStream(streamDefinition, agentSession, indexDefinition);
             if (streamId != null) {
-                int tenantId = agentSession.getCredentials().getTenantId();
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-                    streamAddRemoveListener.streamAdded(tenantId, streamId);
+                    streamAddRemoveListener.streamAdded(streamId);
                 }
             }
             return streamId;
@@ -192,7 +198,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         try {
             authenticatorHandler.initContext(agentSession);
             return eventDispatcher.findStreamId(streamName,
-                    streamVersion, agentSession);
+                                                streamVersion, agentSession);
         } catch (StreamDefinitionStoreException e) {
             log.warn("Cannot find streamId for " + streamName + " " + streamVersion, e);
             return null;
@@ -218,7 +224,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             status = eventDispatcher.deleteStream(DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId), DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId), agentSession);
             if (status) {
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
-                    streamAddRemoveListener.streamRemoved(agentSession.getCredentials().getTenantId(), streamId);
+                    streamAddRemoveListener.streamRemoved(streamId);
                 }
             }
         } finally {
@@ -232,7 +238,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             throws SessionTimeoutException {
         return deleteStream(sessionId, DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion));
     }
-
 
     public void publish(Object eventBundle, String sessionId, EventConverter eventConverter)
             throws UndefinedEventTypeException, SessionTimeoutException {
@@ -267,11 +272,11 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                         totalEventCounter.addAndGet(currentBatchSize);
 
                         String line = "[" + dateFormat.format(date) + "] # of events : " + currentBatchSize +
-                                " start timestamp : " + startTime +
-                                " end time stamp : " + endTime + " Throughput is (events / sec) : " +
-                                (currentBatchSize * 1000) / (endTime - startTime) + " Total Event Count : " +
-                                totalEventCounter + " \n";
-                        File file = new File(CarbonUtils.getCarbonHome() + File.separator + "receiver-perf.txt");
+                                      " start timestamp : " + startTime +
+                                      " end time stamp : " + endTime + " Throughput is (events / sec) : " +
+                                      (currentBatchSize * 1000) / (endTime - startTime) + " Total Event Count : " +
+                                      totalEventCounter + " \n";
+                        File file = new File(Utils.getCarbonHome() + File.separator + "receiver-perf.txt");
                         if (!file.exists()) {
                             log.info("Creating the performance measurement file at : " + file.getAbsolutePath());
                         }
@@ -306,12 +311,10 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
     }
 
-
     public String login(String username, String password) throws AuthenticationException {
         log.info("user " + username + " connected");
         return authenticator.authenticate(username, password);
     }
-
 
     public void logout(String sessionId) throws Exception {
         AgentSession agentSession = authenticator.getSession(sessionId);
@@ -353,7 +356,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public StreamDefinition getStreamDefinition(String sessionId, String streamName,
                                                 String streamVersion)
             throws SessionTimeoutException, StreamDefinitionNotFoundException,
-            StreamDefinitionStoreException {
+                   StreamDefinitionStoreException {
         AgentSession agentSession = authenticator.getSession(sessionId);
         if (agentSession.getUsername() == null) {
             if (log.isDebugEnabled()) {
@@ -364,7 +367,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
         try {
             authenticatorHandler.initContext(agentSession);
-            return getStreamDefinition(streamName, streamVersion, agentSession.getCredentials().getTenantId());
+            return getStreamDefinition(streamName, streamVersion);
         } finally {
             authenticatorHandler.destroyContext(agentSession);
 
@@ -383,7 +386,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
         try {
             authenticatorHandler.initContext(agentSession);
-            return getAllStreamDefinitions(agentSession.getCredentials().getTenantId());
+            return getAllStreamDefinitions();
         } finally {
             authenticatorHandler.destroyContext(agentSession);
         }
@@ -392,7 +395,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     @Override
     public void saveStreamDefinition(String sessionId, StreamDefinition streamDefinition)
             throws SessionTimeoutException, StreamDefinitionStoreException,
-            DifferentStreamDefinitionAlreadyDefinedException {
+                   DifferentStreamDefinitionAlreadyDefinedException {
         AgentSession agentSession = authenticator.getSession(sessionId);
         if (agentSession.getUsername() == null) {
             if (log.isDebugEnabled()) {
@@ -402,7 +405,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
         try {
             authenticatorHandler.initContext(agentSession);
-            saveStreamDefinition(streamDefinition, agentSession.getCredentials().getTenantId());
+            saveStreamDefinition(streamDefinition);
             eventDispatcher.updateStreamDefinitionHolder(agentSession);
         } finally {
             authenticatorHandler.destroyContext(agentSession);
@@ -412,36 +415,35 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     // Stream store operations
     @Override
     public StreamDefinition getStreamDefinition(String streamName,
-                                                String streamVersion, int tenantId)
+                                                String streamVersion)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException {
-        return streamDefinitionStore.getStreamDefinition(streamName, streamVersion, tenantId);
+        return streamDefinitionStore.getStreamDefinition(streamName, streamVersion);
 
     }
 
     @Override
-    public StreamDefinition getStreamDefinition(String streamId, int tenantId)
+    public StreamDefinition getStreamDefinition(String streamId)
             throws StreamDefinitionNotFoundException, StreamDefinitionStoreException {
-        return streamDefinitionStore.getStreamDefinition(streamId, tenantId);
+        return streamDefinitionStore.getStreamDefinition(streamId);
 
     }
 
     @Override
-    public List<StreamDefinition> getAllStreamDefinitions(int tenantId) {
-        return new ArrayList<>(streamDefinitionStore.getAllStreamDefinitions(tenantId));
+    public List<StreamDefinition> getAllStreamDefinitions() {
+        return new ArrayList<>(streamDefinitionStore.getAllStreamDefinitions());
     }
 
-
     @Override
-    public void saveStreamDefinition(StreamDefinition streamDefinition, int tenantId)
+    public void saveStreamDefinition(StreamDefinition streamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException,
-            StreamDefinitionStoreException {
-        streamDefinitionStore.saveStreamDefinition(streamDefinition, tenantId);
+                   StreamDefinitionStoreException {
+        streamDefinitionStore.saveStreamDefinition(streamDefinition);
     }
 
     @Override
     public boolean deleteStreamDefinition(String streamName,
-                                          String streamVersion, int tenantId) {
-        return streamDefinitionStore.deleteStreamDefinition(streamName, streamVersion, tenantId);
+                                          String streamVersion) {
+        return streamDefinitionStore.deleteStreamDefinition(streamName, streamVersion);
     }
 
     public List<AgentCallback> getSubscribers() {
@@ -451,7 +453,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public List<RawDataAgentCallback> getRawDataSubscribers() {
         return eventDispatcher.getRawDataSubscribers();
     }
-
 
     @Override
     public void subscribe(StreamAddRemoveListener streamAddRemoveListener) {
@@ -468,7 +469,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     }
 
     /**
-     * This creates the DataBridgeConfiguration from the data-bridge-config.xml file
+     * This creates the DataBridgeConfiguration from the data-bridge-config.yaml file
      *
      * @param configPath
      * @return DataBridgeConfiguration
@@ -476,13 +477,18 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
      * @throws XMLStreamException
      */
     private DataBridgeConfiguration createDataBridgeConfiguration(String configPath) throws IOException,
-            XMLStreamException, JAXBException {
+                                                                                            XMLStreamException,
+                                                                                            JAXBException {
         File configFile = new File(configPath);
         DataBridgeConfiguration dataBridgeConfiguration;
 
         if (configFile.exists()) {
-            try(FileInputStream fileInputStream = new FileInputStream(configFile)) {
-                JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
+            try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
+                Yaml yaml = new Yaml();
+                dataBridgeConfiguration = DatabridgeConfigurationFileResolver.
+                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) ((LinkedHashMap)
+                                yaml.load(fileInputStream)).get(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
+                /*JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                 dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);
                 StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
@@ -494,7 +500,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                     if (resolvedPassword != null) {
                         dataBridgeConfiguration.setKeyStorePassword(resolvedPassword);
                     }
-                }
+                }*/
+                // TODO: 2/5/17 is secret resolver needed anymore?
                 return dataBridgeConfiguration;
             }
         } else {
@@ -503,14 +510,14 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
     }
 
-    private String getResolvedPassword(SecretResolver secretResolver, String alias) {
-        if (secretResolver.isTokenProtected(alias)) {
-            String resolvedPassword = secretResolver.resolve(alias);
-            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
-                return resolvedPassword;
-            }
-        }
-        return null;
-    }
+//    private String getResolvedPassword(SecretResolver secretResolver, String alias) {
+//        if (secretResolver.isTokenProtected(alias)) {
+//            String resolvedPassword = secretResolver.resolve(alias);
+//            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
+//                return resolvedPassword;
+//            }
+//        }
+//        return null;
+//    }
 
 }

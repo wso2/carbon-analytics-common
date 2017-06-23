@@ -17,11 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.thrift;
 
-import junit.framework.Assert;
-import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -40,11 +39,10 @@ import java.net.SocketException;
 
 
 public class OneEndPointDPSyncThriftTest {
-    Logger log = Logger.getLogger(OneEndPointDPSyncThriftTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private ThriftTestServer thriftTestServer;
-    private String agentConfigFileName = "sync-data-agent-config.xml";
+    private String agentConfigFileName = "sync.data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -72,7 +70,7 @@ public class OneEndPointDPSyncThriftTest {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
                 "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -82,17 +80,17 @@ public class OneEndPointDPSyncThriftTest {
             StreamDefinitionStoreException, MalformedStreamDefinitionException {
         thriftTestServer = new ThriftTestServer();
         thriftTestServer.start(port);
-        thriftTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        thriftTestServer.addStreamDefinition(STREAM_DEFN);
 
     }
 
     @Test
     public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
-        startServer(7612);
+        startServer(7662);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7612",
-                "ssl://" + hostName + ":7712", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7662",
+                "ssl://" + hostName + ":7762", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -109,7 +107,7 @@ public class OneEndPointDPSyncThriftTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), numberOfEventsSent);
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
     }
@@ -121,18 +119,18 @@ public class OneEndPointDPSyncThriftTest {
             DataEndpointException, DataEndpointConfigurationException,
             MalformedStreamDefinitionException, DataBridgeException,
             StreamDefinitionStoreException, SocketException {
-        startServer(7622);
+        startServer(7672);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7622, ssl://" + hostName + ":7612",
-                "ssl://" + hostName + ":7722, ssl://" + hostName + ":7712", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7672, ssl://" + hostName + ":7662",
+                "ssl://" + hostName + ":7772, ssl://" + hostName + ":7762", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
         event.setCorrelationData(null);
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
         }
         int numberOfEventsSent = 1000;
@@ -140,11 +138,11 @@ public class OneEndPointDPSyncThriftTest {
             dataPublisher.publish(event);
         }
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), numberOfEventsSent);
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
     }
@@ -161,7 +159,7 @@ public class OneEndPointDPSyncThriftTest {
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
+        Assert.assertTrue(expected, "Invalid urls passed for receiver and auth, and hence expected to fail");
     }
 
     @Test
@@ -180,7 +178,7 @@ public class OneEndPointDPSyncThriftTest {
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
+        Assert.assertTrue(expected, "Invalid urls passed for receiver and auth, and hence expected to fail");
     }
 
     @Test
@@ -220,7 +218,7 @@ public class OneEndPointDPSyncThriftTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), numberOfEventsSent);
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
     }

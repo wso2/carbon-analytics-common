@@ -19,7 +19,6 @@
 package org.wso2.carbon.databridge.receiver.thrift.converter;
 
 
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle;
@@ -28,7 +27,6 @@ import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
 import org.wso2.carbon.databridge.core.exception.EventConversionException;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +55,7 @@ public final class ThriftEventConverter implements EventConverter {
                         break;
                     case STRING:
                         String stringValue = thriftEventBundle.getStringAttributeList().get(indexCounter.getStringCount());
-                        if (stringValue.equals(EventDefinitionConverterUtils.nullString)) {
+                        if (stringValue.equals(EventDefinitionConverterUtils.NULL_STRING)) {
                             objects[i] = null;
                         } else {
                             objects[i] = stringValue;
@@ -100,9 +98,9 @@ public final class ThriftEventConverter implements EventConverter {
             ThriftEventBundle thriftEventBundle = (ThriftEventBundle) eventBundle;
             int eventBundleSize = 0;
             //arbitray data
-            if (thriftEventBundle.isSetArbitraryDataMapMap()){
+            if (thriftEventBundle.isSetArbitraryDataMapMap()) {
                 Set<Map.Entry<Integer, Map<String, String>>> arbitraryDataMap = thriftEventBundle.getArbitraryDataMapMap().entrySet();
-                for (Map.Entry<Integer, Map<String, String>> arbitraryData : arbitraryDataMap){
+                for (Map.Entry<Integer, Map<String, String>> arbitraryData : arbitraryDataMap) {
                     eventBundleSize += DataBridgeCommonsUtils.getSize(arbitraryData.getValue());
                 }
                 eventBundleSize += arbitraryDataMap.size() * 4; // 4 byte per integer
@@ -113,10 +111,10 @@ public final class ThriftEventConverter implements EventConverter {
             eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * 8; //8 bytes per double field
             eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each double reference.
             eventBundleSize += thriftEventBundle.getIntAttributeListSize() * 4; // 4 bytes per int field
-            eventBundleSize += thriftEventBundle.getIntAttributeListSize()  * DataBridgeCommonsUtils.getReferenceSize(); // for each int reference
+            eventBundleSize += thriftEventBundle.getIntAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each int reference
             eventBundleSize += thriftEventBundle.getLongAttributeListSize() * 8; // 8 bytes per long field
             eventBundleSize += thriftEventBundle.getLongAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each long reference
-            for (String aStringField : thriftEventBundle.getStringAttributeList()){
+            for (String aStringField : thriftEventBundle.getStringAttributeList()) {
                 eventBundleSize += aStringField.getBytes().length;
             }
             eventBundleSize += thriftEventBundle.getStringAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each string reference
@@ -155,11 +153,6 @@ public final class ThriftEventConverter implements EventConverter {
                 event.setTimeStamp(timeStamp);
                 AttributeType[][] attributeTypeOrder = streamTypeHolder.getDataType(streamId);
                 if (attributeTypeOrder == null) {
-                    PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                    if (privilegedCarbonContext.getTenantDomain() == null) {
-                        privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
-                        privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-                    }
                     streamTypeHolder.reloadStreamTypeHolder();
                     attributeTypeOrder = streamTypeHolder.getDataType(streamId);
                     if (attributeTypeOrder == null) {

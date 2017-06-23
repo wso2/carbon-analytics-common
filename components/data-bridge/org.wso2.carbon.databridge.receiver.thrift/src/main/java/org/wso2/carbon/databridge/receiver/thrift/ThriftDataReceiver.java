@@ -21,25 +21,27 @@ package org.wso2.carbon.databridge.receiver.thrift;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.server.ServerContext;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.*;
-import org.wso2.carbon.base.ServerConfiguration;
+import org.apache.thrift.transport.TSSLTransportFactory;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TTransportException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.CommonThriftConstants;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
+import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.net.ssl.SSLServerSocket;
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -53,7 +55,6 @@ public class ThriftDataReceiver {
     private ThriftDataReceiverConfiguration thriftDataReceiverConfiguration;
     private TServer authenticationServer;
     private TServer dataReceiverServer;
-    private int receiverStartupWaitingTime = 0;
 
     /**
      * Initialize Carbon Agent Server
@@ -99,44 +100,48 @@ public class ThriftDataReceiver {
      * @throws org.wso2.carbon.databridge.core.exception.DataBridgeException
      *          if the agent server cannot be started
      */
-    public void start(String hostName, int receiverStartupWaitingTime)
+    public void start(String hostName)
             throws DataBridgeException {
-        this.receiverStartupWaitingTime = receiverStartupWaitingTime;
         startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(),
                 thriftDataReceiverConfiguration.getSslProtocols(), thriftDataReceiverConfiguration.getCiphers(), dataBridgeReceiverService);
         startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
     }
 
-    public void start(String hostName) throws DataBridgeException {
-        start(hostName, 0);
-    }
 
     private void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers,
                                               DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
+
+            //TODO Find a way to get this info from carbon and use in default case.
             String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
             if (keyStore == null) {
-                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-                keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
+//            String carbonHome = Utils.getCarbonHome().toString();
+//            if(carbonHome != null){
+//                keyStore = carbonHome + File.separator + "resources"+ File.separator +
+//                           "resources/security" +File.separator + "wso2carbon.jks";
+//
+//            } else {
+                keyStore = System.getProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    keyStore = System.getProperty("Security.KeyStore.Location");
-                    if (keyStore == null) {
-                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Location is null");
-                    }
+                    throw new DataBridgeException("Cannot start thrift agent server, not valid " +
+                                                  "Security.KeyStore.Location is null");
                 }
+                // }
             }
+
             String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
-                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-                keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
+                keyStorePassword = "wso2carbon";
                 if (keyStorePassword == null) {
                     keyStorePassword = System.getProperty("Security.KeyStore.Password");
                     if (keyStorePassword == null) {
-                        throw new DataBridgeException("Cannot start thrift agent server, not valid Security.KeyStore.Password is null ");
+                        throw new DataBridgeException("Cannot start thrift agent server, not valid" +
+                                                      " Security.KeyStore.Password is null ");
                     }
                 }
             }
+
             startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
         } catch (TransportException e) {
             throw new DataBridgeException("Cannot start agent server on port " + port, e);
@@ -169,7 +174,7 @@ public class ThriftDataReceiver {
                 sslServerSocket.setEnabledCipherSuites(ciphersArray);
             }
 
-            log.info("Thrift Server IP : " + hostName);
+            log.info("Thrift Server started at " + hostName);
         } catch (TTransportException e) {
             throw new TransportException("Thrift transport exception occurred ", e);
         }
@@ -179,12 +184,7 @@ public class ThriftDataReceiver {
                         new ThriftSecureEventTransmissionServiceImpl(dataBridgeReceiverService));
         authenticationServer = new TThreadPoolServer(
                 new TThreadPoolServer.Args(serverTransport).processor(processor));
-
-        if (log.isDebugEnabled()) {
-            authenticationServer.setServerEventHandler(new LoggingServerEventHandler());
-        }
-        String url = hostName + ":" + port;
-        Thread thread = new Thread(new ServerThread(authenticationServer, receiverStartupWaitingTime, url));
+        Thread thread = new Thread(new ServerThread(authenticationServer));
         log.info("Thrift SSL port : " + port);
         thread.start();
     }
@@ -200,8 +200,7 @@ public class ThriftDataReceiver {
                             new ThriftEventTransmissionServiceImpl(dataBridgeReceiverService));
             dataReceiverServer = new TThreadPoolServer(
                     new TThreadPoolServer.Args(serverTransport).processor(processor));
-            String url = hostName + ":" + port;
-            Thread thread = new Thread(new ServerThread(dataReceiverServer, receiverStartupWaitingTime, url));
+            Thread thread = new Thread(new ServerThread(dataReceiverServer));
             log.info("Thrift port : " + port);
             thread.start();
         } catch (TTransportException e) {
@@ -209,36 +208,6 @@ public class ThriftDataReceiver {
                                           " on host " + hostName, e);
         }
     }
-
-    /**
-     * This event handler for thrift servers is intended to log IP and port of the peers connected to the server
-     */
-    static class LoggingServerEventHandler implements TServerEventHandler {
-        @Override
-        public void preServe() {
-
-        }
-
-        @Override
-        public ServerContext createContext(TProtocol input, TProtocol output) {
-            log.debug("Client " +  ((TSocket)input.getTransport()).getSocket().getRemoteSocketAddress().toString()
-                    +" connected to thrift authentication service.");
-
-            return null;
-        }
-
-        @Override
-        public void deleteContext(ServerContext serverContext, TProtocol input, TProtocol output) {
-            log.debug("Client " +  ((TSocket)input.getTransport()).getSocket().getRemoteSocketAddress().toString()
-                    + " disconnected from thrift authentication service.");
-
-        }
-
-        @Override
-        public void processContext(ServerContext serverContext, TTransport inputTransport, TTransport outputTransport) {
-        }
-    }
-
 
     /**
      * To stop the server
@@ -250,23 +219,12 @@ public class ThriftDataReceiver {
 
     static class ServerThread implements Runnable {
         private TServer server;
-        private int waitingTime;
-        private String url;
-        private static final Log log = LogFactory.getLog(ServerThread.class);
 
-        ServerThread(TServer server, int waitingTime, String url) {
+        ServerThread(TServer server) {
             this.server = server;
-            this.waitingTime = waitingTime;
-            this.url = url;
         }
 
         public void run() {
-            if (waitingTime > 0){
-                try {
-                    Thread.sleep(waitingTime);
-                } catch (InterruptedException ignore) {}
-            }
-            log.info("Thrift receiver started on " + url);
             this.server.serve();
         }
     }

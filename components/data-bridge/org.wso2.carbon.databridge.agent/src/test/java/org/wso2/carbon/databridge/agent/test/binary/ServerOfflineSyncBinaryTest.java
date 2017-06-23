@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -41,7 +41,7 @@ import java.net.SocketException;
 public class ServerOfflineSyncBinaryTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
-    private String agentConfigFileName = "sync-data-agent-config.xml";
+    private String agentConfigFileName = "sync.data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -70,7 +70,7 @@ public class ServerOfflineSyncBinaryTest {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://localhost:9687",
                 "ssl://localhost:9787", "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -125,7 +125,7 @@ public class ServerOfflineSyncBinaryTest {
         }
 
         binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        binaryTestServer.addStreamDefinition(STREAM_DEFN);
         binaryTestServer.stopAndStartDuration(9620, 9720, 1000, 1000);
 
         try {
@@ -141,11 +141,11 @@ public class ServerOfflineSyncBinaryTest {
         }
 
         try {
-            Thread.sleep(4000);
+            Thread.sleep(40000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize + 1000, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize + 1000);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }
@@ -170,7 +170,7 @@ public class ServerOfflineSyncBinaryTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        binaryTestServer.addStreamDefinition(STREAM_DEFN);
         binaryTestServer.stopAndStartDuration(9652, 9752, 7000, 1000);
 
         int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Binary").
@@ -184,7 +184,7 @@ public class ServerOfflineSyncBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(0, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), 0);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }

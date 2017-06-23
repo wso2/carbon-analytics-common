@@ -16,37 +16,37 @@ package org.wso2.carbon.databridge.core;
 * limitations under the License.
 */
 
-import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
+import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 
 public class DataBridgeServiceValueHolder {
 
-    private static RealmService realmService;
-    private static AbstractStreamDefinitionStore streamDefinitionStore;
-    private static ConfigurationContextService configurationContextService;
+    private static CarbonRuntime carbonRuntime;
+    private static ConfigProvider configProvider;
+    private static InMemoryStreamDefinitionStore streamDefinitionStore;
 
-    public static void setRealmService(RealmService realmService) {
-        DataBridgeServiceValueHolder.realmService = realmService;
+    public static CarbonRuntime getCarbonRuntime() {
+        return carbonRuntime;
     }
 
-    public static RealmService getRealmService() {
-        return realmService;
+    public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
+        DataBridgeServiceValueHolder.carbonRuntime = carbonRuntime;
     }
 
-    public static void setStreamDefinitionStore(AbstractStreamDefinitionStore streamDefinitionStore) {
-        DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
+    public static ConfigProvider getConfigProvider() {
+        return configProvider;
     }
 
-    public static AbstractStreamDefinitionStore getStreamDefinitionStore() {
+    public static void setConfigProvider(ConfigProvider configProvider) {
+        DataBridgeServiceValueHolder.configProvider = configProvider;
+    }
+
+    public static InMemoryStreamDefinitionStore getStreamDefinitionStore() {
         return streamDefinitionStore;
     }
 
-    public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
-        DataBridgeServiceValueHolder.configurationContextService = configurationContextService;
-    }
-
-    public static ConfigurationContextService getConfigurationContextService() {
-        return configurationContextService;
+    public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
+        DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
     }
 }

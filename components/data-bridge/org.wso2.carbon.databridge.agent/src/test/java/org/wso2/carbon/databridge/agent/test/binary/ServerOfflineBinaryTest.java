@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -28,7 +28,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
-import org.wso2.carbon.databridge.agent.test.thrift.ThriftTestServer;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
@@ -42,7 +41,7 @@ import java.net.SocketException;
 public class ServerOfflineBinaryTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
-    private String agentConfigFileName = "data-agent-config.xml";
+    private String agentConfigFileName = "data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -71,7 +70,7 @@ public class ServerOfflineBinaryTest {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://localhost:9687",
                 "ssl://localhost:9787", "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -128,7 +127,7 @@ public class ServerOfflineBinaryTest {
         }
 
         binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        binaryTestServer.addStreamDefinition(STREAM_DEFN);
         binaryTestServer.start(9619, 9719);
 
         try {
@@ -136,7 +135,7 @@ public class ServerOfflineBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }
@@ -161,7 +160,7 @@ public class ServerOfflineBinaryTest {
         event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
         binaryTestServer = new BinaryTestServer();
-        binaryTestServer.addStreamDefinition(STREAM_DEFN, -1234);
+        binaryTestServer.addStreamDefinition(STREAM_DEFN);
         binaryTestServer.stopAndStartDuration(9651, 9751, 5000, 1000);
 
         int queueSize = AgentHolder.getInstance().getDataEndpointAgent("Binary").
@@ -175,7 +174,7 @@ public class ServerOfflineBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }
