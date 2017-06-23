@@ -19,9 +19,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon.analytics</groupId>
-        <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.39-SNAPSHOT</version>
+        <groupId>org.wso2.carbon.analytics-common</groupId>
+        <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -36,7 +36,7 @@
 
         <!-- databridge-commons dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
         <dependency>
@@ -50,7 +50,7 @@
 
         <!-- databridge-commons-thrift dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons.thrift</artifactId>
         </dependency>
         <dependency>
@@ -60,13 +60,13 @@
 
         <!-- databridge-commons-binary dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons.binary</artifactId>
         </dependency>
 
         <!-- databridge-core dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.core</artifactId>
         </dependency>
         <dependency>
@@ -88,7 +88,7 @@
 
         <!-- databridge-agent dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.agent</artifactId>
         </dependency>
         <dependency>
@@ -106,13 +106,13 @@
 
         <!-- databridge-receiver-binary dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.receiver.binary</artifactId>
         </dependency>
 
         <!-- databridge-receiver-thrift dependencies -->
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.receiver.thrift</artifactId>
         </dependency>
 
@@ -147,7 +147,7 @@
                                 <!-- databridge-commons dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.commons</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>com.google.gson</symbolicName>
@@ -161,7 +161,7 @@
                                 <!-- databridge-commons-thrift dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.commons.thrift</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>libthrift</symbolicName>
@@ -171,14 +171,14 @@
                                 <!-- databridge-commons-thrift dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.commons.binary</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
 
 
                                 <!-- databridge-core dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.core</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.apache.commons.io</symbolicName>
@@ -200,7 +200,7 @@
                                 <!-- databridge-agent dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.agent</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>commons-pool</symbolicName>
@@ -218,13 +218,13 @@
                                 <!-- databridge-receiver-binary dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.receiver.binary</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
 
                                 <!-- databridge-receiver-thrift dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.receiver.thrift</symbolicName>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${carbon.analytics.common.version}</version>
                                 </bundle>
 
                             </bundles>
