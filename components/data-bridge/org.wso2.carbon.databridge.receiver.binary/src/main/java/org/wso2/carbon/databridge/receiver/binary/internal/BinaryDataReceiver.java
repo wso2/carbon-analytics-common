@@ -73,33 +73,22 @@ public class BinaryDataReceiver {
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
-
-        //TODO Find a way to get this info from carbon and use in default case.
         String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
         if (keyStore == null) {
-//            String carbonHome = Utils.getCarbonHome().toString();
-//            if(carbonHome != null){
-//                keyStore = carbonHome + File.separator + "resources"+ File.separator +
-//                           "resources/security" +File.separator + "wso2carbon.jks";
-//
-//            } else {
             keyStore = System.getProperty("Security.KeyStore.Location");
             if (keyStore == null) {
                 throw new DataBridgeException("Cannot start binary agent server, " +
-                                              "not valid Security.KeyStore.Location is null");
+                        "not valid Security.KeyStore.Location is null");
             }
-            // }
         }
 
         String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
         if (keyStorePassword == null) {
-            keyStorePassword = "wso2carbon";
+            keyStorePassword = System.getProperty("Security.KeyStore.Password");
             if (keyStorePassword == null) {
-                keyStorePassword = System.getProperty("Security.KeyStore.Password");
-                if (keyStorePassword == null) {
-                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
-                }
+                throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
             }
+
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyStore);

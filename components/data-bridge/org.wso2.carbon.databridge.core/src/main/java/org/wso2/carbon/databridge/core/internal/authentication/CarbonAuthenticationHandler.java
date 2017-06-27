@@ -64,23 +64,13 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
     @Override
     public void initContext(AgentSession agentSession) {
 
-        //TODO not required
-//        int tenantId = agentSession.getCredentials().getTenantId();
-//        PrivilegedCarbonContext currentContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-//        if (currentContext.getTenantId(true) != tenantId) {
-//            PrivilegedCarbonContext.destroyCurrentContext();
-//            PrivilegedCarbonContext.startTenantFlow();
-//            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-//            privilegedCarbonContext.setTenantId(tenantId);
-//            privilegedCarbonContext.setTenantDomain(agentSession.getDomainName());
-//        }
+        //Not required
     }
 
     @Override
     public void destroyContext(AgentSession agentSession) {
 
-        //TODO not required
-        PrivilegedCarbonContext.destroyCurrentContext();
+        //Not required
     }
 
 }

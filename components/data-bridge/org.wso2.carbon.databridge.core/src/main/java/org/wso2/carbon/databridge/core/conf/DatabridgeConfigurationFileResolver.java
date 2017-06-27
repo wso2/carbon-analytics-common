@@ -17,9 +17,6 @@
 */
 package org.wso2.carbon.databridge.core.conf;
 
-/**
- * Resolves the databridge configuration file.
- */
 
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
@@ -27,6 +24,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Resolves the databridge configuration file.
+ */
 public class DatabridgeConfigurationFileResolver {
 
     public static DataBridgeConfiguration resolveAndSetDatabridgeConfiguration(LinkedHashMap databridgeConfigHashMap) {

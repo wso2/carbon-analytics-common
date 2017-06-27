@@ -16,8 +16,8 @@ package org.wso2.carbon.databridge.agent.internal;
 * limitations under the License.
 */
 
-import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+
+import org.wso2.carbon.config.provider.ConfigProvider;
 
 public class DataAgentServiceValueHolder {
 

@@ -16,9 +16,9 @@ package org.wso2.carbon.databridge.core;
 * limitations under the License.
 */
 
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 
 public class DataBridgeServiceValueHolder {
 

@@ -39,7 +39,7 @@ import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
-import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.bind.JAXBException;
@@ -84,7 +84,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                       DataBridgeConfiguration dataBridgeConfiguration) {
 
         this.setInitialConfig(dataBridgeConfiguration);
-        this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
+        this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration);
         this.streamDefinitionStore = streamDefinitionStore;
         authenticatorHandler = authenticationHandler;
         authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
@@ -109,7 +109,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             log.error("Error while reading the data bridge configuration file", e);
         }
         this.setInitialConfig(dataBridgeConfiguration);
-        this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration, authenticationHandler);
+        this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration);
         this.streamDefinitionStore = streamDefinitionStore;
         authenticatorHandler = authenticationHandler;
         authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
@@ -488,20 +488,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                 dataBridgeConfiguration = DatabridgeConfigurationFileResolver.
                         resolveAndSetDatabridgeConfiguration((LinkedHashMap) ((LinkedHashMap)
                                 yaml.load(fileInputStream)).get(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
-                /*JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
-                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);
-                StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
-                OMElement configElement = builder.getDocumentElement();
-                SecretResolver secretResolver = SecretResolverFactory.create(configElement, true);
-                if (secretResolver != null && secretResolver.isInitialized()) {
-                    String resolvedPassword = getResolvedPassword(secretResolver,
-                            DataBridgeConstants.DATA_BRIDGE_CONF_PASSWORD_ALIAS);
-                    if (resolvedPassword != null) {
-                        dataBridgeConfiguration.setKeyStorePassword(resolvedPassword);
-                    }
-                }*/
-                // TODO: 2/5/17 is secret resolver needed anymore?
                 return dataBridgeConfiguration;
             }
         } else {
@@ -509,15 +495,5 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             return null;
         }
     }
-
-//    private String getResolvedPassword(SecretResolver secretResolver, String alias) {
-//        if (secretResolver.isTokenProtected(alias)) {
-//            String resolvedPassword = secretResolver.resolve(alias);
-//            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
-//                return resolvedPassword;
-//            }
-//        }
-//        return null;
-//    }
 
 }

@@ -50,15 +50,7 @@ public final class Authenticator {
         if (userName == null) {
             logAndAuthenticationException("Authentication request was missing the user name ");
         }
-//
-//        if (userName.indexOf("@") > 0) {
-//            String domainName = userName.substring(userName.indexOf("@") + 1);
-//            if (domainName == null || domainName.trim().equals("")) {
-//                logAndAuthenticationException("Authentication request was missing the domain name of" +
-//                                              " the user");
-//            }
-//        }
-//
+
         if (password == null) {
             logAndAuthenticationException("Authentication request was missing the required password");
         }

@@ -58,17 +58,14 @@ public class EventDispatcher {
     private AbstractStreamDefinitionStore streamDefinitionStore;
     private StreamTypeHolder streamTypeHolder;
     private EventQueue eventQueue;
-    private AuthenticationHandler authenticationHandler;
 
     private static final Log log = LogFactory.getLog(EventDispatcher.class);
 
 
     public EventDispatcher(AbstractStreamDefinitionStore streamDefinitionStore,
-                           DataBridgeConfiguration dataBridgeConfiguration,
-                           AuthenticationHandler authenticationHandler) {
+                           DataBridgeConfiguration dataBridgeConfiguration) {
         this.eventQueue = new EventQueue(subscribers, rawDataSubscribers, dataBridgeConfiguration);
         this.streamDefinitionStore = streamDefinitionStore;
-        this.authenticationHandler = authenticationHandler;
         streamDefinitionStore.subscribe(new StreamAddRemoveListener() {
             @Override
             public void streamAdded(String streamId) {

@@ -18,11 +18,9 @@
 
 package org.wso2.carbon.databridge.agent.conf;
 
+import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
-import org.wso2.carbon.kernel.annotations.Configuration;
-import org.wso2.carbon.kernel.annotations.Element;
-
-import java.util.LinkedHashMap;
 
 /**
  * Class which wrap data receiver constructs

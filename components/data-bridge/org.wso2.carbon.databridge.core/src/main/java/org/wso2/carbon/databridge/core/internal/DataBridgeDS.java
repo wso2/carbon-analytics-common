@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
@@ -40,7 +41,6 @@ import org.wso2.carbon.databridge.core.internal.authentication.CarbonAuthenticat
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeCoreBuilder;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,7 +79,7 @@ public class DataBridgeDS {
                         streamDefinitionStore, DatabridgeConfigurationFileResolver.
                         resolveAndSetDatabridgeConfiguration((LinkedHashMap) DataBridgeServiceValueHolder.
                                 getConfigProvider().
-                                getConfigurationMap(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE)));
+                                getConfigurationObject(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE)));
 
 
                 try {

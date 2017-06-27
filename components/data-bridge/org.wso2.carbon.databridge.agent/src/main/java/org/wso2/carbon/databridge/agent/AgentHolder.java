@@ -19,6 +19,7 @@ package org.wso2.carbon.databridge.agent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.agent.conf.Agent;
 import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.conf.DataAgentConfigurationFileResolver;
@@ -27,7 +28,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfiguration
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.internal.DataAgentServiceValueHolder;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -79,7 +79,7 @@ public class AgentHolder {
     }
 
     /**
-     * Set the data-agent-config.xml path from which the Agents for all endpoint types will be loaded.
+     * Set the data.agent.config.yaml path from which the Agents for all endpoint types will be loaded.
      * This is a one time operation, and if you are changing form default config path,
      * then it needs to be done as first step when the JVM started.
      *
@@ -125,7 +125,7 @@ public class AgentHolder {
                     dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                             resolveAndSetDataAgentConfiguration
                                     ((LinkedHashMap) configProvider.
-                                            getConfigurationMap(DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
+                                            getConfigurationObject(DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
                 }
             } else {
                 File file = new File(configPath);

@@ -22,7 +22,7 @@ package org.wso2.carbon.databridge.receiver.thrift.internal;
  * This interface contains methods for starting thrift server
  */
 
-//2/15/17 replacement for ServerStartupObserver which used to be the interface for ThriftServerStartupImpl
+//TODO replacement for ServerStartupObserver which used to be the interface for ThriftServerStartupImpl
 public interface ThriftServerStartup {
 
     void completingServerStartup();

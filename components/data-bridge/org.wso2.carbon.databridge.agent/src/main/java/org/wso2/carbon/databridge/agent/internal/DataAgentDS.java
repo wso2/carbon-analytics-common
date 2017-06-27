@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+import org.wso2.carbon.config.provider.ConfigProvider;
 
 /**
  * DataAgent Component Activator
