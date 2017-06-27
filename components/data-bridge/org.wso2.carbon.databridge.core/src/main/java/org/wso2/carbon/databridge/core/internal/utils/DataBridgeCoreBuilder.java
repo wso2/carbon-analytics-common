@@ -42,9 +42,6 @@ public final class DataBridgeCoreBuilder {
     // TODO: 2/2/17 stream definitions are temporarily loaded from a file in <product-sp>/deployment
     public static List<String> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
         List<String> streamDefinitionList = new ArrayList<String>();
-//        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
-//        String path = carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR +
-//                File.separator + DataBridgeConstants.STREAM_DEFINITIONS_XML;
         String path = Utils.getCarbonHome().toString() + File.separator + "deployment" + File.separator + "stream-definitions.yaml";
         Yaml yaml = new Yaml();
         File file = new File(path);

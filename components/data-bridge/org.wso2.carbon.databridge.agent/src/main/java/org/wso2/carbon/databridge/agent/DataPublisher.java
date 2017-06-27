@@ -170,7 +170,7 @@ public class DataPublisher {
                 endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.FAILOVER, dataEndpointAgent);
             else endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE,
                     dataEndpointAgent);
-            /**
+            /*
              * Since the first element holds the failover/LB settings
              * we need to start iterating from 2nd element.
              */

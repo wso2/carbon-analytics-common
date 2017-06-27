@@ -79,7 +79,7 @@ public class AgentHolder {
     }
 
     /**
-     * Set the data-agent-config.xml path from which the Agents for all endpoint types will be loaded.
+     * Set the data.agent.config.yaml path from which the Agents for all endpoint types will be loaded.
      * This is a one time operation, and if you are changing form default config path,
      * then it needs to be done as first step when the JVM started.
      *

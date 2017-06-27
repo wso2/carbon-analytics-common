@@ -84,13 +84,11 @@ public class BinaryDataReceiver {
 
         String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
         if (keyStorePassword == null) {
-            keyStorePassword = "wso2carbon";
+            keyStorePassword = System.getProperty("Security.KeyStore.Password");
             if (keyStorePassword == null) {
-                keyStorePassword = System.getProperty("Security.KeyStore.Password");
-                if (keyStorePassword == null) {
-                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
-                }
+                throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
             }
+
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyStore);
