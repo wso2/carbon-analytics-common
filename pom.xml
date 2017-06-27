@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
     <packaging>pom</packaging>
     <version>6.0.0-SNAPSHOT</version>
-    <name>WSO2 Carbon Analytics - Parent</name>
+    <name>WSO2 Carbon Analytics Common - Parent</name>
 
     <modules>
         <module>components/data-bridge</module>
