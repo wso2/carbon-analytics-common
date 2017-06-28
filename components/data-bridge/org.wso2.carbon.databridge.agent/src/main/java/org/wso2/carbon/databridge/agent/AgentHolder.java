@@ -19,6 +19,8 @@ package org.wso2.carbon.databridge.agent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.config.ConfigProviderFactory;
+import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.agent.conf.Agent;
 import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
@@ -33,6 +35,9 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -128,20 +133,24 @@ public class AgentHolder {
                                             getConfigurationObject(DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
                 }
             } else {
-                File file = new File(configPath);
-                if (file.exists()) {
-                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                        Yaml yaml = new Yaml();
+                try {
+                    Path dataAgentConfigPath = Paths.get(configPath);
+                    if(Files.exists(dataAgentConfigPath)) {
+                        ConfigProvider configProvider = ConfigProviderFactory.getConfigProvider(dataAgentConfigPath);
                         dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                                 resolveAndSetDataAgentConfiguration
-                                        ((LinkedHashMap) ((LinkedHashMap) yaml.load(fileInputStream)).get(
-                                                DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
-
-                    } catch (IOException e) {
-                        throw new DataEndpointAgentConfigurationException("Exception when loading databridge " +
-                                "agent configuration.", e);
+                                        ((LinkedHashMap) configProvider.
+                                                getConfigurationObject(DataEndpointConstants.
+                                                        DATA_AGENT_CONFIG_NAMESPACE));
+                    } else {
+                        throw new DataEndpointAgentConfigurationException("Cannot find the databridge agent " +
+                                "configuration file in the specified path");
                     }
+                } catch (ConfigurationException e) {
+                    throw new DataEndpointAgentConfigurationException("Error in when loading databridge agent " +
+                            "configuration", e);
                 }
+
             }
 
             if (dataAgentsConfiguration != null) {

@@ -411,6 +411,11 @@
                 <artifactId>org.wso2.carbon.config</artifactId>
                 <version>${carbon.config.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.secvault</groupId>
+                <artifactId>org.wso2.carbon.secvault</artifactId>
+                <version>${carbon.secvault.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -492,6 +497,7 @@
 
         <!-- Latest Dependencies -->
         <carbon.config.version>2.0.0</carbon.config.version>
+        <carbon.secvault.version>5.0.4</carbon.secvault.version>
 
     </properties>
 
