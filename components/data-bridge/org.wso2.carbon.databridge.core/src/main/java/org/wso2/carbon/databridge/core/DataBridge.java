@@ -20,12 +20,11 @@ package org.wso2.carbon.databridge.core;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.config.ConfigProviderFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
-import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
-import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
+import org.wso2.carbon.databridge.commons.exception.*;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
@@ -33,6 +32,7 @@ import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.definitionstore.StreamAddRemoveListener;
 import org.wso2.carbon.databridge.core.definitionstore.StreamDefinitionStore;
+import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionNotFoundException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.EventDispatcher;
@@ -40,18 +40,11 @@ import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHan
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.utils.Utils;
-import org.yaml.snakeyaml.Yaml;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -103,10 +96,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         DataBridgeConfiguration dataBridgeConfiguration = null;
         try {
             dataBridgeConfiguration = createDataBridgeConfiguration(dataBridgeConfigPath);
-        } catch (FileNotFoundException e) {
+        } catch (DataBridgeConfigurationException e) {
             log.error("Error while loading the data bridge configuration file : " + dataBridgeConfigPath, e);
-        } catch (XMLStreamException | JAXBException | IOException e) {
-            log.error("Error while reading the data bridge configuration file", e);
         }
         this.setInitialConfig(dataBridgeConfiguration);
         this.eventDispatcher = new EventDispatcher(streamDefinitionStore, dataBridgeConfiguration);
@@ -198,7 +189,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         try {
             authenticatorHandler.initContext(agentSession);
             return eventDispatcher.findStreamId(streamName,
-                                                streamVersion, agentSession);
+                    streamVersion, agentSession);
         } catch (StreamDefinitionStoreException e) {
             log.warn("Cannot find streamId for " + streamName + " " + streamVersion, e);
             return null;
@@ -272,10 +263,10 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                         totalEventCounter.addAndGet(currentBatchSize);
 
                         String line = "[" + dateFormat.format(date) + "] # of events : " + currentBatchSize +
-                                      " start timestamp : " + startTime +
-                                      " end time stamp : " + endTime + " Throughput is (events / sec) : " +
-                                      (currentBatchSize * 1000) / (endTime - startTime) + " Total Event Count : " +
-                                      totalEventCounter + " \n";
+                                " start timestamp : " + startTime +
+                                " end time stamp : " + endTime + " Throughput is (events / sec) : " +
+                                (currentBatchSize * 1000) / (endTime - startTime) + " Total Event Count : " +
+                                totalEventCounter + " \n";
                         File file = new File(Utils.getCarbonHome() + File.separator + "receiver-perf.txt");
                         if (!file.exists()) {
                             log.info("Creating the performance measurement file at : " + file.getAbsolutePath());
@@ -356,7 +347,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public StreamDefinition getStreamDefinition(String sessionId, String streamName,
                                                 String streamVersion)
             throws SessionTimeoutException, StreamDefinitionNotFoundException,
-                   StreamDefinitionStoreException {
+            StreamDefinitionStoreException {
         AgentSession agentSession = authenticator.getSession(sessionId);
         if (agentSession.getUsername() == null) {
             if (log.isDebugEnabled()) {
@@ -395,7 +386,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     @Override
     public void saveStreamDefinition(String sessionId, StreamDefinition streamDefinition)
             throws SessionTimeoutException, StreamDefinitionStoreException,
-                   DifferentStreamDefinitionAlreadyDefinedException {
+            DifferentStreamDefinitionAlreadyDefinedException {
         AgentSession agentSession = authenticator.getSession(sessionId);
         if (agentSession.getUsername() == null) {
             if (log.isDebugEnabled()) {
@@ -436,7 +427,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     @Override
     public void saveStreamDefinition(StreamDefinition streamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException,
-                   StreamDefinitionStoreException {
+            StreamDefinitionStoreException {
         streamDefinitionStore.saveStreamDefinition(streamDefinition);
     }
 
@@ -473,26 +464,24 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
      *
      * @param configPath
      * @return DataBridgeConfiguration
-     * @throws FileNotFoundException
-     * @throws XMLStreamException
      */
-    private DataBridgeConfiguration createDataBridgeConfiguration(String configPath) throws IOException,
-                                                                                            XMLStreamException,
-                                                                                            JAXBException {
-        File configFile = new File(configPath);
+    private DataBridgeConfiguration createDataBridgeConfiguration(String configPath) throws
+            DataBridgeConfigurationException {
+        Path databridgeConfigPath = Paths.get(configPath);
         DataBridgeConfiguration dataBridgeConfiguration;
-
-        if (configFile.exists()) {
-            try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
-                Yaml yaml = new Yaml();
+        try {
+            if (Files.exists(databridgeConfigPath)) {
+                ConfigProvider configProvider = ConfigProviderFactory.getConfigProvider(databridgeConfigPath);
                 dataBridgeConfiguration = DatabridgeConfigurationFileResolver.
-                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) ((LinkedHashMap)
-                                yaml.load(fileInputStream)).get(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
+                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) configProvider.
+                                getConfigurationObject(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
                 return dataBridgeConfiguration;
+            } else {
+                log.error("Cannot find data bridge configuration file : " + configPath);
+                return null;
             }
-        } else {
-            log.error("Cannot find data bridge configuration file : " + configPath);
-            return null;
+        } catch (ConfigurationException e) {
+            throw new DataBridgeConfigurationException("Error in when loading databridge configuration", e);
         }
     }
 
