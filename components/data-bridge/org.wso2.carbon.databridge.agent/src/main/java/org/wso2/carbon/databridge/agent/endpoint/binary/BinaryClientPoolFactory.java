@@ -20,10 +20,10 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
 import java.io.IOException;
@@ -31,7 +31,6 @@ import java.net.Socket;
 
 /**
  * This class implements AbstractClientPoolFactory to handle the Binary transport related connections.
- *
  */
 public class BinaryClientPoolFactory extends AbstractClientPoolFactory {
     private static Log log = LogFactory.getLog(BinaryClientPoolFactory.class);
@@ -43,7 +42,7 @@ public class BinaryClientPoolFactory extends AbstractClientPoolFactory {
             int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE)
                     .getAgentConfiguration().getSocketTimeoutMS();
             try {
-                Socket socket =  new Socket(hostName, port);
+                Socket socket = new Socket(hostName, port);
                 socket.setSoTimeout(timeout);
                 return socket;
             } catch (IOException e) {

@@ -40,7 +40,9 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * OneEndPointDPSyncBinaryTest.
+ */
 public class OneEndPointDPSyncBinaryTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -75,7 +77,8 @@ public class OneEndPointDPSyncBinaryTest {
 
 
     @AfterClass
-    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://localhost:9687",
                 "ssl://localhost:9787", "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -90,7 +93,10 @@ public class OneEndPointDPSyncBinaryTest {
     }
 
     @Test
-    public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+    public void testOneDataEndpoint() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, IOException {
         startServer(9682, 9782);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
@@ -118,7 +124,10 @@ public class OneEndPointDPSyncBinaryTest {
     }
 
     @Test
-    public void testOneDataEndpointWithArbitraryEventFields() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+    public void testOneDataEndpointWithArbitraryEventFields() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, IOException {
         startServer(9602, 9702);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
@@ -158,8 +167,10 @@ public class OneEndPointDPSyncBinaryTest {
         startServer(9623, 9723);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9623, tcp://" + hostName + ":9622",
-                "ssl://" + hostName + ":9723, ssl://" + hostName + ":9722", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName +
+                ":9623, tcp://" + hostName + ":9622",
+                "ssl://" + hostName + ":9723, ssl://" + hostName + ":9722", "admin",
+                "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -181,14 +192,18 @@ public class OneEndPointDPSyncBinaryTest {
     }
 
     @Test
-    public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+    public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, SocketException {
         boolean expected = false;
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
-            DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9611, ssl://" + hostName + ":9731",
+            DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName +
+                    ":9611, ssl://" + hostName + ":9731",
                     "ssl://" + hostName + ":9711", "admin", "admin");
 
         } catch (DataEndpointConfigurationException ex) {
@@ -211,7 +226,8 @@ public class OneEndPointDPSyncBinaryTest {
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
             DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9611",
-                    "ssl://" + hostName + ":9711, ssl://" + hostName + ":9721", "admin", "admin");
+                    "ssl://" + hostName + ":9711, ssl://" + hostName + ":9721", "admin",
+                    "admin");
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }

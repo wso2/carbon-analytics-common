@@ -20,7 +20,7 @@ package org.wso2.carbon.databridge.core.internal.utils;
 
 
 /**
- * Agent Server Constants
+ * Agent Server Constants.
  */
 public final class DataBridgeConstants {
 
@@ -33,13 +33,7 @@ public final class DataBridgeConstants {
     public static final int EVENT_BUFFER_CAPACITY = 10000;
     public static final int CLIENT_TIMEOUT_MS = 30000;
 
-    public static final String STREAM_DEFINITIONS_XML = "stream-definitions.xml";
-    public static final String DATA_BRIDGE_CONF_PASSWORD_ALIAS = "DataBridge.Config.keyStorePassword";
-    public static final String STREAM_DEFINITION_STORE_ELEMENT = "StreamDefinitionStore";
     public static final String STREAM_DEFINITIONS_ELEMENT = "streamDefinitions";
-    public static final String DOMAIN_NAME_ATTRIBUTE = "domainName";
-
-    public static final String DEFAULT_DEFINITION_STORE = "org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore";
 
     public static final String DATABRIDGE_CONFIG_NAMESPACE = "databridge.config";
 }

@@ -21,12 +21,18 @@ package org.wso2.carbon.databridge.agent.endpoint;
 import com.lmax.disruptor.EventFactory;
 import org.wso2.carbon.databridge.commons.Event;
 
+/**
+ * Wrapper Event Factory.
+ */
 public class WrappedEventFactory implements EventFactory<WrappedEventFactory.WrappedEvent> {
 
     public WrappedEvent newInstance() {
         return new WrappedEvent();
     }
 
+    /**
+     * Wrapped Event.
+     */
     public class WrappedEvent {
 
         private Event event;

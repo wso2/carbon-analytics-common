@@ -20,7 +20,7 @@
 package org.wso2.carbon.databridge.core.exception;
 
 /**
- * Databridge configuration exception
+ * Databridge configuration exception.
  */
 public class DataBridgeConfigurationException extends Exception {
     private String errorMessage;

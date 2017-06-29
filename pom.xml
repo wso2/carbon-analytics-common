@@ -55,85 +55,60 @@
                     <artifactId>maven-scr-plugin</artifactId>
                     <version>${maven.src.version}</version>
                 </plugin>
-                <plugin><!-- Overridden from parent pom to exclude generated sources -->
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <configuration>
-                        <effort>Max</effort>
-                        <threshold>Low</threshold>
-                        <xmlOutput>true</xmlOutput>
-                        <findbugsXmlOutputDirectory>${project.build.directory}/findbugs
-                        </findbugsXmlOutputDirectory>
-                        <excludeFilterFile>${maven.findbugsplugin.version.exclude}</excludeFilterFile>
-                        <!--Exclude generated sources-->
-                    </configuration>
-                    <version>${maven.findbugsplugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>analyze-compile</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin><!-- Overridden from parent pom to exclude generated sources -->
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>validate</id>
-                            <phase>validate</phase>
-                            <configuration>
-                                <configLocation>
-                                    https://raw.githubusercontent.com/wso2/code-quality-tools/master/checkstyle/checkstyle.xml
-                                </configLocation>
-                                <suppressionsLocation>
-                                    https://raw.githubusercontent.com/wso2/code-quality-tools/master/checkstyle/suppressions.xml
-                                </suppressionsLocation>
-                                <encoding>UTF-8</encoding>
-                                <consoleOutput>true</consoleOutput>
-                                <failsOnError>true</failsOnError>
-                                <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                                <!--Exclude generated sources-->
-                                <excludes>**/parser/*</excludes>
-                            </configuration>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <!-- ANTLR Plugin -->
-                <plugin>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.5.1</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>antlr4</goal>
-                            </goals>
-                            <configuration>
-                                <listener>true</listener>
-                                <visitor>false</visitor>
-                                <encoding>${file.encoding}</encoding>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>&lt;!&ndash; Overridden from parent pom to exclude generated sources &ndash;&gt;-->
+                    <!--<groupId>org.codehaus.mojo</groupId>-->
+                    <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+                    <!--<configuration>-->
+                        <!--<effort>Max</effort>-->
+                        <!--<threshold>Low</threshold>-->
+                        <!--<xmlOutput>true</xmlOutput>-->
+                        <!--<findbugsXmlOutputDirectory>${project.build.directory}/findbugs-->
+                        <!--</findbugsXmlOutputDirectory>-->
+                        <!--<excludeFilterFile>${maven.findbugsplugin.version.exclude}</excludeFilterFile>-->
+                        <!--&lt;!&ndash;Exclude generated sources&ndash;&gt;-->
+                    <!--</configuration>-->
+                    <!--<version>${maven.findbugsplugin.version}</version>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>analyze-compile</id>-->
+                            <!--<phase>compile</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>check</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
 
         <plugins>
             <!-- Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated -->
-            <plugin>
+            <plugin><!-- Overridden from parent pom to exclude generated sources -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <configLocation>
+                                https://raw.githubusercontent.com/wso2/code-quality-tools/master/checkstyle/checkstyle.xml
+                            </configLocation>
+                            <suppressionsLocation>
+                                ${mavan.checkstyle.suppression.file}
+                            </suppressionsLocation>
+                            <encoding>UTF-8</encoding>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <!--Exclude generated sources-->
+                            <excludes>**/parser/*</excludes>
+                        </configuration>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -498,6 +473,8 @@
         <!-- Latest Dependencies -->
         <carbon.config.version>2.0.0</carbon.config.version>
         <carbon.secvault.version>5.0.4</carbon.secvault.version>
+        <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
+
 
     </properties>
 

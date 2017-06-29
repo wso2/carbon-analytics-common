@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * Data bridge agent config file resolver
+ * Data bridge agent config file resolver.
  */
 public class DataAgentConfigurationFileResolver {
 

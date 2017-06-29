@@ -1,21 +1,21 @@
-/**
- * Copyright (c) WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- * <p>
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.databridge.receiver.thrift;
 
 import org.apache.commons.logging.Log;
@@ -36,13 +36,13 @@ import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfigu
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
-import javax.net.ssl.SSLServerSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import javax.net.ssl.SSLServerSocket;
 
 /**
- * Carbon based implementation of the agent server
+ * Carbon based implementation of the agent server.
  */
 public class ThriftDataReceiver {
     private static final Log log = LogFactory.getLog(ThriftDataReceiver.class);
@@ -52,7 +52,7 @@ public class ThriftDataReceiver {
     private TServer dataReceiverServer;
 
     /**
-     * Initialize Carbon Agent Server
+     * Initialize Carbon Agent Server.
      *
      * @param secureReceiverPort
      * @param receiverPort
@@ -65,7 +65,7 @@ public class ThriftDataReceiver {
     }
 
     /**
-     * Initialize Carbon Agent Server
+     * Initialize Carbon Agent Server.
      *
      * @param receiverPort
      * @param dataBridgeReceiverService
@@ -73,11 +73,12 @@ public class ThriftDataReceiver {
     public ThriftDataReceiver(int receiverPort,
                               DataBridgeReceiverService dataBridgeReceiverService) {
         this.dataBridgeReceiverService = dataBridgeReceiverService;
-        this.thriftDataReceiverConfiguration = new ThriftDataReceiverConfiguration(receiverPort + CommonThriftConstants.SECURE_EVENT_RECEIVER_PORT_OFFSET, receiverPort);
+        this.thriftDataReceiverConfiguration = new ThriftDataReceiverConfiguration(receiverPort +
+                CommonThriftConstants.SECURE_EVENT_RECEIVER_PORT_OFFSET, receiverPort);
     }
 
     /**
-     * Initialize Carbon Agent Server
+     * Initialize Carbon Agent Server.
      *
      * @param thriftDataReceiverConfiguration
      * @param dataBridgeReceiverService
@@ -89,15 +90,17 @@ public class ThriftDataReceiver {
     }
 
     /**
-     * To start the Agent server
+     * To start the Agent server.
      *
      * @throws org.wso2.carbon.databridge.core.exception.DataBridgeException if the agent server cannot be started
      */
     public void start(String hostName)
             throws DataBridgeException {
         startSecureEventTransmission(hostName, thriftDataReceiverConfiguration.getSecureDataReceiverPort(),
-                thriftDataReceiverConfiguration.getSslProtocols(), thriftDataReceiverConfiguration.getCiphers(), dataBridgeReceiverService);
-        startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(), dataBridgeReceiverService);
+                thriftDataReceiverConfiguration.getSslProtocols(), thriftDataReceiverConfiguration.getCiphers(),
+                dataBridgeReceiverService);
+        startEventTransmission(hostName, thriftDataReceiverConfiguration.getDataReceiverPort(),
+                dataBridgeReceiverService);
     }
 
 
@@ -123,7 +126,8 @@ public class ThriftDataReceiver {
                 }
             }
 
-            startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword, dataBridgeReceiverService);
+            startSecureEventTransmission(hostName, port, sslProtocols, ciphers, keyStore, keyStorePassword,
+                    dataBridgeReceiverService);
         } catch (TransportException e) {
             throw new DataBridgeException("Cannot start agent server on port " + port, e);
         } catch (UnknownHostException e) {
@@ -131,8 +135,8 @@ public class ThriftDataReceiver {
         }
     }
 
-    protected void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers, String keyStore,
-                                                String keyStorePassword,
+    protected void startSecureEventTransmission(String hostName, int port, String sslProtocols, String ciphers,
+                                                String keyStore, String keyStorePassword,
                                                 DataBridgeReceiverService dataBridgeReceiverService)
             throws TransportException, UnknownHostException {
         TSSLTransportFactory.TSSLTransportParameters params =
@@ -191,7 +195,7 @@ public class ThriftDataReceiver {
     }
 
     /**
-     * To stop the server
+     * To stop the server.
      */
     public void stop() {
         authenticationServer.stop();

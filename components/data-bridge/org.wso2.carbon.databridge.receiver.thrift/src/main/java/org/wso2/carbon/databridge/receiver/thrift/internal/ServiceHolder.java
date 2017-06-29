@@ -17,11 +17,13 @@
 */
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
-import org.osgi.service.http.HttpService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
 import org.wso2.carbon.kernel.CarbonRuntime;
 
+/**
+ * Service holder class.
+ */
 public class ServiceHolder {
     private static DataBridgeReceiverService dataBridgeReceiverService;
     private static ThriftDataReceiver dataReceiver;

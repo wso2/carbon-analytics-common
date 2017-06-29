@@ -24,9 +24,12 @@ import org.wso2.carbon.config.ConfigProviderFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.*;
+import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
+import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
+import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
+import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
@@ -39,9 +42,16 @@ import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
+import org.wso2.carbon.databridge.core.utils.AgentSession;
 import org.wso2.carbon.utils.Utils;
 
-import java.io.*;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -212,7 +222,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
         try {
             authenticatorHandler.initContext(agentSession);
-            status = eventDispatcher.deleteStream(DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId), DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId), agentSession);
+            status = eventDispatcher.deleteStream(DataBridgeCommonsUtils.getStreamNameFromStreamId(streamId),
+                    DataBridgeCommonsUtils.getStreamVersionFromStreamId(streamId), agentSession);
             if (status) {
                 for (StreamAddRemoveListener streamAddRemoveListener : streamAddRemoveListenerList) {
                     streamAddRemoveListener.streamRemoved(streamId);
@@ -326,7 +337,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     }
 
     /**
-     * CEP/BAM can subscribe for Event Streams
+     * CEP/BAM can subscribe for Event Streams.
      *
      * @param agentCallback callbacks of the subscribers
      */
@@ -335,7 +346,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     }
 
     /**
-     * CEP/BAM can subscribe for Raw Event Streams
+     * CEP/BAM can subscribe for Raw Event Streams.
      *
      * @param agentCallback callbacks of the subscribers
      */
@@ -460,7 +471,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     }
 
     /**
-     * This creates the DataBridgeConfiguration from the data-bridge-config.yaml file
+     * This creates the DataBridgeConfiguration from the data-bridge-config.yaml file.
      *
      * @param configPath
      * @return DataBridgeConfiguration

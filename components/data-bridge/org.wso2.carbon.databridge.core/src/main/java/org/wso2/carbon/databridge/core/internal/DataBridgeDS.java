@@ -31,9 +31,9 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.DataBridge;
-import org.wso2.carbon.databridge.core.DataBridgeStreamStore;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
+import org.wso2.carbon.databridge.core.DataBridgeStreamStore;
 import org.wso2.carbon.databridge.core.DataBridgeSubscriberService;
 import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
@@ -46,8 +46,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * Service component to consume CarbonRuntime instance which has been registered as an OSGi service
- * by Carbon Kernel.
+ * Service component to consume CarbonRuntime instance which has been registered as an OSGi service by Carbon Kernel.
  *
  * @since 1.0.0
  */
@@ -86,7 +85,8 @@ public class DataBridgeDS {
                     List<String> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
                     for (String streamDefinitionString : streamDefinitionStrings) {
                         try {
-                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString);
+                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.
+                                    convertFromJson(streamDefinitionString);
                             streamDefinitionStore.saveStreamDefinition(streamDefinition);
 
                         } catch (MalformedStreamDefinitionException e) {

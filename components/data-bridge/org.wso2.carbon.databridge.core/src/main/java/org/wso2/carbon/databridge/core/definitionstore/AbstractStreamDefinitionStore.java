@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * The Event Stream Definition Store interface
- * Used to persist Event Stream Definitions at the Agent Server
+ * Used to persist Event Stream Definitions at the Agent Server.
  */
 public abstract class AbstractStreamDefinitionStore implements StreamDefinitionStore {
 
@@ -71,8 +71,9 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
             return;
         }
         if (!existingDefinition.equals(streamDefinition)) {
-            throw new DifferentStreamDefinitionAlreadyDefinedException("Cannot define Stream definition:" + EventDefinitionConverterUtils.convertToJson(existingDefinition) + ", Another Stream with same name and version" +
-                                                                       " exist :" + EventDefinitionConverterUtils
+            throw new DifferentStreamDefinitionAlreadyDefinedException("Cannot define Stream definition:" +
+                    EventDefinitionConverterUtils.convertToJson(existingDefinition) + ", " +
+                    "Another Stream with same name and version exist :" + EventDefinitionConverterUtils
                     .convertToJson(existingDefinition));
         }
     }

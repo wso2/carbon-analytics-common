@@ -26,7 +26,7 @@ import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiverFactory;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
 
 /**
- * Thrift Server Startup Implementation
+ * Thrift Server Startup Implementation.
  */
 public class ThriftServerStartupImpl implements ThriftServerStartup {
 

@@ -24,11 +24,15 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Event Publisher Threadpool Executor.
+ */
 public class EventPublisherThreadPoolExecutor extends ThreadPoolExecutor {
 
     private final Semaphore semaphore;
 
-    public EventPublisherThreadPoolExecutor(int corePoolSize, int maxPoolSize, long keepAliveTimeInPool, String receiverURL) {
+    public EventPublisherThreadPoolExecutor(int corePoolSize, int maxPoolSize, long keepAliveTimeInPool,
+                                            String receiverURL) {
         super(corePoolSize, maxPoolSize, keepAliveTimeInPool, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
                 new DataBridgeThreadFactory(receiverURL));
         semaphore = new Semaphore(maxPoolSize);
@@ -50,7 +54,7 @@ public class EventPublisherThreadPoolExecutor extends ThreadPoolExecutor {
 
     public void submitJobAndSetState(Thread thread, DataEndpoint dataEndpoint) {
         int permits = semaphore.availablePermits();
-        if (permits <= 1){
+        if (permits <= 1) {
             dataEndpoint.setState(DataEndpoint.State.BUSY);
         }
         submit(thread);

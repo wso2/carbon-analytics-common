@@ -15,6 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+
 package org.wso2.carbon.databridge.agent.endpoint;
 
 import org.apache.commons.logging.Log;
@@ -67,6 +68,9 @@ public abstract class DataEndpoint {
 
     private Semaphore immediateDispatchSemaphore;
 
+    /**
+     * Endpoint state.
+     */
     public enum State {
         ACTIVE, UNAVAILABLE, BUSY, INITIALIZING
     }
@@ -164,7 +168,8 @@ public abstract class DataEndpoint {
         this.threadPoolExecutor = new EventPublisherThreadPoolExecutor(dataEndpointConfiguration.getCorePoolSize(),
                 dataEndpointConfiguration.getMaxPoolSize(), dataEndpointConfiguration.getKeepAliveTimeInPool(),
                 dataEndpointConfiguration.getReceiverURL());
-        this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory("ConnectionService-" +
+        this.connectionService = Executors.newSingleThreadExecutor(new DataBridgeThreadFactory(
+                "ConnectionService-" +
                 dataEndpointConfiguration.getReceiverURL()));
         this.maxPoolSize = dataEndpointConfiguration.getMaxPoolSize();
         this.immediateDispatchSemaphore = new Semaphore(maxPoolSize);
@@ -271,7 +276,8 @@ public abstract class DataEndpoint {
                 publish();
             } catch (SessionTimeoutException e) {
                 try {
-                    if (sessionId == null || sessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
+                    if (sessionId == null || sessionId.equalsIgnoreCase(getDataEndpointConfiguration().
+                            getSessionId())) {
                         syncConnect(sessionId);
                     }
                     publish();
@@ -290,7 +296,8 @@ public abstract class DataEndpoint {
                 log.error("Unexpected error occurred while sending the event. ", ex);
                 handleFailedEvents();
             } catch (Throwable t) {
-                //There can be situations where runtime exceptions/class not found exceptions occur, This block help to catch those exceptions.
+                //There can be situations where runtime exceptions/class not found exceptions occur,
+                // This block help to catch those exceptions.
                 //No need to retry send events. Deactivating the state would be enough.
                 log.error("Unexpected error occurred while sending events. ", t);
                 deactivate();
@@ -301,8 +308,10 @@ public abstract class DataEndpoint {
                     activate();
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
-                            maxPoolSize + ", therefore state is now : " + getState() + " at time : " + System.nanoTime());
+                    log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() +
+                            ", maxPoolSize is : " +
+                            maxPoolSize + ", therefore state is now : " + getState() + " at time : " +
+                            System.nanoTime());
                 }
             }
         }
@@ -327,14 +336,16 @@ public abstract class DataEndpoint {
     }
 
     public String toString() {
-        return "( Receiver URL : " + getDataEndpointConfiguration().getReceiverURL() + ", Authentication URL : " + getDataEndpointConfiguration().getAuthURL() + ")";
+        return "( Receiver URL : " + getDataEndpointConfiguration().getReceiverURL() + ", Authentication URL : " +
+                getDataEndpointConfiguration().getAuthURL() + ")";
     }
 
     /**
      * Graceful shutdown until publish all the events given to the endpoint.
      */
     public void shutdown() {
-        log.info("Shutdown triggered for data publisher endpoint URL - " + getDataEndpointConfiguration().getReceiverURL());
+        log.info("Shutdown triggered for data publisher endpoint URL - " +
+                getDataEndpointConfiguration().getReceiverURL());
         while (threadPoolExecutor.getActiveCount() != 0) {
             try {
                 Thread.sleep(100);
@@ -350,7 +361,8 @@ public abstract class DataEndpoint {
         } catch (InterruptedException e) {
 
         }
-        log.info("Completed shutdown for data publisher endpoint URL - " + getDataEndpointConfiguration().getReceiverURL());
+        log.info("Completed shutdown for data publisher endpoint URL - " +
+                getDataEndpointConfiguration().getReceiverURL());
     }
 
     /**

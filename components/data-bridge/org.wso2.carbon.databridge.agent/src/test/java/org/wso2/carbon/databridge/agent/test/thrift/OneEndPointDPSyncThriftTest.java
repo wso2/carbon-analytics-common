@@ -37,7 +37,9 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.net.SocketException;
 
-
+/**
+ * OneEndPointDPSyncThriftTest.
+ */
 public class OneEndPointDPSyncThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -70,7 +72,8 @@ public class OneEndPointDPSyncThriftTest {
     }
 
     @AfterClass
-    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
                 "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -85,7 +88,10 @@ public class OneEndPointDPSyncThriftTest {
     }
 
     @Test
-    public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+    public void testOneDataEndpoint() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, SocketException {
         startServer(7662);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
@@ -122,8 +128,10 @@ public class OneEndPointDPSyncThriftTest {
         startServer(7672);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7672, ssl://" + hostName + ":7662",
-                "ssl://" + hostName + ":7772, ssl://" + hostName + ":7762", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName +
+                ":7672, ssl://" + hostName + ":7662",
+                "ssl://" + hostName + ":7772, ssl://" + hostName + ":7762", "admin",
+                "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -148,12 +156,16 @@ public class OneEndPointDPSyncThriftTest {
     }
 
     @Test
-    public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+    public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, SocketException {
         boolean expected = false;
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         try {
-            DataPublisher dataPublisher = new DataPublisher("thrift", "tcp://" + hostName + ":7611, ssl://" + hostName + ":7612",
+            DataPublisher dataPublisher = new DataPublisher("thrift", "tcp://" +
+                    hostName + ":7611, ssl://" + hostName + ":7612",
                     "ssl://" + hostName + ":7711", "admin", "admin");
 
         } catch (DataEndpointConfigurationException ex) {
@@ -182,7 +194,10 @@ public class OneEndPointDPSyncThriftTest {
     }
 
     @Test
-    public void testShutdownDataPublisher() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+    public void testShutdownDataPublisher() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException,
+            StreamDefinitionStoreException, SocketException {
         startServer(10162);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;

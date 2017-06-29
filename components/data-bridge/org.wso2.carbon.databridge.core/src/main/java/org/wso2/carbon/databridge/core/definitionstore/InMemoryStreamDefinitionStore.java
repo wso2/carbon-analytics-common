@@ -25,12 +25,12 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The in memory implementation of the Event Stream definition Store
+ * The in memory implementation of the Event Stream definition Store.
  */
 public class InMemoryStreamDefinitionStore extends
                                            AbstractStreamDefinitionStore {
 
-    private ConcurrentHashMap<String, StreamDefinition> streamDefinitionStore = new ConcurrentHashMap<String, StreamDefinition>();
+    private ConcurrentHashMap<String, StreamDefinition> streamDefinitionStore = new ConcurrentHashMap<>();
 
     @Override
     public boolean removeStreamDefinition(String name, String version) {

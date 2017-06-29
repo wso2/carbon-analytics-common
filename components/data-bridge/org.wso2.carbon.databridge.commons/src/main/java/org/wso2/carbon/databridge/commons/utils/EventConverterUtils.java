@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Event Converter Utils
+ * Event Converter Utils.
  */
 public class EventConverterUtils {
 

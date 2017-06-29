@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+/**
+ * Util class for binary message conversion.
+ */
 public class BinaryMessageConverterUtil {
 
     public static byte[] loadData(InputStream in, byte[] dataArray) throws IOException {

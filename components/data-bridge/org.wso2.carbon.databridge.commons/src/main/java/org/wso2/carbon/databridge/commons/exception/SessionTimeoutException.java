@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 /**
- * Data Bridge Session Timeout Exception
+ * Data Bridge Session Timeout Exception.
  */
 public class SessionTimeoutException extends Exception {
     private String errorMessage;

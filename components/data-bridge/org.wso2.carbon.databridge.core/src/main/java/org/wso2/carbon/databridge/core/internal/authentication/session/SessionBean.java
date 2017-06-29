@@ -21,7 +21,7 @@ package org.wso2.carbon.databridge.core.internal.authentication.session;
 import org.wso2.carbon.databridge.commons.Credentials;
 
 /**
- * Session Bean class
+ * Session Bean class.
  */
 public class SessionBean {
     private Credentials credentials;

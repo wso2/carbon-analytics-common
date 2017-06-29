@@ -17,7 +17,7 @@
 package org.wso2.carbon.databridge.commons;
 
 /**
- * Attribute of Event Stream
+ * Attribute of Event Stream.
  *
  * @since 5.0.0
  */

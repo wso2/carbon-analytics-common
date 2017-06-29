@@ -20,11 +20,11 @@ package org.wso2.carbon.databridge.core;
 
 
 import org.wso2.carbon.databridge.commons.Event;
-
 import java.util.List;
 
+
 /**
- * the util class that converts Events and its definitions in to various forms
+ * The util class that converts Events and its definitions in to various forms.
  */
 public interface EventConverter {
 

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Util class that converts Events and its definitions in to various forms
+ * Util class that converts Events and its definitions in to various forms.
  */
 public final class EventDefinitionConverterUtils {
     public static final String NULL_STRING = "_null";

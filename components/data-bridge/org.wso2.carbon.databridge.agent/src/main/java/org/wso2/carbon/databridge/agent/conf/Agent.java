@@ -23,7 +23,7 @@ import org.wso2.carbon.config.annotation.Element;
 
 
 /**
- * Class which wrap data receiver constructs
+ * Class which wrap data receiver constructs.
  */
 @Configuration(description = "Agent configuration")
 public class Agent {

@@ -45,8 +45,8 @@ public final class ThriftEventConverter {
         ThriftEventBundle thriftEventBundle = eventBundle;
         if (thriftEventBundle == null) {
             thriftEventBundle = new ThriftEventBundle();
-            thriftEventBundle.setStringAttributeList(new LinkedList<String>());//adding string list
-            thriftEventBundle.setLongAttributeList(new LinkedList<Long>());//adding long list
+            thriftEventBundle.setStringAttributeList(new LinkedList<String>()); //adding string list
+            thriftEventBundle.setLongAttributeList(new LinkedList<Long>()); //adding long list
             thriftEventBundle.setSessionId(sessionId);
             thriftEventBundle.setEventNum(0);
         }
@@ -110,7 +110,8 @@ public final class ThriftEventConverter {
         return thriftEventBundle;
     }
 
-    private static ThriftEventBundle assignMap(ThriftEventBundle thriftEventBundle, Map<String, String> arbitraryDataMap) {
+    private static ThriftEventBundle assignMap(ThriftEventBundle thriftEventBundle,
+                                               Map<String, String> arbitraryDataMap) {
         if (null != arbitraryDataMap) {
             if (!thriftEventBundle.isSetArbitraryDataMapMap()) {
                 thriftEventBundle.setArbitraryDataMapMap(new HashMap<Integer, Map<String, String>>());

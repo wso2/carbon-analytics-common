@@ -23,7 +23,7 @@ import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
 /**
- * Data agent configuration
+ * Data agent configuration.
  */
 @Configuration(description = "Data agent configuration")
 public class AgentConfiguration {
@@ -35,7 +35,7 @@ public class AgentConfiguration {
     private String dataEndpointClass = "";
 
     @Element(description = "Data publisher strategy", required = false)
-    private String publishingStrategy ="async";
+    private String publishingStrategy = "async";
 
     @Element(description = "Trust store path", required = false)
     private String trustStorePath = "";
@@ -92,7 +92,9 @@ public class AgentConfiguration {
     private String sslEnabledProtocols = "TLSv1,TLSv1.1,TLSv1.2";
 
     @Element(description = "Ciphers", required = false)
-    private String ciphers = "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
+    private String ciphers = "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA," +
+            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA," +
+            "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
 
     public String getName() {
         return name;
@@ -273,27 +275,27 @@ public class AgentConfiguration {
     @Override
     public String toString() {
         return ", Name : " + name +
-               "DataEndpointClass : " + dataEndpointClass +
-               "PublishingStrategy : "+ publishingStrategy+
-               "TrustSorePath" + trustStorePath +
-               "TrustSorePassword" + trustStorePassword +
-               "QueueSize" + queueSize +
-               "BatchSize" + batchSize +
-               "CorePoolSize" + corePoolSize +
-               "SocketTimeoutMS" + socketTimeoutMS +
-               "MaxPoolSize" + maxPoolSize +
-               "KeepAliveTimeInPool" + keepAliveTimeInPool +
-               "ReconnectionInterval" + reconnectionInterval +
-               "MaxTransportPoolSize" + maxTransportPoolSize +
-               "MaxIdleConnections" + maxIdleConnections +
-               "EvictionTimePeriod" + evictionTimePeriod +
-               "MinIdleTimeInPool" + minIdleTimeInPool +
-               "SecureMaxTransportPoolSize" + secureMaxTransportPoolSize +
-               "SecureMaxIdleConnections" + secureMaxIdleConnections +
-               "SecureEvictionTimePeriod" + secureEvictionTimePeriod +
-               "SecureMinIdleTimeInPool" + secureMinIdleTimeInPool +
-               "SSLEnabledProtocols" + sslEnabledProtocols +
-               "Ciphers" + ciphers;
+                "DataEndpointClass : " + dataEndpointClass +
+                "PublishingStrategy : " + publishingStrategy +
+                "TrustSorePath" + trustStorePath +
+                "TrustSorePassword" + trustStorePassword +
+                "QueueSize" + queueSize +
+                "BatchSize" + batchSize +
+                "CorePoolSize" + corePoolSize +
+                "SocketTimeoutMS" + socketTimeoutMS +
+                "MaxPoolSize" + maxPoolSize +
+                "KeepAliveTimeInPool" + keepAliveTimeInPool +
+                "ReconnectionInterval" + reconnectionInterval +
+                "MaxTransportPoolSize" + maxTransportPoolSize +
+                "MaxIdleConnections" + maxIdleConnections +
+                "EvictionTimePeriod" + evictionTimePeriod +
+                "MinIdleTimeInPool" + minIdleTimeInPool +
+                "SecureMaxTransportPoolSize" + secureMaxTransportPoolSize +
+                "SecureMaxIdleConnections" + secureMaxIdleConnections +
+                "SecureEvictionTimePeriod" + secureEvictionTimePeriod +
+                "SecureMinIdleTimeInPool" + secureMinIdleTimeInPool +
+                "SSLEnabledProtocols" + sslEnabledProtocols +
+                "Ciphers" + ciphers;
     }
 
     public AgentConfiguration(String name, String dataEndpointClass) {

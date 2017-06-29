@@ -32,14 +32,14 @@ import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.RawDataAgentCallback;
 import org.wso2.carbon.databridge.core.StreamAttributeComposite;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
-import org.wso2.carbon.databridge.core.Utils.EventComposite;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.definitionstore.StreamAddRemoveListener;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
-import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.queue.EventQueue;
+import org.wso2.carbon.databridge.core.utils.AgentSession;
+import org.wso2.carbon.databridge.core.utils.EventComposite;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Dispatches events  and their definitions subscribers
+ * Dispatches events  and their definitions subscribers.
  */
 public class EventDispatcher {
 
@@ -85,7 +85,7 @@ public class EventDispatcher {
     }
 
     /**
-     * Add thrift subscribers
+     * Add thrift subscribers.
      *
      * @param agentCallback
      */
@@ -101,15 +101,16 @@ public class EventDispatcher {
         StreamDefinition newStreamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinition);
 
         StreamTypeHolder streamTypeHolder = getStreamDefinitionHolder();
-        StreamAttributeComposite attributeComposite = streamTypeHolder.getAttributeComposite(newStreamDefinition.getStreamId());
+        StreamAttributeComposite attributeComposite = streamTypeHolder.
+                getAttributeComposite(newStreamDefinition.getStreamId());
         if (attributeComposite != null) {
 
             StreamDefinition existingStreamDefinition = attributeComposite.getStreamDefinition();
             if (!existingStreamDefinition.equals(newStreamDefinition)) {
-                throw new DifferentStreamDefinitionAlreadyDefinedException("Similar event stream for " +
-                                                                           newStreamDefinition + " with the same name and version already exist: " +
-                                                                           streamDefinitionStore.getStreamDefinition(newStreamDefinition.getName(),
-                                                                                                                     newStreamDefinition.getVersion()));
+                throw new DifferentStreamDefinitionAlreadyDefinedException(
+                        "Similar event stream for " + newStreamDefinition + " with the same name and version " +
+                                "already exist: " + streamDefinitionStore.getStreamDefinition(
+                                        newStreamDefinition.getName(), newStreamDefinition.getVersion()));
             }
             newStreamDefinition = existingStreamDefinition;
 
@@ -140,15 +141,16 @@ public class EventDispatcher {
 
         StreamDefinition newStreamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinition);
         StreamTypeHolder streamTypeHolder = getStreamDefinitionHolder();
-        StreamAttributeComposite attributeComposite = streamTypeHolder.getAttributeComposite(newStreamDefinition.getStreamId());
+        StreamAttributeComposite attributeComposite = streamTypeHolder.
+                getAttributeComposite(newStreamDefinition.getStreamId());
         if (attributeComposite != null) {
 
             StreamDefinition existingStreamDefinition = attributeComposite.getStreamDefinition();
             if (!existingStreamDefinition.equals(newStreamDefinition)) {
-                throw new DifferentStreamDefinitionAlreadyDefinedException("Similar event stream for "
-                                                                           + newStreamDefinition + " with the same name and version already exist: "
-                                                                           + streamDefinitionStore.getStreamDefinition(newStreamDefinition.getName(),
-                                                                                                                       newStreamDefinition.getVersion()));
+                throw new DifferentStreamDefinitionAlreadyDefinedException(
+                        "Similar event stream for " + newStreamDefinition + " with the same name and version " +
+                                "already exist: " + streamDefinitionStore.getStreamDefinition(
+                                        newStreamDefinition.getName(), newStreamDefinition.getVersion()));
             }
             newStreamDefinition = existingStreamDefinition;
 
@@ -174,9 +176,12 @@ public class EventDispatcher {
                                           StreamDefinition existingStreamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException {
         if (newStreamDefinition.getName().equals(existingStreamDefinition.getName())) {
-            validateAttributes(newStreamDefinition.getMetaData(), existingStreamDefinition.getMetaData(), "meta", newStreamDefinition, existingStreamDefinition);
-            validateAttributes(newStreamDefinition.getCorrelationData(), existingStreamDefinition.getCorrelationData(), "correlation", newStreamDefinition, existingStreamDefinition);
-            validateAttributes(newStreamDefinition.getPayloadData(), existingStreamDefinition.getPayloadData(), "payload", newStreamDefinition, existingStreamDefinition);
+            validateAttributes(newStreamDefinition.getMetaData(), existingStreamDefinition.getMetaData(),
+                    "meta", newStreamDefinition, existingStreamDefinition);
+            validateAttributes(newStreamDefinition.getCorrelationData(), existingStreamDefinition.getCorrelationData(),
+                    "correlation", newStreamDefinition, existingStreamDefinition);
+            validateAttributes(newStreamDefinition.getPayloadData(), existingStreamDefinition.getPayloadData(),
+                    "payload", newStreamDefinition, existingStreamDefinition);
         }
     }
 
@@ -190,11 +195,11 @@ public class EventDispatcher {
                 for (Attribute existingAttribute : existingAttributes) {
                     if (attribute.getName().equals(existingAttribute.getName())) {
                         if (attribute.getType() != existingAttribute.getType()) {
-                            throw new DifferentStreamDefinitionAlreadyDefinedException("Attribute type mismatch " + type + " " +
-                                                                                       attribute.getName() + " type:" + attribute.getType() +
-                                                                                       " was already defined with type:" + existingAttribute.getType() +
-                                                                                       " in " + existingStreamDefinition + ", hence " + newStreamDefinition +
-                                                                                       " cannot be defined");
+                            throw new DifferentStreamDefinitionAlreadyDefinedException(
+                                    "Attribute type mismatch " + type + " " + attribute.getName() + " type:" +
+                                            attribute.getType() + " was already defined with type:" +
+                                            existingAttribute.getType() + " in " + existingStreamDefinition +
+                                            ", hence " + newStreamDefinition + " cannot be defined");
                         }
                     }
                 }
@@ -215,9 +220,12 @@ public class EventDispatcher {
                 logMsg += "Meta, Correlation & Payload Data Type Map : ";
                 for (Map.Entry entry : streamTypeHolder.getAttributeCompositeMap().entrySet()) {
                     logMsg += "StreamID=" + entry.getKey() + " :  ";
-                    logMsg += "Meta= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).getAttributeTypes()[0]) + " :  ";
-                    logMsg += "Correlation= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).getAttributeTypes()[1]) + " :  ";
-                    logMsg += "Payload= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).getAttributeTypes()[2]) + "\n";
+                    logMsg += "Meta= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[0]) + " :  ";
+                    logMsg += "Correlation= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[1]) + " :  ";
+                    logMsg += "Payload= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[2]) + "\n";
                 }
                 log.debug(logMsg);
             }
@@ -234,9 +242,12 @@ public class EventDispatcher {
                 logMsg += "Meta, Correlation & Payload Data Type Map : ";
                 for (Map.Entry entry : streamTypeHolder.getAttributeCompositeMap().entrySet()) {
                     logMsg += "StreamID=" + entry.getKey() + " :  ";
-                    logMsg += "Meta= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).getAttributeTypes()[0]) + " :  ";
-                    logMsg += "Correlation= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).getAttributeTypes()[1]) + " :  ";
-                    logMsg += "Payload= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).getAttributeTypes()[2]) + "\n";
+                    logMsg += "Meta= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[0]) + " :  ";
+                    logMsg += "Correlation= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[1]) + " :  ";
+                    logMsg += "Payload= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[2]) + "\n";
                 }
                 log.debug(logMsg);
             }
@@ -333,7 +344,8 @@ public class EventDispatcher {
     public String findStreamId(String streamName, String streamVersion, AgentSession agentSession)
             throws StreamDefinitionStoreException {
 
-        //Updating the cache when calling the findStreamId to keep the sync between the stream manager and register with data publisher
+        //Updating the cache when calling the findStreamId to keep the sync between the stream manager and register
+        // with data publisher
         //for CEP - need to review and fix
         updateDomainNameStreamTypeHolderCache();
         StreamTypeHolder streamTypeHolder = getStreamDefinitionHolder();

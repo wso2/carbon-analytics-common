@@ -19,8 +19,8 @@ package org.wso2.carbon.databridge.core.internal.queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.databridge.core.Utils.DataBridgeUtils;
-import org.wso2.carbon.databridge.core.Utils.EventComposite;
+import org.wso2.carbon.databridge.core.utils.DataBridgeUtils;
+import org.wso2.carbon.databridge.core.utils.EventComposite;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -81,9 +81,11 @@ public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
     public EventComposite poll() {
         EventComposite eventComposite = super.poll();
         currentSize.addAndGet(-eventComposite.getSize());
-        if (semaphore.availablePermits() == 0 && ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
+        if (semaphore.availablePermits() == 0 &&
+                ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
             synchronized (lock) {
-                if (semaphore.availablePermits() == 0 && ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
+                if (semaphore.availablePermits() == 0 &&
+                        ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
                     semaphore.release();
                 }
             }

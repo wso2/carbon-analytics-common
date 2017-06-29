@@ -17,7 +17,7 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 /**
- * Malformed Event Exception
+ * Malformed Event Exception.
  */
 public class MalformedEventException extends RuntimeException {
     private String errorMessage;

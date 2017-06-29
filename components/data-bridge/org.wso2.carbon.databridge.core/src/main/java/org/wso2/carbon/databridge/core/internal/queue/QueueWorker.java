@@ -22,14 +22,14 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.core.AgentCallback;
 import org.wso2.carbon.databridge.core.RawDataAgentCallback;
-import org.wso2.carbon.databridge.core.Utils.EventComposite;
 import org.wso2.carbon.databridge.core.exception.EventConversionException;
+import org.wso2.carbon.databridge.core.utils.EventComposite;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Will removes the events from queues and send then to the endpoints
+ * Will removes the events from queues and send then to the endpoints.
  */
 public class QueueWorker implements Runnable {
 
@@ -63,7 +63,8 @@ public class QueueWorker implements Runnable {
                     try {
                         agentCallback.receive(eventComposite);
                     } catch (Throwable e) {
-                        log.error("Error in passing event composite " + eventComposite + " to subscriber " + agentCallback, e);
+                        log.error("Error in passing event composite " + eventComposite + " to subscriber " +
+                                agentCallback, e);
                     }
                 }
             }
@@ -79,7 +80,8 @@ public class QueueWorker implements Runnable {
                         try {
                             agentCallback.receive(eventList, eventComposite.getAgentSession().getCredentials());
                         } catch (Throwable e) {
-                            log.error("Error in passing event eventList " + eventList + " to subscriber " + agentCallback, e);
+                            log.error("Error in passing event eventList " + eventList + " to subscriber " +
+                                    agentCallback, e);
                         }
                     }
                     if (log.isDebugEnabled()) {
@@ -92,7 +94,8 @@ public class QueueWorker implements Runnable {
                 }
             }
         } catch (Throwable e) {
-            log.error("Error in passing events " + eventList + " to subscribers " + subscribers + " " + rawDataSubscribers, e);
+            log.error("Error in passing events " + eventList + " to subscribers " + subscribers + " " +
+                    rawDataSubscribers, e);
         }
     }
 

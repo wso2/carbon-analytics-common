@@ -61,9 +61,9 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private int reconnectionInterval;
 
-    private final Integer START_INDEX = 0;
+    private final Integer startIndex = 0;
 
-    private AtomicInteger currentDataPublisherIndex = new AtomicInteger(START_INDEX);
+    private AtomicInteger currentDataPublisherIndex = new AtomicInteger(startIndex);
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
@@ -73,6 +73,9 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private boolean isShutdown = false;
 
+    /**
+     * HA Type.
+     */
     public enum HAType {
         FAILOVER, LOADBALANCE
     }
@@ -80,7 +83,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     public DataEndpointGroup(HAType haType, DataEndpointAgent agent) {
         this.dataEndpoints = new ArrayList<>();
         this.haType = haType;
-        this.reconnectionService = Executors.newScheduledThreadPool(1, new DataBridgeThreadFactory("ReconnectionService"));
+        this.reconnectionService = Executors.newScheduledThreadPool(1,
+                new DataBridgeThreadFactory("ReconnectionService"));
         this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
         this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
         if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
@@ -88,7 +92,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);
-        currentDataPublisherIndex.set(START_INDEX);
+        currentDataPublisherIndex.set(startIndex);
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
@@ -146,7 +150,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             }
             if (stopTime <= System.currentTimeMillis()) {
                 if (log.isDebugEnabled()) {
-                    log.debug("DataEndpoint not available for  last " + timeoutMS + " ms, dropping event : " + event);
+                    log.debug("DataEndpoint not available for  last " + timeoutMS + " ms, dropping event : " +
+                            event);
                 }
                 break;
             }
@@ -173,14 +178,19 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
+    /**
+     * Event Queue Class.
+     */
     class EventQueue {
         private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer = null;
         private Disruptor<WrappedEventFactory.WrappedEvent> eventQueueDisruptor = null;
         private ExecutorService eventQueuePool = null;
 
         EventQueue(int queueSize) {
-            eventQueuePool = Executors.newCachedThreadPool(new DataBridgeThreadFactory("EventQueue"));
-            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool, ProducerType.MULTI, new BlockingWaitStrategy());
+            eventQueuePool = Executors.newCachedThreadPool(
+                    new DataBridgeThreadFactory("EventQueue"));
+            eventQueueDisruptor = new Disruptor<>(new WrappedEventFactory(), queueSize, eventQueuePool,
+                    ProducerType.MULTI, new BlockingWaitStrategy());
             eventQueueDisruptor.handleEventsWith(new EventQueueWorker());
             this.ringBuffer = eventQueueDisruptor.start();
         }
@@ -244,27 +254,31 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
+    /**
+     * Event Queue Worker.
+     */
     class EventQueueWorker implements EventHandler<WrappedEventFactory.WrappedEvent> {
 
-        boolean isLastEventDropped =false;
+        boolean isLastEventDropped = false;
+
         @Override
         public void onEvent(WrappedEventFactory.WrappedEvent wrappedEvent, long sequence, boolean endOfBatch) {
             DataEndpoint endpoint = getDataEndpoint(true);
             Event event = wrappedEvent.getEvent();
             if (endpoint != null) {
-                isLastEventDropped =false;
+                isLastEventDropped = false;
                 endpoint.collectAndSend(event);
                 if (endOfBatch) {
                     flushAllDataEndpoints();
                 }
             } else {
-                if(!isLastEventDropped) {
+                if (!isLastEventDropped) {
                     log.error("Dropping all events as DataPublisher is shutting down.");
                 }
                 if (log.isDebugEnabled()) {
                     log.debug("Data publisher is shutting down, dropping event : " + event);
                 }
-                isLastEventDropped =true;
+                isLastEventDropped = true;
             }
         }
     }
@@ -291,7 +305,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         if (haType.equals(HAType.LOADBALANCE)) {
             startIndex = getDataPublisherIndex();
         } else {
-            startIndex = START_INDEX;
+            startIndex = this.startIndex;
         }
         int index = startIndex;
 
@@ -309,7 +323,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             } else {
                 index++;
                 if (index > maximumDataPublisherIndex.get() - 1) {
-                    index = START_INDEX;
+                    index = this.startIndex;
                 }
                 if (index == startIndex) {
                     if (isBusyWait) {
@@ -344,12 +358,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     private boolean isActiveDataEndpointExists() {
-        int index = START_INDEX;
+        int index = startIndex;
         while (index < maximumDataPublisherIndex.get()) {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
             if (dataEndpoint.getState() != DataEndpoint.State.UNAVAILABLE) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Available endpoint : " + dataEndpoint + " existing in state - " + dataEndpoint.getState());
+                    log.debug("Available endpoint : " + dataEndpoint + " existing in state - " +
+                            dataEndpoint.getState());
                 }
                 return true;
             }
@@ -361,7 +376,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     private synchronized int getDataPublisherIndex() {
         int index = currentDataPublisherIndex.getAndIncrement();
         if (index == maximumDataPublisherIndex.get() - 1) {
-            currentDataPublisherIndex.set(START_INDEX);
+            currentDataPublisherIndex.set(startIndex);
         }
         return index;
     }
@@ -398,7 +413,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     private class ReconnectionTask implements Runnable {
         public void run() {
             boolean isOneReceiverConnected = false;
-            for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
+            for (int i = startIndex; i < maximumDataPublisherIndex.get(); i++) {
                 DataEndpoint dataEndpoint = dataEndpoints.get(i);
                 if (!dataEndpoint.isConnected()) {
                     try {
@@ -414,7 +429,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                             dataEndpoint.deactivate();
                         }
                     } catch (DataEndpointConfigurationException exception) {
-                        log.warn("Data Endpoint with receiver URL:" + dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
+                        log.warn("Data Endpoint with receiver URL:" +
+                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
                                 + " could not be deactivated", exception);
                     }
                 }
@@ -423,7 +439,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 }
             }
             if (!isOneReceiverConnected) {
-                log.warn("No receiver is reachable at reconnection, will try to reconnect every " + reconnectionInterval + " sec");
+                log.warn("No receiver is reachable at reconnection, will try to reconnect every " +
+                        reconnectionInterval + " sec");
             }
         }
 

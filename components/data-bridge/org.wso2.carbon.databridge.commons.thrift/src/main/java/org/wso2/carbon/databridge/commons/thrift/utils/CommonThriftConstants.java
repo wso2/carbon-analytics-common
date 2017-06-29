@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.commons.thrift.utils;
 
 /**
- * CommonThriftConstants class
+ * CommonThriftConstants class.
  */
 public class CommonThriftConstants {
 

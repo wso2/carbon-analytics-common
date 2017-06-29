@@ -17,7 +17,7 @@ package org.wso2.carbon.databridge.core.definitionstore;
 */
 
 /**
- * Listener which notify when adding or removing stream
+ * Listener which notify when adding or removing stream.
  */
 public interface StreamAddRemoveListener {
 

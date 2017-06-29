@@ -27,19 +27,22 @@ import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionExc
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.AgentCallback;
 import org.wso2.carbon.databridge.core.DataBridge;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
-import org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiver;
+import org.wso2.carbon.databridge.core.utils.AgentSession;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiver;
 
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Binary Test Server.
+ */
 public class BinaryTestServer {
     Logger log = LoggerFactory.getLogger(BinaryTestServer.class);
     BinaryDataReceiver binaryDataReceiver;
@@ -80,7 +83,7 @@ public class BinaryTestServer {
             @Override
             public boolean authenticate(String userName,
                                         String password) {
-                return true;// allays authenticate to true
+                return true; // allays authenticate to true
             }
 
             @Override
@@ -94,7 +97,8 @@ public class BinaryTestServer {
             }
         }, streamDefinitionStore, DataPublisherTestUtil.getDataBridgeConfigPath());
 
-        BinaryDataReceiverConfiguration dataReceiverConfiguration = new BinaryDataReceiverConfiguration(securePort, tcpPort);
+        BinaryDataReceiverConfiguration dataReceiverConfiguration = new BinaryDataReceiverConfiguration(securePort,
+                tcpPort);
 
         binaryDataReceiver = new BinaryDataReceiver(dataReceiverConfiguration, databridge);
         databridge.subscribe(new AgentCallback() {
@@ -113,7 +117,6 @@ public class BinaryTestServer {
             public void receive(List<Event> eventList, Credentials credentials) {
                 numberOfEventsReceived.addAndGet(eventList.size());
                 log.info("Received events : " + numberOfEventsReceived);
-//                log.info("eventListSize=" + eventList.size() + " eventList " + eventList + " for username " + credentials.getUsername());
             }
 
         });
@@ -125,8 +128,11 @@ public class BinaryTestServer {
     }
 
     public int getNumberOfEventsReceived() {
-        if (numberOfEventsReceived != null) return numberOfEventsReceived.get();
-        else return 0;
+        if (numberOfEventsReceived != null) {
+            return numberOfEventsReceived.get();
+        } else {
+            return 0;
+        }
     }
 
     public void resetReceivedEvents() {
@@ -171,7 +177,9 @@ public class BinaryTestServer {
                 Thread.sleep(stopAfterTimeMilliSeconds);
             } catch (InterruptedException e) {
             }
-            if (binaryDataReceiver != null) binaryDataReceiver.stop();
+            if (binaryDataReceiver != null) {
+                binaryDataReceiver.stop();
+            }
 
             eventReceived = getNumberOfEventsReceived();
 

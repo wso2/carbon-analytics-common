@@ -35,8 +35,9 @@ public abstract class AbstractClientPoolFactory extends BaseKeyedPoolableObjectF
     public Object makeObject(Object key)
             throws DataEndpointException, DataEndpointSecurityException, DataEndpointAgentConfigurationException,
             DataEndpointConfigurationException {
-       Object[] urlParams = DataPublisherUtil.getProtocolHostPort(key.toString());
-        return createClient(urlParams[0].toString(),urlParams[1].toString(), Integer.parseInt(urlParams[2].toString()));
+        Object[] urlParams = DataPublisherUtil.getProtocolHostPort(key.toString());
+        return createClient(urlParams[0].toString(), urlParams[1].toString(),
+                Integer.parseInt(urlParams[2].toString()));
     }
 
     /**
@@ -44,10 +45,10 @@ public abstract class AbstractClientPoolFactory extends BaseKeyedPoolableObjectF
      *
      * @param protocol protocol that is used to connect to the endpoint
      * @param hostName hostname of the endpoint
-     * @param port port of the endpoint that is listening to
+     * @param port     port of the endpoint that is listening to
      * @return A valid client which has connected to the receiver and can be used
-     *         for rest of the operations regarding the endpoint.
-     * @throws DataEndpointException Exception to be thrown when communicating with DataEndpoint.
+     * for rest of the operations regarding the endpoint.
+     * @throws DataEndpointException         Exception to be thrown when communicating with DataEndpoint.
      * @throws DataEndpointSecurityException Security Exception thrown when communicating with Data Endpoint.
      */
     public abstract Object createClient(String protocol, String hostName, int port)

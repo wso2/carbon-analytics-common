@@ -22,20 +22,20 @@ import org.wso2.carbon.databridge.core.definitionstore.StreamDefinitionStore;
 import java.util.List;
 
 /**
- * Databridge subscriber service
+ * Databridge subscriber service.
  */
 public interface DataBridgeSubscriberService extends StreamDefinitionStore {
 
 
     /**
-     * CEP/BAM can subscribe for Event Streams
+     * CEP/BAM can subscribe for Event Streams.
      *
      * @param agentCallback callbacks of the subscribers
      */
     public void subscribe(AgentCallback agentCallback);
 
     /**
-     * CEP/BAM can subscribe for Raw Event Streams
+     * CEP/BAM can subscribe for Raw Event Streams.
      *
      * @param agentCallback callbacks of the subscribers
      */

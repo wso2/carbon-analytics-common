@@ -27,17 +27,20 @@ import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionExc
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.AgentCallback;
 import org.wso2.carbon.databridge.core.DataBridge;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
+import org.wso2.carbon.databridge.core.utils.AgentSession;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
 
 import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Thrift Test Server.
+ */
 public class ThriftTestServer {
     Logger log = Logger.getLogger(ThriftTestServer.class);
     ThriftDataReceiver thriftDataReceiver;
@@ -64,8 +67,8 @@ public class ThriftTestServer {
         getStreamDefinitionStore().saveStreamDefinitionToStore(streamDefinition);
     }
 
-    private InMemoryStreamDefinitionStore getStreamDefinitionStore(){
-        if (streamDefinitionStore == null){
+    private InMemoryStreamDefinitionStore getStreamDefinitionStore() {
+        if (streamDefinitionStore == null) {
             streamDefinitionStore = new InMemoryStreamDefinitionStore();
         }
         return streamDefinitionStore;
@@ -79,7 +82,7 @@ public class ThriftTestServer {
             @Override
             public boolean authenticate(String userName,
                                         String password) {
-                return true;// allays authenticate to true
+                return true; // allays authenticate to true
 
             }
 
@@ -112,20 +115,22 @@ public class ThriftTestServer {
             public void receive(List<Event> eventList, Credentials credentials) {
                 numberOfEventsReceived.addAndGet(eventList.size());
                 log.info("Received events : " + numberOfEventsReceived);
-//                log.info("eventListSize=" + eventList.size() + " eventList " + eventList + " for username " + credentials.getUsername());
             }
 
         });
 
-            String address = "localhost";
-            log.info("Test Server starting on " + address);
-            thriftDataReceiver.start(address);
-            log.info("Test Server Started");
+        String address = "localhost";
+        log.info("Test Server starting on " + address);
+        thriftDataReceiver.start(address);
+        log.info("Test Server Started");
     }
 
     public int getNumberOfEventsReceived() {
-       if(numberOfEventsReceived != null) return numberOfEventsReceived.get();
-        else return 0;
+        if (numberOfEventsReceived != null) {
+            return numberOfEventsReceived.get();
+        } else {
+            return 0;
+        }
     }
 
     public void resetReceivedEvents() {
@@ -168,20 +173,22 @@ public class ThriftTestServer {
                 Thread.sleep(stopAfterTimeMilliSeconds);
             } catch (InterruptedException e) {
             }
-            if (thriftDataReceiver != null) thriftDataReceiver.stop();
+            if (thriftDataReceiver != null) {
+                thriftDataReceiver.stop();
+            }
 
             eventReceived = getNumberOfEventsReceived();
 
-            log.info("Number of events received in server shutdown :"+ eventReceived);
+            log.info("Number of events received in server shutdown :" + eventReceived);
             try {
                 Thread.sleep(startAfterTimeMS);
             } catch (InterruptedException e) {
             }
 
             try {
-                if (thriftDataReceiver != null){
+                if (thriftDataReceiver != null) {
                     thriftDataReceiver.start(DataPublisherTestUtil.LOCAL_HOST);
-                }else {
+                } else {
                     start(port);
                 }
             } catch (DataBridgeException e) {

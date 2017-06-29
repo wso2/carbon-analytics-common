@@ -21,7 +21,7 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
 
 /**
- * The falconry method that is used to create Agent server
+ * The falconry method that is used to create Agent server.
  */
 public class ThriftDataReceiverFactory {
     public ThriftDataReceiver createAgentServer(

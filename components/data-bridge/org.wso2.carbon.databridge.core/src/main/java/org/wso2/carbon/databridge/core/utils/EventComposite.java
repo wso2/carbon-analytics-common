@@ -16,13 +16,13 @@
 * under the License.
 */
 
-package org.wso2.carbon.databridge.core.Utils;
+package org.wso2.carbon.databridge.core.utils;
 
 import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
 
 /**
- * Event composite that's passed to the Queue Worker
+ * Event composite that's passed to the Queue Worker.
  */
 public class EventComposite {
     private StreamTypeHolder streamTypeHolder;

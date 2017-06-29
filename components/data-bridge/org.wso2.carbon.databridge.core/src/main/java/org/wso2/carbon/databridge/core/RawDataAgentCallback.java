@@ -21,26 +21,26 @@ package org.wso2.carbon.databridge.core;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 
 /**
- * RawData Agent Callback
+ * RawData Agent Callback.
  */
 public interface RawDataAgentCallback {
 
     /**
-     * will get called  when types are defined
+     * will get called  when types are defined.
      *
      * @param streamDefinition TypeDefinition of event streams
      */
     void definedStream(StreamDefinition streamDefinition);
 
     /**
-     * will get called  when types are removed
+     * will get called  when types are removed.
      *
      * @param streamDefinition TypeDefinition of event streams
      */
     void removeStream(StreamDefinition streamDefinition);
 
     /**
-     * will get called when Events arrive
+     * will get called when Events arrive.
      *
      * @param eventComposite Event Composite
      */

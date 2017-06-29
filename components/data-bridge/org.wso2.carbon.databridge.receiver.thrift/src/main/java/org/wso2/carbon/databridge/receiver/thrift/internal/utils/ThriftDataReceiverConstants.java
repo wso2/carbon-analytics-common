@@ -20,7 +20,7 @@ package org.wso2.carbon.databridge.receiver.thrift.internal.utils;
 
 
 /**
- * Agent Server Constants
+ * Agent Server Constants.
  */
 public final class ThriftDataReceiverConstants {
 

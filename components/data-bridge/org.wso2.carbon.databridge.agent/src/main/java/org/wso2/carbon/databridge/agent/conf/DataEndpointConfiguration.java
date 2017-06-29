@@ -21,7 +21,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
 /**
- * Data Endpoint Configuration
+ * Data Endpoint Configuration.
  */
 public class DataEndpointConfiguration {
 
@@ -51,6 +51,9 @@ public class DataEndpointConfiguration {
 
     private int keepAliveTimeInPool;
 
+    /**
+     * Protocol Type.
+     */
     public enum Protocol {
         TCP, SSL;
 

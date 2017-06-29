@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helper class to build Agent Server Initial Configurations
+ * Helper class to build Agent Server Initial Configurations.
  */
 public final class DataBridgeCoreBuilder {
     private static final Log log = LogFactory.getLog(DataBridgeCoreBuilder.class);
@@ -42,7 +42,8 @@ public final class DataBridgeCoreBuilder {
     // TODO: 2/2/17 stream definitions are temporarily loaded from a file in <product-sp>/deployment
     public static List<String> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
         List<String> streamDefinitionList = new ArrayList<String>();
-        String path = Utils.getCarbonHome().toString() + File.separator + "deployment" + File.separator + "stream-definitions.yaml";
+        String path = Utils.getCarbonHome().toString() + File.separator + "deployment" + File.separator +
+                "stream-definitions.yaml";
         Yaml yaml = new Yaml();
         File file = new File(path);
         try {

@@ -25,7 +25,7 @@ import org.wso2.carbon.databridge.core.conf.DataReceiverConfiguration;
 import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 
 /**
- * configuration details related to DataReceiver
+ * configuration details related to DataReceiver.
  */
 public class ThriftDataReceiverConfiguration {
     private int secureDataReceiverPort;

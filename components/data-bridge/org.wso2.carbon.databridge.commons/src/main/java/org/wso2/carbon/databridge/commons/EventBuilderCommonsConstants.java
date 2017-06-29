@@ -17,7 +17,7 @@
 package org.wso2.carbon.databridge.commons;
 
 /**
- * Common constants related to event builder
+ * Common constants related to event builder.
  */
 public class EventBuilderCommonsConstants {
     public static final String STREAM_ID = "streamId";

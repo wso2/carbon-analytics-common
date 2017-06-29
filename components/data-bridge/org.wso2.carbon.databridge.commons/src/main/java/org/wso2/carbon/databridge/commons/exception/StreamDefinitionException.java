@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 /**
- * Generic Data Bridge Stream Definition Exception
+ * Generic Data Bridge Stream Definition Exception.
  */
 public class StreamDefinitionException extends Exception {
     private String errorMessage;

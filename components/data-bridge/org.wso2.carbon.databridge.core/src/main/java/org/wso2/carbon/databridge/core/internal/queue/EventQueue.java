@@ -22,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 import org.wso2.carbon.databridge.core.AgentCallback;
 import org.wso2.carbon.databridge.core.RawDataAgentCallback;
-import org.wso2.carbon.databridge.core.Utils.EventComposite;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
+import org.wso2.carbon.databridge.core.utils.EventComposite;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -31,8 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * The Event Queue class wraps a thread safe queue to,
- * queue and deque events in a scalable manner
+ * The Event Queue class wraps a thread safe queue to, queue and deque events in a scalable manner.
  */
 public class EventQueue {
 
@@ -50,9 +49,10 @@ public class EventQueue {
         this.subscribers = subscribers;
         this.rawDataSubscribers = rawDataSubscribers;
         // Note : Using a fixed worker thread pool and a bounded queue to prevent the server dying if load is too high
-        executorService = Executors.newFixedThreadPool(dataBridgeConfiguration.getWorkerThreads(), new DataBridgeThreadFactory("Core"));
+        executorService = Executors.newFixedThreadPool(dataBridgeConfiguration.getWorkerThreads(),
+                new DataBridgeThreadFactory("Core"));
         eventQueue = new EventBlockingQueue(dataBridgeConfiguration.getEventBufferSize(),
-                                            dataBridgeConfiguration.getMaxEventBufferCapacity());
+                dataBridgeConfiguration.getMaxEventBufferCapacity());
     }
 
     public void publish(EventComposite eventComposite) {

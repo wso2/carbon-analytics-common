@@ -20,17 +20,17 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.net.Socket;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * This is a Binary Transport secure implementation for AbstractSecureClientPoolFactory to be used by BinaryEndpoint.
@@ -46,11 +46,14 @@ public class BinarySecureClientPoolFactory extends AbstractSecureClientPoolFacto
     public Object createClient(String protocol, String hostName, int port) throws DataEndpointException,
             DataEndpointSecurityException, DataEndpointAgentConfigurationException {
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.SSL.toString())) {
-            int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE)
+            int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.
+                    BINARY_DATA_AGENT_TYPE)
                     .getAgentConfiguration().getSocketTimeoutMS();
-            String sslProtocols = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE).
+            String sslProtocols = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.
+                    BINARY_DATA_AGENT_TYPE).
                     getAgentConfiguration().getSslEnabledProtocols();
-            String ciphers = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.BINARY_DATA_AGENT_TYPE).
+            String ciphers = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.
+                    BINARY_DATA_AGENT_TYPE).
                     getAgentConfiguration().getCiphers();
 
             try {

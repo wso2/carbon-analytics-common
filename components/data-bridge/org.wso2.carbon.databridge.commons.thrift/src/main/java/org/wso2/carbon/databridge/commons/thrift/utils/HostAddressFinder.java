@@ -24,7 +24,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 /**
- * Host address finder
+ * Host address finder.
  */
 public class HostAddressFinder {
     public static String findAddress(String hostname) throws SocketException {

@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Data receiver configuration properties
+ * Data receiver configuration properties.
  */
 @Configuration(description = "Data receiver configuration")
 public class DataReceiverConfiguration {
