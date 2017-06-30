@@ -55,29 +55,6 @@
                     <artifactId>maven-scr-plugin</artifactId>
                     <version>${maven.src.version}</version>
                 </plugin>
-                <!--<plugin>&lt;!&ndash; Overridden from parent pom to exclude generated sources &ndash;&gt;-->
-                    <!--<groupId>org.codehaus.mojo</groupId>-->
-                    <!--<artifactId>findbugs-maven-plugin</artifactId>-->
-                    <!--<configuration>-->
-                        <!--<effort>Max</effort>-->
-                        <!--<threshold>Low</threshold>-->
-                        <!--<xmlOutput>true</xmlOutput>-->
-                        <!--<findbugsXmlOutputDirectory>${project.build.directory}/findbugs-->
-                        <!--</findbugsXmlOutputDirectory>-->
-                        <!--<excludeFilterFile>${maven.findbugsplugin.version.exclude}</excludeFilterFile>-->
-                        <!--&lt;!&ndash;Exclude generated sources&ndash;&gt;-->
-                    <!--</configuration>-->
-                    <!--<version>${maven.findbugsplugin.version}</version>-->
-                    <!--<executions>-->
-                        <!--<execution>-->
-                            <!--<id>analyze-compile</id>-->
-                            <!--<phase>compile</phase>-->
-                            <!--<goals>-->
-                                <!--<goal>check</goal>-->
-                            <!--</goals>-->
-                        <!--</execution>-->
-                    <!--</executions>-->
-                <!--</plugin>-->
             </plugins>
         </pluginManagement>
 
@@ -111,11 +88,27 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- Overridden from parent pom to exclude generated sources -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${maven.findbugsplugin.version}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <effort>Max</effort>
+                    <threshold>Medium</threshold>
+                    <xmlOutput>true</xmlOutput>
+                    <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+                    <!--Exclude sources-->
+                    <excludeFilterFile>${mavan.findbugsplugin.exclude.file}</excludeFilterFile>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>analyze-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -474,7 +467,7 @@
         <carbon.config.version>2.0.0</carbon.config.version>
         <carbon.secvault.version>5.0.4</carbon.secvault.version>
         <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
-
+        <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
     </properties>
 

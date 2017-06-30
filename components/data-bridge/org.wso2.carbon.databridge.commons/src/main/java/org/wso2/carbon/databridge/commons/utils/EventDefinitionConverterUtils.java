@@ -108,11 +108,6 @@ public final class EventDefinitionConverterUtils {
     }
 
     public static String convertToJson(List<StreamDefinition> existingDefinitions) {
-        JSONArray jsonDefnArray = new JSONArray();
-        for (StreamDefinition existingDefinition : existingDefinitions) {
-            jsonDefnArray.put(convertToJson(existingDefinition));
-        }
-
         return gson.toJson(existingDefinitions);
     }
 

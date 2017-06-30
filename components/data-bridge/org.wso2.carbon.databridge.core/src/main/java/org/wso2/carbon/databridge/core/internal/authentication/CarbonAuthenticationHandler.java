@@ -26,6 +26,7 @@ import org.wso2.carbon.messaging.CarbonMessage;
 import org.wso2.carbon.messaging.DefaultCarbonMessage;
 import org.wso2.carbon.security.caas.api.ProxyCallbackHandler;
 
+import java.nio.charset.Charset;
 import java.util.Base64;
 
 import javax.security.auth.login.LoginContext;
@@ -48,7 +49,7 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
 
             CarbonMessage carbonMessage = new DefaultCarbonMessage();
             carbonMessage.setHeader("Authorization", "Basic " + Base64.getEncoder()
-                    .encodeToString((userName + ":" + password).getBytes())
+                    .encodeToString((userName + ":" + password).getBytes(Charset.forName("UTF-8")))
             );
 
             ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);

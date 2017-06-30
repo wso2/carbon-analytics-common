@@ -33,7 +33,7 @@ public class WrappedEventFactory implements EventFactory<WrappedEventFactory.Wra
     /**
      * Wrapped Event.
      */
-    public class WrappedEvent {
+    public static class WrappedEvent {
 
         private Event event;
 

@@ -82,7 +82,7 @@ public class DataBridgeDS {
 
 
                 try {
-                    List<String> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionXML();
+                    List<String> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionYAML();
                     for (String streamDefinitionString : streamDefinitionStrings) {
                         try {
                             StreamDefinition streamDefinition = EventDefinitionConverterUtils.

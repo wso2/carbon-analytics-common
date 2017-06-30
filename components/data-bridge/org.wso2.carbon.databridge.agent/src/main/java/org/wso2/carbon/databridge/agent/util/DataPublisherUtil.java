@@ -151,18 +151,18 @@ public class DataPublisherUtil {
      */
     private static String getURLSet(Object[] urlGroup) {
         boolean isFailOver = (Boolean) urlGroup[0];
-        String urlSet = "";
+        StringBuilder urlSet = new StringBuilder("");
         for (int i = 1; i < urlGroup.length; i++) {
-            urlSet += urlGroup[i];
+            urlSet.append(urlGroup[i]);
             if (i != urlGroup.length - 1) {
                 if (isFailOver) {
-                    urlSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                    urlSet.append(DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR);
                 } else {
-                    urlSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                    urlSet.append(DataEndpointConstants.LB_URL_GROUP_SEPARATOR);
                 }
             }
         }
-        return urlSet;
+        return urlSet.toString();
     }
 
     /**
@@ -203,26 +203,26 @@ public class DataPublisherUtil {
      */
     public static String getDefaultAuthURLSet(String receiverURLSet) throws DataEndpointConfigurationException {
         ArrayList<Object[]> receiverURLGroups = DataPublisherUtil.getEndpointGroups(receiverURLSet);
-        String authURLSet = "";
+        StringBuilder authURLSet = new StringBuilder("");
         for (int i = 0; i < receiverURLGroups.size(); i++) {
             Object[] receiverGroup = receiverURLGroups.get(i);
             boolean failOver = (Boolean) receiverGroup[0];
-            authURLSet += "{";
+            authURLSet.append("{");
             for (int j = 1; j < receiverGroup.length; j++) {
-                authURLSet += DataPublisherUtil.getDefaultAuthUrl(receiverGroup[j].toString());
+                authURLSet.append(DataPublisherUtil.getDefaultAuthUrl(receiverGroup[j].toString()));
                 if (j != receiverGroup.length - 1) {
                     if (failOver) {
-                        authURLSet += DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR;
+                        authURLSet.append(DataEndpointConstants.FAILOVER_URL_GROUP_SEPARATOR);
                     } else {
-                        authURLSet += DataEndpointConstants.LB_URL_GROUP_SEPARATOR;
+                        authURLSet.append(DataEndpointConstants.LB_URL_GROUP_SEPARATOR);
                     }
                 }
             }
-            authURLSet += "}";
+            authURLSet.append("}");
             if (i != receiverURLGroups.size() - 1) {
-                authURLSet += ",";
+                authURLSet.append(",");
             }
         }
-        return authURLSet;
+        return authURLSet.toString();
     }
 }

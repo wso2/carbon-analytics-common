@@ -95,8 +95,8 @@ public class EventDispatcher {
 
     public synchronized String defineStream(String streamDefinition, AgentSession agentSession)
             throws MalformedStreamDefinitionException,
-                   DifferentStreamDefinitionAlreadyDefinedException,
-                   StreamDefinitionStoreException {
+            DifferentStreamDefinitionAlreadyDefinedException,
+            StreamDefinitionStoreException {
 
         StreamDefinition newStreamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinition);
 
@@ -110,7 +110,7 @@ public class EventDispatcher {
                 throw new DifferentStreamDefinitionAlreadyDefinedException(
                         "Similar event stream for " + newStreamDefinition + " with the same name and version " +
                                 "already exist: " + streamDefinitionStore.getStreamDefinition(
-                                        newStreamDefinition.getName(), newStreamDefinition.getVersion()));
+                                newStreamDefinition.getName(), newStreamDefinition.getVersion()));
             }
             newStreamDefinition = existingStreamDefinition;
 
@@ -136,8 +136,8 @@ public class EventDispatcher {
     public synchronized String defineStream(String streamDefinition, AgentSession agentSession,
                                             String indexDefinition)
             throws MalformedStreamDefinitionException,
-                   DifferentStreamDefinitionAlreadyDefinedException,
-                   StreamDefinitionStoreException {
+            DifferentStreamDefinitionAlreadyDefinedException,
+            StreamDefinitionStoreException {
 
         StreamDefinition newStreamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinition);
         StreamTypeHolder streamTypeHolder = getStreamDefinitionHolder();
@@ -150,7 +150,7 @@ public class EventDispatcher {
                 throw new DifferentStreamDefinitionAlreadyDefinedException(
                         "Similar event stream for " + newStreamDefinition + " with the same name and version " +
                                 "already exist: " + streamDefinitionStore.getStreamDefinition(
-                                        newStreamDefinition.getName(), newStreamDefinition.getVersion()));
+                                newStreamDefinition.getName(), newStreamDefinition.getVersion()));
             }
             newStreamDefinition = existingStreamDefinition;
 
@@ -216,18 +216,18 @@ public class EventDispatcher {
     private StreamTypeHolder getStreamDefinitionHolder() {
         if (streamTypeHolder != null) {
             if (log.isDebugEnabled()) {
-                String logMsg = "Event stream holder : \n";
-                logMsg += "Meta, Correlation & Payload Data Type Map : ";
+                StringBuilder logMsg = new StringBuilder("Event stream holder : \n");
+                logMsg.append("Meta, Correlation & Payload Data Type Map : ");
                 for (Map.Entry entry : streamTypeHolder.getAttributeCompositeMap().entrySet()) {
-                    logMsg += "StreamID=" + entry.getKey() + " :  ";
-                    logMsg += "Meta= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
-                            getAttributeTypes()[0]) + " :  ";
-                    logMsg += "Correlation= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
-                            getAttributeTypes()[1]) + " :  ";
-                    logMsg += "Payload= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
-                            getAttributeTypes()[2]) + "\n";
+                    logMsg.append("StreamID=").append(entry.getKey()).append(" :  ");
+                    logMsg.append("Meta= ").append(Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[0])).append(" :  ");
+                    logMsg.append("Correlation= ").append(Arrays.deepToString(((StreamAttributeComposite)
+                            entry.getValue()).getAttributeTypes()[1])).append(" :  ");
+                    logMsg.append("Payload= ").append(Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[2])).append("\n");
                 }
-                log.debug(logMsg);
+                log.debug(logMsg.toString());
             }
             return streamTypeHolder;
         } else {
@@ -238,16 +238,16 @@ public class EventDispatcher {
     public synchronized void updateStreamDefinitionHolder(AgentSession agentSession) {
         if (streamTypeHolder != null) {
             if (log.isDebugEnabled()) {
-                String logMsg = "Event stream holder: \n ";
-                logMsg += "Meta, Correlation & Payload Data Type Map : ";
+                StringBuilder logMsg = new StringBuilder("Event stream holder: \n ");
+                logMsg.append("Meta, Correlation & Payload Data Type Map : ");
                 for (Map.Entry entry : streamTypeHolder.getAttributeCompositeMap().entrySet()) {
-                    logMsg += "StreamID=" + entry.getKey() + " :  ";
-                    logMsg += "Meta= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
-                            getAttributeTypes()[0]) + " :  ";
-                    logMsg += "Correlation= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
-                            getAttributeTypes()[1]) + " :  ";
-                    logMsg += "Payload= " + Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
-                            getAttributeTypes()[2]) + "\n";
+                    logMsg.append("StreamID=").append(entry.getKey()).append(" :  ");
+                    logMsg.append("Meta= ").append(Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[0])).append(" :  ");
+                    logMsg.append("Correlation= ").append(Arrays.deepToString(((StreamAttributeComposite)
+                            entry.getValue()).getAttributeTypes()[1])).append(" :  ");
+                    logMsg.append("Payload= ").append(Arrays.deepToString(((StreamAttributeComposite) entry.getValue()).
+                            getAttributeTypes()[2])).append("\n");
                 }
                 log.debug(logMsg);
             }
