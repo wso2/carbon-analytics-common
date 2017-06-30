@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 /**
- * Data Bridge Authentication Exception
+ * Data Bridge Authentication Exception.
  */
 public class AuthenticationException extends Exception {
     private String errorMessage;

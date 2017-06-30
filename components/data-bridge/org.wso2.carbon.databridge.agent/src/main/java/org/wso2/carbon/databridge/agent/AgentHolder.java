@@ -30,11 +30,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfiguration
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.internal.DataAgentServiceValueHolder;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,7 +72,7 @@ public class AgentHolder {
         }
     }
 
-    public synchronized static AgentHolder getInstance() throws DataEndpointAgentConfigurationException {
+    public static synchronized AgentHolder getInstance() throws DataEndpointAgentConfigurationException {
         if (instance == null) {
             instance = new AgentHolder();
         }
@@ -94,7 +90,7 @@ public class AgentHolder {
         AgentHolder.configPath = configPath;
     }
 
-    public synchronized static void shutdown() throws DataEndpointException {
+    public static synchronized void shutdown() throws DataEndpointException {
         if (instance != null) {
             for (DataEndpointAgent dataEndpointAgent : instance.dataEndpointAgents.values()) {
                 dataEndpointAgent.shutDown();
@@ -107,7 +103,8 @@ public class AgentHolder {
             throws DataEndpointAgentConfigurationException {
         DataEndpointAgent agent = this.dataEndpointAgents.get(type.toLowerCase());
         if (agent == null) {
-            throw new DataEndpointAgentConfigurationException("No data agent configured for the type: " + type.toLowerCase());
+            throw new DataEndpointAgentConfigurationException("No data agent configured for the type: " +
+                    type.toLowerCase());
         }
         return agent;
     }
@@ -135,7 +132,7 @@ public class AgentHolder {
             } else {
                 try {
                     Path dataAgentConfigPath = Paths.get(configPath);
-                    if(Files.exists(dataAgentConfigPath)) {
+                    if (Files.exists(dataAgentConfigPath)) {
                         ConfigProvider configProvider = ConfigProviderFactory.getConfigProvider(dataAgentConfigPath);
                         dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                                 resolveAndSetDataAgentConfiguration

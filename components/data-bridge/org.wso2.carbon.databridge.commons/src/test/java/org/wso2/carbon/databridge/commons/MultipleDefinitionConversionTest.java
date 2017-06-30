@@ -25,6 +25,9 @@ import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Multiple stream definition validation testcase.
+ */
 public class MultipleDefinitionConversionTest {
 
     @Test

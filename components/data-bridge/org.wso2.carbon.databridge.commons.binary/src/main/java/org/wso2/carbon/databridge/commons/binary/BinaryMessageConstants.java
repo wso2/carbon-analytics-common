@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.databridge.commons.binary;
 
+/**
+ * Databridge Binary Message related constants.
+ */
 public class BinaryMessageConstants {
     public static final String DEFAULT_CHARSET = "UTF-8";
 

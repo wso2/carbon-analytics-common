@@ -20,8 +20,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * WSO2 Event Implementation
- *
+ * WSO2 Event Implementation.
  *
  */
 public class Event {

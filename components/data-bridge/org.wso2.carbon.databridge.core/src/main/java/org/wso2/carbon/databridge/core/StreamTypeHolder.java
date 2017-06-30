@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Event stream data type holder
+ * Event stream data type holder.
  */
 public class StreamTypeHolder {
-    private Map<String, StreamAttributeComposite> attributeCompositeMap = new ConcurrentHashMap<String, StreamAttributeComposite>();
+    private Map<String, StreamAttributeComposite> attributeCompositeMap = new ConcurrentHashMap<>();
     private EventDispatcher eventDispatcherCallback;
 
     public Map<String, StreamAttributeComposite> getAttributeCompositeMap() {

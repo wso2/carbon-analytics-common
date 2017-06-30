@@ -20,6 +20,9 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.kernel.CarbonRuntime;
 
+/**
+ * Databridge service value holder.
+ */
 public class DataBridgeServiceValueHolder {
 
     private static CarbonRuntime carbonRuntime;

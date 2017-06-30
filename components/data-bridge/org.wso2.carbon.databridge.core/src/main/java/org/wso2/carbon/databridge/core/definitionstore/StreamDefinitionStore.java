@@ -25,6 +25,9 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.util.Collection;
 
+/**
+ * Stream definition store.
+ */
 public interface StreamDefinitionStore {
 
     public StreamDefinition getStreamDefinition(String streamName,

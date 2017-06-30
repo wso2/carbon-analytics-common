@@ -130,7 +130,9 @@ public class DataBridgeConfiguration {
         thriftPropertiesMap.put("tcpPort", "7611");
         thriftPropertiesMap.put("sslPort", "7711");
         thriftPropertiesMap.put("sslEnabledProtocols", "TLSv1,TLSv1.1,TLSv1.2");
-        thriftPropertiesMap.put("ciphers", "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA");
+        thriftPropertiesMap.put("ciphers", "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_" +
+                "CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_" +
+                "SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA");
 
         LinkedHashMap<String, String> binaryPropertiesMap = new LinkedHashMap<>();
         thriftPropertiesMap.put("tcpPort", "9611");
@@ -138,7 +140,9 @@ public class DataBridgeConfiguration {
         thriftPropertiesMap.put("tcpReceiverThreadPoolSize", "100");
         thriftPropertiesMap.put("sslReceiverThreadPoolSize", "100");
         thriftPropertiesMap.put("sslEnabledProtocols", "TLSv1,TLSv1.1,TLSv1.2");
-        thriftPropertiesMap.put("ciphers", "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA");
+        thriftPropertiesMap.put("ciphers", "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_" +
+                "CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_" +
+                "SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA");
 
 
         dataReceivers.add(new DataReceiver("Thrift", thriftPropertiesMap));

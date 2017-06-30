@@ -37,6 +37,9 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.net.SocketException;
 
+/**
+ * Server Offline Sync Thrift Testcase.
+ */
 public class ServerOfflineSyncThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -70,7 +73,8 @@ public class ServerOfflineSyncThriftTest {
 
 
     @AfterClass
-    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
                 "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -108,7 +112,9 @@ public class ServerOfflineSyncThriftTest {
 
     @Test
     public void testBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+            DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+            DataBridgeException, StreamDefinitionStoreException, SocketException {
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
@@ -155,7 +161,9 @@ public class ServerOfflineSyncThriftTest {
 
     @Test
     public void testNonBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+            DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+            DataBridgeException, StreamDefinitionStoreException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7652",

@@ -26,12 +26,13 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Helper class to build Agent Server Initial Configurations
+ * Helper class to build Agent Server Initial Configurations.
  */
 public final class DataBridgeCoreBuilder {
     private static final Log log = LogFactory.getLog(DataBridgeCoreBuilder.class);
@@ -40,17 +41,28 @@ public final class DataBridgeCoreBuilder {
     }
 
     // TODO: 2/2/17 stream definitions are temporarily loaded from a file in <product-sp>/deployment
-    public static List<String> loadStreamDefinitionXML() throws DataBridgeConfigurationException {
+    public static List<String> loadStreamDefinitionYAML() throws DataBridgeConfigurationException {
         List<String> streamDefinitionList = new ArrayList<String>();
-        String path = Utils.getCarbonHome().toString() + File.separator + "deployment" + File.separator + "stream-definitions.yaml";
+        String path = Utils.getCarbonHome().toString() + File.separator + "deployment" + File.separator +
+                "stream-definitions.yaml";
         Yaml yaml = new Yaml();
         File file = new File(path);
+        FileInputStream fileInputStream = null;
         try {
-            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream = new FileInputStream(file);
             Map<String, List<String>> streams = (Map<String, List<String>>) yaml.load(fileInputStream);
             streamDefinitionList.addAll(streams.get(DataBridgeConstants.STREAM_DEFINITIONS_ELEMENT));
         } catch (FileNotFoundException e) {
             log.error("File " + path + " could not be found", e);
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    log.error("Error when loading stream definition yaml file", e);
+                }
+            }
+
         }
         return streamDefinitionList;
     }

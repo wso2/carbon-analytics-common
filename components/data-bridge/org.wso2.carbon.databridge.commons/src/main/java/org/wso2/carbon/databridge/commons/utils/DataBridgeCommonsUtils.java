@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Data Bridge Commons Utils
+ * Data Bridge Commons Utils.
  */
 public class DataBridgeCommonsUtils {
 

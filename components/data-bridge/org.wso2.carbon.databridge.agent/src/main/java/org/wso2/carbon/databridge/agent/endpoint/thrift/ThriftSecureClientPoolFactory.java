@@ -24,10 +24,10 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
-import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 
@@ -38,7 +38,6 @@ import javax.net.ssl.SSLSocket;
  * This is a Thrift secure transport implementation for AbstractSecureClientPoolFactory
  * to be used by the Thrift Endpoint.
  */
-
 public class ThriftSecureClientPoolFactory extends AbstractSecureClientPoolFactory {
 
     private TSSLTransportFactory.TSSLTransportParameters params;
@@ -53,15 +52,18 @@ public class ThriftSecureClientPoolFactory extends AbstractSecureClientPoolFacto
     public Object createClient(String protocol, String hostName, int port) throws
             DataEndpointSecurityException, DataEndpointAgentConfigurationException {
         if (protocol.equalsIgnoreCase(DataEndpointConfiguration.Protocol.SSL.toString())) {
-            int timeout = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+            int timeout = AgentHolder.getInstance().
+                    getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
                     getAgentConfiguration().getSocketTimeoutMS();
-            String sslProtocols = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+            String sslProtocols = AgentHolder.getInstance().
+                    getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
                     getAgentConfiguration().getSslEnabledProtocols();
-            String ciphers = AgentHolder.getInstance().getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
+            String ciphers = AgentHolder.getInstance().
+                    getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
                     getAgentConfiguration().getCiphers();
             try {
                 TTransport receiverTransport = TSSLTransportFactory.
-                        getClientSocket(hostName, port, timeout, params );
+                        getClientSocket(hostName, port, timeout, params);
 
                 TSocket tSocket = (TSocket) receiverTransport;
                 SSLSocket sslSocket = (SSLSocket) tSocket.getSocket();

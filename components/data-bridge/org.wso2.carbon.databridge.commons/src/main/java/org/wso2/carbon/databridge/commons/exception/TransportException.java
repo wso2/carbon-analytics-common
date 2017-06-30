@@ -19,7 +19,7 @@ package org.wso2.carbon.databridge.commons.exception;
 
 
 /**
- * TransportException
+ * TransportException.
  */
 public class TransportException extends Exception {
 

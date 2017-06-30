@@ -20,7 +20,6 @@ package org.wso2.carbon.databridge.agent.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -30,7 +29,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
 /**
- * DataAgent Component Activator
+ * DataAgent Component Activator.
  */
 @Component(
         name = "org.wso2.carbon.databridge.agent.internal.DataAgentDS",

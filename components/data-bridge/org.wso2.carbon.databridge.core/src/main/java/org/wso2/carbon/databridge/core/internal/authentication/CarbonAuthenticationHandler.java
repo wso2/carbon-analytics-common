@@ -20,19 +20,21 @@ package org.wso2.carbon.databridge.core.internal.authentication;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
+import org.wso2.carbon.databridge.core.utils.AgentSession;
 import org.wso2.carbon.kernel.context.PrivilegedCarbonContext;
 import org.wso2.carbon.messaging.CarbonMessage;
 import org.wso2.carbon.messaging.DefaultCarbonMessage;
 import org.wso2.carbon.security.caas.api.ProxyCallbackHandler;
 
+import java.nio.charset.Charset;
+import java.util.Base64;
+
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import java.util.Base64;
 
 
 /**
- * CarbonAuthenticationHandler implementation that authenticate Agents
+ * CarbonAuthenticationHandler implementation that authenticate Agents.
  * via Carbon AuthenticationService
  */
 
@@ -47,7 +49,7 @@ public class CarbonAuthenticationHandler implements AuthenticationHandler {
 
             CarbonMessage carbonMessage = new DefaultCarbonMessage();
             carbonMessage.setHeader("Authorization", "Basic " + Base64.getEncoder()
-                    .encodeToString((userName + ":" + password).getBytes())
+                    .encodeToString((userName + ":" + password).getBytes(Charset.forName("UTF-8")))
             );
 
             ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);

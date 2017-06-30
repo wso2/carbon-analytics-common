@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Event conversion testcase.
+ */
 public class EventConversionTest {
 
     private String properJSON2 = "[\n" + "     {\n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"

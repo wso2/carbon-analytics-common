@@ -38,6 +38,9 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.io.IOException;
 import java.net.SocketException;
 
+/**
+ * ServerOfflineBinaryTest.
+ */
 public class ServerOfflineBinaryTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -70,7 +73,8 @@ public class ServerOfflineBinaryTest {
     }
 
     @AfterClass
-    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://localhost:9687",
                 "ssl://localhost:9787", "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -106,7 +110,9 @@ public class ServerOfflineBinaryTest {
 
     @Test
     public void testBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+            DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+            DataBridgeException, StreamDefinitionStoreException, IOException {
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));

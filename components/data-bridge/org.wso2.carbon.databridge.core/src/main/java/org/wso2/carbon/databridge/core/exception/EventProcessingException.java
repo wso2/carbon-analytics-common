@@ -1,4 +1,4 @@
-/**
+/*
  *
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -18,11 +18,11 @@
  * limitations under the License.
  */
 
-/**
- * WSo2Event processing exception
- */
 package org.wso2.carbon.databridge.core.exception;
 
+/**
+ * WSo2Event processing exception.
+ */
 public class EventProcessingException extends Exception {
     public EventProcessingException(String s) {
         super(s);

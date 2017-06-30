@@ -35,7 +35,7 @@ import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.receiver.thrift.converter.ThriftEventConverter;
 
 /**
- * The client implementation for ThriftDataReceiverService
+ * The client implementation for ThriftDataReceiverService.
  */
 public class ThriftEventTransmissionServiceImpl implements
                                                 ThriftEventTransmissionService.Iface {
@@ -71,7 +71,8 @@ public class ThriftEventTransmissionServiceImpl implements
             String streamDefinition = dataBridgeReceiverService.findStreamId(sessionId, streamName, streamVersion);
             if (streamDefinition == null) {
                 //this is used as Thrift cannot send null values
-                throw new ThriftNoStreamDefinitionExistException("Stream definition not exist for " + streamName + " " + streamVersion);
+                throw new ThriftNoStreamDefinitionExistException("Stream definition not exist for " + streamName + " "
+                        + streamVersion);
             }
             return streamDefinition;
         } catch (SessionTimeoutException e) {

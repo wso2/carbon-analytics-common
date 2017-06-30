@@ -25,7 +25,8 @@ import java.util.List;
 /**
  * Configuration class for data-bridge-config.yaml file.
  */
-@Configuration(namespace = "data.agent.config", description = "Configuration of the Data Agents - to publish events through databridge")
+@Configuration(namespace = "data.agent.config", description = "Configuration of the Data Agents - to " +
+        "publish events through databridge")
 public class DataAgentsConfiguration {
 
 
@@ -33,8 +34,10 @@ public class DataAgentsConfiguration {
     public List<Agent> agents = new ArrayList<>();
 
     public DataAgentsConfiguration() {
-        agents.add(new Agent("Thrift", "org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint"));
-        agents.add(new Agent("Binary", "org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint"));
+        agents.add(new Agent("Thrift",
+                "org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint"));
+        agents.add(new Agent("Binary",
+                "org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint"));
     }
 
     @Override

@@ -26,9 +26,6 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -38,6 +35,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 
 import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
 
@@ -86,7 +86,8 @@ public class BinaryDataReceiver {
         if (keyStorePassword == null) {
             keyStorePassword = System.getProperty("Security.KeyStore.Password");
             if (keyStorePassword == null) {
-                throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
+                throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore. " +
+                        "Password is null ");
             }
 
         }
@@ -96,7 +97,8 @@ public class BinaryDataReceiver {
         SSLServerSocketFactory sslserversocketfactory =
                 (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         SSLServerSocket sslserversocket =
-                (SSLServerSocket) sslserversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
+                (SSLServerSocket) sslserversocketfactory.createServerSocket(binaryDataReceiverConfiguration.
+                        getSSLPort());
 
         String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
         if (sslProtocols != null && sslProtocols.length() != 0) {
@@ -119,7 +121,8 @@ public class BinaryDataReceiver {
 
     private void startEventTransmission() throws IOException {
         ServerSocketFactory serversocketfactory = ServerSocketFactory.getDefault();
-        ServerSocket serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getTCPPort());
+        ServerSocket serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.
+                getTCPPort());
         Thread thread = new Thread(new BinaryEventServerAcceptor(serversocket));
         thread.start();
         log.info("Started Binary TCP Transport on port : " + binaryDataReceiverConfiguration.getTCPPort());
@@ -203,13 +206,16 @@ public class BinaryDataReceiver {
         bbuf.putInt(errorClassNameLength);
         bbuf.putInt(errorMsgLength);
 
-        outputStream.write((byte) 1);//Error
+        outputStream.write((byte) 1); //Error
         outputStream.write(bbuf.array());
         outputStream.write(e.getClass().getCanonicalName().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         outputStream.write(e.getMessage().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         outputStream.flush();
     }
 
+    /**
+     * Binary Secure Event Server Acceptor.
+     */
     public class BinarySecureEventServerAcceptor implements Runnable {
         private ServerSocket serverSocket;
 
@@ -230,6 +236,9 @@ public class BinaryDataReceiver {
         }
     }
 
+    /**
+     * Binary Event Server Acceptor.
+     */
     public class BinaryEventServerAcceptor implements Runnable {
         private ServerSocket serverSocket;
 
@@ -250,6 +259,9 @@ public class BinaryDataReceiver {
         }
     }
 
+    /**
+     * Binary Transport Receiver.
+     */
     public class BinaryTransportReceiver implements Runnable {
         private Socket socket;
 

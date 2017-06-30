@@ -20,7 +20,7 @@
 package org.wso2.carbon.databridge.core.exception;
 
 /**
- * WSO2Event conversion exception
+ * WSO2Event conversion exception.
  */
 public class EventConversionException extends RuntimeException {
     private String errorMessage;

@@ -20,19 +20,17 @@ package org.wso2.carbon.databridge.receiver.thrift.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.http.HttpService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 
 /**
- * Service component
+ * ThriftDataReceiver Service component.
  *
  * @since 1.0.0
  */
@@ -55,7 +53,6 @@ public class ThriftDataReceiverDS {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        System.out.println("Called ThriftDataReceiverDS");
         String disableReceiver = System.getProperty(DISABLE_RECEIVER);
         if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
             log.info("Receiver disabled.");

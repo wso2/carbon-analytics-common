@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 /**
- * No Stream Definition Exist Exception
+ * No Stream Definition Exist Exception.
  */
 public class NoStreamDefinitionExistException extends Exception {
     private String errorMessage;

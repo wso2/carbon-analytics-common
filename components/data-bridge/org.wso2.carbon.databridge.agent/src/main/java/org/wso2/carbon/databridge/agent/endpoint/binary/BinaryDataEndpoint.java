@@ -27,7 +27,11 @@ import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
 import java.net.Socket;
 import java.util.List;
 
-import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender.*;
+import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender.processResponse;
+import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender.sendBinaryLoginMessage;
+import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender.sendBinaryLogoutMessage;
+import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender.sendBinaryPublishMessage;
+
 
 /**
  * This class is Binary transport implementation for the Data Endpoint.

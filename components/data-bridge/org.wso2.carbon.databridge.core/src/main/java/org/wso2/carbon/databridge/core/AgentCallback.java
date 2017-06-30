@@ -26,12 +26,12 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import java.util.List;
 
 /**
- * The call back that notifies Event arrivals and StreamDefinition declarations
+ * The call back that notifies Event arrivals and StreamDefinition declarations.
  */
 public interface AgentCallback {
 
     /**
-     * will get called  when types are defined
+     * will get called  when types are defined.
      *
      * @param streamDefinition TypeDefinition of event streams
      */
@@ -39,14 +39,14 @@ public interface AgentCallback {
 
 
     /**
-     * will get called  when types are removed
+     * will get called  when types are removed.
      *
      * @param streamDefinition TypeDefinition of event streams
      */
     void removeStream(StreamDefinition streamDefinition);
 
     /**
-     * will get called when Events arrive
+     * will get called when Events arrive.
      *
      * @param eventList Arrived event list
      */

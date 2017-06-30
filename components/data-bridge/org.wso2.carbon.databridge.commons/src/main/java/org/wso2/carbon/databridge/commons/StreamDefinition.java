@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * WSO2 Event Stream Definition
+ * WSO2 Event Stream Definition.
  */
 public class StreamDefinition {
     private String streamId;
@@ -148,7 +148,7 @@ public class StreamDefinition {
     }
 
     /**
-     * Stream Id is not used for comparing definitions
+     * Stream Id is not used for comparing definitions.
      * This is because this method is used to identify duplicates
      *
      * @param o compared Object
@@ -188,7 +188,7 @@ public class StreamDefinition {
     }
 
     /**
-     * Stream Id is not used for comparing definitions
+     * Stream Id is not used for comparing definitions.
      * This is because this method is used to identify duplicates
      *
      * @return hash code

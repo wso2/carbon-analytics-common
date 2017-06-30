@@ -17,8 +17,7 @@
 package org.wso2.carbon.databridge.commons;
 
 /**
- * Credentials using for login
- *
+ * Credentials using for login.
  */
 
 public class Credentials {

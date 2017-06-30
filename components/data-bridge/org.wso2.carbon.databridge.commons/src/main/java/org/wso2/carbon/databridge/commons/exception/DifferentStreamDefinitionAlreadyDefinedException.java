@@ -19,7 +19,7 @@ package org.wso2.carbon.databridge.commons.exception;
 
 
 /**
- * Data Bridge Different Stream Definition Already Defined Exception
+ * Data Bridge Different Stream Definition Already Defined Exception.
  */
 public class DifferentStreamDefinitionAlreadyDefinedException extends Exception {
     private String errorMessage;

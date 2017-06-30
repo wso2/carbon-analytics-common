@@ -19,7 +19,6 @@ package org.wso2.carbon.databridge.agent.endpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
@@ -48,8 +47,12 @@ public class DataEndpointConnectionWorker implements Runnable {
             }
         } else {
             String errorMsg = "Data endpoint connection worker is not properly initialized ";
-            if (dataEndpoint == null) errorMsg += ", data Endpoint is not provided ";
-            if (dataEndpointConfiguration == null) errorMsg += ", data Endpoint configuration is not provided";
+            if (dataEndpoint == null) {
+                errorMsg += ", data Endpoint is not provided ";
+            }
+            if (dataEndpointConfiguration == null) {
+                errorMsg += ", data Endpoint configuration is not provided";
+            }
             errorMsg += ".";
             log.error(errorMsg);
         }
@@ -97,12 +100,15 @@ public class DataEndpointConnectionWorker implements Runnable {
             dataEndpointConfiguration.setSessionId(sessionId);
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
-            throw new DataEndpointAuthenticationException("Cannot borrow client for " + dataEndpointConfiguration.getAuthURL(), e);
+            throw new DataEndpointAuthenticationException("Cannot borrow client for " +
+                    dataEndpointConfiguration.getAuthURL(), e);
         } finally {
             try {
-                this.dataEndpointConfiguration.getSecuredTransportPool().returnObject(dataEndpointConfiguration.getAuthKey(), client);
+                this.dataEndpointConfiguration.getSecuredTransportPool().
+                        returnObject(dataEndpointConfiguration.getAuthKey(), client);
             } catch (Exception e) {
-                this.dataEndpointConfiguration.getSecuredTransportPool().clear(dataEndpointConfiguration.getAuthKey());
+                this.dataEndpointConfiguration.getSecuredTransportPool().
+                        clear(dataEndpointConfiguration.getAuthKey());
             }
         }
 
@@ -111,18 +117,23 @@ public class DataEndpointConnectionWorker implements Runnable {
     public void disconnect(DataEndpointConfiguration dataPublisherConfiguration) {
         Object client = null;
         try {
-            client = this.dataEndpointConfiguration.getSecuredTransportPool().borrowObject(dataPublisherConfiguration.getAuthKey());
+            client = this.dataEndpointConfiguration.getSecuredTransportPool().
+                    borrowObject(dataPublisherConfiguration.getAuthKey());
             this.dataEndpoint.logout(client, dataPublisherConfiguration.getSessionId());
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
-                log.debug("Cannot connect to the server at " + dataPublisherConfiguration.getAuthURL() + ", for user: " + dataPublisherConfiguration.getUsername(), e);
+                log.debug("Cannot connect to the server at " + dataPublisherConfiguration.getAuthURL() +
+                        ", for user: " + dataPublisherConfiguration.getUsername(), e);
             }
-            log.warn("Cannot connect to the server at " + dataPublisherConfiguration.getAuthURL() + ", for user: " + dataPublisherConfiguration.getUsername());
+            log.warn("Cannot connect to the server at " + dataPublisherConfiguration.getAuthURL() +
+                    ", for user: " + dataPublisherConfiguration.getUsername());
         } finally {
             try {
-                this.dataEndpointConfiguration.getSecuredTransportPool().returnObject(dataPublisherConfiguration.getAuthKey(), client);
+                this.dataEndpointConfiguration.getSecuredTransportPool().returnObject(
+                        dataPublisherConfiguration.getAuthKey(), client);
             } catch (Exception e) {
-                this.dataEndpointConfiguration.getSecuredTransportPool().clear(dataPublisherConfiguration.getAuthKey());
+                this.dataEndpointConfiguration.getSecuredTransportPool().clear(
+                        dataPublisherConfiguration.getAuthKey());
             }
         }
     }

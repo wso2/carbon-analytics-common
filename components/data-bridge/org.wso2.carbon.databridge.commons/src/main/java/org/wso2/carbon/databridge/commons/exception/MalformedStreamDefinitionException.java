@@ -18,7 +18,7 @@
 package org.wso2.carbon.databridge.commons.exception;
 
 /**
- * Malformed Stream Definition Exception
+ * Malformed Stream Definition Exception.
  */
 public class MalformedStreamDefinitionException extends Exception {
     private String errorMessage;

@@ -32,9 +32,10 @@ public class StreamAttributeComposite {
 
     public StreamAttributeComposite(StreamDefinition streamDefinition) {
         this.streamDefinition = streamDefinition;
-        this.attributeTypes = new AttributeType[][]{EventDefinitionConverterUtils.generateAttributeTypeArray(streamDefinition.getMetaData()),
-                                                    EventDefinitionConverterUtils.generateAttributeTypeArray(streamDefinition.getCorrelationData()),
-                                                    EventDefinitionConverterUtils.generateAttributeTypeArray(streamDefinition.getPayloadData())};
+        this.attributeTypes = new AttributeType[][]{
+                EventDefinitionConverterUtils.generateAttributeTypeArray(streamDefinition.getMetaData()),
+                EventDefinitionConverterUtils.generateAttributeTypeArray(streamDefinition.getCorrelationData()),
+                EventDefinitionConverterUtils.generateAttributeTypeArray(streamDefinition.getPayloadData())};
         this.attributeSize = getSize(attributeTypes);
 
     }

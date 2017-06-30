@@ -23,7 +23,7 @@ import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiverServiceComponent;
 
 /**
- * The receiver configuration for Binary Transport Receiver
+ * The receiver configuration for Binary Transport Receiver.
  */
 public class BinaryDataReceiverConfiguration {
     private int sslPort;
@@ -42,7 +42,8 @@ public class BinaryDataReceiverConfiguration {
 
     public BinaryDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration) {
 
-        DataReceiverConfiguration dataReceiverConfiguration = dataBridgeConfiguration.getDataReceiver(BinaryDataReceiverConstants.DATA_BRIDGE_RECEIVER_CONFIG_NAME);
+        DataReceiverConfiguration dataReceiverConfiguration = dataBridgeConfiguration.
+                getDataReceiver(BinaryDataReceiverConstants.DATA_BRIDGE_RECEIVER_CONFIG_NAME);
         String sslPortConfiguration = dataReceiverConfiguration.getProperties().get(
                 BinaryDataReceiverConstants.SSL_RECEIVER_PORT_CONFIG_NAME);
         String tcpPortConfiguration = dataReceiverConfiguration.getProperties().get(

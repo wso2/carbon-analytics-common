@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * the util class that converts Events and its definitions in to various forms
+ * the util class that converts Events and its definitions in to various forms.
  */
 public final class ThriftEventConverter implements EventConverter {
 
@@ -54,7 +54,8 @@ public final class ThriftEventConverter implements EventConverter {
                         indexCounter.incrementLongCount();
                         break;
                     case STRING:
-                        String stringValue = thriftEventBundle.getStringAttributeList().get(indexCounter.getStringCount());
+                        String stringValue = thriftEventBundle.getStringAttributeList().
+                                get(indexCounter.getStringCount());
                         if (stringValue.equals(EventDefinitionConverterUtils.NULL_STRING)) {
                             objects[i] = null;
                         } else {
@@ -67,7 +68,8 @@ public final class ThriftEventConverter implements EventConverter {
                         indexCounter.incrementDoubleCount();
                         break;
                     case FLOAT:
-                        objects[i] = thriftEventBundle.getDoubleAttributeList().get(indexCounter.getDoubleCount()).floatValue();
+                        objects[i] = thriftEventBundle.getDoubleAttributeList().
+                                get(indexCounter.getDoubleCount()).floatValue();
                         indexCounter.incrementDoubleCount();
                         break;
                     case BOOL:
@@ -99,28 +101,38 @@ public final class ThriftEventConverter implements EventConverter {
             int eventBundleSize = 0;
             //arbitray data
             if (thriftEventBundle.isSetArbitraryDataMapMap()) {
-                Set<Map.Entry<Integer, Map<String, String>>> arbitraryDataMap = thriftEventBundle.getArbitraryDataMapMap().entrySet();
+                Set<Map.Entry<Integer, Map<String, String>>> arbitraryDataMap = thriftEventBundle.
+                        getArbitraryDataMapMap().entrySet();
                 for (Map.Entry<Integer, Map<String, String>> arbitraryData : arbitraryDataMap) {
                     eventBundleSize += DataBridgeCommonsUtils.getSize(arbitraryData.getValue());
                 }
                 eventBundleSize += arbitraryDataMap.size() * 4; // 4 byte per integer
-                eventBundleSize += arbitraryDataMap.size() * DataBridgeCommonsUtils.getReferenceSize() * 2; //for the reference
+                //for the reference
+                eventBundleSize += arbitraryDataMap.size() * DataBridgeCommonsUtils.getReferenceSize() * 2;
             }
             eventBundleSize += thriftEventBundle.getBoolAttributeListSize();  //1 byte per boolean field
-            eventBundleSize += thriftEventBundle.getBoolAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each reference
+            // for each reference
+            eventBundleSize += thriftEventBundle.getBoolAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize();
             eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * 8; //8 bytes per double field
-            eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each double reference.
+            // for each double reference.
+            eventBundleSize += thriftEventBundle.getDoubleAttributeListSize() * DataBridgeCommonsUtils.
+                    getReferenceSize();
             eventBundleSize += thriftEventBundle.getIntAttributeListSize() * 4; // 4 bytes per int field
-            eventBundleSize += thriftEventBundle.getIntAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each int reference
+            // for each int reference
+            eventBundleSize += thriftEventBundle.getIntAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize();
             eventBundleSize += thriftEventBundle.getLongAttributeListSize() * 8; // 8 bytes per long field
-            eventBundleSize += thriftEventBundle.getLongAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each long reference
+            // for each long reference
+            eventBundleSize += thriftEventBundle.getLongAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize();
             for (String aStringField : thriftEventBundle.getStringAttributeList()) {
                 eventBundleSize += aStringField.getBytes().length;
             }
-            eventBundleSize += thriftEventBundle.getStringAttributeListSize() * DataBridgeCommonsUtils.getReferenceSize(); // for each string reference
+            // for each string reference
+            eventBundleSize += thriftEventBundle.getStringAttributeListSize() * DataBridgeCommonsUtils.
+                    getReferenceSize();
             eventBundleSize += 4; //for eventNum field
             eventBundleSize += DataBridgeCommonsUtils.getSize(thriftEventBundle.getSessionId());
-            eventBundleSize += 7 * DataBridgeCommonsUtils.getReferenceSize(); // for the references of list and string attributes in thrift event bundle
+            // for the references of list and string attributes in thrift event bundle
+            eventBundleSize += 7 * DataBridgeCommonsUtils.getReferenceSize();
             return eventBundleSize;
         } else {
             throw new EventConversionException("Wrong type of event received " + eventBundle.getClass());
@@ -156,7 +168,8 @@ public final class ThriftEventConverter implements EventConverter {
                     streamTypeHolder.reloadStreamTypeHolder();
                     attributeTypeOrder = streamTypeHolder.getDataType(streamId);
                     if (attributeTypeOrder == null) {
-                        throw new EventConversionException("No StreamDefinition for streamId " + streamId + " present in cache ");
+                        throw new EventConversionException("No StreamDefinition for streamId " + streamId +
+                                " present in cache ");
                     }
                 }
                 event.setMetaData(this.toObjectArray(thriftEventBundle, attributeTypeOrder[0], indexCounter));
@@ -171,7 +184,8 @@ public final class ThriftEventConverter implements EventConverter {
                 eventList.add(event);
             }
         } catch (RuntimeException re) {
-            throw new EventConversionException("Error when converting " + streamId + " of event bundle with events " + thriftEventBundle.getEventNum(), re);
+            throw new EventConversionException("Error when converting " + streamId + " of event bundle with events " +
+                    thriftEventBundle.getEventNum(), re);
         }
         return eventList;
     }

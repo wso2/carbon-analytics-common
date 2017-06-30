@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.databridge.core.internal.authentication;
 
-import org.wso2.carbon.databridge.core.Utils.AgentSession;
+import org.wso2.carbon.databridge.core.utils.AgentSession;
 
 /**
- * The handler interface that's used to authenticate Agents
+ * The handler interface that's used to authenticate Agents.
  */
 public interface AuthenticationHandler {
 

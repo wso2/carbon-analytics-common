@@ -31,6 +31,10 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 
 import java.io.IOException;
 
+/**
+ * Binary Data Receiver ServiceComponent.
+ */
+
 @Component(
         name = "binary-receiver-component-service",
         immediate = true

@@ -24,7 +24,6 @@ import org.wso2.carbon.databridge.commons.exception.MalformedEventException;
 import org.wso2.carbon.databridge.core.EventConverter;
 import org.wso2.carbon.databridge.core.StreamTypeHolder;
 import org.wso2.carbon.databridge.core.exception.EventConversionException;
-import org.wso2.carbon.kernel.context.PrivilegedCarbonContext;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class BinaryEventConverter implements EventConverter {
         List<Event> eventList = new ArrayList<>();
         for (int i = 0; i < events; i++) {
             int eventSize = byteBuffer.getInt();
-            byte[] bytes= new byte[eventSize];
+            byte[] bytes = new byte[eventSize];
             byteBuffer.get(bytes);
             ByteBuffer eventByteBuffer = ByteBuffer.wrap(bytes);
             eventList.add(getEvent(eventByteBuffer, streamTypeHolder));
@@ -63,7 +62,7 @@ public class BinaryEventConverter implements EventConverter {
 
     @Override
     public int getSize(Object eventBundle) {
-        return ((byte[])eventBundle).length;
+        return ((byte[]) eventBundle).length;
     }
 
     @Override
@@ -153,7 +152,7 @@ public class BinaryEventConverter implements EventConverter {
                 int keySize = byteBuffer.getInt();
                 String key = BinaryMessageConverterUtil.getString(byteBuffer, keySize);
                 int valueSize = byteBuffer.getInt();
-                String value = BinaryMessageConverterUtil.getString(byteBuffer,valueSize);
+                String value = BinaryMessageConverterUtil.getString(byteBuffer, valueSize);
                 eventProps.put(key, value);
             }
             return eventProps;

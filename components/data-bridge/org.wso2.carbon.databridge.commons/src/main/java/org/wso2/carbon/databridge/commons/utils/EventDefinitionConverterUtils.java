@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Util class that converts Events and its definitions in to various forms
+ * Util class that converts Events and its definitions in to various forms.
  */
 public final class EventDefinitionConverterUtils {
     public static final String NULL_STRING = "_null";
@@ -108,11 +108,6 @@ public final class EventDefinitionConverterUtils {
     }
 
     public static String convertToJson(List<StreamDefinition> existingDefinitions) {
-        JSONArray jsonDefnArray = new JSONArray();
-        for (StreamDefinition existingDefinition : existingDefinitions) {
-            jsonDefnArray.put(convertToJson(existingDefinition));
-        }
-
         return gson.toJson(existingDefinitions);
     }
 

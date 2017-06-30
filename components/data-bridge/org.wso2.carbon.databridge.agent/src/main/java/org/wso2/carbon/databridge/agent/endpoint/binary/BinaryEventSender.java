@@ -20,14 +20,22 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 
-import java.io.*;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.*;
+import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.assignData;
+import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.getSize;
+import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
+
 
 /**
  * This is a Util class which does the Binary message transformation for publish, login, logout operations.
@@ -59,7 +67,8 @@ public class BinaryEventSender {
         outputStream.flush();
     }
 
-    public static void sendBinaryPublishMessage(Socket socket, List<Event> events, String sessionId) throws IOException {
+    public static void sendBinaryPublishMessage(Socket socket, List<Event> events, String sessionId)
+            throws IOException {
         int messageSize = 8 + sessionId.length();
         List<byte[]> bytes = new ArrayList<byte[]>();
 
@@ -156,8 +165,10 @@ public class BinaryEventSender {
                 int errorClassNameLength = bbuf.getInt();
                 int errorMsgLength = bbuf.getInt();
 
-                String className = new String(ByteBuffer.wrap(loadData(bufferedInputStream, new byte[errorClassNameLength])).array());
-                String errorMsg = new String(ByteBuffer.wrap(loadData(bufferedInputStream, new byte[errorMsgLength])).array());
+                String className = new String(ByteBuffer.wrap(loadData(bufferedInputStream,
+                        new byte[errorClassNameLength])).array());
+                String errorMsg = new String(ByteBuffer.wrap(loadData(bufferedInputStream,
+                        new byte[errorMsgLength])).array());
 
                 throw (Exception) (BinaryDataEndpoint.class.getClassLoader().
                         loadClass(className).getConstructor(String.class).newInstance(errorMsg));

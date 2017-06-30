@@ -17,7 +17,7 @@
 */
 
 
-package org.wso2.carbon.databridge.core.Utils;
+package org.wso2.carbon.databridge.core.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Databridge utils class
+ * Databridge utils class.
  */
 public class DataBridgeUtils {
 

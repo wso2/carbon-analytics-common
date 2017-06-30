@@ -19,7 +19,7 @@
 package org.wso2.carbon.databridge.receiver.thrift.converter;
 
 /**
- * Counter used to dematerialise event bundle
+ * Counter used to dematerialise event bundle.
  */
 public class IndexCounter {
 

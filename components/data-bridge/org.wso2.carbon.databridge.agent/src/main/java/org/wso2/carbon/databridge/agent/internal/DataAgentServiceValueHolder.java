@@ -19,6 +19,9 @@ package org.wso2.carbon.databridge.agent.internal;
 
 import org.wso2.carbon.config.provider.ConfigProvider;
 
+/**
+ * Data Agent Service value holder.
+ */
 public class DataAgentServiceValueHolder {
 
     private static ConfigProvider configProvider;

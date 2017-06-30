@@ -19,7 +19,7 @@
 package org.wso2.carbon.databridge.agent.util;
 
 /**
- * Class to define the constants for Data Agent Constants
+ * Class to define the constants for Data Agent Constants.
  */
 
 public class DataAgentConstants {

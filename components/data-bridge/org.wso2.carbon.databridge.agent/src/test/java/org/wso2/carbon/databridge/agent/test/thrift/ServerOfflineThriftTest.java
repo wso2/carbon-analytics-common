@@ -38,6 +38,9 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.net.SocketException;
 
+/**
+ * ServerOfflineThriftTest.
+ */
 public class ServerOfflineThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
@@ -140,9 +143,11 @@ public class ServerOfflineThriftTest {
 //            for (LoggingEvent loggingEvent : log) {
 //                if (loggingEvent.getLevel() == Level.ERROR) {
 //                    Throwable exception = loggingEvent.getThrowableInformation().getThrowable();
-//                    if (exception instanceof DataEndpointException && exception.getMessage().contains("knownUserName")) {
+//                    if (exception instanceof DataEndpointException && exception.getMessage().
+//                                      contains("knownUserName")) {
 //                        String errorMessage = exception.getMessage();
-//                        Assert.assertTrue("Format of log entry does not match", errorMessage.contains(DataEndpointConstants.SEPARATOR));
+//                        Assert.assertTrue("Format of log entry does not match", errorMessage.
+//                                      contains(DataEndpointConstants.SEPARATOR));
 //                        Assert.assertFalse("Log output not sanitized", errorMessage.contains("knownPass"));
 //                        break;
 //                    }

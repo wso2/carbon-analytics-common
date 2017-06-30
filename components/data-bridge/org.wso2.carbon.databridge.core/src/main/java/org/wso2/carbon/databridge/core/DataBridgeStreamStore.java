@@ -25,7 +25,7 @@ import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionS
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 /**
- * Class which adds/removes stream definition to InMemoryStreamDefinitionStore
+ * Class which adds/removes stream definition to InMemoryStreamDefinitionStore.
  */
 public class DataBridgeStreamStore {
 
@@ -49,7 +49,7 @@ public class DataBridgeStreamStore {
 
         InMemoryStreamDefinitionStore inMemoryStreamDefinitionStore = DataBridgeServiceValueHolder.
                 getStreamDefinitionStore();
-        if(inMemoryStreamDefinitionStore != null){
+        if (inMemoryStreamDefinitionStore != null) {
             inMemoryStreamDefinitionStore.removeStreamDefinition(streamName, streamVersion);
         }
     }

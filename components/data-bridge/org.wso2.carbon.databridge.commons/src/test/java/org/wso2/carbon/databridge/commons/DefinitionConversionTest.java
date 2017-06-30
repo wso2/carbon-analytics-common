@@ -24,6 +24,9 @@ import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Testcase to validate stream definition conversion.
+ */
 public class DefinitionConversionTest {
 
     @BeforeClass

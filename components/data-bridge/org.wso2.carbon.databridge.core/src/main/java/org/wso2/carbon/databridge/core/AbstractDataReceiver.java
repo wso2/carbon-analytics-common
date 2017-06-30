@@ -29,7 +29,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import java.util.List;
 
 /**
- * Abstract DataReceiver
+ * Abstract DataReceiver.
  */
 public abstract class AbstractDataReceiver implements DataBridgeReceiverService {
 

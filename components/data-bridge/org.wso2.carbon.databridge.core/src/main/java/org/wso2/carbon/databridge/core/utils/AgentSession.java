@@ -16,12 +16,12 @@
 * under the License.
 */
 
-package org.wso2.carbon.databridge.core.Utils;
+package org.wso2.carbon.databridge.core.utils;
 
 import org.wso2.carbon.databridge.commons.Credentials;
 
 /**
- * Agent Client's session
+ * Agent Client's session.
  */
 public class AgentSession {
     private String sessionId;
