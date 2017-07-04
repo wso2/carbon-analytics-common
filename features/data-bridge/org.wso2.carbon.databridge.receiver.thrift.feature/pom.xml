@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.databridge.receiver.thrift.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Carbon Databridge Thrift Binary Feature</name>
+    <name>WSO2 Carbon Databridge Receiver Thrift Feature</name>
     <url>http://wso2.org</url>
     <description>This aggregated feature contains the bundles required for the thrift receiver of the data bridge</description>
 
