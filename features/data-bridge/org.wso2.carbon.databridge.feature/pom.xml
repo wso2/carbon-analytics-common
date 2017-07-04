@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ /*
-  ~ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~ *
   ~ * Licensed under the Apache License, Version 2.0 (the "License");
   ~ * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
+        <artifactId>data-bridge-feature</artifactId>
         <version>6.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -30,7 +30,7 @@
     <packaging>carbon-feature</packaging>
     <name>WSO2 Carbon Databridge Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles related to databridge</description>
+    <description>This aggregated feature contains the all bundles related to databridge</description>
 
     <dependencies>
 
@@ -132,7 +132,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <propertyFile>../etc/feature.properties</propertyFile>
+                            <propertyFile>../../etc/feature.properties</propertyFile>
                             <adviceFileContents>
                                 <advice>
                                     <name>org.wso2.carbon.p2.category.type</name>
@@ -168,7 +168,7 @@
                                     <version>${libthrift.version}</version>
                                 </bundle>
 
-                                <!-- databridge-commons-thrift dependencies -->
+                                <!-- databridge-commons-binary dependencies -->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.databridge.commons.binary</symbolicName>
                                     <version>${carbon.analytics.common.version}</version>

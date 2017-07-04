@@ -32,7 +32,7 @@
 
     <modules>
         <module>components/data-bridge</module>
-        <module>features/org.wso2.carbon.databridge.feature</module>
+        <module>features/data-bridge</module>
     </modules>
 
     <build>
