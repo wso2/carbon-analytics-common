@@ -16,12 +16,12 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <artifactId>carbon-analytics-common</artifactId>
-        <version>5.1.10-SNAPSHOT</version>
+        <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -32,16 +32,14 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.databridge.commons.server.feature</module>
-        <module>org.wso2.carbon.databridge.commons.binary.server.feature</module>
-        <module>org.wso2.carbon.databridge.agent.server.feature</module>
-        <module>org.wso2.carbon.databridge.commons.thrift.server.feature</module>
-        <module>org.wso2.carbon.databridge.datapublisher.feature</module>
-        <module>org.wso2.carbon.databridge.core.server.feature</module>
-        <module>org.wso2.carbon.databridge.receiver.thrift.server.feature</module>
-        <module>org.wso2.carbon.databridge.datareceiver.feature</module>
-        <module>org.wso2.carbon.databridge.receiver.binary.server.feature</module>
-        <module>org.wso2.carbon.databridge.streamdefn.filesystem.server.feature</module>
+        <module>org.wso2.carbon.databridge.feature</module>
+        <module>org.wso2.carbon.databridge.commons.binary.feature</module>
+        <module>org.wso2.carbon.databridge.commons.thrift.feature</module>
+        <module>org.wso2.carbon.databridge.core.feature</module>
+        <module>org.wso2.carbon.databridge.receiver.binary.feature</module>
+        <module>org.wso2.carbon.databridge.receiver.thrift.feature</module>
+        <module>org.wso2.carbon.databridge.commons.feature</module>
+        <module>org.wso2.carbon.databridge.agent.feature</module>
     </modules>
 
 </project>
