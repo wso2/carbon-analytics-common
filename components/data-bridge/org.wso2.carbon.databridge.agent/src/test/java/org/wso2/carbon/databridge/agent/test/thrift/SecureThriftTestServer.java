@@ -39,15 +39,15 @@ import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ThriftTestServer {
-    Logger log = Logger.getLogger(ThriftTestServer.class);
+public class SecureThriftTestServer {
+    Logger log = Logger.getLogger(SecureThriftTestServer.class);
     ThriftDataReceiver thriftDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;
     AtomicInteger numberOfEventsReceived;
     RestarterThread restarterThread;
 
     public void startTestServer() throws DataBridgeException, InterruptedException {
-        ThriftTestServer thriftTestServer = new ThriftTestServer();
+        SecureThriftTestServer thriftTestServer = new SecureThriftTestServer();
         thriftTestServer.start(7611);
         Thread.sleep(100000000);
         thriftTestServer.stop();
@@ -103,7 +103,7 @@ public class ThriftTestServer {
             public void destroyContext(AgentSession agentSession) {
 
             }
-        }, streamDefinitionStore, DataPublisherTestUtil.getDataBridgeConfigPath());
+        }, streamDefinitionStore, DataPublisherTestUtil.getSecureDataBridgeConfigPath());
 
         thriftDataReceiver = new ThriftDataReceiver(receiverPort, databridge);
 
