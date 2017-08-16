@@ -33,6 +33,7 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
@@ -167,8 +168,18 @@ public class ThriftDataReceiver {
         ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> processor =
                 new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
                         new ThriftSecureEventTransmissionServiceImpl(dataBridgeReceiverService));
-        authenticationServer = new TThreadPoolServer(
-                new TThreadPoolServer.Args(serverTransport).processor(processor));
+        TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport).processor(processor)
+                .maxWorkerThreads(thriftDataReceiverConfiguration.getSslMaxWorkerThreads());
+        if (thriftDataReceiverConfiguration.getSslMinWorkerThreads() != ThriftDataReceiverConstants.UNDEFINED) {
+            args.minWorkerThreads = thriftDataReceiverConfiguration.getSslMinWorkerThreads();
+        }
+        if (thriftDataReceiverConfiguration.getSslRequestTimeout() != ThriftDataReceiverConstants.UNDEFINED) {
+            args.requestTimeout = thriftDataReceiverConfiguration.getSslRequestTimeout();
+        }
+        if (thriftDataReceiverConfiguration.getSslStopTimeoutVal() != ThriftDataReceiverConstants.UNDEFINED) {
+            args.stopTimeoutVal = thriftDataReceiverConfiguration.getSslStopTimeoutVal();
+        }
+        authenticationServer = new TThreadPoolServer(args);
         Thread thread = new Thread(new ServerThread(authenticationServer));
         log.info("Thrift SSL port : " + port);
         thread.start();
@@ -183,8 +194,18 @@ public class ThriftDataReceiver {
             ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor =
                     new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
                             new ThriftEventTransmissionServiceImpl(dataBridgeReceiverService));
-            dataReceiverServer = new TThreadPoolServer(
-                    new TThreadPoolServer.Args(serverTransport).processor(processor));
+            TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport).processor(processor)
+                    .maxWorkerThreads(thriftDataReceiverConfiguration.getTcpMaxWorkerThreads());
+            if (thriftDataReceiverConfiguration.getTcpMinWorkerThreads() != ThriftDataReceiverConstants.UNDEFINED) {
+                args.minWorkerThreads = thriftDataReceiverConfiguration.getTcpMinWorkerThreads();
+            }
+            if (thriftDataReceiverConfiguration.getTcpRequestTimeout() != ThriftDataReceiverConstants.UNDEFINED) {
+                args.requestTimeout = thriftDataReceiverConfiguration.getTcpRequestTimeout();
+            }
+            if (thriftDataReceiverConfiguration.getTcpStopTimeoutVal() != ThriftDataReceiverConstants.UNDEFINED) {
+                args.stopTimeoutVal = thriftDataReceiverConfiguration.getTcpStopTimeoutVal();
+            }
+            dataReceiverServer = new TThreadPoolServer(args);
             Thread thread = new Thread(new ServerThread(dataReceiverServer));
             log.info("Thrift port : " + port);
             thread.start();
