@@ -33,6 +33,14 @@ public class ThriftDataReceiverConfiguration {
     private String sslProtocols;
     private String ciphers;
     private String receiverHostName;
+    private int tcpMaxWorkerThreads = ThriftDataReceiverConstants.THRIFT_TCP_DEFAULT_MAX_WORKER_THREADS;
+    private int tcpMinWorkerThreads = ThriftDataReceiverConstants.UNDEFINED;
+    private int tcpRequestTimeout = ThriftDataReceiverConstants.UNDEFINED;
+    private int tcpStopTimeoutVal = ThriftDataReceiverConstants.UNDEFINED;
+    private int sslMaxWorkerThreads = ThriftDataReceiverConstants.THRIFT_SSL_DEFAULT_MAX_WORKER_THREADS;
+    private int sslMinWorkerThreads = ThriftDataReceiverConstants.UNDEFINED;
+    private int sslRequestTimeout = ThriftDataReceiverConstants.UNDEFINED;
+    private int sslStopTimeoutVal = ThriftDataReceiverConstants.UNDEFINED;
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort) {
         secureDataReceiverPort = defaultSslPort;
@@ -78,6 +86,54 @@ public class ThriftDataReceiverConfiguration {
 
         if (ciphers != null && !ciphers.trim().isEmpty()) {
             this.ciphers = ciphers;
+        }
+
+        String tcpMaxWorkerThreads = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_TCP_MAX_WORKER_THREADS);
+        if (tcpMaxWorkerThreads != null && !tcpMaxWorkerThreads.trim().isEmpty()) {
+            this.tcpMaxWorkerThreads = Integer.parseInt(tcpMaxWorkerThreads.trim());
+        }
+
+        String tcpMinWorkerThreads = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_TCP_MIN_WORKER_THREADS);
+        if (tcpMinWorkerThreads != null && !tcpMinWorkerThreads.trim().isEmpty()) {
+            this.tcpMinWorkerThreads = Integer.parseInt(tcpMinWorkerThreads.trim());
+        }
+
+        String tcpRequestTimeout = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_TCP_REQUEST_TIMEOUT);
+        if (tcpRequestTimeout != null && !tcpRequestTimeout.trim().isEmpty()) {
+            this.tcpRequestTimeout = Integer.parseInt(tcpRequestTimeout.trim());
+        }
+
+        String tcpStopTimeoutVal = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_TCP_STOP_TIMEOUT_VAL);
+        if (tcpStopTimeoutVal != null && !tcpStopTimeoutVal.trim().isEmpty()) {
+            this.tcpStopTimeoutVal = Integer.parseInt(tcpStopTimeoutVal.trim());
+        }
+
+        String sslMaxWorkerThreads = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_SSL_MAX_WORKER_THREADS);
+        if (sslMaxWorkerThreads != null && !sslMaxWorkerThreads.trim().isEmpty()) {
+            this.sslMaxWorkerThreads = Integer.parseInt(sslMaxWorkerThreads.trim());
+        }
+
+        String sslMinWorkerThreads = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_SSL_MIN_WORKER_THREADS);
+        if (sslMinWorkerThreads != null && !sslMinWorkerThreads.trim().isEmpty()) {
+            this.sslMinWorkerThreads = Integer.parseInt(sslMinWorkerThreads.trim());
+        }
+
+        String sslRequestTimeout = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_SSL_REQUEST_TIMEOUT);
+        if (sslRequestTimeout != null && !sslRequestTimeout.trim().isEmpty()) {
+            this.sslRequestTimeout = Integer.parseInt(sslRequestTimeout.trim());
+        }
+
+        String sslStopTimeoutVal = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.THRIFT_SSL_STOP_TIMEOUT_VAL);
+        if (sslStopTimeoutVal != null && !sslStopTimeoutVal.trim().isEmpty()) {
+            this.sslStopTimeoutVal = Integer.parseInt(sslStopTimeoutVal.trim());
         }
     }
 
@@ -126,5 +182,69 @@ public class ThriftDataReceiverConfiguration {
 
     public void setCiphers(String ciphers) {
         this.ciphers = ciphers;
+    }
+
+    public int getTcpMaxWorkerThreads() {
+        return tcpMaxWorkerThreads;
+    }
+
+    public void setTcpMaxWorkerThreads(int tcpMaxWorkerThreads) {
+        this.tcpMaxWorkerThreads = tcpMaxWorkerThreads;
+    }
+
+    public int getTcpMinWorkerThreads() {
+        return tcpMinWorkerThreads;
+    }
+
+    public void setTcpMinWorkerThreads(int tcpMinWorkerThreads) {
+        this.tcpMinWorkerThreads = tcpMinWorkerThreads;
+    }
+
+    public int getTcpRequestTimeout() {
+        return tcpRequestTimeout;
+    }
+
+    public void setTcpRequestTimeout(int tcpRequestTimeout) {
+        this.tcpRequestTimeout = tcpRequestTimeout;
+    }
+
+    public int getTcpStopTimeoutVal() {
+        return tcpStopTimeoutVal;
+    }
+
+    public void setTcpStopTimeoutVal(int tcpStopTimeoutVal) {
+        this.tcpStopTimeoutVal = tcpStopTimeoutVal;
+    }
+
+    public int getSslMaxWorkerThreads() {
+        return sslMaxWorkerThreads;
+    }
+
+    public void setSslMaxWorkerThreads(int sslMaxWorkerThreads) {
+        this.sslMaxWorkerThreads = sslMaxWorkerThreads;
+    }
+
+    public int getSslMinWorkerThreads() {
+        return sslMinWorkerThreads;
+    }
+
+    public void setSslMinWorkerThreads(int sslMinWorkerThreads) {
+        this.sslMinWorkerThreads = sslMinWorkerThreads;
+    }
+
+    public int getSslRequestTimeout() {
+        return sslRequestTimeout;
+    }
+
+    public void setSslRequestTimeout(int sslRequestTimeout) {
+        this.sslRequestTimeout = sslRequestTimeout;
+    }
+
+    public int getSslStopTimeoutVal() {
+        return sslStopTimeoutVal;
+    }
+
+    public void setSslStopTimeoutVal(int sslStopTimeoutVal) {
+        this.sslStopTimeoutVal = sslStopTimeoutVal;
     }
 }
