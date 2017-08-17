@@ -26,7 +26,11 @@ import org.apache.thrift.server.ServerContext;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.*;
+import org.apache.thrift.transport.TSSLTransportFactory;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
@@ -36,13 +40,14 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
+import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
-import javax.net.ssl.SSLServerSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import javax.net.ssl.SSLServerSocket;
 
 /**
  * Carbon based implementation of the agent server
@@ -177,8 +182,18 @@ public class ThriftDataReceiver {
         ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> processor =
                 new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
                         new ThriftSecureEventTransmissionServiceImpl(dataBridgeReceiverService));
-        authenticationServer = new TThreadPoolServer(
-                new TThreadPoolServer.Args(serverTransport).processor(processor));
+        TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport).processor(processor)
+                .maxWorkerThreads(thriftDataReceiverConfiguration.getSslMaxWorkerThreads());
+        if (thriftDataReceiverConfiguration.getSslMinWorkerThreads() != ThriftDataReceiverConstants.UNDEFINED) {
+            args.minWorkerThreads = thriftDataReceiverConfiguration.getSslMinWorkerThreads();
+        }
+        if (thriftDataReceiverConfiguration.getSslRequestTimeout() != ThriftDataReceiverConstants.UNDEFINED) {
+            args.requestTimeout = thriftDataReceiverConfiguration.getSslRequestTimeout();
+        }
+        if (thriftDataReceiverConfiguration.getSslStopTimeoutVal() != ThriftDataReceiverConstants.UNDEFINED) {
+            args.stopTimeoutVal = thriftDataReceiverConfiguration.getSslStopTimeoutVal();
+        }
+        authenticationServer = new TThreadPoolServer(args);
 
         if (log.isDebugEnabled()) {
             authenticationServer.setServerEventHandler(new LoggingServerEventHandler());
@@ -198,8 +213,18 @@ public class ThriftDataReceiver {
             ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor =
                     new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
                             new ThriftEventTransmissionServiceImpl(dataBridgeReceiverService));
-            dataReceiverServer = new TThreadPoolServer(
-                    new TThreadPoolServer.Args(serverTransport).processor(processor));
+            TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport).processor(processor)
+                    .maxWorkerThreads(thriftDataReceiverConfiguration.getTcpMaxWorkerThreads());
+            if (thriftDataReceiverConfiguration.getTcpMinWorkerThreads() != ThriftDataReceiverConstants.UNDEFINED) {
+                args.minWorkerThreads = thriftDataReceiverConfiguration.getTcpMinWorkerThreads();
+            }
+            if (thriftDataReceiverConfiguration.getTcpRequestTimeout() != ThriftDataReceiverConstants.UNDEFINED) {
+                args.requestTimeout = thriftDataReceiverConfiguration.getTcpRequestTimeout();
+            }
+            if (thriftDataReceiverConfiguration.getTcpStopTimeoutVal() != ThriftDataReceiverConstants.UNDEFINED) {
+                args.stopTimeoutVal = thriftDataReceiverConfiguration.getTcpStopTimeoutVal();
+            }
+            dataReceiverServer = new TThreadPoolServer(args);
             String url = hostName + ":" + port;
             Thread thread = new Thread(new ServerThread(dataReceiverServer, receiverStartupWaitingTime, url));
             log.info("Thrift port : " + port);
