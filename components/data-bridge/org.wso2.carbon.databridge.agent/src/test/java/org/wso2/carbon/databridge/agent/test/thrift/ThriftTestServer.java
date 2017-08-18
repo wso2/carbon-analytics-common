@@ -129,7 +129,7 @@ public class ThriftTestServer {
 
         });
 
-            String address = "0.0.0.0";
+            String address = "localhost";
             log.info("Test Server starting on " + address);
             thriftDataReceiver.start(address, 0);
             log.info("Test Server Started");
