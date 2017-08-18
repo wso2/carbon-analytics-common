@@ -24,6 +24,30 @@
     <dataReceiver name="Thrift">
         <config name="tcpPort">7611</config>
         <config name="sslPort">7711</config>
+
+        <!--The maximum size of the data receiving worker thread pool. Default value is 20.-->
+        <!--<config name="tcpMaxWorkerThreads">5</config>-->
+
+        <!--The minimum or the starting size of the data receiving worker thread pool. Default value is 5.-->
+        <!--<config name="tcpMinWorkerThreads">2</config>-->
+
+        <!--The request timeout in milli seconds. Default value is 20.-->
+        <!--<config name="tcpRequestTimeout">15</config>-->
+
+        <!--The stop timeout in milliseconds. Default value is 60.-->
+        <!--<config name="tcpStopTimeoutVal">50</config>-->
+
+        <!--The maximum size of the authenticating worker thread pool. Default value is 20.-->
+        <!--<config name="sslMaxWorkerThreads">5</config>-->
+
+        <!--The minimum or the starting size of the authenticating worker thread pool. Default value is 5.-->
+        <!--<config name="sslMinWorkerThreads">2</config>-->
+
+        <!--The request timeout in milli seconds. Default value is 20.-->
+        <!--<config name="sslRequestTimeout">15</config>-->
+
+        <!--The stop timeout in milliseconds. Default value is 60.-->
+        <!--<config name="sslStopTimeoutVal">50</config>-->
     </dataReceiver>
 
     <dataReceiver name="Binary">
