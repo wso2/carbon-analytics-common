@@ -82,10 +82,10 @@ public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
         EventComposite eventComposite = super.poll();
         currentSize.addAndGet(-eventComposite.getSize());
         if (semaphore.availablePermits() == 0 &&
-                ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
+                (((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty())) {
             synchronized (lock) {
                 if (semaphore.availablePermits() == 0 &&
-                        ((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty()) {
+                        (((currentEventCompositeSize + currentSize.get()) < maxSize) || isEmpty())) {
                     semaphore.release();
                 }
             }
