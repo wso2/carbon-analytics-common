@@ -18,19 +18,7 @@
 
 package org.wso2.carbon.databridge.core.internal.authentication;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.core.utils.AgentSession;
-import org.wso2.carbon.kernel.context.PrivilegedCarbonContext;
-import org.wso2.carbon.messaging.CarbonMessage;
-import org.wso2.carbon.messaging.DefaultCarbonMessage;
-import org.wso2.carbon.security.caas.api.ProxyCallbackHandler;
-
-import java.nio.charset.Charset;
-import java.util.Base64;
-
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
 
 
 /**
@@ -40,38 +28,22 @@ import javax.security.auth.login.LoginException;
 
 public class CarbonAuthenticationHandler implements AuthenticationHandler {
 
-    private static final Log log = LogFactory.getLog(CarbonAuthenticationHandler.class);
-
     public boolean authenticate(String userName, String password) {
-        boolean isAuthenticated = false;
-        try {
-            PrivilegedCarbonContext.destroyCurrentContext();
-
-            CarbonMessage carbonMessage = new DefaultCarbonMessage();
-            carbonMessage.setHeader("Authorization", "Basic " + Base64.getEncoder()
-                    .encodeToString((userName + ":" + password).getBytes(Charset.forName("UTF-8")))
-            );
-
-            ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);
-            LoginContext loginContext = new LoginContext("CarbonSecurityConfig", callbackHandler);
-            loginContext.login();
-            isAuthenticated = true;
-        } catch (LoginException e) {
-            log.error("Error trying load tenant after successful login", e);
-        }
-
-        return isAuthenticated;
+        // TODO: 9/14/17: Re-enable authentication
+        /*
+         * Caas based authentication was removed due to kernel/dependency issues.
+         * Proper authentication will be added once the OSGi based authenticator is released.
+         */
+        return true;
     }
 
     @Override
     public void initContext(AgentSession agentSession) {
-
         //Not required
     }
 
     @Override
     public void destroyContext(AgentSession agentSession) {
-
         //Not required
     }
 

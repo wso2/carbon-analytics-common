@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -355,11 +356,6 @@
                 <version>1.0.0</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.security.caas</groupId>
-                <artifactId>org.wso2.carbon.security.caas</artifactId>
-                <version>${carbon.security.caas.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.log4j.wso2</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.17.wso2v1</version>
@@ -458,7 +454,6 @@
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
         <databridge.version.range>[6.0.0, 7.0.0)</databridge.version.range>
         <disruptor.version.range>[2.10.0,3.4)</disruptor.version.range>
-        <carbon.security.caas.version>1.0.2-m1</carbon.security.caas.version>
         <org.wso2.json.version>3.0.0.wso2v1</org.wso2.json.version>
 
         <!-- Latest Dependencies -->

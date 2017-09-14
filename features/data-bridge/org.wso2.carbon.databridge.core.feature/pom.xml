@@ -50,10 +50,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.security.caas</groupId>
-            <artifactId>org.wso2.carbon.security.caas</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -98,10 +94,6 @@
                                 <bundle>
                                     <symbolicName>com.google.guava</symbolicName>
                                     <version>${guava.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.security.caas</symbolicName>
-                                    <version>${carbon.security.caas.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
