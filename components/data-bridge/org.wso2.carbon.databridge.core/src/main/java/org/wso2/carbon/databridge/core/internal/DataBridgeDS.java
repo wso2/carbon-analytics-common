@@ -16,8 +16,7 @@
 
 package org.wso2.carbon.databridge.core.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -55,7 +54,7 @@ import java.util.List;
         immediate = true
 )
 public class DataBridgeDS {
-    private static final Log log = LogFactory.getLog(DataBridgeDS.class);
+    private static final Logger log = Logger.getLogger(DataBridgeDS.class);
     private ServiceRegistration receiverServiceRegistration;
     private ServiceRegistration subscriberServiceRegistration;
     private ServiceRegistration dataBridgeEventStreamServiceRegistration;

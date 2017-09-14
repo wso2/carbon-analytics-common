@@ -19,8 +19,7 @@
 
 package org.wso2.carbon.databridge.core.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
@@ -35,7 +34,7 @@ import java.util.List;
  */
 public class DataBridgeUtils {
 
-    private static Log log = LogFactory.getLog(DataBridgeUtils.class);
+    private static final Logger log = Logger.getLogger(DataBridgeUtils.class);
 
     public static boolean equals(Event event1, Event event2, StreamDefinition streamDefinition) {
         if (event1 == event2) {

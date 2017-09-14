@@ -7,8 +7,6 @@
 package org.wso2.carbon.databridge.commons.thrift.data;
 
 
-import java.util.Map;
-import java.util.HashMap;
 import org.apache.thrift.TEnum;
 
 public enum ThriftAttributeType implements TEnum {

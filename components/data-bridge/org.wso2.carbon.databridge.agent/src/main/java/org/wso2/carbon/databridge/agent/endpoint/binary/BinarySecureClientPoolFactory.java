@@ -17,8 +17,7 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint.binary;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
@@ -36,7 +35,7 @@ import javax.net.ssl.SSLSocketFactory;
  * This is a Binary Transport secure implementation for AbstractSecureClientPoolFactory to be used by BinaryEndpoint.
  */
 public class BinarySecureClientPoolFactory extends AbstractSecureClientPoolFactory {
-    private static Log log = LogFactory.getLog(BinarySecureClientPoolFactory.class);
+    private static final Logger log = Logger.getLogger(BinarySecureClientPoolFactory.class);
 
     public BinarySecureClientPoolFactory(String trustStore, String trustStorePassword) {
         super(trustStore, trustStorePassword);

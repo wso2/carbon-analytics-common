@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.databridge.receiver.thrift;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TSSLTransportFactory;
@@ -46,7 +45,7 @@ import javax.net.ssl.SSLServerSocket;
  * Carbon based implementation of the agent server.
  */
 public class ThriftDataReceiver {
-    private static final Log log = LogFactory.getLog(ThriftDataReceiver.class);
+    private static final Logger log = Logger.getLogger(ThriftDataReceiver.class);
     private DataBridgeReceiverService dataBridgeReceiverService;
     private ThriftDataReceiverConfiguration thriftDataReceiverConfiguration;
     private TServer authenticationServer;

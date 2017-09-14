@@ -17,8 +17,7 @@
 */
 package org.wso2.carbon.databridge.core.internal.queue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 import org.wso2.carbon.databridge.core.AgentCallback;
 import org.wso2.carbon.databridge.core.RawDataAgentCallback;
@@ -35,7 +34,7 @@ import java.util.concurrent.Executors;
  */
 public class EventQueue {
 
-    private static final Log log = LogFactory.getLog(EventQueue.class);
+    private static final Logger log = Logger.getLogger(EventQueue.class);
 
     private BlockingQueue<EventComposite> eventQueue;
 
