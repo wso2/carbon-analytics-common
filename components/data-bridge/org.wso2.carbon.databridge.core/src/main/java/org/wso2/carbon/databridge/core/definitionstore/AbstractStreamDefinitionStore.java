@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.databridge.core.definitionstore;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
@@ -35,7 +34,7 @@ import java.util.List;
  */
 public abstract class AbstractStreamDefinitionStore implements StreamDefinitionStore {
 
-    private Log log = LogFactory.getLog(AbstractStreamDefinitionStore.class);
+    private static final Logger log = Logger.getLogger(AbstractStreamDefinitionStore.class);
     private List<StreamAddRemoveListener> streamAddRemoveListenerList = new ArrayList<StreamAddRemoveListener>();
 
     public StreamDefinition getStreamDefinition(String name,
@@ -60,7 +59,7 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
 
     public void saveStreamDefinition(StreamDefinition streamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException,
-                   StreamDefinitionStoreException {
+            StreamDefinitionStoreException {
         StreamDefinition existingDefinition;
         existingDefinition = getStreamDefinition(streamDefinition.getName(), streamDefinition.getVersion());
         if (existingDefinition == null) {

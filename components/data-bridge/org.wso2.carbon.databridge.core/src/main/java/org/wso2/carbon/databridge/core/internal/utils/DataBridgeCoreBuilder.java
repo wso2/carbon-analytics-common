@@ -17,8 +17,7 @@
 */
 package org.wso2.carbon.databridge.core.internal.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationException;
 import org.wso2.carbon.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
@@ -35,7 +34,7 @@ import java.util.Map;
  * Helper class to build Agent Server Initial Configurations.
  */
 public final class DataBridgeCoreBuilder {
-    private static final Log log = LogFactory.getLog(DataBridgeCoreBuilder.class);
+    private static final Logger log = Logger.getLogger(DataBridgeCoreBuilder.class);
 
     private DataBridgeCoreBuilder() {
     }

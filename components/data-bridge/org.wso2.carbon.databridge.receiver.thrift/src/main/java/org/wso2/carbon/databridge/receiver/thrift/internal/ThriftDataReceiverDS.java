@@ -17,8 +17,7 @@
 
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -40,7 +39,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 )
 
 public class ThriftDataReceiverDS {
-    private static final Log log = LogFactory.getLog(ThriftDataReceiverDS.class);
+    private static final Logger log = Logger.getLogger(ThriftDataReceiverDS.class);
 
     private static final String DISABLE_RECEIVER = "disable.receiver";
 

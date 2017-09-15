@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.databridge.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
@@ -29,7 +28,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
  */
 public class DataBridgeStreamStore {
 
-    private static final Log log = LogFactory.getLog(DataBridgeStreamStore.class);
+    private static final Logger log = Logger.getLogger(DataBridgeStreamStore.class);
 
     public void addStreamDefinition(StreamDefinition streamDefinition) {
 

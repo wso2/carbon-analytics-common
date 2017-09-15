@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.databridge.agent.endpoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
@@ -46,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class DataEndpoint {
 
-    private static Log log = LogFactory.getLog(DataEndpoint.class);
+    private static final Logger log = Logger.getLogger(DataEndpoint.class);
 
     private DataEndpointConnectionWorker connectionWorker;
 

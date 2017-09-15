@@ -20,7 +20,6 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;

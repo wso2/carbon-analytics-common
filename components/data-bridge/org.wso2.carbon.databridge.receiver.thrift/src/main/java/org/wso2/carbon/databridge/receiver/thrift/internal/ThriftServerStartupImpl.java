@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.thrift.utils.HostAddressFinder;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiverFactory;
@@ -30,7 +29,7 @@ import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfigu
  */
 public class ThriftServerStartupImpl implements ThriftServerStartup {
 
-    private static final Log log = LogFactory.getLog(ThriftServerStartupImpl.class);
+    private static final Logger log = Logger.getLogger(ThriftServerStartupImpl.class);
 
     public void completingServerStartup() {
         try {

@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.databridge.agent.endpoint.thrift;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.thrift.data.ThriftEventBundle;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
@@ -34,7 +33,7 @@ import java.util.Map;
  */
 
 public final class ThriftEventConverter {
-    private static Log log = LogFactory.getLog(ThriftEventConverter.class);
+    private static final Logger log = Logger.getLogger(ThriftEventConverter.class);
 
     private ThriftEventConverter() {
     }

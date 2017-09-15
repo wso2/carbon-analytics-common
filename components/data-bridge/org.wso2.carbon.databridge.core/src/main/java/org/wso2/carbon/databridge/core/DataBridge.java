@@ -45,7 +45,6 @@ import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.core.utils.AgentSession;
 import org.wso2.carbon.utils.Utils;
 
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
