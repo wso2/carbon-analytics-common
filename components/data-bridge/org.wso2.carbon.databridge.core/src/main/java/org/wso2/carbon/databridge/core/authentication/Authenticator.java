@@ -17,14 +17,14 @@
 */
 
 
-package org.wso2.carbon.databridge.core.internal.authentication;
+package org.wso2.carbon.databridge.core.authentication;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
+import org.wso2.carbon.databridge.core.authentication.session.SessionBean;
+import org.wso2.carbon.databridge.core.authentication.session.SessionCache;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
-import org.wso2.carbon.databridge.core.internal.authentication.session.SessionBean;
-import org.wso2.carbon.databridge.core.internal.authentication.session.SessionCache;
 import org.wso2.carbon.databridge.core.utils.AgentSession;
 
 import java.util.UUID;
