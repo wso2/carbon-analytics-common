@@ -25,13 +25,11 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerConstants;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerException;
-import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerValueHolder;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.util.JaggeryappTemplateDeployerHelper;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.util.JaggeryappTemplateDeployerUtility;
 import org.wso2.carbon.registry.api.Registry;
@@ -125,10 +123,8 @@ public class JaggeryappTemplateDeployer implements TemplateDeployer {
         File templateDirectory = new File(templateParentDirectory + properties.get(JaggeryappTemplateDeployerConstants.TEMPLATE_DIRECTORY));
         JaggeryappTemplateDeployerHelper.validateFilePath(properties.get(JaggeryappTemplateDeployerConstants.TEMPLATE_DIRECTORY));
 
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            Registry registry = JaggeryappTemplateDeployerValueHolder.getRegistryService()
-                    .getConfigSystemRegistry(tenantId);
+            Registry registry = JaggeryappTemplateDeployerUtility.getRegistry();
             Resource resource;
             if (registry.resourceExists(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
                 resource = registry.get(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH);
@@ -189,10 +185,8 @@ public class JaggeryappTemplateDeployer implements TemplateDeployer {
 
     @Override
     public void undeployArtifact(String artifactId) throws TemplateDeploymentException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            Registry registry = JaggeryappTemplateDeployerValueHolder.getRegistryService()
-                    .getConfigSystemRegistry(tenantId);
+            Registry registry = JaggeryappTemplateDeployerUtility.getRegistry();
             if (registry.resourceExists(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
                 Resource resource = registry.get(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH);
                 String directory = resource.getProperty(artifactId);
@@ -221,10 +215,8 @@ public class JaggeryappTemplateDeployer implements TemplateDeployer {
 
     @Override
     public void deployIfNotDoneAlready(DeployableTemplate template) throws TemplateDeploymentException {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            Registry registry = JaggeryappTemplateDeployerValueHolder.getRegistryService()
-                    .getConfigSystemRegistry(tenantId);
+            Registry registry = JaggeryappTemplateDeployerUtility.getRegistry();
             if (registry.resourceExists(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH)) {
                 Resource resource = registry.get(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH);
                 if (resource.getProperty(template.getArtifactId()) == null) {
