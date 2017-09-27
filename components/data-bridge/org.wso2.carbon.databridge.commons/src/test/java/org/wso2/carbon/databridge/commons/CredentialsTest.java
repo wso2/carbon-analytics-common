@@ -1,8 +1,3 @@
-package org.wso2.carbon.databridge.commons;
-
-import junit.framework.TestCase;
-import org.junit.Test;
-
 /**
  * Copyright (c) WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * <p/>
@@ -18,6 +13,12 @@ import org.junit.Test;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wso2.carbon.databridge.commons;
+
+import junit.framework.TestCase;
+import org.junit.Test;
+
+
 public class CredentialsTest extends TestCase {
 
     @Test
