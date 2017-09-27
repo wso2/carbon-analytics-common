@@ -13,9 +13,7 @@ public class Credentials {
     }
 
     public Credentials(String username, String password, String domainName, int tenantId) {
-        this.username = username;
-        this.password = password;
-        this.domainName = domainName;
+        this(username, password, domainName);
         this.tenantId = tenantId;
     }
 

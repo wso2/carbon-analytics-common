@@ -33,9 +33,9 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>service-stubs</module>
-        <module>components/analytics-dashboard</module>
         <module>components/data-bridge</module>
+        <!--module>service-stubs</module>
+        <module>components/analytics-dashboard</module>
         <module>components/analytics-data-agents</module>
         <module>components/event-stream</module>
         <module>components/application-deployer</module>
@@ -61,7 +61,7 @@
         <module>features/analytics-gadget-templates</module>
         <module>features/gadget-template-deployer</module>
         <module>features/dashboard-template-deployer</module>
-        <module>features/jaggeryapp-template-deployer</module>
+        <module>features/jaggeryapp-template-deployer</module-->
     </modules>
 
     <dependencyManagement>
@@ -1196,6 +1196,34 @@
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.5.201505241946</version>
+                    <configuration>
+                        <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                        <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>jacoco-initialize</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>jacoco-site</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${basedir}/target/coverage-reports/
+                                </outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-scr-plugin</artifactId>
