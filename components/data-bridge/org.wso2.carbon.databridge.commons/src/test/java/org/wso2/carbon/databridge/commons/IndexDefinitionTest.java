@@ -1,10 +1,3 @@
-package org.wso2.carbon.databridge.commons;
-
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.utils.IndexDefinitionConverterUtils;
-
 /**
  * Copyright (c) WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * <p/>
@@ -20,6 +13,14 @@ import org.wso2.carbon.databridge.commons.utils.IndexDefinitionConverterUtils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.wso2.carbon.databridge.commons;
+
+import junit.framework.TestCase;
+import org.junit.Test;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
+import org.wso2.carbon.databridge.commons.utils.IndexDefinitionConverterUtils;
+
 public class IndexDefinitionTest extends TestCase {
 
     private static final String secondaryIndex = "payload_secIndex1:STRING,correlation_secIndex2:BOOL,meta_secIndex3:STRING";
