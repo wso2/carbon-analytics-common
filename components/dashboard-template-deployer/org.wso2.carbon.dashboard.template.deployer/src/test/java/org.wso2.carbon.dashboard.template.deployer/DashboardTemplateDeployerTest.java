@@ -28,6 +28,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.wso2.carbon.dashboard.template.deployer.internal.DashboardTemplateDeployerConstants;
+import org.wso2.carbon.dashboard.template.deployer.internal.DashboardTemplateDeployerException;
 import org.wso2.carbon.dashboard.template.deployer.internal.util.DashboardTemplateDeployerUtility;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.ScenarioConfiguration;
@@ -108,7 +109,6 @@ public class DashboardTemplateDeployerTest {
         Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
         Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.DASHBOARDS_RESOURCE_PATH +
                 deployableTemplate.getArtifactId()));
-
     }
 
     @Test
@@ -125,6 +125,7 @@ public class DashboardTemplateDeployerTest {
     @Test
     public void testDeploySharedDashboardResource() throws Exception {
         doReturn(true).when(registry, "resourceExists", anyString());
+        doReturn(resource).when(registry, "get", anyString());
 
         Properties properties = new Properties();
         List<String> list = new ArrayList();
@@ -133,18 +134,74 @@ public class DashboardTemplateDeployerTest {
         resource.setProperties(properties);
         resource.setProperty(deployableTemplate.getArtifactId(), ARTIFACT_ID);
 
-        doReturn(resource).when(registry, "get", anyString());
         dashboardTemplateDeployer.deployArtifact(deployableTemplate);
         Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
         Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.DASHBOARDS_RESOURCE_PATH +
                 deployableTemplate.getArtifactId()));
-
     }
 
     @Test
     public void testGetArtifactType() {
-        DashboardTemplateDeployer dashboardTemplateDeployer = new DashboardTemplateDeployer();
         dashboardTemplateDeployer.getType();
         Assert.assertEquals("dashboard", dashboardTemplateDeployer.getType());
+    }
+
+    @Test
+    public void testUnDeployDashboardResourceWhenNoResource() throws Exception {
+        doReturn(false).when(registry, "resourceExists", anyString());
+        doReturn(resource).when(registry, "get", anyString());
+        hashMap.put(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH, resource);
+        dashboardTemplateDeployer.undeployArtifact(ARTIFACT_ID);
+        Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
+    }
+
+    @Test
+    public void testUnDeployDashboardResourceWhenNoDashboardResource() throws Exception {
+        doReturn(true).when(registry, "resourceExists", anyString());
+        doReturn(resource).when(registry, "get", anyString());
+        hashMap.put(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH, resource);
+        dashboardTemplateDeployer.undeployArtifact(ARTIFACT_ID);
+        Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
+    }
+
+    @Test
+    public void testUnDeployDashboardResourceWhenNoDashboardDefinition() throws Exception {
+        doReturn(true).when(registry, "resourceExists", DashboardTemplateDeployerConstants
+                .ARTIFACT_DASHBOARD_ID_MAPPING_PATH);
+        resource.setProperty(deployableTemplate.getArtifactId(), ARTIFACT_ID);
+        doReturn(false).when(registry, "resourceExists",
+                DashboardTemplateDeployerConstants.DASHBOARDS_RESOURCE_PATH + ARTIFACT_ID);
+        doReturn(resource).when(registry, "get", anyString());
+        dashboardTemplateDeployer.undeployArtifact(ARTIFACT_ID);
+        Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
+        Assert.assertEquals(resource, hashMap.get(DashboardTemplateDeployerConstants
+                .ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
+    }
+
+    @Test
+    public void testDeployDashboardWithoutTemplateArtifactId() throws Exception {
+        doReturn(true).when(registry, "resourceExists", DashboardTemplateDeployerConstants
+                .ARTIFACT_DASHBOARD_ID_MAPPING_PATH);
+        doReturn(resource).when(registry, "get", anyString());
+        dashboardTemplateDeployer.deployIfNotDoneAlready(deployableTemplate);
+        Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.ARTIFACT_DASHBOARD_ID_MAPPING_PATH));
+        Assert.assertTrue(hashMap.containsKey(DashboardTemplateDeployerConstants.DASHBOARDS_RESOURCE_PATH +
+                deployableTemplate.getArtifactId()));
+    }
+
+    @Test(expected = DashboardTemplateDeployerException.class)
+    public void testDeployCorruptedDashboardResource() throws Exception {
+        String artifact = new String(Files.readAllBytes(Paths.get("src", File.separator, "test",
+                File.separator, "resources", File.separator, "dashboardTemplateCorrupted.xml")));
+        deployableTemplate.setArtifact(artifact);
+        dashboardTemplateDeployer.deployIfNotDoneAlready(deployableTemplate);
+    }
+
+    @Test(expected = DashboardTemplateDeployerException.class)
+    public void testDeployDashboardWithoutContent() throws Exception {
+        String artifact = new String(Files.readAllBytes(Paths.get("src", File.separator, "test",
+                File.separator, "resources", File.separator, "dashboardTemplateWithoutContent.xml")));
+        deployableTemplate.setArtifact(artifact);
+        dashboardTemplateDeployer.deployArtifact(deployableTemplate);
     }
 }
