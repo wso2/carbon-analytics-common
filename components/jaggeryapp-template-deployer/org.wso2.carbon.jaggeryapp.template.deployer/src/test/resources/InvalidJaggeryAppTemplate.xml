@@ -1,0 +1,33 @@
+<domain name="TwitterAnalytics">
+    <description>Twitter Analytics Jaggery App</description>
+    <scenarios>
+        <scenario type="TwitterAnalytics">
+            <description>Configure a twitter analytics scenario to display statistics for a given stream of your choice</description>
+            <templates>
+                <template type="jaggeryapp">
+                    <config>
+                        <properties>
+                            <property name="directoryName">TwitterAnalytics</property>
+                            <property name="templateDirectory">TwitterAnalytics</property>
+                        </properties>
+                        <artifacts>
+                            <artifact file="application-data.json"><![CDATA[{config :{file: 'application-data.json'}}]]>
+                            </artifact>
+                            <artifact file="htag.xml"><![CDATA[<twitter-analytic-app><file>htag.xml</file></twitter-analytic-app>]]>
+                            </artifact>
+                            <artifact file="config.json"><![CDATA[{config: {file: 'config.json'}}]]>
+                            </artifact>
+                        </artifacts>
+                    </config>
+                </template>
+            <parameters>
+                <parameter name="jaggeryAppName" type="string">
+                    <displayName>Jaggery Application Name</displayName>
+                    <description>The name of the jaggery application that will be deployed</description>
+                    <defaultValue>twitter-analytic</defaultValue>
+                </parameter>
+            </parameters>
+
+        </scenario>
+    </scenarios>
+</domain>
