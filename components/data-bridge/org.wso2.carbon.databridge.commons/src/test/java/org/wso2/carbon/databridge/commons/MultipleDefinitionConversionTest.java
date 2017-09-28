@@ -164,8 +164,29 @@ public class MultipleDefinitionConversionTest {
 
     }
 
+    @Test
+    public void testConvertDefintionArray() throws MalformedStreamDefinitionException {
+        String multipleDefns = combineJSONEventDefinitons();
+        List<StreamDefinition> actualStreamDefinitions =
+                EventDefinitionConverterUtils.convertMultipleEventDefns(multipleDefns);
+
+        EventDefinitionConverterUtils.convertToJson(actualStreamDefinitions);
+
+        Assert.assertTrue(combineJSONEventDefinitons().equals(multipleDefns));
+    }
+
+    @Test(expected = MalformedStreamDefinitionException.class)
+    public void multipleDefnConversionFromInvalidJSON() throws MalformedStreamDefinitionException {
+        String multipleDefns = combineToInvalidJSONEventDefinitons();
+        EventDefinitionConverterUtils.convertMultipleEventDefns(multipleDefns);
+    }
+
     private String combineJSONEventDefinitons() {
         return "[" + definition1 + ", " + definition2 + ", " + definition3 + "]";
+    }
+
+    private String combineToInvalidJSONEventDefinitons() {
+        return "[" + definition1 + ", " + definition2 + definition3 ;
     }
 
 }
