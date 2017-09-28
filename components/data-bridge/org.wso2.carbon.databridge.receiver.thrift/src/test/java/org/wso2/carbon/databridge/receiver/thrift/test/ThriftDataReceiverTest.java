@@ -64,7 +64,6 @@ public class ThriftDataReceiverTest {
             public boolean authenticate(String userName,
                                         String password) {
                 return true;// always authenticate to true
-
             }
 
             @Override
@@ -79,7 +78,6 @@ public class ThriftDataReceiverTest {
 
             @Override
             public void initContext(AgentSession agentSession) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
 
             @Override

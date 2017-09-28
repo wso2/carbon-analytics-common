@@ -47,9 +47,9 @@ import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUt
 
 public class BinaryServerUtil {
 
-    private static Logger log = Logger.getLogger(BinaryServerUtil.class);
-
     public static final Path testDir = Paths.get("src", "test", "resources");
+    
+    private static Logger log = Logger.getLogger(BinaryServerUtil.class);
 
     public static byte[] convertEventToByteArray(Event event, String sessionId) throws IOException {
 

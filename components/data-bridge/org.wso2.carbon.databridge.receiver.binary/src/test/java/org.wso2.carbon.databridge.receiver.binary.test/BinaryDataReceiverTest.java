@@ -76,7 +76,7 @@ public class BinaryDataReceiverTest {
             @Override
             public boolean authenticate(String userName,
                                         String password) {
-                return true;// allays authenticate to true
+                return true;// always authenticate to true
             }
 
             @Override

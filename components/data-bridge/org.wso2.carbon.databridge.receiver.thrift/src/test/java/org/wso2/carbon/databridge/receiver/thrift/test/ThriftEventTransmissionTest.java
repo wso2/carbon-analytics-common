@@ -41,10 +41,8 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
 
-
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DataBridgeReceiverService.class)
@@ -66,7 +64,6 @@ public class ThriftEventTransmissionTest {
     private static final String RETURN_SESSION_ID = "sessionId";
     private ThriftEventTransmissionServiceImpl service = null;
     private ThriftSecureEventTransmissionServiceImpl secureService = null;
-    private ThriftEventBundle thriftEventBundle = new ThriftEventBundle();
 
     @Before
     @SuppressWarnings("unchecked")
@@ -110,13 +107,15 @@ public class ThriftEventTransmissionTest {
         secureService.publish(new ThriftEventBundle());
 
         Assert.assertEquals(MOCK_RETURN_STREAM_ID, service.defineStream(MOCK_NORMAL_SESSION, STREAM_DEFINITION));
-        Assert.assertEquals(MOCK_RETURN_STREAM_ID, service.findStreamId(MOCK_NORMAL_SESSION, MOCK_STREAM_NAME, MOCK_VERSION));
+        Assert.assertEquals(MOCK_RETURN_STREAM_ID, service.findStreamId(MOCK_NORMAL_SESSION, MOCK_STREAM_NAME,
+                MOCK_VERSION));
         Assert.assertEquals(true, service.deleteStreamById(MOCK_NORMAL_SESSION, MOCK_STREAM_ID));
         Assert.assertEquals(true, service.deleteStreamByNameVersion(MOCK_NORMAL_SESSION, MOCK_STREAM_NAME,
                 MOCK_VERSION));
 
         Assert.assertEquals(MOCK_RETURN_STREAM_ID, secureService.defineStream(MOCK_NORMAL_SESSION, STREAM_DEFINITION));
-        Assert.assertEquals(MOCK_RETURN_STREAM_ID, secureService.findStreamId(MOCK_NORMAL_SESSION, MOCK_STREAM_NAME, MOCK_VERSION));
+        Assert.assertEquals(MOCK_RETURN_STREAM_ID, secureService.findStreamId(MOCK_NORMAL_SESSION, MOCK_STREAM_NAME,
+                MOCK_VERSION));
         Assert.assertEquals(true, secureService.deleteStreamById(MOCK_NORMAL_SESSION, MOCK_STREAM_ID));
         Assert.assertEquals(true, secureService.deleteStreamByNameVersion(MOCK_NORMAL_SESSION, MOCK_STREAM_NAME,
                 MOCK_VERSION));
