@@ -103,7 +103,7 @@ public class ThriftSecureEventTransmissionServiceImpl
             throws ThriftSessionExpiredException,
                    TException {
         try {
-            return dataBridgeReceiverService.deleteStream(sessionId, sessionId);
+            return dataBridgeReceiverService.deleteStream(sessionId, streamId);
         } catch (SessionTimeoutException e) {
             throw new ThriftSessionExpiredException(e.getErrorMessage());
         }
