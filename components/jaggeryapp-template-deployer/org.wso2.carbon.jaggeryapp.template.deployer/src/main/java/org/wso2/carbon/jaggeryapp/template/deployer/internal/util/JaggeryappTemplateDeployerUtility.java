@@ -18,7 +18,13 @@
 
 package org.wso2.carbon.jaggeryapp.template.deployer.internal.util;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerConstants;
+import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerValueHolder;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.CarbonUtils;
+
 import java.io.File;
 
 public class JaggeryappTemplateDeployerUtility {
@@ -33,5 +39,10 @@ public class JaggeryappTemplateDeployerUtility {
         StringBuilder stringBuilder = new StringBuilder(carbonRepository);
         stringBuilder.append("jaggeryapps").append(File.separator);
         return stringBuilder.toString();
+    }
+
+    public static Registry getRegistry() throws RegistryException {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        return JaggeryappTemplateDeployerValueHolder.getRegistryService().getConfigSystemRegistry(tenantId);
     }
 }

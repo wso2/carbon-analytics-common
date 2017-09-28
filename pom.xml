@@ -1132,6 +1132,30 @@
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${securevault.wso2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.ant</artifactId>
+                <version>${org.jacoco.ant.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <!--carbon-deployment features start-->
             <!--<dependency>-->
             <!--<groupId>org.wso2.carbon.deployment</groupId>-->
@@ -1254,6 +1278,34 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.7</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${org.jacoco.ant.version}</version>
+                    <configuration>
+                        <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                        <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>jacoco-initialize</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>jacoco-site</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${basedir}/target/coverage-reports/
+                                </outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1502,6 +1554,10 @@
         <xmlunit.version>1.6</xmlunit.version>
 
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
+
+        <mockito.version>1.10.19</mockito.version>
+        <powermock.version>1.6.4</powermock.version>
+        <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
     </properties>
 
 </project>
