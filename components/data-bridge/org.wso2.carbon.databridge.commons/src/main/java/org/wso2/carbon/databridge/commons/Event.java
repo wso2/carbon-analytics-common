@@ -53,11 +53,7 @@ public class Event implements Serializable {
                  Object[] correlationDataArray,
                  Object[] payloadDataArray,
                  Map<String, String> arbitraryDataMap) {
-        this.streamId = streamId;
-        this.timeStamp = timeStamp;
-        this.metaData = metaDataArray;
-        this.correlationData = correlationDataArray;
-        this.payloadData = payloadDataArray;
+        this(streamId, timeStamp, metaDataArray, correlationDataArray, payloadDataArray);
         this.arbitraryDataMap = arbitraryDataMap;
     }
 
