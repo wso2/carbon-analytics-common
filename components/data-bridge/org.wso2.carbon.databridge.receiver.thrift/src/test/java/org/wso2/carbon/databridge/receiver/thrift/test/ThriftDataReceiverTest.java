@@ -92,7 +92,7 @@ public class ThriftDataReceiverTest {
     @Test(expected = DataBridgeException.class)
     public void testReceiverWithNoKeyStoreLocation() throws DataBridgeException, InterruptedException {
 
-        System.setProperty("Security.KeyStore.Location", "");
+        System.clearProperty("Security.KeyStore.Location");
         ThriftDataReceiver thriftDataReceiver = new ThriftDataReceiver(7611, dataBridge);
         thriftDataReceiver.start("localhost");
         Thread.sleep(1000);
@@ -102,7 +102,7 @@ public class ThriftDataReceiverTest {
     @Test(expected = DataBridgeException.class)
     public void testReceiverWithNoKeyPassword() throws DataBridgeException, InterruptedException {
 
-        System.setProperty("Security.KeyStore.Password", "");
+        System.clearProperty("Security.KeyStore.Password");
         System.setProperty("Security.KeyStore.Location", ThriftServerUtil.testDir + File.separator + "wso2carbon.jks");
         ThriftDataReceiver thriftDataReceiver = new ThriftDataReceiver(7611, dataBridge);
         thriftDataReceiver.start("localhost");
@@ -113,6 +113,7 @@ public class ThriftDataReceiverTest {
     @Test
     public void testReceiver() {
 
+        System.setProperty("Security.KeyStore.Location", ThriftServerUtil.testDir + File.separator + "wso2carbon.jks");
         System.setProperty("Security.KeyStore.Password", "wso2carbon");
         ThriftDataReceiver thriftDataReceiver = new ThriftDataReceiver(7611, dataBridge);
 
@@ -131,7 +132,7 @@ public class ThriftDataReceiverTest {
     public void testReceiverFactory() throws JAXBException, XMLStreamException, IOException, DataBridgeException,
             InterruptedException {
 
-        ThriftServerUtil.setupCarbonConfig("test");
+        ThriftServerUtil.setupCarbonConfig("testTenant");
         System.setProperty("Security.KeyStore.Location", ThriftServerUtil.testDir + File.separator + "wso2carbon.jks");
         System.setProperty("Security.KeyStore.Password", "wso2carbon");
 

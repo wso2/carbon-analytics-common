@@ -21,20 +21,12 @@
     <eventBufferSize>2000</eventBufferSize>
     <clientTimeoutMin>30</clientTimeoutMin>
 
-    <dataReceiver name="Thrift">
-        <config name="tcpPort">7611</config>
-        <config name="sslPort">7711</config>
-        <config name="hostname">10.101.10.101</config>
-        <config name="waitingTimeInMilliSeconds">10</config>
-        <config name="sslEnabledProtocols">TLSv1</config>
+    <dataReceiver name="Binary">
+        <config name="tcpPort">9611</config>
+        <config name="sslPort">9711</config>
+        <config name="sslReceiverThreadPoolSize">100</config>
+        <config name="tcpReceiverThreadPoolSize">120</config>
+        <config name="sslEnabledProtocols">TLSv1.2</config>
         <config name="ciphers">SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,SSL_RSA_WITH_DES_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA</config>
-        <config name="tcpMaxWorkerThreads">20</config>
-        <config name="tcpMinWorkerThreads">5</config>
-        <config name="tcpRequestTimeout">10</config>
-        <config name="tcpStopTimeoutVal">50</config>
-        <config name="sslMaxWorkerThreads">20</config>
-        <config name="sslMinWorkerThreads">5</config>
-        <config name="sslRequestTimeout">10</config>
-        <config name="sslStopTimeoutVal">50</config>
     </dataReceiver>
 </dataBridgeConfiguration>
