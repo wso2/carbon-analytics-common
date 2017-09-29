@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.databridge.agent.test.binary;
+package org.wso2.carbon.databridge.agent.test;
 
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
@@ -28,7 +28,8 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfiguration
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
+import org.wso2.carbon.databridge.agent.test.binary.BinaryTestServer;
+import org.wso2.carbon.databridge.agent.test.binary.OneEndPointDPBinaryTest;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
@@ -37,18 +38,15 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class OneEndPointDPBinaryTest {
+public class DataPublisherTestCase {
     Logger log = Logger.getLogger(OneEndPointDPBinaryTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
     private String agentConfigFileName = "data-agent-config.xml";
-
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -67,7 +65,6 @@ public class OneEndPointDPBinaryTest {
             "          {'name':'min','type':'Double'}" +
             "  ]" +
             "}";
-
 
     @BeforeClass
     public static void init() {
@@ -90,58 +87,30 @@ public class OneEndPointDPBinaryTest {
     }
 
     @Test
-    public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
-        startServer(9681, 9781);
+    public void overLoadPublishWithArbitraryElementsofEvent() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+        startServer(9611, 9711);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9681",
-                "ssl://" + hostName + ":9781", "admin", "admin");
-        Event event = new Event();
-        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-        event.setMetaData(new Object[]{"127.0.0.1"});
-        event.setCorrelationData(null);
-        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
-        int numberOfEventsSent = 1000;
-        for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(event);
-        }
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-        }
-        dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
-        testServer.resetReceivedEvents();
-        testServer.stop();
-    }
-
-    @Test
-    public void testOneDataEndpointWithArbitraryEventFields() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
-        startServer(9601, 9701);
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
-        String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9601",
-                "ssl://" + hostName + ":9701", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9611",
+                "ssl://" + hostName + ":9711", "admin", "admin");
 
         String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
         Object[] metaData = new Object[]{"127.0.0.1"};
         Object[] correlationData = null;
         Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
-        Long timeStamp = System.currentTimeMillis();
         Map<String, String> arbitrary = new HashMap<String, String>();
         arbitrary.put("test", "testValue");
         arbitrary.put("test1", "test123");
 
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(streamID, timeStamp, metaData, correlationData, payLoad, arbitrary);
+            dataPublisher.publish(streamID, metaData, correlationData, payLoad, arbitrary);
         }
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            log.error(e.getMessage());
         }
         dataPublisher.shutdown();
         Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -150,26 +119,24 @@ public class OneEndPointDPBinaryTest {
     }
 
     @Test
-    public void testTwoDataEndpoint() throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException, TransportException,
-            DataEndpointException, DataEndpointConfigurationException,
-            MalformedStreamDefinitionException, DataBridgeException,
-            StreamDefinitionStoreException, IOException {
-        startServer(9621, 9721);
+    public void nonBlockingPublishTestOverLoad() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+        startServer(9219, 9319);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9621, tcp://" + hostName + ":9622",
-                "ssl://" + hostName + ":9721, ssl://" + hostName + ":9722", "admin", "admin");
+
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9219",
+                "ssl://" + hostName + ":9319", "admin", "admin");
+
         String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
         Object[] metaData = new Object[]{"127.0.0.1"};
         Object[] correlationData = null;
         Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
-        Long timeStamp= System.currentTimeMillis();
+        long timeout = 1000;
+
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(streamID, timeStamp,metaData, correlationData, payLoad);
+            dataPublisher.tryPublish(streamID, metaData, correlationData, payLoad, timeout);
         }
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -181,71 +148,93 @@ public class OneEndPointDPBinaryTest {
     }
 
     @Test
-    public void testInvalidAuthenticationURLs() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
-        boolean expected = false;
-        DataPublisherTestUtil.setKeyStoreParams();
-        DataPublisherTestUtil.setTrustStoreParams();
+    public void nonBlockingPublishTestOverLoadWithArbitaryElementsOfEvent() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+        startServer(9629, 9729);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        try {
-            DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9611, ssl://" + hostName + ":9731",
-                    "ssl://" + hostName + ":9711", "admin", "admin");
 
-        } catch (DataEndpointConfigurationException ex) {
-            expected = true;
-        }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
-    }
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9651",
+                "ssl://" + hostName + ":9751", "admin", "admin");
 
-    @Test
-    public void testInvalidReceiverURLs() throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException, TransportException,
-            DataEndpointException, DataEndpointConfigurationException,
-            MalformedStreamDefinitionException,
-            DataBridgeException,
-            StreamDefinitionStoreException, SocketException {
-        boolean expected = false;
-        DataPublisherTestUtil.setKeyStoreParams();
-        DataPublisherTestUtil.setTrustStoreParams();
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
-        String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        try {
-            DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9611",
-                    "ssl://" + hostName + ":9711, ssl://" + hostName + ":9721", "admin", "admin");
-        } catch (DataEndpointConfigurationException ex) {
-            expected = true;
-        }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
-    }
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        Map<String, String> arbitrary = new HashMap<String, String>();
+        arbitrary.put("test", "testValue");
+        arbitrary.put("test1", "test123");
 
-    @Test
-    public void testShutdownDataPublisher() throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException, TransportException,
-            DataEndpointException, DataEndpointConfigurationException,
-            MalformedStreamDefinitionException, DataBridgeException,
-            StreamDefinitionStoreException, IOException {
-        startServer(9641, 9741);
-        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
-        String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9641",
-                "ssl://" + hostName + ":9741", "admin", "admin");
-        Event event = new Event();
-        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-        event.setMetaData(new Object[]{"127.0.0.1"});
-        event.setCorrelationData(null);
-        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
 
-        int numberOfEventsSent = 100000;
+        int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(event);
+            dataPublisher.tryPublish(streamID, metaData, correlationData, payLoad, arbitrary);
         }
-
-        dataPublisher.shutdown();
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
         }
+        dataPublisher.shutdown();
+        testServer.resetReceivedEvents();
+        testServer.stop();
+    }
+
+    @Test
+    public void nonBlockingPublishTestOverLoadWithTimeStampAndArbitaryElementsOfEvent() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+        startServer(9699, 9799);
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
+        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9699",
+                "ssl://" + hostName + ":9799", "admin", "admin");
+
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Long timeStamp = System.currentTimeMillis();
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        Map<String, String> arbitrary = new HashMap<String, String>();
+        arbitrary.put("test", "testValue");
+        arbitrary.put("test1", "test123");
+
+
+        int numberOfEventsSent = 1000;
+        for (int i = 0; i < numberOfEventsSent; i++) {
+            dataPublisher.tryPublish(streamID, timeStamp, metaData, correlationData, payLoad, arbitrary);
+        }
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+        }
+        dataPublisher.shutdown();
+        testServer.resetReceivedEvents();
+        testServer.stop();
+    }
+
+    @Test
+    public void nonBlockingPublishTestWithTimeOut() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+        startServer(9129, 9130);
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
+        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9129",
+                "ssl://" + hostName + ":9130", "admin", "admin");
+
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Long timeStamp = System.currentTimeMillis();
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        long timeout = 1000;
+
+        int numberOfEventsSent = 1000;
+        for (int i = 0; i < numberOfEventsSent; i++) {
+            dataPublisher.tryPublish(streamID, timeStamp, metaData, correlationData, payLoad, timeout);
+        }
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+        }
+        dataPublisher.shutdown();
         Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
         testServer.resetReceivedEvents();
         testServer.stop();
