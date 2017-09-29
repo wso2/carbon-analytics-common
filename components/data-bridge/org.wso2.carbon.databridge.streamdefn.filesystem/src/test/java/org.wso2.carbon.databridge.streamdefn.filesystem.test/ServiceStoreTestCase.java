@@ -37,11 +37,10 @@ import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ServiceStoreTestCase.class)
 public class ServiceStoreTestCase {
+    private FileSystemStreamDefinitionStore fileSystemStreamDefinitionStore = new FileSystemStreamDefinitionStore();
+
     @Mock
     CarbonEventStreamService carbonEventStreamService;
-
-    FileSystemStreamDefinitionStore fileSystemStreamDefinitionStore = new FileSystemStreamDefinitionStore();
-
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -54,13 +53,11 @@ public class ServiceStoreTestCase {
     public void testServiceStore() throws MalformedStreamDefinitionException, StreamDefinitionStoreException {
         FilesystemTestUtil.setupCarbonConfig();
         StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(FilesystemTestUtil.STREAM_DEFN);
-
         ServiceHolder.setEventStreamService(carbonEventStreamService);
         ServiceHolder.setStreamDefinitionStore(fileSystemStreamDefinitionStore);
         ServiceHolder.getEventStreamService();
         ServiceHolder.getStreamDefinitionStore();
         ServiceHolder.getEventStreamService();
-
         fileSystemStreamDefinitionStore.saveStreamDefinitionToStore(streamDefinition, FilesystemTestUtil.TENANT_ID);
     }
 }

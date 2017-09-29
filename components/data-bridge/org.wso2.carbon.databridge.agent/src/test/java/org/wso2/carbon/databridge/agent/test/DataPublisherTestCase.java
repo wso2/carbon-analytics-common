@@ -107,10 +107,10 @@ public class DataPublisherTestCase {
         for (int i = 0; i < numberOfEventsSent; i++) {
             dataPublisher.publish(streamID, metaData, correlationData, payLoad, arbitrary);
         }
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            log.error(e.getMessage());
         }
         dataPublisher.shutdown();
         Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -128,7 +128,6 @@ public class DataPublisherTestCase {
                 "ssl://" + hostName + ":9319", "admin", "admin");
 
         String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
-        Long timeStamp = System.currentTimeMillis();
         Object[] metaData = new Object[]{"127.0.0.1"};
         Object[] correlationData = null;
         Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
