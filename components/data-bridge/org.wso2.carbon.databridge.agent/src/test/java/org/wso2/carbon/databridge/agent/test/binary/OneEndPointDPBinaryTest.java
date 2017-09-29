@@ -164,9 +164,10 @@ public class OneEndPointDPBinaryTest {
         Object[] metaData = new Object[]{"127.0.0.1"};
         Object[] correlationData = null;
         Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        Long timeStamp= System.currentTimeMillis();
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(streamID, metaData, correlationData, payLoad);
+            dataPublisher.publish(streamID, timeStamp,metaData, correlationData, payLoad);
         }
 
         try {
