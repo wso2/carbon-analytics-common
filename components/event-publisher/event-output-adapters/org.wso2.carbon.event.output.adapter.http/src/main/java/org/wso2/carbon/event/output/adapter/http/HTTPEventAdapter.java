@@ -185,7 +185,6 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
 
             httpClient = new HttpClient(connectionManager);
-
             String proxyHost = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
             String proxyPort = staticProperties.get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
             if (proxyHost != null && proxyHost.trim().length() > 0) {
