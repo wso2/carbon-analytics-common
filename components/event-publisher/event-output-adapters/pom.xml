@@ -51,6 +51,17 @@
         <module>org.wso2.carbon.event.output.adapter.mqtt</module>
         <module>org.wso2.carbon.event.output.adapter.sms</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId>
+        </dependency>
+    </dependencies>
 </project>
 
 
