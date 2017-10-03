@@ -1,0 +1,12 @@
+
+
+            {
+            "id": "temperature-count-chart",
+            "title": "temperature-count-chart",
+            "type": "gadget",
+            "thumbnail": "gadget/temperature-count-chart/thumbnail.png",
+            "data": {
+            "url": "gadget/temperature-count-chart/gadget.xml"
+            }
+            }
+        

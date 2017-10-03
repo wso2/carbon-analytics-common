@@ -1,0 +1,51 @@
+<config>
+    <properties>
+        <property name="directoryName">temperature-count-chart</property>
+        <property name="templateDirectory">numberchart</property>
+    </properties>
+    <artifacts>
+        <artifact file="gadget.json">
+
+            {
+            "id": "temperature-count-chart",
+            "title": "temperature-count-chart",
+            "type": "gadget",
+            "thumbnail": "gadget/temperature-count-chart/thumbnail.png",
+            "data": {
+            "url": "gadget/temperature-count-chart/gadget.xml"
+            }
+            }
+        </artifact>
+        <artifact file="conf.json">
+
+            {"provider-conf" : {"streamName" : "org.wso2.event.temperature.statistics.stream:1.0.0", "provider-name" :
+            "realtime"}, "chart-conf" : {"x" : "count", "title" : "Count temperature", "gadget-name" :
+            "temperature-count-chart", "chart-name" : "number-chart"}}
+
+        </artifact>
+        <artifact file="js/core/gadget-util.js">
+
+            var getGadgetLocation = function (callback) {
+            var gadgetLocation = "/portal/store/carbon.super/fs/gadget/temperature-count-chart";
+            var PATH_SEPERATOR = "/";
+            if (gadgetLocation.search("store") != -1) {
+            wso2.gadgets.identity.getTenantDomain(function (tenantDomain) {
+            var gadgetPath = gadgetLocation.split(PATH_SEPERATOR);
+            var modifiedPath = '';
+            for (var i = 1; i &lt; gadgetPath.length; i++) {
+            if (i === 3) {
+            modifiedPath = modifiedPath.concat(PATH_SEPERATOR, tenantDomain);
+            } else {
+            modifiedPath = modifiedPath.concat(PATH_SEPERATOR, gadgetPath[i])
+            }
+            }
+            callback(modifiedPath);
+            });
+            } else {
+            callback(gadgetLocation);
+            }
+            }
+
+        </artifact>
+    </artifacts>
+</config>
