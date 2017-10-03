@@ -151,7 +151,6 @@ public class GadgetTemplateDeployerTest {
                     if (!FileUtils.contentEquals(sourceFile, destinationFile)) {
                         return false;
                     } else {
-                        System.out.println("fooo");
                         break;
                     }
                 }
