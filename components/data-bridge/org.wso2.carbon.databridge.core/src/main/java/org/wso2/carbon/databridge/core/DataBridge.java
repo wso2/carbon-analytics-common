@@ -116,7 +116,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
 
     public String defineStream(String sessionId, String streamDefinition)
             throws
-
             DifferentStreamDefinitionAlreadyDefinedException,
             MalformedStreamDefinitionException, SessionTimeoutException {
         AgentSession agentSession = authenticator.getSession(sessionId);
@@ -316,7 +315,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public void logout(String sessionId) throws Exception {
         AgentSession agentSession = authenticator.getSession(sessionId);
         authenticator.logout(sessionId);
-        if (agentSession != null) {
+        if (agentSession != null && agentSession.getCredentials() != null) {
             log.info("user " + agentSession.getUsername() + " disconnected");
         } else {
             log.info("session " + sessionId + " disconnected");
@@ -355,7 +354,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             throws SessionTimeoutException, StreamDefinitionNotFoundException,
             StreamDefinitionStoreException {
         AgentSession agentSession = authenticator.getSession(sessionId);
-        if (agentSession.getUsername() == null) {
+        if (agentSession.getCredentials() == null) {
             if (log.isDebugEnabled()) {
                 log.debug("session " + sessionId + " expired ");
             }
@@ -375,7 +374,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public List<StreamDefinition> getAllStreamDefinitions(String sessionId)
             throws SessionTimeoutException {
         AgentSession agentSession = authenticator.getSession(sessionId);
-        if (agentSession.getUsername() == null) {
+        if (agentSession.getCredentials() == null) {
             if (log.isDebugEnabled()) {
                 log.debug("session " + sessionId + " expired ");
             }
@@ -394,7 +393,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             throws SessionTimeoutException, StreamDefinitionStoreException,
             DifferentStreamDefinitionAlreadyDefinedException {
         AgentSession agentSession = authenticator.getSession(sessionId);
-        if (agentSession.getUsername() == null) {
+        if (agentSession.getCredentials()== null) {
             if (log.isDebugEnabled()) {
                 log.debug("session " + sessionId + " expired ");
             }

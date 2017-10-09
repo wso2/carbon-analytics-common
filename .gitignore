@@ -1,4 +1,7 @@
 *.class
+*.html
+*.css
+*.gif
 target/
 
 # Mobile Tools for Java (J2ME)
@@ -22,3 +25,4 @@ hs_err_pid*
 
 # Mac OS temp files
 .DS_Store
+
