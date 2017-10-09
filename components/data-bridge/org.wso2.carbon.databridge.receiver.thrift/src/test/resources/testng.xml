@@ -22,7 +22,10 @@
 <suite name="org.wso2.carbon.databridge.receiver.thrift">
     <test name="data-bridge-receiver-thrift-unit-tests" preserve-order="true" parallel="false">
         <classes>
-
+            <class name="org.wso2.carbon.databridge.receiver.thrift.test.ThriftDataReceiverConfigurationTest"/>
+            <class name="org.wso2.carbon.databridge.receiver.thrift.test.ThriftDataReceiverTest"/>
+            <class name="org.wso2.carbon.databridge.receiver.thrift.test.ThriftEventConverterTest"/>
+            <class name="org.wso2.carbon.databridge.receiver.thrift.test.ThriftEventTransmissionTest"/>
         </classes>
     </test>
 </suite>
