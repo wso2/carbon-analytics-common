@@ -91,15 +91,15 @@ public class ServerOfflineSyncBinaryTest {
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ": 9612",
                 "ssl://" + hostName + ":9712", "admin", "admin");
-        Event event = new Event();
-        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-        event.setMetaData(new Object[]{"127.0.0.1"});
-        event.setCorrelationData(null);
-        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
 
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.tryPublish(event);
+            dataPublisher.tryPublish(streamID, metaData, correlationData, payLoad);
         }
         try {
             Thread.sleep(2000);
@@ -156,7 +156,6 @@ public class ServerOfflineSyncBinaryTest {
         binaryTestServer.stop();
     }
 
-
     @Test
     public void testNonBlockingEventSendingAndServerStartup()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
@@ -169,11 +168,12 @@ public class ServerOfflineSyncBinaryTest {
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9652",
                 "ssl://" + hostName + ":9752", "admin", "admin");
-        Event event = new Event();
-        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-        event.setMetaData(new Object[]{"127.0.0.1"});
-        event.setCorrelationData(null);
-        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        Long timeStamp = System.currentTimeMillis();
 
         binaryTestServer = new BinaryTestServer();
         binaryTestServer.addStreamDefinition(STREAM_DEFN);
@@ -183,15 +183,16 @@ public class ServerOfflineSyncBinaryTest {
                 getAgentConfiguration().getQueueSize();
         int numberOfEventsSent = queueSize + 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.tryPublish(event);
+            dataPublisher.tryPublish(streamID, timeStamp, metaData, correlationData, payLoad);
         }
         try {
             Thread.sleep(16000);
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), 0);
+        Assert.assertEquals(0, binaryTestServer.getNumberOfEventsReceived());
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }
+
 }

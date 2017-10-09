@@ -22,7 +22,7 @@
 <suite name="org.wso2.carbon.databridge.commons.binary">
     <test name="data-bridge-commons-binary-unit-tests" preserve-order="true" parallel="false">
         <classes>
-
+            <class name="org.wso2.carbon.databridge.commons.binary.test.BinaryMessageConvertUtilTest"/>
         </classes>
     </test>
 </suite>
