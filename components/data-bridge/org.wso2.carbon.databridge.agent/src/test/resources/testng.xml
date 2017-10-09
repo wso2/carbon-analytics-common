@@ -30,6 +30,8 @@
             <class name="org.wso2.carbon.databridge.agent.test.thrift.OneEndPointDPThriftTest"/>
             <class name="org.wso2.carbon.databridge.agent.test.thrift.ServerOfflineSyncThriftTest"/>
             <class name="org.wso2.carbon.databridge.agent.test.thrift.ServerOfflineThriftTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.DataBrigdeWorkerTestCase"/>
+            <class name="org.wso2.carbon.databridge.agent.test.DataPublisherTestCase"/>
         </classes>
     </test>
 </suite>
