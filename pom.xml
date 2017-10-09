@@ -91,7 +91,7 @@
                             <configuration>
                                 <excludes>
                                     <!--Excluding auto generated thrift code-->
-                                    <exclude>org.wso2.carbon.databridge.commons.thrift/*</exclude>
+                                    <exclude>**/org.wso2.carbon.databridge.commons.thrift/*</exclude>
                                 </excludes>
                             </configuration>
                         </execution>
