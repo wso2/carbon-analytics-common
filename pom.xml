@@ -33,6 +33,7 @@
     <modules>
         <module>components/data-bridge</module>
         <module>features/data-bridge</module>
+        <module>coverage-reports</module>
     </modules>
 
     <build>
@@ -53,6 +54,48 @@
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-scr-plugin</artifactId>
                     <version>${maven.src.version}</version>
+                </plugin>
+                <!-- surefire plugin configuration -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.4.3</version>
+                    <configuration>
+                        <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+                        <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+                        <includes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Test.java</include>
+                        </includes>
+                        <useFile>false</useFile>
+                        <forkMode>once</forkMode>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${org.jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <id>jacoco-initialize</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>jacoco-site</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <excludes>
+                                    <!--Excluding auto generated thrift code-->
+                                    <exclude>**/org.wso2.carbon.databridge.commons.thrift/*</exclude>
+                                </excludes>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -124,15 +167,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!-- <inherited>false</inherited> -->
-                <configuration>
-                    <environmentVariables>
-                        <testEnvironmentVariable>EnvironmentVariable</testEnvironmentVariable>
-                    </environmentVariables>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -251,11 +285,6 @@
                 <groupId>org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-log4j2</artifactId>
                 <version>${pax.logging.log4j2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jacoco</groupId>
-                <artifactId>org.jacoco.ant</artifactId>
-                <version>${org.jacoco.ant.version}</version>
             </dependency>
             <dependency>
                 <groupId>slf4j.wso2</groupId>
@@ -404,7 +433,12 @@
                 <artifactId>org.wso2.carbon.secvault</artifactId>
                 <version>${carbon.secvault.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <version>${org.jacoco.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -412,7 +446,7 @@
         <carbon.analytics.common.version>6.0.3-SNAPSHOT</carbon.analytics.common.version>
         <siddhi.version>4.0.0-M9</siddhi.version>
         <siddhi.bundle.version>4.0.0.M9</siddhi.bundle.version>
-
+        <org.jacoco.version>0.7.9</org.jacoco.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <json.version>3.0.0.wso2v1</json.version>
@@ -424,7 +458,6 @@
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
 
         <pax.logging.log4j2.version>1.8.5</pax.logging.log4j2.version>
-        <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
         <apache.felix.gogo.command.version>0.10.0.v201209301215</apache.felix.gogo.command.version>
         <apache.felix.gogo.runtime.version>0.10.0.v201209301036</apache.felix.gogo.runtime.version>
         <apache.felix.gogo.shell.version>0.10.0.v201212101605</apache.felix.gogo.shell.version>
