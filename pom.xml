@@ -1541,6 +1541,9 @@
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.4</powermock.version>
         <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
+
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
 </project>
