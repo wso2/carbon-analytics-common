@@ -38,7 +38,7 @@ public class BinaryMessageConvertUtilTest {
     Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
 
     @Test
-    public void testEventBufferSize() throws IOException {
+    public void testEventBufferSize() {
         int stringSize = BinaryMessageConverterUtil.getSize("i♥apim)");
         int intSize = BinaryMessageConverterUtil.getSize(1);
         int longSize = BinaryMessageConverterUtil.getSize(1L);

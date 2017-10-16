@@ -112,7 +112,7 @@ public class BinaryEventSender {
         outputstream.flush();
     }
 
-    private static int getEventSize(Event event) throws IOException {
+    private static int getEventSize(Event event) {
         int eventSize = 4 + event.getStreamId().length() + 8;
         Object[] data = event.getMetaData();
         if (data != null) {
