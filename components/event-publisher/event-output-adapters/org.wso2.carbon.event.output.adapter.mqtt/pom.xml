@@ -38,10 +38,6 @@
             <artifactId>org.wso2.carbon.event.output.adapter.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.paho</groupId>
             <artifactId>mqtt-client</artifactId>
         </dependency>
