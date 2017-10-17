@@ -15,8 +15,7 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -28,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.3-SNAPSHOT</version>
+    <version>6.0.3</version>
     <name>WSO2 Carbon Analytics Common - Parent</name>
 
     <modules>
@@ -209,7 +208,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>HEAD</tag>
+        <tag>v6.0.3</tag>
     </scm>
 
     <dependencyManagement>
@@ -444,7 +443,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.common.version>6.0.3-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>6.0.3</carbon.analytics.common.version>
         <siddhi.version>4.0.0-M9</siddhi.version>
         <siddhi.bundle.version>4.0.0.M9</siddhi.bundle.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
