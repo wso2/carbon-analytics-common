@@ -45,7 +45,7 @@ public class BinaryMessageConverterUtil {
 
         byte[] bytes = new byte[size];
         byteBuffer.get(bytes);
-        return new String(bytes);
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     public static int getSize(Object data) {

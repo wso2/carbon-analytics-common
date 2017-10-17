@@ -29,10 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class BinaryMessageConvertUtilTest {
     Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
@@ -58,16 +55,10 @@ public class BinaryMessageConvertUtilTest {
 
     @Test
     public void testGetString() {
-        Charset charset = Charset.forName("UTF-8");
-        CharsetEncoder encoder = charset.newEncoder();
-        ByteBuffer byteBuffer = null;
-        try {
-            byteBuffer = encoder.encode(CharBuffer.wrap("i♥apim)"));
-        } catch (CharacterCodingException e) {
-            log.error(e.getMessage());
-        }
-        String returnString = BinaryMessageConverterUtil.getString(byteBuffer, 4);
-        Assert.assertEquals("Expected return string is \'i♥\'", "i♥", returnString);
+        byte[] bytes = "iapim)".getBytes(StandardCharsets.UTF_8);
+        ByteBuffer eventByteBuffer = ByteBuffer.wrap(bytes);
+        String returnString = BinaryMessageConverterUtil.getString(eventByteBuffer, 5);
+        Assert.assertEquals("Expected return string is \'iapim\'", "iapim", returnString);
     }
 
     @Test
