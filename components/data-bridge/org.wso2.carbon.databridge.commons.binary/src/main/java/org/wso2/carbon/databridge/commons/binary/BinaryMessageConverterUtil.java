@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Util class for binary message conversion.
@@ -47,12 +48,12 @@ public class BinaryMessageConverterUtil {
 
         byte[] bytes = new byte[size];
         byteBuffer.get(bytes);
-        return new String(bytes);
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     public static int getSize(Object data) {
         if (data instanceof String) {
-            return 4 + ((String) data).length();
+            return 4 + ((String) data).getBytes(StandardCharsets.UTF_8).length;
         } else if (data instanceof Integer) {
             return 4;
         } else if (data instanceof Long) {
@@ -70,7 +71,7 @@ public class BinaryMessageConverterUtil {
 
     public static void assignData(Object data, ByteBuffer eventDataBuffer) throws IOException {
         if (data instanceof String) {
-            eventDataBuffer.putInt(((String) data).length());
+            eventDataBuffer.putInt(((String) data).getBytes(BinaryMessageConstants.DEFAULT_CHARSET).length);
             eventDataBuffer.put((((String) data).getBytes(BinaryMessageConstants.DEFAULT_CHARSET)));
         } else if (data instanceof Integer) {
             eventDataBuffer.putInt((Integer) data);

@@ -30,10 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -52,7 +49,7 @@ public class BinaryMessageConvertUtilTest {
         int booleanSize = BinaryMessageConverterUtil.getSize(true);
         int intArraySize = BinaryMessageConverterUtil.getSize(new int[]{1, 2, 3});
 
-        AssertJUnit.assertEquals("Expected byte length of String is 11", 11, stringSize);
+        AssertJUnit.assertEquals("Expected byte length of String is 13", 13, stringSize);
         AssertJUnit.assertEquals("Expected byte length of Int is 4", 4, intSize);
         AssertJUnit.assertEquals("Expected byte length of Float is 4", 4, floatSize);
         AssertJUnit.assertEquals("Expected byte length of Long is 8", 8, longSize);
@@ -63,16 +60,10 @@ public class BinaryMessageConvertUtilTest {
 
     @Test
     public void testGetString() {
-        Charset charset = Charset.forName("UTF-8");
-        CharsetEncoder encoder = charset.newEncoder();
-        ByteBuffer byteBuffer = null;
-        try {
-            byteBuffer = encoder.encode(CharBuffer.wrap("i♥apim)"));
-        } catch (CharacterCodingException e) {
-            log.error(e.getMessage());
-        }
-        String returnString = BinaryMessageConverterUtil.getString(byteBuffer, 4);
-        AssertJUnit.assertEquals("Expected return string is \'i♥\'", "i♥", returnString);
+        byte[] bytes = "iapim)".getBytes(StandardCharsets.UTF_8);
+        ByteBuffer eventByteBuffer = ByteBuffer.wrap(bytes);
+        String returnString = BinaryMessageConverterUtil.getString(eventByteBuffer, 5);
+        AssertJUnit.assertEquals("Expected return string is \'iapim\'", "iapim", returnString);
     }
 
     @Test
