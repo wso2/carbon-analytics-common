@@ -30,6 +30,8 @@ import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionExc
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
 import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+import org.wso2.carbon.databridge.core.authentication.AuthenticationHandler;
+import org.wso2.carbon.databridge.core.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
@@ -39,8 +41,6 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeConfigurationExceptio
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionNotFoundException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.EventDispatcher;
-import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
-import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.core.utils.AgentSession;
 import org.wso2.carbon.utils.Utils;

@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.databridge.core.internal.authentication;
+package org.wso2.carbon.databridge.core.authentication;
 
 import org.wso2.carbon.databridge.core.utils.AgentSession;
 

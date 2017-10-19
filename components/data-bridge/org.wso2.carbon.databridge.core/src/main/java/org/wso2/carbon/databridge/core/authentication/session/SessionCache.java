@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.databridge.core.internal.authentication.session;
+package org.wso2.carbon.databridge.core.authentication.session;
 
 import com.google.common.base.Function;
 import com.google.common.cache.CacheBuilder;

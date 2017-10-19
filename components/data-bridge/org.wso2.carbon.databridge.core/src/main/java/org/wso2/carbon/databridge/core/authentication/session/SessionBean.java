@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.databridge.core.internal.authentication.session;
+package org.wso2.carbon.databridge.core.authentication.session;
 
 import org.wso2.carbon.databridge.commons.Credentials;
 
