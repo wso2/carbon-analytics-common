@@ -421,8 +421,6 @@
                 <type>zip</type>
             </dependency>
 
-
-            <!-- Latest Dependencies - after 5.2.0-m4 migration -->
             <dependency>
                 <groupId>org.wso2.carbon.config</groupId>
                 <artifactId>org.wso2.carbon.config</artifactId>
