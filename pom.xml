@@ -421,8 +421,6 @@
                 <type>zip</type>
             </dependency>
 
-
-            <!-- Latest Dependencies - after 5.2.0-m4 migration -->
             <dependency>
                 <groupId>org.wso2.carbon.config</groupId>
                 <artifactId>org.wso2.carbon.config</artifactId>
@@ -444,8 +442,6 @@
 
     <properties>
         <carbon.analytics.common.version>6.0.4-SNAPSHOT</carbon.analytics.common.version>
-        <siddhi.version>4.0.0-M9</siddhi.version>
-        <siddhi.bundle.version>4.0.0.M9</siddhi.bundle.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
@@ -497,9 +493,8 @@
 
         <osgi.framework.import.version.range>[1.8.0, 2.0.0)</osgi.framework.import.version.range>
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
-        <carbon.kernel.version>5.2.0-m4</carbon.kernel.version>
-        <carbon.kernel.package.import.version.range>[5.0.0, 6.0.0)</carbon.kernel.package.import.version.range>
-        <carbon.kernel.pax.version>5.2.0-m4</carbon.kernel.pax.version>
+        <carbon.kernel.version>5.2.0</carbon.kernel.version>
+        <carbon.kernel.pax.version>5.2.0</carbon.kernel.pax.version>
         <slf4j.version>1.7.5</slf4j.version>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <guava.version>20.0</guava.version>
@@ -515,8 +510,8 @@
         <org.wso2.json.version>3.0.0.wso2v1</org.wso2.json.version>
 
         <!-- Latest Dependencies -->
-        <carbon.config.version>2.0.5</carbon.config.version>
-        <carbon.secvault.version>5.0.8</carbon.secvault.version>
+        <carbon.config.version>2.1.4</carbon.config.version>
+        <carbon.secvault.version>5.0.10</carbon.secvault.version>
         <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
