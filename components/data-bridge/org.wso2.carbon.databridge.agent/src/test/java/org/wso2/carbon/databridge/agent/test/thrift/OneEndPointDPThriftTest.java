@@ -36,6 +36,7 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
+import java.io.IOException;
 import java.net.SocketException;
 
 
@@ -223,4 +224,32 @@ public class OneEndPointDPThriftTest {
 
     }
 
+	@Test
+	public void testOneSecureDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
+		startServer(7611);
+		AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
+		String hostName = DataPublisherTestUtil.LOCAL_HOST;
+		DataPublisher dataPublisher = new DataPublisher("Thrift", "ssl://" + hostName + ":7711",
+			"ssl://" + hostName + ":7711", "admin", "admin");
+		Event event = new Event();
+		event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
+		event.setMetaData(new Object[]{"127.0.0.1"});
+		event.setCorrelationData(null);
+		event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+
+		int numberOfEventsSent = 10;
+		for (int i = 0; i < numberOfEventsSent; i++) {
+			dataPublisher.publish(event);
+		}
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+		}
+
+		dataPublisher.shutdown();
+		Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+		thriftTestServer.resetReceivedEvents();
+		thriftTestServer.stop();
+	}
 }
