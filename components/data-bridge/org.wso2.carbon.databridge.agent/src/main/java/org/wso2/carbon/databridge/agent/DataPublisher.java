@@ -155,8 +155,8 @@ public class DataPublisher {
         DataPublisherUtil.validateURLs(receiverURLGroups, authURLGroups);
 
         for (int i = 0; i < receiverURLGroups.size(); i++) {
-            Object[] receiverGroup = (Object[]) receiverURLGroups.get(i);
-            Object[] authGroup = (Object[]) authURLGroups.get(i);
+            Object[] receiverGroup = receiverURLGroups.get(i);
+            Object[] authGroup = authURLGroups.get(i);
             boolean failOver = (Boolean) receiverGroup[0];
 
             DataEndpointGroup endpointGroup;
@@ -169,14 +169,27 @@ public class DataPublisher {
              * we need to start iterating from 2nd element.
              */
             for (int j = 1; j < receiverGroup.length; j++) {
-                DataEndpointConfiguration endpointConfiguration =
-                        new DataEndpointConfiguration((String) receiverGroup[j],
-                                (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
-                                dataEndpointAgent.getSecuredTransportPool(), dataEndpointAgent.
-                                getAgentConfiguration().getBatchSize(),
-                                dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
-                                dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
-                                dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool());
+	            DataEndpointConfiguration endpointConfiguration;
+	            String[] urlParams =  DataPublisherUtil.getProtocolHostPort((String) receiverGroup[j]);
+
+	            if (urlParams[0].equalsIgnoreCase(DataEndpointConfiguration.Protocol.TCP.toString())) {
+		            endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
+			            (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
+			            dataEndpointAgent.getSecuredTransportPool(),
+			            dataEndpointAgent.getAgentConfiguration().getBatchSize(),
+			            dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
+			            dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
+			            dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool());
+	            } else {
+		            endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
+			            (String) authGroup[j], username, password, dataEndpointAgent.getSecuredTransportPool(),
+			            dataEndpointAgent.getSecuredTransportPool(),
+			            dataEndpointAgent.getAgentConfiguration().getBatchSize(),
+			            dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
+			            dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
+			            dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool());
+	            }
+
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);
                 endpointGroup.addDataEndpoint(dataEndpoint);
