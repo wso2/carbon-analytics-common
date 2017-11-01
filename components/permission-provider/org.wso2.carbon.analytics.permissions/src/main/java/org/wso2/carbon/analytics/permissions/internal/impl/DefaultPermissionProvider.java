@@ -74,7 +74,9 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public void addPermission(Permission permission) throws PermissionException {
-        log.debug("Add permission " + permission);
+        if (log.isDebugEnabled()) {
+            log.debug("Add permission " + permission);
+        }
         this.getPermissionsDAO().addPermission(permission);
     }
 
@@ -86,7 +88,9 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public void deletePermission(Permission permission) throws PermissionException {
-        log.debug("Delete permission " + permission);
+        if (log.isDebugEnabled()) {
+            log.debug("Delete permission " + permission);
+        }
         this.getPermissionsDAO().revokePermission(permission);
         this.getPermissionsDAO().deletePermission(permission);
     }
@@ -100,7 +104,9 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public void grantPermission(Permission permission, Role role) throws PermissionException {
-        log.debug("Grant permission " + permission + " to " + role);
+        if (log.isDebugEnabled()) {
+            log.debug("Grant permission " + permission + " to " + role);
+        }
         this.getPermissionsDAO().grantPermission(permission, role);
     }
 
@@ -112,7 +118,9 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public void revokePermission(Permission permission) throws PermissionException {
-        log.debug("Revoke permission " + permission);
+        if (log.isDebugEnabled()) {
+            log.debug("Revoke permission " + permission);
+        }
         this.getPermissionsDAO().revokePermission(permission);
     }
 
@@ -125,7 +133,9 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public void revokePermission(Permission permission, Role role) throws PermissionException {
-        log.debug("Revoke permission " + permission + " from " + role);
+        if (log.isDebugEnabled()) {
+            log.debug("Revoke permission " + permission + " from " + role);
+        }
         this.getPermissionsDAO().revokePermission(permission, role);
     }
 
@@ -138,7 +148,9 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public boolean hasPermission(String username, Permission permission) throws PermissionException {
-        log.debug("Check permission " + permission);
+        if (log.isDebugEnabled()) {
+            log.debug("Check permission " + permission);
+        }
         List<Role> roles = getRoles(username);
         if (roles.size() == 0) {
             log.debug("No roles retrieved for the user.");
@@ -158,14 +170,12 @@ public class DefaultPermissionProvider implements PermissionProvider {
         if (idPClient == null) {
             throw new RuntimeException("IdP client is not initialized properly. Unable to get user roles.");
         }
-
         List<Role> roles = new ArrayList<>();
         try {
             List<Group> groups = idPClient.getUsersGroups(username);
             groups.forEach(group -> roles.add(new Role(group.getId(), group.getDisplayName())));
         } catch (IdPClientException e) {
-            log.error("Unable to check permission. Failed getting roles of the user.");
-            throw new PermissionException("Failed getting roles of the user.");
+            throw new PermissionException("Failed getting roles of the user. Unable to check permissions");
         }
         return roles;
     }
@@ -211,7 +221,6 @@ public class DefaultPermissionProvider implements PermissionProvider {
         try {
             permissionConfig = configProvider.getConfigurationObject(PermissionConfig.class);
         } catch (ConfigurationException e) {
-            log.error("Error occurred while fetching permission configuration.", e);
             throw new PermissionException("Error occurred while fetching permission configuration.", e);
         }
     }

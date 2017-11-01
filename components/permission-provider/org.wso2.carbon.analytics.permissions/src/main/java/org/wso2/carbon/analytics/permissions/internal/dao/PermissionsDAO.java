@@ -68,7 +68,9 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            log.debug("Executing query: " + query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -95,7 +97,9 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            log.debug("Executing query: " + query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
@@ -124,7 +128,9 @@ public class PermissionsDAO {
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             ps.setString(3, role.getId());
-            log.debug("Executing query: " + query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -151,7 +157,9 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            log.debug("Executing query: " + query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
@@ -180,7 +188,9 @@ public class PermissionsDAO {
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             ps.setString(3, role.getId());
-            log.debug("Executing query: " + query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
@@ -218,7 +228,9 @@ public class PermissionsDAO {
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             ps.setString(3, roleIds);
-            log.debug("Executing query: " + query);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 hasPermission = true;
@@ -232,18 +244,20 @@ public class PermissionsDAO {
     }
 
     private DataSource getDataSource() throws PermissionException {
-        if (dataSource == null) {
-            if (dataSourceService == null) {
-                throw new PermissionException("Datasource service is null. Cannot retrieve datasource " +
-                        permissionConfig.getDatasourceName());
-            }
+        if (dataSource != null) {
+            return dataSource;
+        }
 
-            try {
-                dataSource = (DataSource) dataSourceService.getDataSource(permissionConfig.getDatasourceName());
-            } catch (DataSourceException e) {
-                throw new PermissionException("Unable to retrieve the datasource: " +
-                        permissionConfig.getDatasourceName(), e);
-            }
+        if (dataSourceService == null) {
+            throw new PermissionException("Datasource service is null. Cannot retrieve datasource " +
+                    permissionConfig.getDatasourceName());
+        }
+
+        try {
+            dataSource = (DataSource) dataSourceService.getDataSource(permissionConfig.getDatasourceName());
+        } catch (DataSourceException e) {
+            throw new PermissionException("Unable to retrieve the datasource: " +
+                    permissionConfig.getDatasourceName(), e);
         }
         return dataSource;
     }

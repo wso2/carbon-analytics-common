@@ -91,7 +91,6 @@ public class PermissionManagerImpl implements PermissionManager {
         try {
             permissionConfig = configProvider.getConfigurationObject(PermissionConfig.class);
         } catch (ConfigurationException e) {
-            log.error("Error occurred while fetching permission configuration.", e);
             throw new PermissionException("Error occurred while fetching permission configuration.", e);
         }
     }
@@ -112,12 +111,12 @@ public class PermissionManagerImpl implements PermissionManager {
     @Override
     public PermissionProvider getProvider() {
         String providerName = permissionConfig.getPermissionProvider();
-        if (permissionProviders.containsKey(providerName)) {
-            log.debug("Permission provider " + providerName + " found.");
-            return permissionProviders.get(providerName);
+        if (!permissionProviders.containsKey(providerName)) {
+            throw new PermissionException("Unable to find permission provider \"" + providerName + "\"");
         }
-
-        log.error("Unable to find the permission provider \"" + providerName + "\"");
-        throw new PermissionException("Unable to find permission provider \"" + providerName + "\"");
+        if (log.isDebugEnabled()) {
+            log.debug("Permission provider " + providerName + " found.");
+        }
+        return permissionProviders.get(providerName);
     }
 }
