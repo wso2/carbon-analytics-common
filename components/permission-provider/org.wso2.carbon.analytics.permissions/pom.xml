@@ -52,7 +52,7 @@
 
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.stream.processor.idp.client</artifactId>
+            <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
         </dependency>
     </dependencies>
 

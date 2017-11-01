@@ -25,6 +25,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.PermissionConfig;
@@ -34,9 +36,7 @@ import org.wso2.carbon.analytics.permissions.internal.dao.PermissionsDAO;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
-import org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient;
-import org.wso2.carbon.stream.processor.idp.client.core.exception.IdPClientException;
-import org.wso2.carbon.stream.processor.idp.client.core.models.Group;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,8 +172,8 @@ public class DefaultPermissionProvider implements PermissionProvider {
         }
         List<Role> roles = new ArrayList<>();
         try {
-            List<Group> groups = idPClient.getUsersGroups(username);
-            groups.forEach(group -> roles.add(new Role(group.getId(), group.getDisplayName())));
+            List<Role> userRoles = idPClient.getUserRoles(username);
+            userRoles.forEach(role -> roles.add(new Role(role.getId(), role.getName())));
         } catch (IdPClientException e) {
             throw new PermissionException("Failed getting roles of the user. Unable to check permissions");
         }
@@ -239,7 +239,7 @@ public class DefaultPermissionProvider implements PermissionProvider {
      * @param idPClient
      */
     @Reference(
-            name = "org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient",
+            name = "org.wso2.carbon.analytics.idp.client.core.api.IdPClient",
             service = IdPClient.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

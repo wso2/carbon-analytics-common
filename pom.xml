@@ -438,22 +438,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.idp.client.feature</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.idp.client</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
@@ -469,15 +459,15 @@
 
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.stream.processor.idp.client.feature</artifactId>
+                <artifactId>org.wso2.carbon.analytics.idp.client.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.stream.processor.auth.rest.api.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.config</groupId>
                 <artifactId>org.wso2.carbon.config</artifactId>
