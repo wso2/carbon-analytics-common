@@ -16,6 +16,7 @@ package org.wso2.carbon.databridge.core;
 * limitations under the License.
 */
 
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.kernel.CarbonRuntime;
@@ -28,6 +29,7 @@ public class DataBridgeServiceValueHolder {
     private static CarbonRuntime carbonRuntime;
     private static ConfigProvider configProvider;
     private static InMemoryStreamDefinitionStore streamDefinitionStore;
+    private static IdPClient idPClient;
 
     public static CarbonRuntime getCarbonRuntime() {
         return carbonRuntime;
@@ -51,5 +53,13 @@ public class DataBridgeServiceValueHolder {
 
     public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
         DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
+    }
+
+    public static IdPClient getIdPClient() {
+        return idPClient;
+    }
+
+    public static void setIdPClient(IdPClient idPClient) {
+        DataBridgeServiceValueHolder.idPClient = idPClient;
     }
 }
