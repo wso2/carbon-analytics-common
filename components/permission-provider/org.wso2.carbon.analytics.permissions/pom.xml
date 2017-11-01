@@ -49,6 +49,11 @@
             <groupId>org.wso2.carbon.datasources</groupId>
             <artifactId>org.wso2.carbon.datasource.core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.idp.client</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -71,7 +76,8 @@
                         <Import-Package>
                             org.osgi.framework,*;resolution:=optional,
                             org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
-                            org.wso2.carbon.config.*;version="${carbon.config.version.range}"
+                            org.wso2.carbon.config.*;version="${carbon.config.version.range}",
+                            org.wso2.carbon.stream.processor.idp.*,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

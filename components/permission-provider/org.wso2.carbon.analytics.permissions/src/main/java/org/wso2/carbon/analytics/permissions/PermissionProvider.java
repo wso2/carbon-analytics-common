@@ -75,6 +75,7 @@ public interface PermissionProvider {
      * @param username
      * @param permission
      * @return
+     * @throws PermissionException
      */
-    boolean hasPermission(String username, Permission permission);
+    boolean hasPermission(String username, Permission permission) throws PermissionException;
 }

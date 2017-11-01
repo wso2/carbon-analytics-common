@@ -34,7 +34,11 @@ import org.wso2.carbon.analytics.permissions.internal.dao.PermissionsDAO;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient;
+import org.wso2.carbon.stream.processor.idp.client.core.exception.IdPClientException;
+import org.wso2.carbon.stream.processor.idp.client.core.models.Group;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +53,7 @@ public class DefaultPermissionProvider implements PermissionProvider {
     private static final Logger log = LoggerFactory.getLogger(DefaultPermissionProvider.class);
 
     private DataSourceService dataSourceService;
+    private IdPClient idPClient;
     private PermissionConfig permissionConfig;
 
     private PermissionsDAO permissionsDAO;
@@ -132,9 +137,15 @@ public class DefaultPermissionProvider implements PermissionProvider {
      * @return
      */
     @Override
-    public boolean hasPermission(String username, Permission permission) {
+    public boolean hasPermission(String username, Permission permission) throws PermissionException {
         log.debug("Check permission " + permission);
-        return this.getPermissionsDAO().hasPermission(getRoles(username), permission);
+        List<Role> roles = getRoles(username);
+        if (roles.size() == 0) {
+            log.debug("No roles retrieved for the user.");
+            return false;
+        }
+        log.debug("Retrieved roles for the user.");
+        return this.getPermissionsDAO().hasPermission(roles, permission);
     }
 
     /**
@@ -144,7 +155,19 @@ public class DefaultPermissionProvider implements PermissionProvider {
      * @return
      */
     private List<Role> getRoles(String username) {
-        throw new RuntimeException("Not implemented");
+        if (idPClient == null) {
+            throw new RuntimeException("IdP client is not initialized properly. Unable to get user roles.");
+        }
+
+        List<Role> roles = new ArrayList<>();
+        try {
+            List<Group> groups = idPClient.getUsersGroups(username);
+            groups.forEach(group -> roles.add(new Role(group.getId(), group.getDisplayName())));
+        } catch (IdPClientException e) {
+            log.error("Unable to check permission. Failed getting roles of the user.");
+            throw new PermissionException("Failed getting roles of the user.");
+        }
+        return roles;
     }
 
     /**
@@ -199,5 +222,30 @@ public class DefaultPermissionProvider implements PermissionProvider {
      * @param configProvider
      */
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
+    }
+
+    /**
+     * Register analytics IdP client.
+     *
+     * @param idPClient
+     */
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient",
+            service = IdPClient.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterIdPClient"
+    )
+    protected void registerIdPClient(IdPClient idPClient) {
+        this.idPClient = idPClient;
+    }
+
+    /**
+     * Unregister analytics IdP client.
+     *
+     * @param idPClient
+     */
+    protected void unregisterIdPClient(IdPClient idPClient) {
+        this.idPClient = null;
     }
 }
