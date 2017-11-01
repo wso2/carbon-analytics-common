@@ -93,7 +93,7 @@ public class LocalIdPClient implements IdPClient {
     }
 
     @Override
-    public Map<String, String> login(Map<String, String> properties) throws IdPClientException {
+    public Map<String, String> login(Map<String, String> properties) {
         Map<String, String> returnProperties = new HashMap<>();
         String grantType = properties.getOrDefault(IdPClientConstants.GRANT_TYPE,
                 IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -201,7 +201,7 @@ public class LocalIdPClient implements IdPClient {
     }
 
     @Override
-    public boolean authenticate(String token) throws AuthenticationException, IdPClientException {
+    public boolean authenticate(String token) throws AuthenticationException {
         Session session = sessionIdSessionMap.get(token);
         if (session == null) {
             throw new AuthenticationException("The session with id '" + token + "' is not valid.");
