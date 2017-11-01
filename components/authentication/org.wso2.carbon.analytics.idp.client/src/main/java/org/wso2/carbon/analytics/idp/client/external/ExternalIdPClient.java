@@ -382,8 +382,18 @@ public class ExternalIdPClient implements IdPClient {
             grantTypes.add(IdPClientConstants.PASSWORD_GRANT_TYPE);
             grantTypes.add(IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
             grantTypes.add(IdPClientConstants.REFRESH_GRANT_TYPE);
-            String callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.REGEX_BASE_END;
+
+            String callBackUrl;
+            if (oAuthAppName.equals(this.spOAuthAppName)) {
+                callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
+                        ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH +
+                        ExternalIdPClientConstants.REGEX_BASE_END;
+            } else {
+                callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
+                        ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH
+                        + oAuthAppName + ExternalIdPClientConstants.REGEX_BASE_END;
+            }
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Creating OAuth2 application.");
             }
