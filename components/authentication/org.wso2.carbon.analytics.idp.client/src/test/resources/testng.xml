@@ -20,5 +20,9 @@ under the License.
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="wso2sp-test-suite">
-
+    <test name="IdP Client tests">
+        <classes>
+            <class name="org.wso2.carbon.analytics.idp.client.LocalIdPClientTest"/>
+        </classes>
+    </test>
 </suite>
