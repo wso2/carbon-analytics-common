@@ -438,12 +438,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.idp.client.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
@@ -452,7 +446,11 @@
                 <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.stream.processor.idp.client</artifactId>
