@@ -112,8 +112,6 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         oAuthAppNames.add(statusAppName);
         oAuthAppNames.add(businessAppName);
 
-
-
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
                 .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword, kmCertAlias);
         OAuth2ServiceStubs keyManagerServiceStubs = OAuth2ServiceStubFactory.getKeyManagerServiceStubs(

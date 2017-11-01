@@ -62,12 +62,12 @@ public class User {
         this.properties = properties;
     }
 
-    public void setRoles(String roles) {
-        this.roles = roles;
-    }
-
     public String getRoles() {
         return this.roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 
     public List<Role> getRolesList() {
