@@ -308,7 +308,7 @@ public class ExternalIdPClient implements IdPClient {
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Unable to get the username from introspection of the token '" +
-                                oAuth2TokenInfo.getAccessToken()+ "'. Response : '" +
+                                oAuth2TokenInfo.getAccessToken() + "'. Response : '" +
                                 introspectTokenResponse.toString());
                     }
                 }
