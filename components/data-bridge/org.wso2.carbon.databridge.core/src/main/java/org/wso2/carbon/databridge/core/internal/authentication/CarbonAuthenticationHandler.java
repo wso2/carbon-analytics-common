@@ -18,7 +18,15 @@
 
 package org.wso2.carbon.databridge.core.internal.authentication;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
+import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
 import org.wso2.carbon.databridge.core.utils.AgentSession;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -27,14 +35,27 @@ import org.wso2.carbon.databridge.core.utils.AgentSession;
  */
 
 public class CarbonAuthenticationHandler implements AuthenticationHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(CarbonAuthenticationHandler.class);
 
     public boolean authenticate(String userName, String password) {
-        // TODO: 9/14/17: Re-enable authentication
-        /*
-         * Caas based authentication was removed due to kernel/dependency issues.
-         * Proper authentication will be added once the OSGi based authenticator is released.
-         */
-        return true;
+        try {
+            Map<String, String> loginProperties = new HashMap<>();
+            loginProperties.put(IdPClientConstants.USERNAME, userName);
+            loginProperties.put(IdPClientConstants.PASSWORD, password);
+            loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
+            Map<String, String> login = DataBridgeServiceValueHolder.getIdPClient().login(loginProperties);
+            String loginStatus = login.get(IdPClientConstants.LOGIN_STATUS);
+            if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
+                return true;
+            } else {
+                LOG.error("Authentication failed for username '" + userName + "'. Error : '"
+                        + login.get(IdPClientConstants.ERROR) + "'. Error Description : '"
+                        + login.get(IdPClientConstants.ERROR_DESCRIPTION) + "'");
+                return false;
+            }
+        } catch (IdPClientException e) {
+            return false;
+        }
     }
 
     @Override
