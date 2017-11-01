@@ -307,7 +307,8 @@ public class ExternalIdPClient implements IdPClient {
                     returnProperties.put(IdPClientConstants.AUTH_USER, authUser);
                 } else {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Unable to get the username from introspection. Response : '" +
+                        LOG.debug("Unable to get the username from introspection of the token '" +
+                                oAuth2TokenInfo.getAccessToken()+ "'. Response : '" +
                                 introspectTokenResponse.toString());
                     }
                 }
@@ -374,7 +375,7 @@ public class ExternalIdPClient implements IdPClient {
                         response.body().toString() + " Status Code: " + response.status());
             }
         } catch (IOException e) {
-            throw new IdPClientException("Error occurred while parsing the authentication response.");
+            throw new IdPClientException("Error occurred while parsing the authentication response.", e);
         }
     }
 
