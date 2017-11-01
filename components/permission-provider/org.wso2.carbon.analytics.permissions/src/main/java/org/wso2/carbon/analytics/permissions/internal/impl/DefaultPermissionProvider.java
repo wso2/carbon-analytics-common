@@ -172,8 +172,8 @@ public class DefaultPermissionProvider implements PermissionProvider {
         }
         List<Role> roles = new ArrayList<>();
         try {
-            List<Role> userRoles = idPClient.getUserRoles(username);
-            userRoles.forEach(role -> roles.add(new Role(role.getId(), role.getName())));
+            List<org.wso2.carbon.analytics.idp.client.core.models.Role> userRoles = idPClient.getUserRoles(username);
+            userRoles.forEach(role -> roles.add(new Role(role.getId(), role.getDisplayName())));
         } catch (IdPClientException e) {
             throw new PermissionException("Failed getting roles of the user. Unable to check permissions");
         }
