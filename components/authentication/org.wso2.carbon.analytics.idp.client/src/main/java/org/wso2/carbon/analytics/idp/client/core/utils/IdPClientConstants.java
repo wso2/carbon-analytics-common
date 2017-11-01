@@ -78,7 +78,7 @@ public class IdPClientConstants {
     public static class Error {
         public static final String GRANT_TYPE_NOT_SUPPORTED = "Grant_Type_Not_Supported";
         public static final String INVALID_CREDENTIALS = "Invalid_Credentials";
-
+        public static final String INTERNAL_SERVER_ERROR = "Internal_Server_Error";
     }
 
 

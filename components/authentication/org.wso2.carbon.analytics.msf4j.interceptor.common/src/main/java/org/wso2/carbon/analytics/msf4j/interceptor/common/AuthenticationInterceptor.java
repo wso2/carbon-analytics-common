@@ -92,11 +92,11 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                     if (loginValues.get(IdPClientConstants.LOGIN_STATUS)
                             .equals(IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
                         LOG.error("Authentication failed for the request to : '" + request.getUri() + "' due to " +
-                                "Error :'" + loginProperties.get(IdPClientConstants.ERROR) + "', Error Description : '"
-                                + loginProperties.get(IdPClientConstants.ERROR_DESCRIPTION));
+                                "Error :'" + loginValues.get(IdPClientConstants.ERROR) + "', Error Description : '"
+                                + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION));
                         response.setEntity("Authentication failed for the request to : '" + request.getUri() +
-                                "' due to Error :'" + loginProperties.get(IdPClientConstants.ERROR) + "'," +
-                                " Error Description : '" + loginProperties.get(IdPClientConstants.ERROR_DESCRIPTION))
+                                "' due to Error :'" + loginValues.get(IdPClientConstants.ERROR) + "'," +
+                                " Error Description : '" + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION))
                                 .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
                         return false;
                     }
@@ -129,15 +129,13 @@ public class AuthenticationInterceptor implements RequestInterceptor {
     public boolean onRequestInterceptionError(Request request, Response response, Exception e) {
         if (e instanceof AuthenticationException) {
             LOG.error("Authorization invalid for request : '" + request.getUri() + "'", e);
-            response.setEntity("Login credential is not valid in accessing the uri '" + request.getUri() + "'. " +
-                    "Please check the credentials and try again.")
+            response.setEntity(e.getMessage())
                     .setMediaType(MediaType.TEXT_PLAIN)
                     .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
             return false;
         }
-
         String message = "Exception while executing request interceptor '" + this.getClass() + "' for uri : '" +
-                request.getUri() + "'";
+                request.getUri() + "'. Error: '" + e.getMessage() + "'";
         LOG.error(message, e);
         response.setEntity(message)
                 .setMediaType(MediaType.TEXT_PLAIN)

@@ -64,11 +64,8 @@ public class ExternalIdPClientConstants {
     public static final String REDIRECT_URL = "Redirect_Url";
     public static final String CALLBACK_URL_NAME = "Callback_Url";
     public static final String REQUEST_URL = "REQUEST_URL";
-    public static final String TOKEN = "Token";
 
     public static final String CALLBACK_URL = "/login/callback";
-    public static final String SP_APPLICATION_NAME = "SP";
-
     public static final String REGEX_BASE_START = "regexp=(";
     public static final String REGEX_BASE_END = "/.*)";
 

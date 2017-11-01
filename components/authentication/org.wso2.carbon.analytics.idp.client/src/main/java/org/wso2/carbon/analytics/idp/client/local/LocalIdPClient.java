@@ -116,8 +116,6 @@ public class LocalIdPClient implements IdPClient {
                     returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
                     return returnProperties;
                 }
-
-
             } else {
                 errorMessage = "The login credential used for login are invalid, username : '" + userName + "'.";
                 LOG.error(errorMessage);
@@ -203,7 +201,7 @@ public class LocalIdPClient implements IdPClient {
         if (session.isInternalUser()) {
             return true;
         }
-        if (session.getExpiryTime() < Calendar.getInstance().getTimeInMillis()) {
+        if (session.getExpiryTime() > Calendar.getInstance().getTimeInMillis()) {
             return true;
         } else {
             usersToSessionMap.remove(session.getUserHash());
