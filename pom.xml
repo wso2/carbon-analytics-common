@@ -32,6 +32,7 @@
 
     <modules>
         <module>components/data-bridge</module>
+        <module>components/database-query-manager</module>
         <module>features/data-bridge</module>
         <module>coverage-reports</module>
     </modules>
