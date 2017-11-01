@@ -62,7 +62,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
     @Override
     public IdPClient getIdPClient(Map<String, String> properties, List<User> users, List<Role> roles)
             throws IdPClientException {
-        int sessionTimeout = 0;
+        int sessionTimeout;
         try {
             sessionTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_SESSION_TIMEOUT));

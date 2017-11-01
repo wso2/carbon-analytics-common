@@ -94,91 +94,92 @@ public class LocalIdPClient implements IdPClient {
         String grantType = properties.getOrDefault(IdPClientConstants.GRANT_TYPE,
                 IdPClientConstants.PASSWORD_GRANT_TYPE);
         String userName, password, errorMessage;
-        if (grantType.equals(IdPClientConstants.PASSWORD_GRANT_TYPE)) {
-            userName = properties.get(IdPClientConstants.USERNAME);
-            password = properties.get(IdPClientConstants.PASSWORD);
-            Session session;
-            int userValue = (userName + ":" + password).hashCode();
-            if (userName != null & password != null) {
-                //Checking if session is already present and update expiry time.
-                Session oldSession = this.usersToSessionMap.get(userValue);
-                if (oldSession != null) {
-                    Long createdAt = Calendar.getInstance().getTimeInMillis();
-                    oldSession.setExpiryTime(createdAt + this.sessionTimeout);
-                    usersToSessionMap.replace(userValue, oldSession);
-                    sessionIdSessionMap.replace(oldSession.getSessionId().toString(), oldSession);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("User '" + userName + "' session is extended.");
+        switch (grantType) {
+            case IdPClientConstants.PASSWORD_GRANT_TYPE:
+                userName = properties.get(IdPClientConstants.USERNAME);
+                password = properties.get(IdPClientConstants.PASSWORD);
+                Session session;
+                int userValue = (userName + ":" + password).hashCode();
+                if (userName != null & password != null) {
+                    //Checking if session is already present and update expiry time.
+                    Session oldSession = this.usersToSessionMap.get(userValue);
+                    if (oldSession != null) {
+                        Long createdAt = Calendar.getInstance().getTimeInMillis();
+                        oldSession.setExpiryTime(createdAt + this.sessionTimeout);
+                        usersToSessionMap.replace(userValue, oldSession);
+                        sessionIdSessionMap.replace(oldSession.getSessionId().toString(), oldSession);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("User '" + userName + "' session is extended.");
+                        }
+                        returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oldSession.getSessionId().toString());
+                        returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
+                        returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                        return returnProperties;
                     }
-                    returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
-                    returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oldSession.getSessionId().toString());
-                    returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
-                    returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
-                    return returnProperties;
-                }
-            } else {
-                errorMessage = "The login credential used for login are invalid, username : '" + userName + "'.";
-                LOG.error(errorMessage);
-                returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
-                returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
-                returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
-                return returnProperties;
-            }
-            User user = getUserFromUsersList(userName);
-            if (user != null) {
-                byte[] plainUserPassword = Base64.getDecoder().decode(user.getPassword());
-                if (!Arrays.equals(plainUserPassword, password.getBytes(Charset.forName("UTF-8")))) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Password did not match with the configured user, userName: '" + userName + "', " +
-                                "Failing the authentication.");
-                    }
+                } else {
+                    errorMessage = "The login credential used for login are invalid, username : '" + userName + "'.";
+                    LOG.error(errorMessage);
                     returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
-                    returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, "The login credential used for login " +
-                            "are invalid, username : '" + userName + "'.");
-                    return returnProperties;
-                } else {
-                    Long createdAt = Calendar.getInstance().getTimeInMillis();
-                    session = new Session(userValue, false, createdAt + this.sessionTimeout);
-                    usersToSessionMap.put(userValue, session);
-                    sessionIdSessionMap.put(session.getSessionId().toString(), session);
-                    returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
-                    returnProperties.put(IdPClientConstants.ACCESS_TOKEN, session.getSessionId().toString());
-                    returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
-                    returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                    returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
                     return returnProperties;
                 }
-            } else {
-                LOG.debug("User not found for userName: '" + userName + "'. Failing the authentication.");
-                returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
-                returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
-                returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, "The login credential used for login are " +
-                        "invalid, username : '" + userName + "'.");
+                User user = getUserFromUsersList(userName);
+                if (user != null) {
+                    byte[] plainUserPassword = Base64.getDecoder().decode(user.getPassword());
+                    if (!Arrays.equals(plainUserPassword, password.getBytes(Charset.forName("UTF-8")))) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Password did not match with the configured user, userName: '" + userName + "', " +
+                                    "Failing the authentication.");
+                        }
+                        returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
+                        returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
+                        returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, "The login credential used for login " +
+                                "are invalid, username : '" + userName + "'.");
+                        return returnProperties;
+                    } else {
+                        Long createdAt = Calendar.getInstance().getTimeInMillis();
+                        session = new Session(userValue, false, createdAt + this.sessionTimeout);
+                        usersToSessionMap.put(userValue, session);
+                        sessionIdSessionMap.put(session.getSessionId().toString(), session);
+                        returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.ACCESS_TOKEN, session.getSessionId().toString());
+                        returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
+                        returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                        return returnProperties;
+                    }
+                } else {
+                    LOG.debug("User not found for userName: '" + userName + "'. Failing the authentication.");
+                    returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
+                    returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
+                    returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, "The login credential used for login are " +
+                            "invalid, username : '" + userName + "'.");
+                    return returnProperties;
+                }
+            case IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE:
+                //Login for any system service to access API's
+                userName = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
+                password = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
+                int userHash = (userName + ":" + password).hashCode();
+                Long createdAt = Calendar.getInstance().getTimeInMillis();
+                Session newSession = new Session(userHash, true, createdAt + this.sessionTimeout);
+                usersToSessionMap.put(userHash, newSession);
+                sessionIdSessionMap.put(newSession.getSessionId().toString(), newSession);
+                returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                returnProperties.put(IdPClientConstants.ACCESS_TOKEN, newSession.getSessionId().toString());
+                returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
+                returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
                 return returnProperties;
-            }
-        } else if (grantType.equals(IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE)) {
-            //Login for any system service to access API's
-            userName = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
-            password = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
-            int userHash = (userName + ":" + password).hashCode();
-            Long createdAt = Calendar.getInstance().getTimeInMillis();
-            Session newSession = new Session(userHash, true, createdAt + this.sessionTimeout);
-            usersToSessionMap.put(userHash, newSession);
-            sessionIdSessionMap.put(newSession.getSessionId().toString(), newSession);
-            returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
-            returnProperties.put(IdPClientConstants.ACCESS_TOKEN, newSession.getSessionId().toString());
-            returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
-            returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
-            return returnProperties;
 
-        } else {
-            errorMessage = "The Grant Type '" + grantType + "' is not" +
-                    "supported by the IdPClient '" + LocalIdPClient.class.getName();
-            LOG.error(errorMessage);
-            returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
-            returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
-            returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
-            return returnProperties;
+            default:
+                errorMessage = "The Grant Type '" + grantType + "' is not" +
+                        "supported by the IdPClient '" + LocalIdPClient.class.getName();
+                LOG.error(errorMessage);
+                returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
+                returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
+                returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
+                return returnProperties;
         }
     }
 

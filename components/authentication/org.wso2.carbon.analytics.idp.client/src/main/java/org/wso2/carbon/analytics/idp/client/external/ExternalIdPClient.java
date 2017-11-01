@@ -137,9 +137,8 @@ public class ExternalIdPClient implements IdPClient {
             userProperties.put(ExternalIdPClientConstants.SCIM2_USER_JSON, scimUser.getAsString());
             JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
             List<String> userGroupsDisplayNameList = new ArrayList<>();
-            scimGroups.forEach((scimGroup) -> {
-                userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString());
-            });
+            scimGroups.forEach(scimGroup ->
+                    userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString()));
             List<Role> userGroups = getAllRoles().stream()
                     .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
                     .collect(Collectors.toList());
@@ -171,9 +170,8 @@ public class ExternalIdPClient implements IdPClient {
             JsonObject scimUser = (JsonObject) users.get(0);
             JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
             List<String> userGroupsDisplayNameList = new ArrayList<>();
-            scimGroups.forEach((scimGroup) -> {
-                userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString());
-            });
+            scimGroups.forEach((scimGroup) ->
+                    userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString()));
             userGroups = getAllRoles().stream()
                     .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
                     .collect(Collectors.toList());
