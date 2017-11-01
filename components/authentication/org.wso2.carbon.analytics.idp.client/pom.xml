@@ -85,19 +85,6 @@
                     <basedir>${project.build.outputDirectory}/org/wso2/carbon/analytics/idp/client</basedir>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>
-                                org.wso2.carbon.analytics.idp.client.core.internal.IdPClientServiceComponent
-                            </mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
