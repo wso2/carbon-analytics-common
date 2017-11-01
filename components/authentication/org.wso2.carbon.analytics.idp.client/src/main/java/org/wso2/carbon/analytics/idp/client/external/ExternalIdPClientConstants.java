@@ -54,7 +54,7 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_IDP_PASSWORD = "admin";
     public static final String DEFAULT_SP_APP_NAME = "sp";
     public static final String DEFAULT_PORTAL_APP_NAME = "portal";
-    public static final String DEFAULT_STATUS_DB_APP_NAME = "sp-status";
+    public static final String DEFAULT_STATUS_DB_APP_NAME = "monitoring";
     public static final String DEFAULT_BR_DB_APP_NAME = "business-rules";
 
 
