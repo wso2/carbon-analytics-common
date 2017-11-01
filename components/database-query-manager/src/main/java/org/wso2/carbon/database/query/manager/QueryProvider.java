@@ -24,7 +24,9 @@ import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailable
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The query mapping provider which mapping the queries of default map with component default config and
@@ -41,47 +43,58 @@ public class QueryProvider {
                                                    ArrayList<Queries> componentQueries,
                                                    ArrayList<Queries> deploymentQueries)
             throws QueryMappingNotAvailableException {
-        Map<String, String> defaultConfigMap = new HashMap<>();
+        Set<String> defaultConfigSet = new HashSet<>();
         Map<String, String> deploymentConfigMap = new HashMap<>();
         Map<String, String> componentConfigMap = new HashMap<>();
         Map<String, String> result = new HashMap<>();
+        //populate the deployment query map for given database type and version.
         for (Queries queries : deploymentQueries) {
-            if (queries.getType().equals(databaseType) && queries.getVersion() == null ?
-                    databaseVersion == null : queries.getVersion().equals(databaseVersion)) {
+            if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
+                    databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
                 deploymentConfigMap = queries.getMappings();
             }
         }
+        //populate the default and component query map for given type and version.
         for (Queries queries : componentQueries) {
-            if (queries.getType().equals(DEFAULT_TYPE) && queries.getVersion() == null) {
-                defaultConfigMap = queries.getMappings();
-            } else if (queries.getType().equals(databaseType) && queries.getVersion() == null ?
-                    databaseVersion == null : queries.getVersion().equals(databaseVersion)) {
+            if (queries.getType().equals(DEFAULT_TYPE)) {
+                defaultConfigSet = queries.getMappings().keySet();
+            } else if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
+                    databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
                 componentConfigMap = queries.getMappings();
             }
         }
-        if (defaultConfigMap != null && !defaultConfigMap.isEmpty()) {
-            for (Map.Entry<String, String> defaultEntry : defaultConfigMap.entrySet()) {
+        //if matching database type and version not found check whether default version available.
+        if (componentConfigMap == null || componentConfigMap.isEmpty()) {
+            for (Queries queries : componentQueries) {
+                if (queries.getType().equals(databaseType) && queries.getVersion() != null &&
+                        queries.getVersion().equals(DEFAULT_TYPE)) {
+                    componentConfigMap = queries.getMappings();
+                }
+            }
+        }
+        if (!defaultConfigSet.isEmpty()) {
+            for (String defaultEntry : defaultConfigSet) {
                 String value;
                 if (deploymentConfigMap != null && !deploymentConfigMap.isEmpty() &&
-                        deploymentConfigMap.containsKey(defaultEntry.getKey())) {
-                    value = deploymentConfigMap.get(defaultEntry.getKey());
+                        deploymentConfigMap.containsKey(defaultEntry)) {
+                    value = deploymentConfigMap.get(defaultEntry);
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Override the query : '" + defaultEntry.getKey() + "' with deployment " +
+                        LOGGER.debug("Override the query : '" + defaultEntry + "' with deployment " +
                                 "config value: '" + value + "'  for database type: '" + databaseType
                                 + "' and version '" + databaseVersion + "'.");
                     }
                 } else {
                     if (componentConfigMap != null && !componentConfigMap.isEmpty()
-                            && componentConfigMap.containsKey(defaultEntry.getKey())) {
-                        value = componentConfigMap.get(defaultEntry.getKey());
+                            && componentConfigMap.containsKey(defaultEntry)) {
+                        value = componentConfigMap.get(defaultEntry);
                     } else {
                         throw new QueryMappingNotAvailableException("Mapping value for query: '" +
-                                defaultEntry.getKey() + "' not found in Deployment config Map and Component " +
+                                defaultEntry + "' not found in Deployment config Map and Component " +
                                 "config Map for database type: '" + databaseType + "' and version '" +
                                 databaseVersion + "'.");
                     }
                 }
-                result.put(defaultEntry.getKey(), value);
+                result.put(defaultEntry, value);
             }
             return result;
         } else {
