@@ -130,20 +130,22 @@ public class ExternalIdPClient implements IdPClient {
             JsonParser parser = new JsonParser();
             JsonObject parsedResponseBody = (JsonObject) parser.parse(responseBody);
             JsonArray users = (JsonArray) parsedResponseBody.get(ExternalIdPClientConstants.RESOURCES);
-            JsonObject scimUser = (JsonObject) users.get(0);
-
-            String userName = scimUser.get(ExternalIdPClientConstants.SCIM2_USERNAME).getAsString();
-            Map<String, String> userProperties = new HashMap<>();
-            userProperties.put(ExternalIdPClientConstants.SCIM2_USER_JSON, scimUser.getAsString());
-            JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
-            List<String> userGroupsDisplayNameList = new ArrayList<>();
-            scimGroups.forEach(scimGroup ->
-                    userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString()));
-            List<Role> userGroups = getAllRoles().stream()
-                    .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
-                    .collect(Collectors.toList());
-            return new User(userName, null, userProperties, userGroups);
-
+            if (users != null) {
+                JsonObject scimUser = (JsonObject) users.get(0);
+                String userName = scimUser.get(ExternalIdPClientConstants.SCIM2_USERNAME).getAsString();
+                Map<String, String> userProperties = new HashMap<>();
+                userProperties.put(ExternalIdPClientConstants.SCIM2_USER_JSON, scimUser.toString());
+                JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
+                List<String> userGroupsDisplayNameList = new ArrayList<>();
+                scimGroups.forEach(scimGroup ->
+                        userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString()));
+                List<Role> userGroups = getAllRoles().stream()
+                        .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
+                        .collect(Collectors.toList());
+                return new User(userName, null, userProperties, userGroups);
+            } else {
+                return null;
+            }
         } else {
             String errorMessage = "Error occurred while retrieving groups for user, '" + name + "'. HTTP error code: "
                     + response.status() + " Error Response: " + getErrorMessage(response);

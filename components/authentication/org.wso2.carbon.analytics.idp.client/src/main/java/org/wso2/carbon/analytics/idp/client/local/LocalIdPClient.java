@@ -28,6 +28,7 @@ import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.local.models.Session;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
@@ -72,8 +73,11 @@ public class LocalIdPClient implements IdPClient {
     @Override
     public User getUser(String name) {
         User user = getUserFromUsersList(name);
-        user.setPassword(null);
-        return user;
+        if (user != null) {
+            user.setPassword(null);
+            return user;
+        }
+        return null;
     }
 
     @Override
@@ -85,7 +89,7 @@ public class LocalIdPClient implements IdPClient {
         if (LOG.isDebugEnabled()) {
             LOG.debug("User with username '" + name + "' is not present when retrieving user roles.");
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
