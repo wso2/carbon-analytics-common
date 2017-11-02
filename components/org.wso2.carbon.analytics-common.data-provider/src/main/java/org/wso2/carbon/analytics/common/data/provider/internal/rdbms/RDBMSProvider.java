@@ -22,6 +22,7 @@ import org.wso2.carbon.analytics.common.data.provider.api.DataModel;
 import org.wso2.carbon.analytics.common.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.analytics.common.data.provider.internal.DataProviderEndPoint;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
+import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 public class RDBMSProvider implements DataProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSProvider.class);
+
     private final RDBMSProviderConf providerConf;
     private Connection connection;
     private String sessionID;
@@ -69,9 +71,11 @@ public class RDBMSProvider implements DataProvider {
     @Override
     public DataProvider start() {
         try {
-            connection = RDBMSHelper.getConnection(
-                    providerConf.getUrl(), providerConf.getUsername(), providerConf.getPassword());
+
+            connection = RDBMSHelper.getConnection(providerConf.getDatabaseName());
         } catch (SQLException e) {
+            LOGGER.error("Failed to create a connection to the database", e);
+        } catch (DataSourceException e) {
             LOGGER.error("Failed to create a connection to the database", e);
         }
         executorService.scheduleAtFixedRate(() -> {
@@ -82,7 +86,7 @@ public class RDBMSProvider implements DataProvider {
                 statement = connection.createStatement();
                 resultSet = statement.executeQuery(providerConf.getQuery());
                 DataSetMetadata metadata = null;
-                if (dataModel.getMetadata() == null) {
+                if (dataModel == null) {
                     ResultSetMetaData rsmd = resultSet.getMetaData();
                     metadata = new DataSetMetadata(rsmd.getColumnCount());
 
@@ -109,9 +113,9 @@ public class RDBMSProvider implements DataProvider {
                         }
 
                         for (int i = 1; i <= columnCount; i++) {
-                            if (dataModel.getMetadata().getTypes()[i - 1].equalsIgnoreCase("linear")) {
+                            if (metadata.getTypes()[i - 1].equalsIgnoreCase("linear")) {
                                 data[resultSet.getRow() - lastRow - 1][i - 1] = resultSet.getDouble(i);
-                            } else if (dataModel.getMetadata().getTypes()[i - 1].equalsIgnoreCase("ordinal")) {
+                            } else if (metadata.getTypes()[i - 1].equalsIgnoreCase("ordinal")) {
                                 data[resultSet.getRow() - lastRow - 1][i - 1] = resultSet.getString(i);
                             } else {
                                 data[resultSet.getRow() - lastRow - 1][i - 1] = resultSet.getDate(i);

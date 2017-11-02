@@ -16,29 +16,30 @@
 package org.wso2.carbon.analytics.common.data.provider.internal.rdbms;
 
 
+import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.datasource.core.exception.DataSourceException;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Properties;
+import javax.sql.DataSource;
 
 /**
  * common functions to RDBMS connection and retrieval of data.
  */
 public class RDBMSHelper {
 
+    private static DataSourceService dataSourceService;
+
     /**
      * get connection object for the instance.
      *
      * @return java.sql.Connection object for the dataProvider Configuration
      */
-    public static Connection getConnection(String url, String username, String password) throws SQLException {
-        Properties properties = new Properties();
-        properties.setProperty("user", username);
-        properties.setProperty("password", password);
-        properties.setProperty("useSSL", "false");
-        properties.setProperty("autoReconnect", "true");
-        return DriverManager.getConnection(url, properties);
+    public static Connection getConnection(String dataSourceName)
+            throws SQLException, DataSourceException {
+
+        return ((DataSource) dataSourceService.getDataSource(dataSourceName)).getConnection();
     }
 
 
@@ -64,6 +65,15 @@ public class RDBMSHelper {
                 break;
             case "derby":
                 break;
+            case "h2":
+                linearTypes = new String[]{"INT", "INTEGER", "MEDIUMINT", "INT4", "SIGNED", "TINYINT", "SMALLINT",
+                        "INT2", "YEAR", "BIGINT", "INT8", "IDENTITY", "DECIMAL", "NUMBER", "DEC", "NUMERIC",
+                        "DOUBLE", "PRECISION",
+                        "FLOAT", "FLOAT8", "REAL", "FLOAT4"};
+                ordinalTypes = new String[]{"VARCHAR", "LONGVARCHAR", "VARCHAR2", "NVARCHAR", "NVARCHAR2",
+                        "VARCHAR_CASESENSITIVE", "VARCHAR_IGNORECASE", "CHAR", "NCHAR", "CLOB", "TINYTEXT", "TEXT",
+                        "MEDIUMTEXT", "LONGTEXT", "NTEXT", "NCLOB"};
+                break;
             case "oracle":
                 linearTypes = new String[]{"NUMBER", "BINARY_FLOAT", "BINARY_DOUBLE"};
                 ordinalTypes = new String[]{"CHAR", "VARCHAR", "VARCHAR2", "NCHAR", "NVARCHAR2"};
@@ -82,4 +92,7 @@ public class RDBMSHelper {
 
     }
 
+    public static void setDataSourceService(DataSourceService dataSourceService) {
+        RDBMSHelper.dataSourceService = dataSourceService;
+    }
 }

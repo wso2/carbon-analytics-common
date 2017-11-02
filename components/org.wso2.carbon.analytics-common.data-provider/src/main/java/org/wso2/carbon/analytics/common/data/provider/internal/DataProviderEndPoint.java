@@ -17,10 +17,15 @@ package org.wso2.carbon.analytics.common.data.provider.internal;
 
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.common.data.provider.api.ProviderFactory;
+import org.wso2.carbon.analytics.common.data.provider.internal.rdbms.RDBMSHelper;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
@@ -49,6 +54,20 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Map<String, Session> sessionMap = new HashMap<>();
     private final Map<String, DataProvider> providerMap = new HashMap<>();
 
+    @Reference(
+            name = "org.wso2.carbon.datasource.DataSourceService",
+            service = DataSourceService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterDataSourceService"
+    )
+    protected void registerDataSourceService(DataSourceService service) {
+        RDBMSHelper.setDataSourceService(service);
+    }
+
+    protected void unregisterDataSourceService(DataSourceService service) {
+        RDBMSHelper.setDataSourceService(null);
+    }
 
     /**
      * Handle initiation of the connection map the session object in the session map.
@@ -57,7 +76,6 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnOpen
     public void onOpen(Session session) {
-        LOGGER.info("Awa");
         sessionMap.put(session.getId(), session);
     }
 
