@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>org.wso2.carbon.analytics-common.dataprovider.feature</artifactId>
-    <version>6.0.5-SNAPSHOT</version>
+    <version>6.0.7-SNAPSHOT</version>
     <packaging>carbon-feature</packaging>
     <name>WSO2 Carbon - Data Provider - Feature</name>
     <url>http://wso2.org</url>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
-        <version>6.0.5-SNAPSHOT</version>
+        <version>6.0.7-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

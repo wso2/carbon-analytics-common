@@ -306,19 +306,6 @@
                 <version>${apache.felix.gogo.command.version}</version>
             </dependency>
 
-            <!--data sources-->
-            <dependency>
-                <groupId>org.wso2.carbon.datasources</groupId>
-                <artifactId>org.wso2.carbon.datasource.core</artifactId>
-                <version>${carbon.datasources.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.datasources</groupId>
-                <artifactId>org.wso2.carbon.datasource.core.feature</artifactId>
-                <version>${carbon.datasources.version}</version>
-                <type>zip</type>
-            </dependency>
-
             <!-- child module dependencies-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -602,7 +589,7 @@
         <json.version>3.0.0.wso2v1</json.version>
         <libthrift.version>0.9.2.wso2v1</libthrift.version>
 
-        <data-provider.version>6.0.5-SNAPSHOT</data-provider.version>
+        <data-provider.version>6.0.7-SNAPSHOT</data-provider.version>
 
         <httpclient.version>4.3.2.wso2v1</httpclient.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
@@ -666,8 +653,6 @@
         <!-- Datasource -->
         <carbon.datasource.core.version>1.1.2</carbon.datasource.core.version>
         <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
-        <carbon.datasources.version>1.1.2</carbon.datasources.version>
-
 
         <project.scm.id>my-scm-server</project.scm.id>
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
