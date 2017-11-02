@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,10 +47,7 @@ public class RDBMSProvider implements DataProvider {
     private final RDBMSProviderConf providerConf;
     private Connection connection;
     private String sessionID;
-    private int lastRow;
     private final ScheduledExecutorService executorService;
-    private DataModel dataModel;
-    private int columnCount;
 
     /**
      * initialize the instance with the providerConfiguration.
@@ -79,66 +77,47 @@ public class RDBMSProvider implements DataProvider {
             LOGGER.error("Failed to create a connection to the database", e);
         }
         executorService.scheduleAtFixedRate(() -> {
-
             Statement statement = null;
             ResultSet resultSet = null;
             try {
                 statement = connection.createStatement();
                 resultSet = statement.executeQuery(providerConf.getQuery());
+
                 DataSetMetadata metadata = null;
-                if (dataModel == null) {
-                    ResultSetMetaData rsmd = resultSet.getMetaData();
-                    metadata = new DataSetMetadata(rsmd.getColumnCount());
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+                metadata = new DataSetMetadata(rsmd.getColumnCount());
 
-                    for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                        metadata.put(i - 1, rsmd.getColumnName(i),
-                                RDBMSHelper.getMetadataTypes(providerConf.getUrl().split(":")[1], rsmd
-                                        .getColumnTypeName
-                                                (i)));
-                        columnCount++;
-                    }
-
-
+                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                    metadata.put(i - 1, rsmd.getColumnName(i),
+                            RDBMSHelper.getMetadataTypes(providerConf.getUrl().split(":")[1], rsmd
+                                    .getColumnTypeName
+                                            (i)));
                 }
-
-                resultSet.last();
-                int currentLast = resultSet.getRow();
-                resultSet.beforeFirst();
-                Object[][] data = new Object[currentLast - lastRow][columnCount];
-                if (lastRow < currentLast) {
-
-                    while (resultSet.next()) {
-                        if (resultSet.getRow() <= lastRow) {
-                            continue;
+                int columnCount = metadata.getNames().length;
+                ArrayList<Object[]> data = new ArrayList<>();
+                while (resultSet.next()) {
+                    Object[] rowData = new Object[columnCount];
+                    for (int i = 1; i <= columnCount; i++) {
+                        if (metadata.getTypes()[i - 1].equalsIgnoreCase("linear")) {
+                            rowData[i - 1] = resultSet.getDouble(i);
+                        } else if (metadata.getTypes()[i - 1].equalsIgnoreCase("ordinal")) {
+                            rowData[i - 1] = resultSet.getString(i);
+                        } else {
+                            rowData[i - 1] = resultSet.getDate(i);
                         }
-
-                        for (int i = 1; i <= columnCount; i++) {
-                            if (metadata.getTypes()[i - 1].equalsIgnoreCase("linear")) {
-                                data[resultSet.getRow() - lastRow - 1][i - 1] = resultSet.getDouble(i);
-                            } else if (metadata.getTypes()[i - 1].equalsIgnoreCase("ordinal")) {
-                                data[resultSet.getRow() - lastRow - 1][i - 1] = resultSet.getString(i);
-                            } else {
-                                data[resultSet.getRow() - lastRow - 1][i - 1] = resultSet.getDate(i);
-                            }
-                        }
-
-
                     }
-
-
-                    lastRow = currentLast;
-                    dataModel = new DataModel(metadata, data, lastRow);
+                    data.add(rowData);
+                }
+                connection.commit();
+                if (data.size() > 0) {
+                    DataModel dataModel = new DataModel(metadata, data.toArray(new Object[0][0]), -1);
                     try {
                         DataProviderEndPoint.sendText(new Gson().toJson(dataModel), sessionID);
                     } catch (IOException e) {
                         LOGGER.error("Failed to deliver message to client", e);
                     }
-
-
                 }
-
-
-            } catch (SQLException e) {
+            } catch (Throwable e) {
                 LOGGER.error("SQL exception occurred", e);
 
             } finally {
@@ -149,7 +128,6 @@ public class RDBMSProvider implements DataProvider {
                         LOGGER.error("Error on closing resultset", e);
                     }
                 }
-
 
                 if (statement != null) {
                     try {

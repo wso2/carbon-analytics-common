@@ -87,7 +87,7 @@
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
-            org.wso2.msf4j.*;version="${msf4j-core.version.range}",
+            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             javax.websocket.*;version="${javax.websocket.version.range}",
             org.slf4j.*;version="${slf4j.version.range}",
