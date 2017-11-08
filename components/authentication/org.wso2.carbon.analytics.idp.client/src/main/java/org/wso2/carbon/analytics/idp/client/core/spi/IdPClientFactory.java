@@ -19,11 +19,8 @@ package org.wso2.carbon.analytics.idp.client.core.spi;
 
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
-import org.wso2.carbon.analytics.idp.client.core.models.Role;
-import org.wso2.carbon.analytics.idp.client.core.models.User;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 
-import java.util.List;
-import java.util.Map;
 
 /**
  * IdP Client Factory interface.
@@ -32,6 +29,6 @@ public interface IdPClientFactory {
 
     String getType();
 
-    IdPClient getIdPClient(Map<String, String> properties, List<User> users, List<Role> roles)
+    IdPClient getIdPClient(IdPClientConfiguration idPClientConfiguration)
             throws IdPClientException;
 }

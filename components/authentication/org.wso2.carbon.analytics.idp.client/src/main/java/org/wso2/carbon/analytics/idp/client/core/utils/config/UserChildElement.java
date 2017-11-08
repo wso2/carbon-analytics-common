@@ -24,29 +24,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * IdP configurations.
+ * User Details Child Element.
  */
-@Configuration(namespace = "auth.configs", description = "SP Authorization Configuration Parameters")
-public class IdPClientConfiguration {
+@Configuration(description = "User Child Element configuration")
+public class UserChildElement {
 
-    @Element(description = "Client Type", required = true)
-    private String type = "local";
+    @Element(description = "Username", required = true)
+    private String username = "admin";
 
-    @Element(description = "Client properties")
+    @Element(description = "Encrypted Password", required = true)
+    private String password = "YWRtaW4=";
+
+    @Element(description = "Properties associated with the user")
     private Map<String, String> properties = new HashMap<>();
 
-    @Element(description = "User Store")
-    private UserStoreElement userStore = new UserStoreElement();
+    @Element(description = "List of comma separated role ids", required = true)
+    private String roles = "1";
 
-    public String getType() {
-        return type;
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public Map<String, String> getProperties() {
         return properties;
     }
 
-    public UserStoreElement getUserStore() {
-        return userStore;
+    public String getRoles() {
+        return roles;
     }
 }
