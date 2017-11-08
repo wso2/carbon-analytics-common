@@ -26,13 +26,13 @@ public class User {
     private String username;
     private String password;
     private Map<String, String> properties;
-    private List<Role> rolesList;
+    private List<Role> roles;
 
-    public User(String username, String password, Map<String, String> properties, List<Role> rolesList) {
+    public User(String username, String password, Map<String, String> properties, List<Role> roles) {
         this.username = username;
         this.password = password;
         this.properties = properties;
-        this.rolesList = rolesList;
+        this.roles = roles;
     }
 
     public String getUsername() {
@@ -59,11 +59,11 @@ public class User {
         this.properties = properties;
     }
 
-    public List<Role> getRolesList() {
-        return rolesList;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setRolesList(List<Role> rolesList) {
-        this.rolesList = rolesList;
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

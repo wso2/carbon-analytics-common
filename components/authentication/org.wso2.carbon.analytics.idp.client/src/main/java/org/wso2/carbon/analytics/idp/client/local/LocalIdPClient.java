@@ -75,7 +75,7 @@ public class LocalIdPClient implements IdPClient {
     public List<Role> getUserRoles(String name) {
         User user = getUserFromUsersList(name);
         if (user != null) {
-            return user.getRolesList();
+            return user.getRoles();
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("User with username '" + name + "' is not present when retrieving user roles.");
