@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.event.output.adapter.rdbms;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -37,6 +39,11 @@ import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Semaphore;
 
 /**
  * Class will Insert or Update/Insert values to selected RDBMS
@@ -51,11 +58,24 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     private ExecutionInfo executionInfo = null;
     private DataSource dataSource;
     private boolean isUpdate;
+    private Queue<Object> events;
+    private boolean isBatchInsertionEnabled = false;
+    private long timeInterval = 1000;
+    private int batchSize = 1000;
+    private ExecutorService scheduler;
+    private final String IS_BATCH_INSERTION_ENABLED =  "isBatchInsertionEnabled";
+    private final String BATCH_SIZE = "batchSize";
+    private final String TIME_INTERVAL = "timeInterval";
+    private String tableName;
+    private Semaphore semaphore;
+
 
     public RDBMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
+        this.events = new ConcurrentLinkedQueue<>();
+        this.semaphore = new Semaphore(1);
     }
 
     @Override
@@ -64,6 +84,11 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         resourceBundle = ResourceBundle
                 .getBundle("org.wso2.carbon.event.output.adapter.rdbms.i18n.Resources", Locale.getDefault());
         populateDbMappings();
+        if (isBatchInsertionEnabled) {
+            scheduler = Executors.newScheduledThreadPool(1);
+        }
+        tableName = eventAdapterConfiguration.getStaticProperties().get(RDBMSEventAdapterConstants
+                .ADAPTER_GENERIC_RDBMS_TABLE_NAME);
     }
 
     @Override
@@ -109,18 +134,16 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         } finally {
             cleanupConnections(null, con);
         }
-
+        if (isBatchInsertionEnabled) {
+            startScheduler();
+        }
     }
 
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
-
-        String tableName;
         try {
             if (message instanceof Map) {
 
-                tableName = eventAdapterConfiguration.getStaticProperties().get(RDBMSEventAdapterConstants
-                        .ADAPTER_GENERIC_RDBMS_TABLE_NAME);
                 String executionMode = eventAdapterConfiguration.getStaticProperties().get(RDBMSEventAdapterConstants
                         .ADAPTER_GENERIC_RDBMS_EXECUTION_MODE);
                 String updateColumnKeys = eventAdapterConfiguration.getStaticProperties().get(RDBMSEventAdapterConstants
@@ -130,7 +153,14 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                     executionInfo = new ExecutionInfo();
                     initializeDatabaseExecutionInfo(tableName, executionMode, updateColumnKeys, message);
                 }
-                executeProcessActions(message, tableName);
+                if (!isBatchInsertionEnabled) {
+                    executeProcessActions(message, tableName);
+                } else {
+                    events.offer(message);
+                    if (events.size() >= batchSize) {
+                        executeBatchProcessActions((ConcurrentLinkedQueue)events, tableName);
+                    }
+                }
             } else {
                 throw new OutputEventAdapterRuntimeException(
                         message.getClass().toString() + "is not a compatible type. Hence Event is dropped.");
@@ -297,6 +327,21 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         }
     }
 
+    public void executeBatchProcessActions(ConcurrentLinkedQueue batch, String tableName)
+            throws OutputEventAdapterException {
+
+        createTableIfNotExist(tableName);
+        try {
+            semaphore.acquire();
+            if (batch.size() > 0) {
+                executeDbActions(batch);
+            }
+            semaphore.release();
+        } catch (InterruptedException e) {
+            log.error("Failed to acquire lock for writing into database.");
+        }
+    }
+
     public void executeDbActions(Object message)
             throws OutputEventAdapterException {
 
@@ -337,6 +382,69 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         } catch (SQLException e) {
             throw new OutputEventAdapterException(
                     "Cannot Execute Insert/Update Query for event " + message.toString() + " " + e.getMessage(), e);
+        } finally {
+            cleanupConnections(stmt, con);
+        }
+    }
+
+    public void executeDbActions(ConcurrentLinkedQueue<Object> events) throws OutputEventAdapterException {
+
+        PreparedStatement stmt;
+        PreparedStatement updateStmt;
+        Connection con;
+
+        try {
+            con = dataSource.getConnection();
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedInsertStatement());
+
+        } catch (SQLException e) {
+            throw new ConnectionUnavailableException(e);
+        }
+
+        boolean executeInsert = true;
+        Object event = new HashMap<>();
+        Object message;
+
+        try {
+            if (executionInfo.isUpdateMode()) {
+                while ((message = events.poll()) != null) {
+                    updateStmt = con.prepareStatement(executionInfo.getPreparedUpdateStatement());
+                    Map<String, Object> map = (Map<String, Object>) message;
+                    event = message;
+                    populateStatement(map, updateStmt, executionInfo.getUpdateQueryColumnOrder());
+                    int updatedRows = updateStmt.executeUpdate();
+                    con.commit();
+                    updateStmt.close();
+                    if (updatedRows > 0) {
+                        executeInsert = false;
+                    }
+
+                    if (executeInsert) {
+                        populateStatement(map, stmt, executionInfo.getInsertQueryColumnOrder());
+                        stmt.addBatch();
+                    }
+                }
+                if (executeInsert && stmt != null) {
+                    stmt.executeBatch();
+                    con.commit();
+                }
+            } else {
+                while ((message = events.poll()) != null) {
+                    Map<String, Object> map = (Map<String, Object>) message;
+                    event = message;
+                    populateStatement(map, stmt, executionInfo.getInsertQueryColumnOrder());
+                    stmt.addBatch();
+                }
+                if (stmt != null) {
+                    stmt.executeBatch();
+                    con.commit();
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new OutputEventAdapterException(
+                    "Cannot Execute Insert/Update Query for event " + event.toString() + " " + e.getMessage(), e);
         } finally {
             cleanupConnections(stmt, con);
         }
@@ -567,6 +675,20 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
             }
         }
 
+        String batchInsertionEnabled = globalProperties.get(IS_BATCH_INSERTION_ENABLED);
+        if (batchInsertionEnabled != null && "TRUE".equalsIgnoreCase(batchInsertionEnabled)) {
+            isBatchInsertionEnabled = true;
+        }
+
+        String timeInterval = globalProperties.get(TIME_INTERVAL);
+        if (timeInterval != null) {
+            this.timeInterval = Integer.parseInt(timeInterval);
+        }
+
+        String batchSize = globalProperties.get(BATCH_SIZE);
+        if (batchSize != null) {
+            this.batchSize = Integer.parseInt(batchSize);
+        }
     }
 
     @Override
@@ -578,6 +700,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         if (executionInfo != null) {
             executionInfo.setTableExist(false);
         }
+        scheduler.shutdown();
     }
 
     @Override
@@ -594,5 +717,20 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     @Override
     public boolean isPolled() {
         return false;
+    }
+
+    public void startScheduler() {
+        final Runnable writer = new Runnable() {
+            public void run() {
+                if (events.size() > 0) {
+                    try {
+                        executeBatchProcessActions((ConcurrentLinkedQueue)events, tableName);
+                    } catch (OutputEventAdapterException e) {
+                        log.error(e.getMessage() + " Hence Event is dropped.", e);
+                    }
+                }
+            }
+        };
+        ((ScheduledExecutorService)scheduler).scheduleAtFixedRate(writer, 0, timeInterval, MILLISECONDS);
     }
 }
