@@ -66,7 +66,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
                             propertyOMElement.setText(value);
                             propertyOMElement.addAttribute(EventReceiverConstants.ER_ATTR_ENCRYPTED, "true", null);
                         } catch (Exception e) {
-                            log.error("Unable to decrypt the encrypted field: " + name + " for adaptor type: " + adaptorType);
+                            log.error("Unable to decrypt the encrypted field: " + name + " for adaptor type: " +
+                                    adaptorType + ". Hence, setting \"\" (empty string) as the property value", e);
                             propertyOMElement.setText("");
                         }
                     }
