@@ -20,7 +20,7 @@
 
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <artifactId>data-bridge</artifactId>
+        <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
         <version>6.0.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -30,7 +30,7 @@
 
     <packaging>bundle</packaging>
 
-    <name>WSO2 Stream Processor : Database Query Manager</name>
+    <name>WSO2 Carbon Database Query Manager</name>
     <url>http://wso2.org</url>
 
     <dependencies>
@@ -46,29 +46,36 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9.1</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/gen/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Export-Package>
+                            org.wso2.carbon.database.query.manager.*;version="${carbon.analytics.common.version}"
+                        </Export-Package>
+                        <Import-Package>
+                            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
+                            *;resolution:=optional
+                        </Import-Package>
+                    </instructions>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/database/query/manager</basedir>
+                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/database-query-manager</basedir>
                 </configuration>
             </plugin>
             <plugin>
@@ -77,12 +84,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <export.package>
-            org.wso2.carbon.database.query.manager.*;version="${carbon.analytics.common.version}"
-        </export.package>
-    </properties>
-
 </project>

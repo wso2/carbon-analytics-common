@@ -32,8 +32,9 @@
 
     <modules>
         <module>components/data-bridge</module>
-        <module>components/database-query-manager</module>
+        <module>components/org.wso2.carbon.database.query.manager</module>
         <module>features/data-bridge</module>
+        <module>features/org.wso2.carbon.database.query.manager.feature</module>
         <module>coverage-reports</module>
     </modules>
 
@@ -278,6 +279,11 @@
                 <groupId>commons-pool.wso2</groupId>
                 <artifactId>commons-pool</artifactId>
                 <version>${commons.pool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
 
 
