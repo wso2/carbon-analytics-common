@@ -15,7 +15,7 @@ This project contains compontents which implements common functionalities used i
 
 
 ## How to Contribute
-* Send your bug fixes pull requests to [master branch] (https://github.com/wso2/carbon-analytics-common/tree/master) 
+* Send your bug fixes pull requests to [master branch](https://github.com/wso2/carbon-analytics-common/tree/master) 
 
 ## Contact us
 WSO2 Carbon developers can be contacted via the mailing lists:

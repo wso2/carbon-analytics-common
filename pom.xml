@@ -27,15 +27,21 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.5-SNAPSHOT</version>
+    <version>6.0.8-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics Common - Parent</name>
 
     <modules>
+        <module>components/authentication</module>
         <module>components/data-bridge</module>
-        <module>components/org.wso2.carbon.database.query.manager</module>
+        <module>components/permission-provider</module>
+        <module>features/authentication</module>
         <module>features/data-bridge</module>
-        <module>features/org.wso2.carbon.database.query.manager.feature</module>
+        <module>features/permission-provider</module>
+        <module>features/org.wso2.carbon.analytics-common.data-provider.feature</module>
         <module>coverage-reports</module>
+        <module>components/org.wso2.carbon.analytics-common.data-provider</module>
+        <module>components/org.wso2.carbon.database.query.manager</module>
+        <module>features/org.wso2.carbon.database.query.manager.feature</module>
     </modules>
 
     <build>
@@ -250,6 +256,7 @@
                 <artifactId>org.wso2.carbon.databridge.receiver.thrift</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.agent</artifactId>
@@ -304,7 +311,6 @@
                 <artifactId>org.apache.felix.gogo.command</artifactId>
                 <version>${apache.felix.gogo.command.version}</version>
             </dependency>
-
 
             <!-- child module dependencies-->
             <dependency>
@@ -429,6 +435,59 @@
             </dependency>
 
             <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.auth.rest.api</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.auth.rest.api</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.idp.client.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.auth.rest.api.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <!--dataprovider feature -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics-common.dataprovider.feature</artifactId>
+                <version>${data-provider.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics-common.dataprovider</artifactId>
+                <version>${data-provider.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.config</groupId>
                 <artifactId>org.wso2.carbon.config</artifactId>
                 <version>${carbon.config.version}</version>
@@ -444,16 +503,99 @@
                 <version>${org.jacoco.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- Datasources -->
+            <dependency>
+                <groupId>org.wso2.carbon.datasources</groupId>
+                <artifactId>org.wso2.carbon.datasource.core</artifactId>
+                <version>${carbon.datasources.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.datasources</groupId>
+                <artifactId>org.wso2.carbon.datasource.core.feature</artifactId>
+                <version>${carbon.datasources.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-gson</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.json-simple.wso2</groupId>
+                <artifactId>json-simple</artifactId>
+                <version>${json-simple.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.messaging</groupId>
+                <artifactId>org.wso2.carbon.messaging.feature</artifactId>
+                <version>${carbon.messaging.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.msf4j</groupId>
+                <artifactId>org.wso2.msf4j.feature</artifactId>
+                <version>${msf4j.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.msf4j</groupId>
+                <artifactId>msf4j-core</artifactId>
+                <version>${msf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${io.swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${javax.ws.rs-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-joda</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${com.fasterxml.jackson.core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.websocket</groupId>
+                <artifactId>javax.websocket-api</artifactId>
+                <version>${javax.websocket.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.common.version>6.0.5-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>6.0.8-SNAPSHOT</carbon.analytics.common.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <json.version>3.0.0.wso2v1</json.version>
         <libthrift.version>0.9.2.wso2v1</libthrift.version>
+
+        <data-provider.version>6.0.8-SNAPSHOT</data-provider.version>
 
         <httpclient.version>4.3.2.wso2v1</httpclient.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
@@ -501,14 +643,22 @@
         <osgi.framework.import.version.range>[1.8.0, 2.0.0)</osgi.framework.import.version.range>
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
         <carbon.kernel.version>5.2.0</carbon.kernel.version>
+        <carbon.kernel.package.import.version.range>[5.0.0, 6.0.0)</carbon.kernel.package.import.version.range>
         <carbon.kernel.pax.version>5.2.0</carbon.kernel.pax.version>
         <slf4j.version>1.7.5</slf4j.version>
+        <slf4j.version.range>[1.7,2)</slf4j.version.range>
         <disruptor.version>3.3.2.wso2v2</disruptor.version>
         <guava.version>20.0</guava.version>
         <guava.bundle.version>20.0.0</guava.bundle.version>
         <gson.version>2.5</gson.version>
+        <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
         <pax.logging.api.version>1.8.5</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
+
+
+        <!-- Datasource -->
+        <carbon.datasource.core.version>1.1.2</carbon.datasource.core.version>
+        <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
 
         <project.scm.id>my-scm-server</project.scm.id>
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
@@ -518,6 +668,7 @@
 
         <!-- Latest Dependencies -->
         <carbon.config.version>2.1.4</carbon.config.version>
+        <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
         <carbon.secvault.version>5.0.10</carbon.secvault.version>
         <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
@@ -527,6 +678,27 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Datasources -->
+        <carbon.datasources.version>1.1.3</carbon.datasources.version>
+        <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
+
+        <feign.version>9.5.0</feign.version>
+        <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
+        <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
+
+        <carbon.messaging.version>3.0.1</carbon.messaging.version>
+        <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
+
+        <msf4j.version>2.4.1</msf4j.version>
+        <msf4j.import.version.range>[2.0.0, 3.0.0)</msf4j.import.version.range>
+
+        <com.fasterxml.jackson.core.version>2.7.4</com.fasterxml.jackson.core.version>
+        <io.swagger.version>1.5.10</io.swagger.version>
+        <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
+        <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
+        <javax.websocket.version>1.1</javax.websocket.version>
+        <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
 
     </properties>
 

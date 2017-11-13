@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
@@ -167,6 +168,20 @@ public class DataBridgeDS {
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
         DataBridgeServiceValueHolder.setConfigProvider(null);
+    }
+
+    @Reference(
+            name = "IdPClient",
+            service = IdPClient.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterIdP"
+    )
+    protected void registerIdP(IdPClient client) {
+        DataBridgeServiceValueHolder.setIdPClient(client);
+    }
+
+    protected void unregisterIdP(IdPClient client) {
     }
 
 }

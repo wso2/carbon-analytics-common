@@ -80,6 +80,21 @@
     </Match>
 
 
+    <Match>
+        <Class name="org.wso2.carbon.analytics.common.data.provider.api.DataModel"/>
+
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.analytics.common.data.provider.api.DataSetMetadata"/>
+
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.analytics.common.data.provider.internal.DataProviderEndPoint"/>
+
+    </Match>
+
+
+
     <!-- TODO Validate below -->
     <Match>
         <Class name="org.wso2.carbon.databridge.core.DataBridge"/>
