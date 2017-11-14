@@ -36,14 +36,26 @@ import org.wso2.carbon.event.output.adapter.rdbms.internal.util.RDBMSEventAdapte
 import org.wso2.carbon.ndatasource.common.DataSourceException;
 import org.wso2.carbon.ndatasource.core.CarbonDataSource;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Queue;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.sql.DataSource;
 
 /**
  * Class will Insert or Update/Insert values to selected RDBMS
@@ -67,7 +79,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
     private final String BATCH_SIZE = "batchSize";
     private final String TIME_INTERVAL = "timeInterval";
     private String tableName;
-    private Semaphore semaphore;
+    private Lock lock;
 
 
     public RDBMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
@@ -75,7 +87,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
         this.events = new ConcurrentLinkedQueue<>();
-        this.semaphore = new Semaphore(1);
+        this.lock = new ReentrantLock();
     }
 
     @Override
@@ -332,13 +344,12 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
 
         createTableIfNotExist(tableName);
         try {
-            semaphore.acquire();
+            lock.lock();
             if (batch.size() > 0) {
                 executeDbActions(batch);
             }
-            semaphore.release();
-        } catch (InterruptedException e) {
-            log.error("Failed to acquire lock for writing into database.");
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -700,7 +711,9 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
         if (executionInfo != null) {
             executionInfo.setTableExist(false);
         }
-        scheduler.shutdown();
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
     }
 
     @Override
