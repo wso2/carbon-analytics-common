@@ -25,10 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
-import org.wso2.carbon.analytics.idp.client.core.models.Role;
-import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.external.factories.DCRMServiceStubFactory;
 import org.wso2.carbon.analytics.idp.client.external.factories.OAuth2ServiceStubFactory;
 import org.wso2.carbon.analytics.idp.client.external.factories.SCIM2ServiceStubFactory;
@@ -67,8 +66,9 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
     }
 
     @Override
-    public IdPClient getIdPClient(Map<String, String> properties, List<User> users, List<Role> roles)
+    public IdPClient getIdPClient(IdPClientConfiguration idPClientConfiguration)
             throws IdPClientException {
+        Map<String, String> properties = idPClientConfiguration.getProperties();
         String dcrEndpoint = properties.getOrDefault(ExternalIdPClientConstants.KM_DCR_URL,
                 ExternalIdPClientConstants.DEFAULT_KM_DCR_URL);
         String kmUsername = properties.getOrDefault(ExternalIdPClientConstants.KM_USERNAME,

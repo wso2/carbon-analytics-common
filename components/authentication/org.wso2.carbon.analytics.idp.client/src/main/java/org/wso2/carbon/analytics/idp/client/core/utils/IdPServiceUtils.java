@@ -54,8 +54,7 @@ public class IdPServiceUtils {
             if (idPClientFactory == null) {
                 throw new IdPClientException("No idPClientFactory found for type: " + idPClientConfiguration.getType());
             }
-            idPClient = idPClientFactory.getIdPClient(idPClientConfiguration.getProperties(),
-                    idPClientConfiguration.getUsers(), idPClientConfiguration.getRoles());
+            idPClient = idPClientFactory.getIdPClient(idPClientConfiguration);
         } catch (ConfigurationException e) {
             throw new IdPClientException("Error in reading '" + SP_AUTH_NAMESPACE + "' from file..", e);
         }

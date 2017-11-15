@@ -121,7 +121,7 @@ public class ExternalIdPClient implements IdPClient {
         Response response = scimServiceStub.searchUser(ExternalIdPClientConstants.FILTER_PREFIX_USER + name);
         if (response == null) {
             String errorMessage =
-                    "Error occurred while retrieving groups for user, '" + name + "'. Error : Response is null.";
+                    "Error occurred while retrieving user, '" + name + "'. Error : Response is null.";
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
@@ -131,23 +131,43 @@ public class ExternalIdPClient implements IdPClient {
             JsonObject parsedResponseBody = (JsonObject) parser.parse(responseBody);
             JsonArray users = (JsonArray) parsedResponseBody.get(ExternalIdPClientConstants.RESOURCES);
             if (users != null) {
-                JsonObject scimUser = (JsonObject) users.get(0);
-                String userName = scimUser.get(ExternalIdPClientConstants.SCIM2_USERNAME).getAsString();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Retrieving all roles for getting role id of the roles of the user '" + name + "'.");
+                }
+                List<Role> allRolesInUserStore = getAllRoles();
+
                 Map<String, String> userProperties = new HashMap<>();
-                userProperties.put(ExternalIdPClientConstants.SCIM2_USER_JSON, scimUser.toString());
-                JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
-                List<String> userGroupsDisplayNameList = new ArrayList<>();
-                scimGroups.forEach(scimGroup ->
-                        userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString()));
-                List<Role> userGroups = getAllRoles().stream()
-                        .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
-                        .collect(Collectors.toList());
-                return new User(userName, null, userProperties, userGroups);
+                List<Role> userRoles = new ArrayList<>();
+
+                JsonObject scimUser = (JsonObject) users.get(0);
+                for (Map.Entry<String, JsonElement> entry : scimUser.entrySet()) {
+                    switch (entry.getKey()) {
+                        case ExternalIdPClientConstants.SCIM2_USERNAME:
+                            break;
+                        case ExternalIdPClientConstants.SCIM2_GROUPS:
+                            JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS)
+                                    .getAsJsonArray();
+                            List<String> userGroupsDisplayNameList = new ArrayList<>();
+                            scimGroups.forEach(scimGroup -> {
+                                        JsonElement displayName = ((JsonObject) scimGroup)
+                                                .get(ExternalIdPClientConstants.SCIM2_DISPLAY);
+                                        userGroupsDisplayNameList.add(displayName.getAsString());
+                                    }
+                            );
+                            userRoles = allRolesInUserStore.stream()
+                                    .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
+                                    .collect(Collectors.toList());
+                            break;
+                        default:
+                            userProperties.put(entry.getKey(), entry.getValue().toString());
+                    }
+                }
+                return new User(name, null, userProperties, userRoles);
             } else {
                 return null;
             }
         } else {
-            String errorMessage = "Error occurred while retrieving groups for user, '" + name + "'. HTTP error code: "
+            String errorMessage = "Error occurred while retrieving user, '" + name + "'. HTTP error code: "
                     + response.status() + " Error Response: " + getErrorMessage(response);
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
@@ -156,33 +176,13 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public List<Role> getUserRoles(String name) throws IdPClientException {
-        List<Role> userGroups;
-        Response userResponse = scimServiceStub.searchUser(ExternalIdPClientConstants.FILTER_PREFIX_USER + name);
-        if (userResponse == null) {
-            String errorMessage =
-                    "Error occurred while retrieving user '" + name + "'. Error : Response is null.";
-            LOG.error(errorMessage);
-            throw new IdPClientException(errorMessage);
+        List<Role> userGroups = new ArrayList<>();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieving user roles by retrieving user '" + name + "'.");
         }
-        if (userResponse.status() == 200) {
-            String responseBody = userResponse.body().toString();
-            JsonParser parser = new JsonParser();
-            JsonObject parsedResponseBody = (JsonObject) parser.parse(responseBody);
-            JsonArray users = (JsonArray) parsedResponseBody.get(ExternalIdPClientConstants.RESOURCES);
-            JsonObject scimUser = (JsonObject) users.get(0);
-            JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
-            List<String> userGroupsDisplayNameList = new ArrayList<>();
-            scimGroups.forEach((scimGroup) ->
-                    userGroupsDisplayNameList.add(((JsonObject) scimGroup).get("display").getAsString()));
-            userGroups = getAllRoles().stream()
-                    .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
-                    .collect(Collectors.toList());
-        } else {
-            String errorMessage =
-                    "Error occurred while retrieving groups of user '" + name + "'. HTTP error code: " +
-                            userResponse.status() + " Error Response: " + getErrorMessage(userResponse);
-            LOG.error(errorMessage);
-            throw new IdPClientException(errorMessage);
+        User user = getUser(name);
+        if (user != null) {
+            userGroups = user.getRoles();
         }
         return userGroups;
     }

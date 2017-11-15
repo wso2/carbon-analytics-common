@@ -28,9 +28,13 @@ import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.UserChildElement;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Local IdP Client Factory.
@@ -60,9 +64,9 @@ public class LocalIdPClientFactory implements IdPClientFactory {
     }
 
     @Override
-    public IdPClient getIdPClient(Map<String, String> properties, List<User> users, List<Role> roles)
-            throws IdPClientException {
+    public IdPClient getIdPClient(IdPClientConfiguration idPClientConfiguration) throws IdPClientException {
         int sessionTimeout;
+        Map<String, String> properties = idPClientConfiguration.getProperties();
         try {
             sessionTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_SESSION_TIMEOUT));
@@ -70,6 +74,20 @@ public class LocalIdPClientFactory implements IdPClientFactory {
             throw new IdPClientException("Session timeout overridden property '" +
                     properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
         }
+
+        List<Role> roles = idPClientConfiguration.getUserStore().getRoles().stream().map(roleElement ->
+                new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplay())
+        ).collect(Collectors.toList());
+
+        List<User> users = idPClientConfiguration.getUserStore().getUsers().stream().map(userElement -> {
+            UserChildElement user = userElement.getUser();
+            List<String> roleIdList = Arrays.asList(user.getRoles().split(","));
+            List<Role> userRolesFromId = roles.stream()
+                    .filter((role) -> roleIdList.contains(role.getId()))
+                    .collect(Collectors.toList());
+            return new User(user.getUsername(), user.getPassword(), user.getProperties(), userRolesFromId);
+        }).collect(Collectors.toList());
+
         return new LocalIdPClient(sessionTimeout, users, roles);
     }
 
