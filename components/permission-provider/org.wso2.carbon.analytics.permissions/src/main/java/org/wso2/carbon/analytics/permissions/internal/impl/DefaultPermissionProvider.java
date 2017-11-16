@@ -37,9 +37,10 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Default implementation of permission provider.
@@ -161,6 +162,35 @@ public class DefaultPermissionProvider implements PermissionProvider {
     }
 
     /**
+     * Get granted roles for a specific permission.
+     *
+     * @param permission
+     * @return
+     * @throws PermissionException
+     */
+    @Override
+    public List<Role> getGrantedRoles(Permission permission) throws PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Get roles assigned for " + permission);
+        }
+
+        // Create a map out of all the roles with role Id as the key. This map will be used to get the role name.
+        Map<String, org.wso2.carbon.analytics.idp.client.core.models.Role> roleMap = new HashMap<>();
+        try {
+            List<org.wso2.carbon.analytics.idp.client.core.models.Role> allRoles = idPClient.getAllRoles();
+            for (org.wso2.carbon.analytics.idp.client.core.models.Role role: allRoles) {
+                roleMap.put(role.getId(), role);
+            }
+        } catch (IdPClientException e) {
+            throw new PermissionException("Failed getting roles for the permission " + permission + ".");
+        }
+
+        List<Role> roles = this.getPermissionsDAO().getGrantedRoles(permission);
+        roles.forEach(role -> role.setName(roleMap.get(role.getId()).getDisplayName()));
+        return roles;
+    }
+
+    /**
      * Get roles by username.
      *
      * @param username
@@ -175,7 +205,7 @@ public class DefaultPermissionProvider implements PermissionProvider {
             List<org.wso2.carbon.analytics.idp.client.core.models.Role> userRoles = idPClient.getUserRoles(username);
             userRoles.forEach(role -> roles.add(new Role(role.getId(), role.getDisplayName())));
         } catch (IdPClientException e) {
-            throw new PermissionException("Failed getting roles of the user. Unable to check permissions");
+            throw new PermissionException("Failed getting roles of the user. Unable to check permissions.");
         }
         return roles;
     }
