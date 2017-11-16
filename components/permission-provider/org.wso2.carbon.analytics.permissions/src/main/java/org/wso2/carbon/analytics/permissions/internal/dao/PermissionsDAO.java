@@ -32,6 +32,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -89,7 +91,7 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         // TODO: Get the query from the QueryManager
-        String query = "DELETE FROM PERMISSIONS WHERE APP_NAME = ? PERMISSION_STRING = ?";
+        String query = "DELETE FROM PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
 
         try {
             conn = getConnection();
@@ -243,6 +245,46 @@ public class PermissionsDAO {
         return hasPermission;
     }
 
+    /**
+     * Get granted roles of a specific permission.
+     *
+     * @param permission
+     * @return
+     */
+    public List<Role> getGrantedRoles(Permission permission) {
+        List<Role> roles = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet resultSet = null;
+        String query = "SELECT ROLE_ID FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
+
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, permission.getAppName());
+            ps.setString(2, permission.getPermissionString());
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
+            resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                roles.add(new Role(resultSet.getString("ROLE_ID"), ""));
+            }
+        } catch (SQLException e) {
+            throw new PermissionException("Unable to get roles assigned for the permission " + permission +
+                    ". [Query=" + query + "]", e);
+        } finally {
+            closeConnection(conn, ps, resultSet);
+        }
+        return roles;
+    }
+
+    /**
+     * Get datasource object from carbon data-sources.
+     *
+     * @return
+     * @throws PermissionException
+     */
     private DataSource getDataSource() throws PermissionException {
         if (dataSource != null) {
             return dataSource;
@@ -262,6 +304,12 @@ public class PermissionsDAO {
         return dataSource;
     }
 
+    /**
+     * Get database connection.
+     *
+     * @return
+     * @throws SQLException
+     */
     private Connection getConnection() throws SQLException {
         return getDataSource().getConnection();
     }
