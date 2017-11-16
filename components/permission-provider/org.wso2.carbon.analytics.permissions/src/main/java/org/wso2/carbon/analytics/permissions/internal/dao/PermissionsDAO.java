@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -251,11 +252,11 @@ public class PermissionsDAO {
      * @return
      */
     public List<Role> getGrantedRoles(Permission permission) {
-        List<Role> roles = Collections.emptyList();
+        List<Role> roles = new ArrayList<>();
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
+        String query = "SELECT ROLE_ID FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
 
         try {
             conn = getConnection();
