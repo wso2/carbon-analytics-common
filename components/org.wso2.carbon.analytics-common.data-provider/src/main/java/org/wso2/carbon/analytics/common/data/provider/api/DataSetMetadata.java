@@ -20,25 +20,36 @@ package org.wso2.carbon.analytics.common.data.provider.api;
  * model class for the metadata of the data.
  */
 public class DataSetMetadata {
-    private final String[] names;
-    private final String[] types;
+    private String[] names;
+    private Types[] types;
 
+    public enum Types {
+        LINEAR, ORDINAL, TIME
+    }
 
     public DataSetMetadata(int columnCount) {
         names = new String[columnCount];
-        types = new String[columnCount];
+        types = new Types[columnCount];
     }
 
     public String[] getNames() {
         return names;
     }
 
-    public String[] getTypes() {
+    public Types[] getTypes() {
         return types;
     }
 
-    public void put(int columnNo, String name, String type) {
-        this.names[columnNo] = name;
-        this.types[columnNo] = type;
+    public void put(int columnCount, String name, Types type) {
+        this.names[columnCount] = name;
+        this.types[columnCount] = type;
+    }
+
+    public int getColumnCount(){
+        if(names != null){
+            return names.length;
+        } else{
+            return 0;
+        }
     }
 }

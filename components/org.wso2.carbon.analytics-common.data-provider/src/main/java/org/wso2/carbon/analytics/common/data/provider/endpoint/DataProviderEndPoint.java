@@ -13,17 +13,19 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.wso2.carbon.analytics.common.data.provider.internal;
+package org.wso2.carbon.analytics.common.data.provider.endpoint;
 
 
+import com.google.gson.Gson;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.analytics.common.data.provider.api.ProviderFactory;
-import org.wso2.carbon.analytics.common.data.provider.internal.rdbms.RDBMSHelper;
+import org.wso2.carbon.analytics.common.data.provider.rdbms.RDBMSBatchDataProvider;
+import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSProviderConf;
+import org.wso2.carbon.analytics.common.data.provider.rdbms.utils.RDBMSHelper;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
@@ -88,10 +90,22 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnMessage
     public void onMessage(String message, @PathParam("sourceType") String sourceType, Session session) {
-
-        DataProvider dataProvider = new ProviderFactory().createNewDataProvider(sourceType, message);
-        dataProvider.init(session.getId()).start();
-        providerMap.put(session.getId(), dataProvider);
+        try {
+            DataProvider dataProvider;
+            switch (sourceType) {
+                case "rdbms":
+                    RDBMSProviderConf conf = new Gson().fromJson(message, RDBMSProviderConf.class);
+                    dataProvider = new RDBMSBatchDataProvider().init(session.getId(), conf);
+                    dataProvider.start();
+                    break;
+                default:
+                    throw new Exception("Provider type: " + sourceType + " not registered.");
+            }
+            providerMap.put(session.getId(), dataProvider);
+        } catch (Exception e) {
+            LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType +". "
+                    + e.getMessage(), e);
+        }
     }
 
     /**
@@ -101,7 +115,6 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
-
         providerMap.get(session.getId()).stop(); //stop the pushing service
         providerMap.remove(session.getId()); //remove the provider from the map
         sessionMap.remove(session.getId()); //remove the session from sessionMap

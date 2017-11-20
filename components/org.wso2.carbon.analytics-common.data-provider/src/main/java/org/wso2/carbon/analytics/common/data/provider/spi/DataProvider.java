@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.common.data.provider.spi;
 
+import org.wso2.carbon.analytics.common.data.provider.exception.DataProviderException;
 
 /**
  * Data provider interface.
@@ -23,23 +24,21 @@ package org.wso2.carbon.analytics.common.data.provider.spi;
  */
 public interface DataProvider {
 
-
     /**
      * Initialize the instance with the session id.
-     * @param sessionId Session id of the session associated with the connection
+     * @param sessionID Session id of the session associated with the connection.
      */
-    DataProvider init(String sessionId);
-
+    DataProvider init(String sessionID, ProviderConfig providerConfig) throws DataProviderException;
 
     /**
      * Start pushing data to the client from the data sources.
-     * @return DataProvider instance
      */
-    DataProvider start();
+    void start();
 
     /**
      * Stop pushing data to the client and disconnect.
      */
     void stop();
 
+    boolean configValidator(ProviderConfig providerConfig);
 }
