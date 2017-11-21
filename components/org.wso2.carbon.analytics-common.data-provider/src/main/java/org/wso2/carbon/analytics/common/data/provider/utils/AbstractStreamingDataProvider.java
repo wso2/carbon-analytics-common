@@ -1,6 +1,8 @@
-package org.wso2.carbon.analytics.common.data.provider.spi;
+package org.wso2.carbon.analytics.common.data.provider.utils;
 
 import org.wso2.carbon.analytics.common.data.provider.exception.DataProviderException;
+import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
+import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,14 +15,18 @@ public abstract class AbstractStreamingDataProvider implements DataProvider {
     private String sessionID;
     private ScheduledExecutorService dataPublishingExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService dataPurgingExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private ProviderConfig providerConfig;
-
+    private long publishingPollingInterval;
+    private long purgingPollingInterval;
+    private boolean isPurgingEnable;
     @Override
     public DataProvider init(String sessionID, ProviderConfig providerConfig)
             throws DataProviderException {
         if(configValidator(providerConfig)){
             this.sessionID = sessionID;
-            this.providerConfig = providerConfig;
+            this.publishingPollingInterval = providerConfig.getPublishingInterval();
+            this.purgingPollingInterval = providerConfig.getPurgingInterval();
+            this.isPurgingEnable = providerConfig.isPurgingEnable();
+            setProviderConfig(providerConfig);
             return this;
         } else {
             throw new DataProviderException("Invalid configuration provided. Unable to complete initialization " +
@@ -37,19 +43,21 @@ public abstract class AbstractStreamingDataProvider implements DataProvider {
     @Override
     public void start() {
         dataPublishingExecutorService.scheduleAtFixedRate(() -> {
-            publish(this.sessionID, this.providerConfig);
-        }, 0, providerConfig.getPublishingPollingInterval(), TimeUnit.SECONDS);
-        if (this.providerConfig.isPurgingEnable()) {
+            publish(this.sessionID);
+        }, 0, this.publishingPollingInterval, TimeUnit.SECONDS);
+        if (isPurgingEnable) {
             dataPublishingExecutorService.scheduleAtFixedRate(() -> {
-                purging(this.providerConfig);
-            }, 0, providerConfig.getPurgingPollingInterval(), TimeUnit.SECONDS);
+                purging();
+            }, 0, this.purgingPollingInterval, TimeUnit.SECONDS);
         }
     }
 
     @Override
     public abstract boolean configValidator(ProviderConfig providerConfig);
 
-    public abstract void publish(String sessionID, ProviderConfig providerConfig);
+    public abstract void publish(String sessionID);
 
-    public abstract void purging(ProviderConfig providerConfig);
+    public abstract void purging();
+
+    public abstract void setProviderConfig(ProviderConfig providerConfig);
 }

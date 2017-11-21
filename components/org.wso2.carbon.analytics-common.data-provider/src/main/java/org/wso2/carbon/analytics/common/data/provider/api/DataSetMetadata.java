@@ -24,7 +24,7 @@ public class DataSetMetadata {
     private Types[] types;
 
     public enum Types {
-        LINEAR, ORDINAL, TIME
+        LINEAR, ORDINAL, TIME, OBJECT
     }
 
     public DataSetMetadata(int columnCount) {

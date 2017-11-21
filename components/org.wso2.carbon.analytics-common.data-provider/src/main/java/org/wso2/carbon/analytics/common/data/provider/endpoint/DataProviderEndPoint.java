@@ -24,9 +24,10 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.common.data.provider.rdbms.RDBMSBatchDataProvider;
-import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSProviderConf;
-import org.wso2.carbon.analytics.common.data.provider.rdbms.utils.RDBMSHelper;
+import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSDataProviderConf;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
+import org.wso2.carbon.analytics.common.data.provider.utils.DataProviderValueHolder;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
@@ -55,6 +56,8 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
 
     private static final Map<String, Session> sessionMap = new HashMap<>();
     private final Map<String, DataProvider> providerMap = new HashMap<>();
+    private DataSourceService dataSourceService = null;
+    private ConfigProvider configProvider = null;
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -64,11 +67,23 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             unbind = "unregisterDataSourceService"
     )
     protected void registerDataSourceService(DataSourceService service) {
-        RDBMSHelper.setDataSourceService(service);
+        DataProviderValueHolder.setDataSourceService(service);
     }
 
     protected void unregisterDataSourceService(DataSourceService service) {
-        RDBMSHelper.setDataSourceService(null);
+        DataProviderValueHolder.setDataSourceService(null);
+    }
+
+    @Reference(service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigProvider")
+    protected void setConfigProvider(ConfigProvider configProvider) {
+        DataProviderValueHolder.setConfigProvider(configProvider);
+    }
+
+    protected void unsetConfigProvider(ConfigProvider configProvider) {
+        DataProviderValueHolder.setConfigProvider(null);
     }
 
     /**
@@ -94,7 +109,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             DataProvider dataProvider;
             switch (sourceType) {
                 case "rdbms":
-                    RDBMSProviderConf conf = new Gson().fromJson(message, RDBMSProviderConf.class);
+                    RDBMSDataProviderConf conf = new Gson().fromJson(message, RDBMSDataProviderConf.class);
                     dataProvider = new RDBMSBatchDataProvider().init(session.getId(), conf);
                     dataProvider.start();
                     break;

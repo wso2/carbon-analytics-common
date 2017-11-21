@@ -17,8 +17,8 @@ package org.wso2.carbon.analytics.common.data.provider.rdbms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSProviderConf;
-import org.wso2.carbon.analytics.common.data.provider.spi.AbstractStreamingDataProvider;
+import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSDataProviderConf;
+import org.wso2.carbon.analytics.common.data.provider.utils.AbstractStreamingDataProvider;
 import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
 
 /**
@@ -28,21 +28,23 @@ import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
 public class RDBMSStreamingDataProvider extends AbstractStreamingDataProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSStreamingDataProvider.class);
+    private RDBMSDataProviderConf rdbmsProviderConf;
 
     @Override
-    public void publish(String sessionID, ProviderConfig providerConfig) {
-
+    public void publish(String sessionID) {
     }
 
     @Override
-    public void purging(ProviderConfig providerConfig) {
+    public void purging() {
+    }
 
+    @Override
+    public void setProviderConfig(ProviderConfig providerConfig) {
+        this.rdbmsProviderConf = (RDBMSDataProviderConf) providerConfig;
     }
 
     @Override
     public boolean configValidator(ProviderConfig providerConfig){
-        RDBMSProviderConf rdbmsProviderConf = (RDBMSProviderConf) providerConfig;
-        return rdbmsProviderConf.getDataSetMetadata().getTypes().length == rdbmsProviderConf.getDataSetMetadata().
-                getColumnCount();
+        return true;
     }
 }

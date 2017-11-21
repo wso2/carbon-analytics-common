@@ -19,37 +19,39 @@ package org.wso2.carbon.analytics.common.data.provider.rdbms.config;
 import org.wso2.carbon.analytics.common.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
 
+import java.util.Arrays;
+
 /**
  * Model class for the RDBMS provider configurations.
  */
-public class RDBMSProviderConf implements ProviderConfig {
+public class RDBMSDataProviderConf implements ProviderConfig {
     private String datasourceName;
     private String query;
     private String tableName;
-    private long publishingPollingInterval;
-    private long purgingPollingInterval;
+    private String incrementalColumn;
+    private long publishingInterval;
+    private long purgingInterval;
+    private long publishingLimit;
+    private long purgingLimit;
     private boolean isPurgingEnable;
-    private DataSetMetadata dataSetMetadata;
 
-    public RDBMSProviderConf(){
-        this.publishingPollingInterval = 6000;
-        this.purgingPollingInterval = 6000;
+    public RDBMSDataProviderConf(){
+        this.publishingInterval = 6000;
+        this.purgingInterval = 6000;
         this.isPurgingEnable = false;
     }
 
-    public RDBMSProviderConf(String datasourceName, String tableName, String query,
-                             DataSetMetadata dataSetMetadata) {
+    public RDBMSDataProviderConf(String datasourceName, String tableName, String query) {
         this.datasourceName = datasourceName;
         this.query = query;
         this.tableName = tableName;
-        this.dataSetMetadata = dataSetMetadata;
     }
 
-    public RDBMSProviderConf(String datasourceName, String tableName, String query, long pollingInterval,
-                             long initialDelay, DataSetMetadata dataSetMetadata, boolean isPurgingEnable) {
-        this(datasourceName, tableName, query, dataSetMetadata);
-        this.publishingPollingInterval = pollingInterval;
-        this.purgingPollingInterval = initialDelay;
+    public RDBMSDataProviderConf(String datasourceName, String tableName, String query, long pollingInterval,
+                                 long initialDelay, boolean isPurgingEnable) {
+        this(datasourceName, tableName, query);
+        this.publishingInterval = pollingInterval;
+        this.purgingInterval = initialDelay;
         this.isPurgingEnable = isPurgingEnable;
     }
 
@@ -65,18 +67,26 @@ public class RDBMSProviderConf implements ProviderConfig {
         return tableName;
     }
 
-    public DataSetMetadata getDataSetMetadata(){
-        return dataSetMetadata;
+    public String getIncrementalColumn() {
+        return incrementalColumn;
+    }
+
+    public long getPublishingLimit() {
+        return publishingLimit;
+    }
+
+    public long getPurgingLimit() {
+        return purgingLimit;
     }
 
     @Override
-    public long getPublishingPollingInterval() {
-        return publishingPollingInterval;
+    public long getPublishingInterval() {
+        return publishingInterval;
     }
 
     @Override
-    public long getPurgingPollingInterval() {
-        return purgingPollingInterval;
+    public long getPurgingInterval() {
+        return purgingInterval;
     }
 
     @Override
