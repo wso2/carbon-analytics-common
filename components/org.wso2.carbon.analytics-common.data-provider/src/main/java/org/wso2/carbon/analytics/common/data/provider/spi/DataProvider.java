@@ -20,12 +20,12 @@ import org.wso2.carbon.analytics.common.data.provider.exception.DataProviderExce
 
 /**
  * Data provider interface.
- *
  */
 public interface DataProvider {
 
     /**
      * Initialize the instance with the session id.
+     *
      * @param sessionID Session id of the session associated with the connection.
      */
     DataProvider init(String sessionID, ProviderConfig providerConfig) throws DataProviderException;
@@ -40,5 +40,5 @@ public interface DataProvider {
      */
     void stop();
 
-    boolean configValidator(ProviderConfig providerConfig);
+    boolean configValidator(ProviderConfig providerConfig) throws DataProviderException;
 }

@@ -15,7 +15,6 @@
 */
 package org.wso2.carbon.analytics.common.data.provider.api;
 
-
 /**
  * model class for the metadata of the data.
  */
@@ -23,6 +22,9 @@ public class DataSetMetadata {
     private String[] names;
     private Types[] types;
 
+    /**
+     * enum for define the supportive data column types.
+     */
     public enum Types {
         LINEAR, ORDINAL, TIME, OBJECT
     }
@@ -45,10 +47,10 @@ public class DataSetMetadata {
         this.types[columnCount] = type;
     }
 
-    public int getColumnCount(){
-        if(names != null){
+    public int getColumnCount() {
+        if (names != null) {
             return names.length;
-        } else{
+        } else {
             return 0;
         }
     }

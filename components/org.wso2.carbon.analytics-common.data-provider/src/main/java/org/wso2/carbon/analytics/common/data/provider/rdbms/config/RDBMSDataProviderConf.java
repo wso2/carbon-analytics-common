@@ -15,11 +15,7 @@
 */
 package org.wso2.carbon.analytics.common.data.provider.rdbms.config;
 
-
-import org.wso2.carbon.analytics.common.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
-
-import java.util.Arrays;
 
 /**
  * Model class for the RDBMS provider configurations.
@@ -35,24 +31,10 @@ public class RDBMSDataProviderConf implements ProviderConfig {
     private long purgingLimit;
     private boolean isPurgingEnable;
 
-    public RDBMSDataProviderConf(){
+    public RDBMSDataProviderConf() {
         this.publishingInterval = 6000;
         this.purgingInterval = 6000;
         this.isPurgingEnable = false;
-    }
-
-    public RDBMSDataProviderConf(String datasourceName, String tableName, String query) {
-        this.datasourceName = datasourceName;
-        this.query = query;
-        this.tableName = tableName;
-    }
-
-    public RDBMSDataProviderConf(String datasourceName, String tableName, String query, long pollingInterval,
-                                 long initialDelay, boolean isPurgingEnable) {
-        this(datasourceName, tableName, query);
-        this.publishingInterval = pollingInterval;
-        this.purgingInterval = initialDelay;
-        this.isPurgingEnable = isPurgingEnable;
     }
 
     public String getDatasourceName() {

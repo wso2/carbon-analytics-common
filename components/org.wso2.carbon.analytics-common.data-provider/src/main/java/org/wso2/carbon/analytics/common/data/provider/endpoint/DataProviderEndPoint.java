@@ -24,8 +24,10 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.common.data.provider.rdbms.RDBMSBatchDataProvider;
+import org.wso2.carbon.analytics.common.data.provider.rdbms.RDBMSStreamingDataProvider;
 import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSDataProviderConf;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
+import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
 import org.wso2.carbon.analytics.common.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
@@ -53,11 +55,8 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/data-provider/{sourceType}")
 public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderEndPoint.class);
-
     private static final Map<String, Session> sessionMap = new HashMap<>();
     private final Map<String, DataProvider> providerMap = new HashMap<>();
-    private DataSourceService dataSourceService = null;
-    private ConfigProvider configProvider = null;
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -107,10 +106,16 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     public void onMessage(String message, @PathParam("sourceType") String sourceType, Session session) {
         try {
             DataProvider dataProvider;
+            ProviderConfig providerConfig;
             switch (sourceType) {
-                case "rdbms":
-                    RDBMSDataProviderConf conf = new Gson().fromJson(message, RDBMSDataProviderConf.class);
-                    dataProvider = new RDBMSBatchDataProvider().init(session.getId(), conf);
+                case "rdbms-batch":
+                    providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
+                    dataProvider = new RDBMSBatchDataProvider().init(session.getId(), providerConfig);
+                    dataProvider.start();
+                    break;
+                case "rdbms-streaming":
+                    providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
+                    dataProvider = new RDBMSStreamingDataProvider().init(session.getId(), providerConfig);
                     dataProvider.start();
                     break;
                 default:
@@ -118,7 +123,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
             providerMap.put(session.getId(), dataProvider);
         } catch (Exception e) {
-            LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType +". "
+            LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType + ". "
                     + e.getMessage(), e);
         }
     }
