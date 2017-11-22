@@ -18,6 +18,9 @@
 package org.wso2.carbon.analytics.msf4j.interceptor.common.internal;
 
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.config.provider.ConfigProvider;
+
+import java.util.List;
 
 /**
  * Data holder class to hold reference to IdP Client OSGi service.
@@ -25,6 +28,9 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 public class DataHolder {
     private static DataHolder instance = new DataHolder();
     private IdPClient idPClient;
+    private ConfigProvider configProvider;
+    private boolean isInterceptorEnabled;
+    private List<String> excludeURLList;
 
     private DataHolder() {
     }
@@ -44,5 +50,29 @@ public class DataHolder {
 
     public void setIdPClient(IdPClient idPClient) {
         this.idPClient = idPClient;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
+    }
+
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+    }
+
+    public boolean isInterceptorEnabled() {
+        return isInterceptorEnabled;
+    }
+
+    public void setInterceptorEnabled(boolean interceptorEnabled) {
+        isInterceptorEnabled = interceptorEnabled;
+    }
+
+    public List<String> getExcludeURLList() {
+        return excludeURLList;
+    }
+
+    public void setExcludeURLList(List<String> excludeURLList) {
+        this.excludeURLList = excludeURLList;
     }
 }

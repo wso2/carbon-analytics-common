@@ -25,6 +25,15 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * component to get the registered IdPClient OSGi service.
@@ -37,11 +46,47 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 public class ServiceComponent {
 
     @Activate
-    protected void start(BundleContext bundleContext) {
+    protected void start(BundleContext bundleContext) throws ConfigurationException {
+        ConfigProvider configProvider = DataHolder.getInstance().getConfigProvider();
+        if (configProvider.getConfigurationObject(IdPClientConstants.SP_AUTH_NAMESPACE) == null) {
+            DataHolder.getInstance().setInterceptorEnabled(true);
+            DataHolder.getInstance().setExcludeURLList(new ArrayList<>());
+        } else {
+            IdPClientConfiguration idPClientConfiguration = configProvider.
+                    getConfigurationObject(IdPClientConfiguration.class);
+            String enableInterceptor = idPClientConfiguration.getProperties()
+                    .getOrDefault(IdPClientConstants.ENABLE_INTERCEPTOR, "true");
+            String exclude = idPClientConfiguration.getProperties().get(IdPClientConstants.EXCLUDE_INTERCEPTOR);
+            Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
+            DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
+            if (isInterceptorEnabled) {
+                List<String> collect = Arrays.stream(
+                        exclude.replaceAll("\\s*","").split(",")).collect(Collectors.toList());
+                DataHolder.getInstance().setExcludeURLList(collect);
+            } else {
+                DataHolder.getInstance().setExcludeURLList(new ArrayList<>());
+            }
+        }
     }
 
     @Deactivate
     protected void stop() {
+    }
+
+
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) {
+        DataHolder.getInstance().setConfigProvider(configProvider);
+    }
+
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        DataHolder.getInstance().setConfigProvider(null);
     }
 
     @Reference(

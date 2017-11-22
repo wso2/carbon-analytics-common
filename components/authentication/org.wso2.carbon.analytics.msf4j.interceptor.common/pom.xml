@@ -33,6 +33,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.wso2.carbon.config</groupId>
+            <artifactId>org.wso2.carbon.config</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
@@ -63,6 +67,7 @@
     </build>
     <properties>
         <import.package>
+            org.wso2.carbon.config.*;version="${carbon.config.version.range}",
             org.wso2.carbon.analytics.idp.client.*,
             org.wso2.carbon.kernel.*,
             org.osgi.framework.*,
