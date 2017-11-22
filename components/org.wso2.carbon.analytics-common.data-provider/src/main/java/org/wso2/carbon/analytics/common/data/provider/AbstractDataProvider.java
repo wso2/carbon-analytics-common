@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.common.data.provider.utils;
+package org.wso2.carbon.analytics.common.data.provider;
 
 import org.wso2.carbon.analytics.common.data.provider.exception.DataProviderException;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;

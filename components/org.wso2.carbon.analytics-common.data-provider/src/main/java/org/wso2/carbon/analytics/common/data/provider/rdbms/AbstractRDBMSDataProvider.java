@@ -29,7 +29,7 @@ import org.wso2.carbon.analytics.common.data.provider.rdbms.bean.RDBMSDataProvid
 import org.wso2.carbon.analytics.common.data.provider.rdbms.config.RDBMSDataProviderConf;
 import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
 import org.wso2.carbon.analytics.common.data.provider.spi.ProviderConfig;
-import org.wso2.carbon.analytics.common.data.provider.utils.AbstractDataProvider;
+import org.wso2.carbon.analytics.common.data.provider.AbstractDataProvider;
 import org.wso2.carbon.analytics.common.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
