@@ -255,7 +255,7 @@ public class LocalIdPClientTest {
         Assert.assertNull(localIdPClient.getUser("admin2"));
     }
 
-   @Test(expectedExceptions = AuthenticationException.class)
+    @Test(expectedExceptions = AuthenticationException.class)
     public void testLogout() throws IdPClientException, AuthenticationException {
         //logging in
         Map<String, String> userProperties = new HashMap<>();
