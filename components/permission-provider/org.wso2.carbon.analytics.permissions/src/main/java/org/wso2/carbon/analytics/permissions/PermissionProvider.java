@@ -23,6 +23,8 @@ import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.analytics.permissions.exceptions.PermissionException;
 
+import java.util.List;
+
 /**
  * Permission provider interface.
  */
@@ -78,4 +80,13 @@ public interface PermissionProvider {
      * @throws PermissionException
      */
     boolean hasPermission(String username, Permission permission) throws PermissionException;
+
+    /**
+     * Get list of roles which has a permission granted.
+     *
+     * @param permission
+     * @return
+     * @throws PermissionException
+     */
+    List<Role> getGrantedRoles(Permission permission) throws PermissionException;
 }

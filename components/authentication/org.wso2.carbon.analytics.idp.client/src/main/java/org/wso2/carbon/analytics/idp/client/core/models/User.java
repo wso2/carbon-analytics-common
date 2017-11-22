@@ -15,7 +15,6 @@
 */
 package org.wso2.carbon.analytics.idp.client.core.models;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -27,15 +26,13 @@ public class User {
     private String username;
     private String password;
     private Map<String, String> properties;
-    private String roles;
-    private List<Role> rolesList;
+    private List<Role> roles;
 
-    public User(String username, String password, Map<String, String> properties, List<Role> rolesList) {
+    public User(String username, String password, Map<String, String> properties, List<Role> roles) {
         this.username = username;
         this.password = password;
         this.properties = properties;
-        this.rolesList = rolesList;
-        this.roles = "";
+        this.roles = roles;
     }
 
     public String getUsername() {
@@ -62,24 +59,11 @@ public class User {
         this.properties = properties;
     }
 
-    public String getRoles() {
-        return this.roles;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setRoles(String roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
-
-    public List<Role> getRolesList() {
-        return rolesList;
-    }
-
-    public void setRolesList(List<Role> rolesList) {
-        this.rolesList = rolesList;
-    }
-
-    public void addRolesList(List<Role> rolesList) {
-        this.rolesList.addAll(rolesList);
-    }
-
 }

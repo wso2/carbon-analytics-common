@@ -34,7 +34,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Local IdP Client.
@@ -52,16 +51,9 @@ public class LocalIdPClient implements IdPClient {
 
     public LocalIdPClient(int sessionTimeOut, List<User> users, List<Role> roles) {
         this.sessionTimeout = sessionTimeOut * 1000;
-        this.rolesList = roles;
         this.systemLoginCount = 0;
-        this.usersList = users.stream().map((user) -> {
-            List<String> roleIdList = Arrays.asList(user.getRoles().split(","));
-            List<Role> userRolesFromId = this.rolesList.stream()
-                    .filter((role) -> roleIdList.contains(role.getId()))
-                    .collect(Collectors.toList());
-            user.addRolesList(userRolesFromId);
-            return user;
-        }).collect(Collectors.toList());
+        this.rolesList = roles;
+        this.usersList = users;
     }
 
     @Override
@@ -83,7 +75,7 @@ public class LocalIdPClient implements IdPClient {
     public List<Role> getUserRoles(String name) {
         User user = getUserFromUsersList(name);
         if (user != null) {
-            return user.getRolesList();
+            return user.getRoles();
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("User with username '" + name + "' is not present when retrieving user roles.");

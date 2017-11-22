@@ -81,7 +81,7 @@ public class ExternalIdPClientConstants {
 
     public static final String SCIM2_USERNAME = "userName";
     public static final String SCIM2_GROUPS = "groups";
-    public static final String SCIM2_USER_JSON = "userDetails";
+    public static final String SCIM2_DISPLAY = "display";
 
 
     private ExternalIdPClientConstants() {
