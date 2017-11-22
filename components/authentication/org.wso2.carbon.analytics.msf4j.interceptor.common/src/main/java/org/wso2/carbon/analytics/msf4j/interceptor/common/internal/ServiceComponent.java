@@ -60,8 +60,8 @@ public class ServiceComponent {
             Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
             DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
             if (isInterceptorEnabled) {
-                List<String> collect = Arrays.stream(
-                        exclude.replaceAll("\\s*","").split(",")).collect(Collectors.toList());
+                List<String> collect = Arrays.stream(exclude.replaceAll("\\s*", "")
+                                .split(",")).collect(Collectors.toList());
                 DataHolder.getInstance().setExcludeURLList(collect);
             } else {
                 DataHolder.getInstance().setExcludeURLList(new ArrayList<>());
