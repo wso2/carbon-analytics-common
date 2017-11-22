@@ -25,7 +25,7 @@ public class LocalIdPClientConstants {
     public static final String LOCAL_IDP_CLIENT_TYPE = "local";
 
     public static final String SESSION_TIME_OUT = "session.timeout";
-    public static final String DEFAULT_SESSION_TIMEOUT = "60";
+    public static final String DEFAULT_SESSION_TIMEOUT = "3600";
 
     private LocalIdPClientConstants() {
     }
