@@ -36,9 +36,16 @@ public class QueryProvider {
     private static final Logger LOGGER = Logger.getLogger(QueryProvider.class);
     private static final String DEFAULT_TYPE = "default";
 
-    public QueryProvider() {
-    }
-
+    /**
+     * Merge the query mapping for component and deployment queries.
+     *
+     * @param databaseType      database type for query template lookup.
+     * @param databaseVersion   database version for query template lookup.
+     * @param componentQueries  queries array load from component queries config file.
+     * @param deploymentQueries queries array load from carbon deployment config file.
+     * @return results map of the component and deployment queries mapping.
+     * @throws QueryMappingNotAvailableException
+     */
     public static Map<String, String> mergeMapping(String databaseType, String databaseVersion,
                                                    ArrayList<Queries> componentQueries,
                                                    ArrayList<Queries> deploymentQueries)

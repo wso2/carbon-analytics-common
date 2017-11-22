@@ -41,7 +41,6 @@
         <module>coverage-reports</module>
         <module>components/org.wso2.carbon.analytics-common.data-provider</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
-        <module>features/org.wso2.carbon.database.query.manager.feature</module>
     </modules>
 
     <build>
