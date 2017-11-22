@@ -28,8 +28,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import static org.wso2.carbon.analytics.common.data.provider.rdbms.utils.RDBMSProviderConstants
-        .INCREMENTAL_COLUMN_PLACEHOLDER;
-import static org.wso2.carbon.analytics.common.data.provider.rdbms.utils.RDBMSProviderConstants
         .LAST_RECORD_VALUE_PLACEHOLDER;
 
 /**
@@ -38,16 +36,9 @@ import static org.wso2.carbon.analytics.common.data.provider.rdbms.utils.RDBMSPr
 public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSStreamingDataProvider.class);
     private double lastRecordValue = 0;
-    private String greaterThanWhereSQLQuery;
 
     public RDBMSStreamingDataProvider() throws ConfigurationException, SQLException, DataSourceException {
         super();
-        Connection connection = getConnection(getRdbmsProviderConf().getDatasourceName());
-        String databaseName = connection.getMetaData().getDatabaseProductName();
-        String databaseVersion = connection.getMetaData().getDatabaseProductName();
-        greaterThanWhereSQLQuery = getQueryTemplateFromMap(getRdbmsDataProviderConfBean()
-                .getGreaterThanWhereSQLQueryMap(), databaseName, databaseVersion).replace
-                (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConf().getIncrementalColumn());
     }
 
     @Override
@@ -64,8 +55,9 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                 try {
                     if (lastRecordValue > 0) {
                         String query = getRdbmsProviderConf().getQuery();
-                        String greaterThanWhereQuery = greaterThanWhereSQLQuery.replace(LAST_RECORD_VALUE_PLACEHOLDER,
-                                Double.toString(lastRecordValue));
+                        String greaterThanWhereQuery = getGreaterThanWhereSQLQuery().replace
+                                (LAST_RECORD_VALUE_PLACEHOLDER,
+                                        Double.toString(lastRecordValue));
                         query = query.concat(greaterThanWhereQuery).concat(getRecordLimitQuery());
                         statement = connection.prepareStatement(query);
                     } else {

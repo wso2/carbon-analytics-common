@@ -24,8 +24,8 @@ package org.wso2.carbon.analytics.common.data.provider.rdbms.utils;
 public final class RDBMSProviderConstants {
     public static final String DATABASE_NAME_VERSION_SEPARATOR = "_";
     public static final String DATABASE_DEFAULT_VERSION = "default";
-    public static final String TABLE_NAME_PLACEHOLDER = "TABLE_NAME";
-    public static final String INCREMENTAL_COLUMN_PLACEHOLDER = "INCREMENTAL_COLUMN";
-    public static final String LIMIT_VALUE_PLACEHOLDER = "LIMIT_VALUE";
-    public static final String LAST_RECORD_VALUE_PLACEHOLDER = "LAST_RECORD_VALUE";
+    public static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
+    public static final String INCREMENTAL_COLUMN_PLACEHOLDER = "{{INCREMENTAL_COLUMN}}";
+    public static final String LIMIT_VALUE_PLACEHOLDER = "{{LIMIT_VALUE}}";
+    public static final String LAST_RECORD_VALUE_PLACEHOLDER = "{{LAST_RECORD_VALUE}}";
 }

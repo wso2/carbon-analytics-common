@@ -48,7 +48,7 @@ import javax.websocket.server.ServerEndpoint;
  * Data provider web socket endpoint.
  */
 @Component(
-        name = "org.wso2.carbon.analytics.common.data.provider",
+        name = "org.wso2.carbon.analytics.common.data.provider.endpoint",
         service = WebSocketEndpoint.class,
         immediate = true
 )
@@ -121,10 +121,14 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
                 default:
                     throw new Exception("Provider type: " + sourceType + " not registered.");
             }
+            if (providerMap.containsKey(session.getId())) {
+                providerMap.get(session.getId()).stop();
+            }
             providerMap.put(session.getId(), dataProvider);
         } catch (Exception e) {
             LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType + ". "
                     + e.getMessage(), e);
+            onError(e);
         }
     }
 

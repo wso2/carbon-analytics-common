@@ -64,6 +64,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private String purgingQuery;
     private String totalRecordCountQuery;
     private String customQuery;
+    private String greaterThanWhereSQLQuery;
     private DataSetMetadata metadata;
     private int columnCount;
     private RDBMSDataProviderConf rdbmsProviderConf;
@@ -83,19 +84,25 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         try {
             connection = getConnection(rdbmsProviderConf.getDatasourceName());
             String databaseName = connection.getMetaData().getDatabaseProductName();
-            String databaseVersion = connection.getMetaData().getDatabaseProductName();
-            totalRecordCountQuery = getQueryTemplateFromMap(rdbmsDataProviderConfBean.getPurgingSQLQueryMap(),
+            String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
+            totalRecordCountQuery = getQueryTemplateFromMap(rdbmsDataProviderConfBean.getTotalRecordCountSQLQueryMap(),
                     databaseName, databaseVersion);
             if (totalRecordCountQuery != null) {
                 totalRecordCountQuery = totalRecordCountQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConf
                         .getTableName());
             }
-            purgingQuery = getQueryTemplateFromMap(rdbmsDataProviderConfBean.getTotalRecordCountSQLQueryMap(),
+            purgingQuery = getQueryTemplateFromMap(rdbmsDataProviderConfBean.getPurgingSQLQueryMap(),
                     databaseName, databaseVersion);
             if (purgingQuery != null) {
                 purgingQuery = purgingQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConf
                         .getTableName()).replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConf
                         .getIncrementalColumn());
+            }
+            greaterThanWhereSQLQuery = getQueryTemplateFromMap(getRdbmsDataProviderConfBean()
+                    .getGreaterThanWhereSQLQueryMap(), databaseName, databaseVersion);
+            if (greaterThanWhereSQLQuery != null) {
+                greaterThanWhereSQLQuery = greaterThanWhereSQLQuery.replace
+                        (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConf().getIncrementalColumn());
             }
             recordLimitQuery = getQueryTemplateFromMap(rdbmsDataProviderConfBean.getRecordLimitSQLQueryMap(),
                     databaseName, databaseVersion);
@@ -103,7 +110,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                 recordLimitQuery = recordLimitQuery.replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConf
                         .getIncrementalColumn()).replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConf
                         .getPublishingLimit()));
-                customQuery = customQuery.concat(recordLimitQuery);
+                customQuery = rdbmsProviderConf.getQuery().concat(recordLimitQuery);
                 try {
                     statement = connection.prepareStatement(customQuery);
                     resultSet = statement.executeQuery();
@@ -224,6 +231,10 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         return columnCount;
     }
 
+    public String getGreaterThanWhereSQLQuery() {
+        return greaterThanWhereSQLQuery;
+    }
+
     public RDBMSDataProviderConf getRdbmsProviderConf() {
         return rdbmsProviderConf;
     }
@@ -279,7 +290,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                         String query = purgingQuery.replace(LIMIT_VALUE_PLACEHOLDER,
                                 Long.toString(totalRecordCount - rdbmsProviderConf.getPurgingLimit()));
                         statement = connection.prepareStatement(query);
-                        resultSet = statement.executeQuery();
+                        statement.executeUpdate();
                         connection.commit();
                     }
                 } catch (SQLException e) {

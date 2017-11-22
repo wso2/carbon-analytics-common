@@ -56,6 +56,7 @@ public class RDBMSDataProviderConfBean {
         put("H2_default", " ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}");
     } };
 
+
     @Element(description = "Map for greater than where clause sql queries template.")
     Map<String, String> greaterThanWhereSQLQueryMap = new HashMap<String, String>() { {
         put("MySQL_default", " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}");

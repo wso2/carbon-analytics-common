@@ -74,18 +74,21 @@
             <groupId>org.wso2.carbon.datasources</groupId>
             <artifactId>org.wso2.carbon.datasource.core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.config</groupId>
+            <artifactId>org.wso2.carbon.config</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
         <export.package>
-            !org.wso2.carbon.analytics.common.data.provider.internal.*,
-            org.wso2.carbon.analytics.common.data.provider.api.*;version="6.5.0",
-            org.wso2.carbon.analytics.common.data.provider.spi.*;version="6.5.0",
+            org.wso2.carbon.analytics.common.data.provider.*
         </export.package>
         <private.package>org.wso2.carbon.analytics.common.data.provider.internal.*</private.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
+            org.wso2.carbon.config.provider.*;version="${carbon.config.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             javax.websocket.*;version="${javax.websocket.version.range}",
