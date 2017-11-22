@@ -31,6 +31,10 @@ public class IdPClientConstants {
     public static final String REFRESH_GRANT_TYPE = "refresh_token";
     public static final String CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
 
+    public static final String SP_AUTH_NAMESPACE = "auth.configs";
+    public static final String ENABLE_INTERCEPTOR = "rest.api.enable.auth";
+    public static final String EXCLUDE_INTERCEPTOR = "rest.exclude";
+
     public static final String LOGIN_STATUS = "Status";
     public static final String REDIRECTION_URL = "Redirect_Url";
     public static final String CLIENT_ID = "Client_Id";

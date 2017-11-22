@@ -81,7 +81,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
 
         List<User> users = idPClientConfiguration.getUserStore().getUsers().stream().map(userElement -> {
             UserChildElement user = userElement.getUser();
-            List<String> roleIdList = Arrays.asList(user.getRoles().split(","));
+            List<String> roleIdList = Arrays.asList(user.getRoles().replaceAll("\\s*", "").split(","));
             List<Role> userRolesFromId = roles.stream()
                     .filter((role) -> roleIdList.contains(role.getId()))
                     .collect(Collectors.toList());
