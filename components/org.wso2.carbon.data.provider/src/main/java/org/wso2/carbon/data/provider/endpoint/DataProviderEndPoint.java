@@ -13,18 +13,23 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.wso2.carbon.analytics.common.data.provider.internal;
+package org.wso2.carbon.data.provider.endpoint;
 
 
+import com.google.gson.Gson;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.analytics.common.data.provider.api.ProviderFactory;
-import org.wso2.carbon.analytics.common.data.provider.internal.rdbms.RDBMSHelper;
-import org.wso2.carbon.analytics.common.data.provider.spi.DataProvider;
+import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.data.provider.DataProvider;
+import org.wso2.carbon.data.provider.ProviderConfig;
+import org.wso2.carbon.data.provider.rdbms.RDBMSBatchDataProvider;
+import org.wso2.carbon.data.provider.rdbms.RDBMSStreamingDataProvider;
+import org.wso2.carbon.data.provider.rdbms.config.RDBMSDataProviderConf;
+import org.wso2.carbon.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
@@ -43,14 +48,13 @@ import javax.websocket.server.ServerEndpoint;
  * Data provider web socket endpoint.
  */
 @Component(
-        name = "org.wso2.carbon.analytics.common.data.provider",
+        name = "org.wso2.carbon.analytics.common.data.provider.endpoint",
         service = WebSocketEndpoint.class,
         immediate = true
 )
 @ServerEndpoint(value = "/data-provider/{sourceType}")
 public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderEndPoint.class);
-
     private static final Map<String, Session> sessionMap = new HashMap<>();
     private final Map<String, DataProvider> providerMap = new HashMap<>();
 
@@ -62,11 +66,23 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             unbind = "unregisterDataSourceService"
     )
     protected void registerDataSourceService(DataSourceService service) {
-        RDBMSHelper.setDataSourceService(service);
+        DataProviderValueHolder.setDataSourceService(service);
     }
 
     protected void unregisterDataSourceService(DataSourceService service) {
-        RDBMSHelper.setDataSourceService(null);
+        DataProviderValueHolder.setDataSourceService(null);
+    }
+
+    @Reference(service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigProvider")
+    protected void setConfigProvider(ConfigProvider configProvider) {
+        DataProviderValueHolder.setConfigProvider(configProvider);
+    }
+
+    protected void unsetConfigProvider(ConfigProvider configProvider) {
+        DataProviderValueHolder.setConfigProvider(null);
     }
 
     /**
@@ -88,10 +104,32 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnMessage
     public void onMessage(String message, @PathParam("sourceType") String sourceType, Session session) {
-
-        DataProvider dataProvider = new ProviderFactory().createNewDataProvider(sourceType, message);
-        dataProvider.init(session.getId()).start();
-        providerMap.put(session.getId(), dataProvider);
+        try {
+            DataProvider dataProvider;
+            ProviderConfig providerConfig;
+            switch (sourceType) {
+                case "rdbms-batch":
+                    providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
+                    dataProvider = new RDBMSBatchDataProvider().init(session.getId(), providerConfig);
+                    dataProvider.start();
+                    break;
+                case "rdbms-streaming":
+                    providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
+                    dataProvider = new RDBMSStreamingDataProvider().init(session.getId(), providerConfig);
+                    dataProvider.start();
+                    break;
+                default:
+                    throw new Exception("Provider type: " + sourceType + " not registered.");
+            }
+            if (providerMap.containsKey(session.getId())) {
+                providerMap.get(session.getId()).stop();
+            }
+            providerMap.put(session.getId(), dataProvider);
+        } catch (Exception e) {
+            LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType + ". "
+                    + e.getMessage(), e);
+            onError(e);
+        }
     }
 
     /**
@@ -101,7 +139,6 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
-
         providerMap.get(session.getId()).stop(); //stop the pushing service
         providerMap.remove(session.getId()); //remove the provider from the map
         sessionMap.remove(session.getId()); //remove the session from sessionMap

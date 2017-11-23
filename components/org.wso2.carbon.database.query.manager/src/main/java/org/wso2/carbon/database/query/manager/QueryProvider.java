@@ -54,30 +54,36 @@ public class QueryProvider {
         Map<String, String> deploymentConfigMap = new HashMap<>();
         Map<String, String> componentConfigMap = new HashMap<>();
         Map<String, String> result = new HashMap<>();
-        //populate the deployment query map for given database type and version.
-        for (Queries queries : deploymentQueries) {
-            if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
-                    databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
-                deploymentConfigMap = queries.getMappings();
+        if (deploymentQueries != null) {
+            //populate the deployment query map for given database type and version.
+            for (Queries queries : deploymentQueries) {
+                if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
+                        databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
+                    deploymentConfigMap = queries.getMappings();
+                }
             }
         }
-        //populate the default and component query map for given type and version.
-        for (Queries queries : componentQueries) {
-            if (queries.getType().equals(DEFAULT_TYPE)) {
-                defaultConfigSet = queries.getMappings().keySet();
-            } else if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
-                    databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
-                componentConfigMap = queries.getMappings();
-            }
-        }
-        //if matching database type and version not found check whether default version available.
-        if (componentConfigMap == null || componentConfigMap.isEmpty()) {
+        if (componentQueries != null) {
+            //populate the default and component query map for given type and version.
             for (Queries queries : componentQueries) {
-                if (queries.getType().equals(databaseType) && queries.getVersion() != null &&
-                        queries.getVersion().equals(DEFAULT_TYPE)) {
+                if (queries.getType().equals(DEFAULT_TYPE)) {
+                    defaultConfigSet = queries.getMappings().keySet();
+                } else if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
+                        databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
                     componentConfigMap = queries.getMappings();
                 }
             }
+            //if matching database type and version not found check whether default version available.
+            if (componentConfigMap == null || componentConfigMap.isEmpty()) {
+                for (Queries queries : componentQueries) {
+                    if (queries.getType().equals(databaseType) && queries.getVersion() != null &&
+                            queries.getVersion().equals(DEFAULT_TYPE)) {
+                        componentConfigMap = queries.getMappings();
+                    }
+                }
+            }
+        } else {
+            throw new QueryMappingNotAvailableException("Component configuration array list is null.");
         }
         if (!defaultConfigSet.isEmpty()) {
             for (String defaultEntry : defaultConfigSet) {

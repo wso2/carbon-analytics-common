@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -12,30 +12,28 @@
   ~ Unless required by applicable law or agreed to in writing,
   ~ software distributed under the License is distributed on an
   ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  ~ KIND, either express or implied.  See the License for the
+  ~ KIND, either express or implied. See the License for the
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>org.wso2.carbon.analytics-common.dataprovider.feature</artifactId>
-    <version>6.0.16-SNAPSHOT</version>
-    <packaging>carbon-feature</packaging>
-    <name>WSO2 Carbon - Data Provider - Feature</name>
-    <url>http://wso2.org</url>
-
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
         <version>6.0.16-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>org.wso2.carbon.data.provider.feature</artifactId>
+    <packaging>carbon-feature</packaging>
+    <name>WSO2 Carbon - Data Provider - Feature</name>
+    <url>http://wso2.org</url>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.analytics-common.dataprovider</artifactId>
+            <artifactId>org.wso2.carbon.data.provider</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -69,10 +67,9 @@
                                 </advice>
                             </adviceFileContents>
                             <bundles>
-                                <!-- databridge-receiver-thrift dependencies -->
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.analytics-common.dataprovider</symbolicName>
-                                    <version>${data-provider.version}</version>
+                                    <symbolicName>org.wso2.carbon.data.provider</symbolicName>
+                                    <version>${project.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>com.google.gson</symbolicName>

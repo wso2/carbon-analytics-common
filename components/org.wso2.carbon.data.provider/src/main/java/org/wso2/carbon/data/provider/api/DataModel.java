@@ -13,7 +13,7 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package org.wso2.carbon.analytics.common.data.provider.api;
+package org.wso2.carbon.data.provider.api;
 
 /**
  * Model class of the data object to be sent.
