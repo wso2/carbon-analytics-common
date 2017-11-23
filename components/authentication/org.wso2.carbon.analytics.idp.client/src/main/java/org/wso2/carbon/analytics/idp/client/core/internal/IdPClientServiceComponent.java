@@ -107,6 +107,9 @@ public class IdPClientServiceComponent implements RequiredCapabilityListener {
         try {
             IdPClient idPClient = IdPServiceUtils.getIdPClient(configProvider, idPClientFactoryHashMap);
             this.serviceRegistration = bundleContext.registerService(IdPClient.class.getName(), idPClient, null);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("IdPClient of class '" + idPClient.getClass().getName() + "' is registered as a service.");
+            }
         } catch (IdPClientException e) {
             LOG.error("Error occurred while initializing IdP Client", e);
         }

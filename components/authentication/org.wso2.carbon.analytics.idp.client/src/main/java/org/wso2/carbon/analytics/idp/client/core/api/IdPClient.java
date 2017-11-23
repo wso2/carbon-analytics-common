@@ -39,5 +39,5 @@ public interface IdPClient {
 
     void logout(Map<String, String> properties) throws IdPClientException;
 
-    boolean authenticate(String token) throws AuthenticationException, IdPClientException;
+    String authenticate(String token) throws AuthenticationException, IdPClientException;
 }

@@ -143,8 +143,8 @@ public class OAuth2ServiceStubs {
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        public default Response generatePasswordGrantAccessToken(String username, String password, String scopes,
-                                                                 String clientId, String clientSecret) {
+        default Response generatePasswordGrantAccessToken(String username, String password, String scopes,
+                                                          String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return generateAccessToken(authToken, IdPClientConstants.PASSWORD_GRANT_TYPE, null, null, null,
@@ -161,8 +161,8 @@ public class OAuth2ServiceStubs {
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        public default Response generateAuthCodeGrantAccessToken(String code, String redirectUri, String scopes,
-                                                                 String clientId, String clientSecret) {
+        default Response generateAuthCodeGrantAccessToken(String code, String redirectUri, String scopes,
+                                                          String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return generateAccessToken(authToken, IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE, code, redirectUri,
@@ -178,8 +178,8 @@ public class OAuth2ServiceStubs {
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        public default Response generateRefreshGrantAccessToken(String refreshToken, String scopes,
-                                                                String clientId, String clientSecret) {
+        default Response generateRefreshGrantAccessToken(String refreshToken, String scopes,
+                                                         String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return generateAccessToken(authToken, IdPClientConstants.REFRESH_GRANT_TYPE, null,
@@ -194,8 +194,8 @@ public class OAuth2ServiceStubs {
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        public default Response generateClientCredentialsGrantAccessToken(String scopes, String clientId,
-                                                                          String clientSecret) {
+        default Response generateClientCredentialsGrantAccessToken(String scopes, String clientId,
+                                                                   String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return generateAccessToken(authToken, IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE,
@@ -226,7 +226,7 @@ public class OAuth2ServiceStubs {
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        public default Response revokeAccessToken(String token, String clientId, String clientSecret) {
+        default Response revokeAccessToken(String token, String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return revokeToken(authToken, token);
