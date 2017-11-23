@@ -113,6 +113,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                                     .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
                             return false;
                         }
+                        request.setProperty(InterceptorConstants.PROPERTY_USERNAME, userName);
                         return true;
                     } else {
                         LOGGER.debug("Authorization method '{}' not supported for : '{}'.", headerPrefix,
