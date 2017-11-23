@@ -38,7 +38,7 @@ public class RDBMSDataProviderConfBean {
     String sqlTableNameSanitizingRegex = null;
 
     @Element(description = "Database queries template array list.")
-    private ArrayList<Queries> queries;
+    private ArrayList<Queries> queries = new ArrayList<>();
 
     @Element(description = "Array of linear column types in the database.")
     String[] linearTypes = new String[]{"INTEGER", "INT", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT",
