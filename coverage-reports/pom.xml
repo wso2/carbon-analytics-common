@@ -61,6 +61,35 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.receiver.thrift</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.auth.rest.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics-common.dataprovider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
