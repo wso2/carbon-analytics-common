@@ -24,6 +24,7 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.internal.DataHolder;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.messaging.Headers;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.Response;
@@ -48,19 +49,15 @@ public class AuthenticationInterceptor implements RequestInterceptor {
 
     @Override
     public boolean interceptRequest(Request request, Response response) throws Exception {
-
         if (!DataHolder.getInstance().isInterceptorEnabled()) {
             return true;
         } else {
-
-            for (String url: DataHolder.getInstance().getExcludeURLList()) {
+            for (String url : DataHolder.getInstance().getExcludeURLList()) {
                 if (request.getUri().contains(url)) {
                     return true;
                 }
             }
-
             IdPClient idPClient = DataHolder.getInstance().getIdPClient();
-
             Headers headers = request.getHeaders();
             String authorizationHeader = request.getHeader(IdPClientConstants.AUTHORIZATION_HEADER);
             if (authorizationHeader != null) {
@@ -84,7 +81,12 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                         String accessToken = (partialTokenFromCookie != null) ?
                                 headerPostfix + partialTokenFromCookie :
                                 headerPostfix;
-                        return idPClient.authenticate(accessToken);
+                        String username = idPClient.authenticate(accessToken);
+                        if (username != null) {
+                            request.setProperty(InterceptorConstants.PROPERTY_USERNAME, username);
+                            return true;
+                        }
+                        return false;
                     } else if (headerPrefix.equalsIgnoreCase(IdPClientConstants.BASIC_PREFIX)) {
                         byte[] decodedAuthHeader = Base64.getDecoder().decode(headerPostfix);
                         String authHeader = new String(decodedAuthHeader, Charset.forName("UTF-8"));

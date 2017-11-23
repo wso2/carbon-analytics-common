@@ -163,14 +163,15 @@ public class LocalIdPClientTest {
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
         loginProperties.put(IdPClientConstants.PASSWORD, "admin");
+        loginProperties.put(IdPClientConstants.REMEMBER_ME, "false");
 
         Map<String, String> login = localIdPClient.login(loginProperties);
         Assert.assertEquals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS,
                 login.get(IdPClientConstants.LOGIN_STATUS));
         String sessionId = login.get(IdPClientConstants.ACCESS_TOKEN);
         Thread.sleep(5000);
-        boolean authenticate = localIdPClient.authenticate(sessionId);
-        Assert.assertEquals(authenticate, true);
+
+        Assert.assertNotNull(localIdPClient.authenticate(sessionId));
     }
 
     @Test
@@ -282,7 +283,6 @@ public class LocalIdPClientTest {
         localIdPClient.logout(properties);
 
         String sessionId = login.get(IdPClientConstants.ACCESS_TOKEN);
-        boolean authenticate = localIdPClient.authenticate(sessionId);
-        Assert.assertEquals(authenticate, false);
+        Assert.assertNotNull(localIdPClient.authenticate(sessionId));
     }
 }
