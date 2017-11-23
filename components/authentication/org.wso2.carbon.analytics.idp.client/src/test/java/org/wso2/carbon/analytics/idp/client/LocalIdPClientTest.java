@@ -163,6 +163,7 @@ public class LocalIdPClientTest {
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
         loginProperties.put(IdPClientConstants.PASSWORD, "admin");
+        loginProperties.put(IdPClientConstants.REMEMBER_ME, "false");
 
         Map<String, String> login = localIdPClient.login(loginProperties);
         Assert.assertEquals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS,
