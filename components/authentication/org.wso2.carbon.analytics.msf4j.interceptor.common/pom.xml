@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>authentication</artifactId>
-        <version>6.0.11-SNAPSHOT</version>
+        <version>6.0.13-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,6 +32,10 @@
     <url>http://maven.apache.org</url>
 
     <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.config</groupId>
+            <artifactId>org.wso2.carbon.config</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -63,6 +67,7 @@
     </build>
     <properties>
         <import.package>
+            org.wso2.carbon.config.*;version="${carbon.config.version.range}",
             org.wso2.carbon.analytics.idp.client.*,
             org.wso2.carbon.kernel.*,
             org.osgi.framework.*,

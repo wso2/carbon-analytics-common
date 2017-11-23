@@ -33,7 +33,6 @@ import java.util.Map;
  */
 public class IdPServiceUtils {
     private static final Logger LOG = LoggerFactory.getLogger(IdPServiceUtils.class);
-    private static final String SP_AUTH_NAMESPACE = "auth.configs";
 
     public static IdPClient getIdPClient(ConfigProvider configProvider, Map<String,
             IdPClientFactory> idPClientFactoryMap) throws IdPClientException {
@@ -41,7 +40,7 @@ public class IdPServiceUtils {
         IdPClient idPClient;
         try {
             IdPClientConfiguration idPClientConfiguration;
-            if (configProvider.getConfigurationObject(SP_AUTH_NAMESPACE) == null) {
+            if (configProvider.getConfigurationObject(IdPClientConstants.SP_AUTH_NAMESPACE) == null) {
                 idPClientConfiguration = new IdPClientConfiguration();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Enabling default IdPClient Local User Store.");
@@ -56,7 +55,8 @@ public class IdPServiceUtils {
             }
             idPClient = idPClientFactory.getIdPClient(idPClientConfiguration);
         } catch (ConfigurationException e) {
-            throw new IdPClientException("Error in reading '" + SP_AUTH_NAMESPACE + "' from file..", e);
+            throw new IdPClientException("Error in reading '" + IdPClientConstants.SP_AUTH_NAMESPACE + "' from file.",
+                    e);
         }
         return idPClient;
     }
