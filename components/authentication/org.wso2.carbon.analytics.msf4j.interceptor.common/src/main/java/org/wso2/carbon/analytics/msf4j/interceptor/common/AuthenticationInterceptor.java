@@ -45,7 +45,7 @@ import javax.ws.rs.core.MediaType;
         service = RequestInterceptor.class
 )
 public class AuthenticationInterceptor implements RequestInterceptor {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthenticationInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
     @Override
     public boolean interceptRequest(Request request, Response response) throws Exception {
@@ -103,9 +103,10 @@ public class AuthenticationInterceptor implements RequestInterceptor {
 
                         if (loginValues.get(IdPClientConstants.LOGIN_STATUS)
                                 .equals(IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
-                            LOG.error("Authentication failed for the request to : '" + request.getUri() + "' due to " +
-                                    "Error :'" + loginValues.get(IdPClientConstants.ERROR) + "', Error Description : '"
-                                    + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION));
+                            LOGGER.debug("Authentication failed for the request to '{}' due to Error: '{}', " +
+                                            "Error Description: '{}'.", request.getUri(),
+                                    loginValues.get(IdPClientConstants.ERROR),
+                                    loginValues.get(IdPClientConstants.ERROR_DESCRIPTION));
                             response.setEntity("Authentication failed for the request to : '" + request.getUri() +
                                     "' due to Error :'" + loginValues.get(IdPClientConstants.ERROR) + "'," +
                                     " Error Description : '" + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION))
@@ -114,25 +115,25 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                         }
                         return true;
                     } else {
-                        LOG.error("Authorization method '" + headerPrefix + "' not supported for : '"
-                                + request.getUri() + "'.");
+                        LOGGER.debug("Authorization method '{}' not supported for : '{}'.", headerPrefix,
+                                request.getUri());
                         response.setEntity("Authorization method '" + headerPrefix + "' not supported for : '"
                                 + request.getUri() + "'. Please reset the authentication header and try again.")
-                                .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
+                                .setStatus(javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode());
                         return false;
                     }
                 } else {
-                    LOG.error("Malformed Authorization header found for request : '" + request.getUri() + "'.");
+                    LOGGER.debug("Malformed Authorization header found for request : '{}'.", request.getUri());
                     response.setEntity("Malformed authorization header when accessing uri '" +
                             request.getUri() + "'. Please reset the authentication header and try again.")
-                            .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
+                            .setStatus(javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode());
                     return false;
                 }
             } else {
-                LOG.error("Authorization header not found for request : '" + request.getUri() + "'");
+                LOGGER.debug("Authorization header not found for request '{}'", request.getUri());
                 response.setEntity("Authorization is required to access uri '" + request.getUri() + "'. " +
                         "Please set the authentication header and try again.")
-                        .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
+                        .setStatus(javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode());
                 return false;
             }
         }
@@ -141,7 +142,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
     @Override
     public boolean onRequestInterceptionError(Request request, Response response, Exception e) {
         if (e instanceof AuthenticationException) {
-            LOG.error("Authorization invalid for request : '" + request.getUri() + "'", e);
+            LOGGER.debug("Authorization invalid for request '{}'.", request.getUri(), e);
             response.setEntity(e.getMessage())
                     .setMediaType(MediaType.TEXT_PLAIN)
                     .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
@@ -149,7 +150,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
         }
         String message = "Exception while executing request interceptor '" + this.getClass() + "' for uri : '" +
                 request.getUri() + "'. Error: '" + e.getMessage() + "'";
-        LOG.error(message, e);
+        LOGGER.debug(message, e);
         response.setEntity(message)
                 .setMediaType(MediaType.TEXT_PLAIN)
                 .setStatus(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
