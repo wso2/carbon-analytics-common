@@ -473,8 +473,7 @@ public class ExternalIdPClient implements IdPClient {
         if (response != null && response.body() != null) {
             try {
                 String errorDescription = new Gson().fromJson(response.body().toString(), JsonElement.class)
-                        .getAsJsonObject().get("Errors").getAsJsonArray().get(0).getAsJsonObject().get("description")
-                        .getAsString();
+                        .getAsJsonObject().getAsString();
                 errorMessage.append(errorDescription);
             } catch (Exception ex) {
                 LOG.error("Error occurred while parsing error response. Response: '" + response.body().toString() +

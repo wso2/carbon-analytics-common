@@ -59,13 +59,12 @@ public class ServiceComponent {
             String exclude = idPClientConfiguration.getProperties().get(IdPClientConstants.EXCLUDE_INTERCEPTOR);
             Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
             DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
-            if (isInterceptorEnabled) {
-                List<String> collect = Arrays.stream(exclude.replaceAll("\\s*", "")
-                                .split(",")).collect(Collectors.toList());
-                DataHolder.getInstance().setExcludeURLList(collect);
-            } else {
-                DataHolder.getInstance().setExcludeURLList(new ArrayList<>());
+            List<String> excludeURLList = new ArrayList<>();
+            if (exclude != null) {
+                excludeURLList =  Arrays.stream(exclude.replaceAll("\\s*", "")
+                        .split(",")).collect(Collectors.toList());
             }
+            DataHolder.getInstance().setExcludeURLList(excludeURLList);
         }
     }
 
