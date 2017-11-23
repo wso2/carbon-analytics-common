@@ -48,19 +48,15 @@ public class AuthenticationInterceptor implements RequestInterceptor {
 
     @Override
     public boolean interceptRequest(Request request, Response response) throws Exception {
-
         if (!DataHolder.getInstance().isInterceptorEnabled()) {
             return true;
         } else {
-
-            for (String url: DataHolder.getInstance().getExcludeURLList()) {
+            for (String url : DataHolder.getInstance().getExcludeURLList()) {
                 if (request.getUri().contains(url)) {
                     return true;
                 }
             }
-
             IdPClient idPClient = DataHolder.getInstance().getIdPClient();
-
             Headers headers = request.getHeaders();
             String authorizationHeader = request.getHeader(IdPClientConstants.AUTHORIZATION_HEADER);
             if (authorizationHeader != null) {
