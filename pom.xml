@@ -32,15 +32,15 @@
 
     <modules>
         <module>components/authentication</module>
-        <module>components/data-bridge</module>
-        <module>components/permission-provider</module>
+<!--        <module>components/data-bridge</module>
+        <module>components/permission-provider</module>-->
         <module>features/authentication</module>
-        <module>features/data-bridge</module>
+       <!-- <module>features/data-bridge</module>
         <module>features/permission-provider</module>
         <module>features/org.wso2.carbon.analytics-common.data-provider.feature</module>
         <module>coverage-reports</module>
         <module>components/org.wso2.carbon.analytics-common.data-provider</module>
-        <module>components/org.wso2.carbon.database.query.manager</module>
+        <module>components/org.wso2.carbon.database.query.manager</module>-->
     </modules>
 
     <build>
