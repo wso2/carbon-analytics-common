@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.data.provider.spi;
+package org.wso2.carbon.data.provider;
 
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 
@@ -42,5 +42,11 @@ public interface DataProvider {
      */
     void stop();
 
+    /**
+     * Provider configuration validator.
+     * @param providerConfig provider configuration get from the client.
+     * @return validation results.
+     * @throws DataProviderException if the validation failed due to exception.
+     */
     boolean configValidator(ProviderConfig providerConfig) throws DataProviderException;
 }

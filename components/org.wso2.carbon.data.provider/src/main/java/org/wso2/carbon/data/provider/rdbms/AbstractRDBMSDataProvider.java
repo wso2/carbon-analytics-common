@@ -22,13 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
+import org.wso2.carbon.data.provider.DataProvider;
+import org.wso2.carbon.data.provider.ProviderConfig;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean;
 import org.wso2.carbon.data.provider.rdbms.config.RDBMSDataProviderConf;
 import org.wso2.carbon.data.provider.rdbms.utils.RDBMSQueryManager;
-import org.wso2.carbon.data.provider.spi.DataProvider;
-import org.wso2.carbon.data.provider.spi.ProviderConfig;
 import org.wso2.carbon.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -63,9 +63,18 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private String greaterThanWhereSQLQuery;
     private DataSetMetadata metadata;
     private int columnCount;
-    private RDBMSDataProviderConf rdbmsProviderConf;
+    private RDBMSDataProviderConf rdbmsProviderConfig;
     private RDBMSDataProviderConfBean rdbmsDataProviderConfBean;
     private RDBMSQueryManager rdbmsQueryManager;
+
+    public AbstractRDBMSDataProvider() throws DataProviderException {
+        try {
+            rdbmsDataProviderConfBean = DataProviderValueHolder.getConfigProvider().
+                    getConfigurationObject(RDBMSDataProviderConfBean.class);
+        } catch (ConfigurationException e) {
+            throw new DataProviderException("unable to load database query configuration: " + e.getMessage(), e);
+        }
+    }
 
     @Override
     public DataProvider init(String sessionID, ProviderConfig providerConfig) throws DataProviderException {
@@ -74,34 +83,32 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = getConnection(rdbmsProviderConf.getDatasourceName());
+            connection = getConnection(rdbmsProviderConfig.getDatasourceName());
             String databaseName = connection.getMetaData().getDatabaseProductName();
             String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
             rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
-            rdbmsDataProviderConfBean = DataProviderValueHolder.getConfigProvider().
-                    getConfigurationObject(RDBMSDataProviderConfBean.class);
             totalRecordCountQuery = rdbmsQueryManager.getQuery(TOTAL_RECORD_COUNT_QUERY);
             if (totalRecordCountQuery != null) {
-                totalRecordCountQuery = totalRecordCountQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConf
+                totalRecordCountQuery = totalRecordCountQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConfig
                         .getTableName());
             }
             purgingQuery = rdbmsQueryManager.getQuery(RECORD_DELETE_QUERY);
             if (purgingQuery != null) {
-                purgingQuery = purgingQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConf
-                        .getTableName()).replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConf
+                purgingQuery = purgingQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConfig
+                        .getTableName()).replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConfig
                         .getIncrementalColumn());
             }
             greaterThanWhereSQLQuery = rdbmsQueryManager.getQuery(RECORD_GREATER_THAN_QUERY);
             if (greaterThanWhereSQLQuery != null) {
                 greaterThanWhereSQLQuery = greaterThanWhereSQLQuery.replace
-                        (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConf().getIncrementalColumn());
+                        (INCREMENTAL_COLUMN_PLACEHOLDER, getRdbmsProviderConfig().getIncrementalColumn());
             }
             recordLimitQuery = rdbmsQueryManager.getQuery(RECORD_LIMIT_QUERY);
             if (recordLimitQuery != null) {
-                recordLimitQuery = recordLimitQuery.replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConf
-                        .getIncrementalColumn()).replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConf
+                recordLimitQuery = recordLimitQuery.replace(INCREMENTAL_COLUMN_PLACEHOLDER, rdbmsProviderConfig
+                        .getIncrementalColumn()).replace(LIMIT_VALUE_PLACEHOLDER, Long.toString(rdbmsProviderConfig
                         .getPublishingLimit()));
-                customQuery = rdbmsProviderConf.getQuery().concat(recordLimitQuery);
+                customQuery = rdbmsProviderConfig.getQuery().concat(recordLimitQuery);
                 try {
                     statement = connection.prepareStatement(customQuery);
                     resultSet = statement.executeQuery();
@@ -179,8 +186,22 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         }
     }
 
-    public boolean querySanitizingValidator(String query) {
-        return query != null;
+    public boolean querySanitizingValidator(String query, String tableName) {
+        boolean isValidQuery = true;
+        if (query != null && tableName != null) {
+            if (rdbmsDataProviderConfBean.getSqlSelectQuerySanitizingRegex() != null) {
+                isValidQuery = !query.matches(rdbmsDataProviderConfBean.getSqlSelectQuerySanitizingRegex());
+            }
+            if (rdbmsDataProviderConfBean.getSqlWhereQuerySanitizingRegex() != null) {
+                isValidQuery = !query.matches(rdbmsDataProviderConfBean.getSqlWhereQuerySanitizingRegex());
+            }
+            if (rdbmsDataProviderConfBean.getSqlTableNameSanitizingRegex() != null) {
+                isValidQuery = !tableName.matches(rdbmsDataProviderConfBean.getSqlTableNameSanitizingRegex());
+            }
+        } else {
+            isValidQuery = false;
+        }
+        return isValidQuery;
     }
 
     public String getRecordLimitQuery() {
@@ -207,8 +228,8 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         return greaterThanWhereSQLQuery;
     }
 
-    public RDBMSDataProviderConf getRdbmsProviderConf() {
-        return rdbmsProviderConf;
+    public RDBMSDataProviderConf getRdbmsProviderConfig() {
+        return rdbmsProviderConfig;
     }
 
     public RDBMSDataProviderConfBean getRdbmsDataProviderConfBean() {
@@ -217,7 +238,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
 
     @Override
     public void setProviderConfig(ProviderConfig providerConfig) {
-        this.rdbmsProviderConf = (RDBMSDataProviderConf) providerConfig;
+        this.rdbmsProviderConfig = (RDBMSDataProviderConf) providerConfig;
     }
 
     @Override
@@ -228,7 +249,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     @Override
     public boolean configValidator(ProviderConfig providerConfig) throws DataProviderException {
         RDBMSDataProviderConf rdbmsDataProviderConf = (RDBMSDataProviderConf) providerConfig;
-        return querySanitizingValidator(rdbmsDataProviderConf.getQuery());
+        return querySanitizingValidator(rdbmsDataProviderConf.getQuery(), rdbmsDataProviderConf.getTableName());
     }
 
     @Override
@@ -241,7 +262,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         if (totalRecordCountQuery != null && purgingQuery != null) {
             Connection connection;
             try {
-                connection = getConnection(rdbmsProviderConf.getDatasourceName());
+                connection = getConnection(rdbmsProviderConfig.getDatasourceName());
                 PreparedStatement statement = null;
                 ResultSet resultSet = null;
                 try {
@@ -252,9 +273,9 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                     while (resultSet.next()) {
                         totalRecordCount = resultSet.getInt(1);
                     }
-                    if (totalRecordCount > rdbmsProviderConf.getPurgingLimit()) {
+                    if (totalRecordCount > rdbmsProviderConfig.getPurgingLimit()) {
                         String query = purgingQuery.replace(LIMIT_VALUE_PLACEHOLDER,
-                                Long.toString(totalRecordCount - rdbmsProviderConf.getPurgingLimit()));
+                                Long.toString(totalRecordCount - rdbmsProviderConfig.getPurgingLimit()));
                         statement = connection.prepareStatement(query);
                         statement.executeUpdate();
                         connection.commit();

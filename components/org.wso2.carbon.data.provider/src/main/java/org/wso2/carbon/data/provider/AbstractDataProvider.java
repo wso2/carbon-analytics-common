@@ -25,8 +25,6 @@ import org.wso2.carbon.data.provider.api.DataModel;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.data.provider.endpoint.DataProviderEndPoint;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
-import org.wso2.carbon.data.provider.spi.DataProvider;
-import org.wso2.carbon.data.provider.spi.ProviderConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +56,7 @@ public abstract class AbstractDataProvider implements DataProvider {
             return this;
         } else {
             throw new DataProviderException("Invalid configuration provided. Unable to complete initialization " +
-                    "of batch data provider.");
+                    "of data provider.");
         }
     }
 
@@ -98,7 +96,16 @@ public abstract class AbstractDataProvider implements DataProvider {
 
     public abstract void purging();
 
+    /**
+     * Set the provider configuration, child class will be maintained
+     * its own provider configuration bean object.
+     * @param providerConfig client provided configuration.
+     */
     public abstract void setProviderConfig(ProviderConfig providerConfig);
 
+    /**
+     * Get the meta data of the RDBMS provider.
+     * @return rdbms meta data object.
+     */
     public abstract DataSetMetadata getMetadata();
 }

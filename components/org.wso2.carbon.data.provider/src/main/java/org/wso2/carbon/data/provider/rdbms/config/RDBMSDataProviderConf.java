@@ -15,7 +15,7 @@
 */
 package org.wso2.carbon.data.provider.rdbms.config;
 
-import org.wso2.carbon.data.provider.spi.ProviderConfig;
+import org.wso2.carbon.data.provider.ProviderConfig;
 
 /**
  * Model class for the RDBMS provider configurations.

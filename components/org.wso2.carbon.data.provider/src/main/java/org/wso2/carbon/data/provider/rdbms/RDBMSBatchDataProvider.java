@@ -18,6 +18,7 @@ package org.wso2.carbon.data.provider.rdbms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
+import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.sql.Connection;
@@ -32,6 +33,10 @@ import java.util.ArrayList;
 public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSBatchDataProvider.class);
 
+    public RDBMSBatchDataProvider() throws DataProviderException {
+        super();
+    }
+
     @Override
     public void publish(String sessionID) {
         String customQuery = getCustomQuery();
@@ -40,7 +45,7 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
         if (customQuery != null) {
             Connection connection;
             try {
-                connection = getConnection(getRdbmsProviderConf().getDatasourceName());
+                connection = getConnection(getRdbmsProviderConfig().getDatasourceName());
                 PreparedStatement statement = null;
                 ResultSet resultSet = null;
                 try {

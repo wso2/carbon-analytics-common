@@ -18,6 +18,7 @@ package org.wso2.carbon.data.provider.rdbms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
+import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.sql.Connection;
@@ -35,6 +36,10 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSStreamingDataProvider.class);
     private double lastRecordValue = 0;
 
+    public RDBMSStreamingDataProvider() throws DataProviderException {
+        super();
+    }
+
     @Override
     public void publish(String sessionID) {
         String customQuery = getCustomQuery();
@@ -43,12 +48,12 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
         if (customQuery != null) {
             Connection connection;
             try {
-                connection = getConnection(getRdbmsProviderConf().getDatasourceName());
+                connection = getConnection(getRdbmsProviderConfig().getDatasourceName());
                 PreparedStatement statement = null;
                 ResultSet resultSet = null;
                 try {
                     if (lastRecordValue > 0) {
-                        String query = getRdbmsProviderConf().getQuery();
+                        String query = getRdbmsProviderConfig().getQuery();
                         String greaterThanWhereQuery = getGreaterThanWhereSQLQuery().replace
                                 (LAST_RECORD_VALUE_PLACEHOLDER,
                                         Double.toString(lastRecordValue));
@@ -76,7 +81,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                                 }
                                 rowData[i] = resultSet.getObject(i + 1);
                             }
-                            if (metadata.getNames()[i].equals(getRdbmsProviderConf().getIncrementalColumn())) {
+                            if (metadata.getNames()[i].equals(getRdbmsProviderConfig().getIncrementalColumn())) {
                                 lastRecordValue = (double) rowData[i];
                             }
                         }

@@ -53,7 +53,7 @@ public class RDBMSDataProviderConfBean {
             "NTEXT", "NCLOB"};
 
     @Element(description = "Array of time column types in the database.")
-    String[] timeTypes = null;
+    String[] timeTypes = new String[]{"DATE", "TIME", "DATETIME", "TIMESTAMP"};
 
     public String getSqlSelectQuerySanitizingRegex() {
         return sqlSelectQuerySanitizingRegex;
