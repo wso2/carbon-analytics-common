@@ -33,7 +33,7 @@ public class IdPClientConstants {
 
     public static final String SP_AUTH_NAMESPACE = "auth.configs";
     public static final String ENABLE_INTERCEPTOR = "rest.api.enable.auth";
-    public static final String EXCLUDE_INTERCEPTOR = "rest.exclude";
+    public static final String EXCLUDE_INTERCEPTOR = "rest.api.exclude";
 
     public static final String LOGIN_STATUS = "Status";
     public static final String REDIRECTION_URL = "Redirect_Url";
