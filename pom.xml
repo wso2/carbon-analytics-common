@@ -34,13 +34,13 @@
         <module>components/authentication</module>
         <module>components/data-bridge</module>
         <module>components/permission-provider</module>
+        <module>components/org.wso2.carbon.data.provider</module>
+        <module>components/org.wso2.carbon.database.query.manager</module>
         <module>features/authentication</module>
         <module>features/data-bridge</module>
         <module>features/permission-provider</module>
-        <module>features/org.wso2.carbon.analytics-common.data-provider.feature</module>
+        <module>features/org.wso2.carbon.data.provider</module>
         <module>coverage-reports</module>
-        <module>components/org.wso2.carbon.analytics-common.data-provider</module>
-        <module>components/org.wso2.carbon.database.query.manager</module>
     </modules>
 
     <build>
@@ -577,6 +577,18 @@
                 <artifactId>javax.websocket-api</artifactId>
                 <version>${javax.websocket.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${org.snakeyaml.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -647,6 +659,7 @@
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
         <pax.logging.api.version>1.8.5</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
+        <org.snakeyaml.version>1.17</org.snakeyaml.version>
 
 
         <!-- Datasource -->
@@ -692,7 +705,7 @@
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
         <javax.websocket.version>1.1</javax.websocket.version>
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
-
+        <org.snakeyaml.import.version.range>[1.17.0,2.0.0)</org.snakeyaml.import.version.range>
     </properties>
 
 </project>
