@@ -25,7 +25,6 @@ import org.wso2.carbon.data.provider.api.DataModel;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.data.provider.endpoint.DataProviderEndPoint;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
-import org.wso2.carbon.data.provider.rdbms.AbstractRDBMSDataProvider;
 import org.wso2.carbon.data.provider.spi.DataProvider;
 import org.wso2.carbon.data.provider.spi.ProviderConfig;
 

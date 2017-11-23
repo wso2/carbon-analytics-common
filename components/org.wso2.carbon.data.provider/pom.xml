@@ -81,9 +81,8 @@
             <artifactId>org.wso2.carbon.database.query.manager</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.yaml</groupId>
+            <groupId>org.wso2.orbit.org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 

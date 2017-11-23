@@ -67,16 +67,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private RDBMSDataProviderConfBean rdbmsDataProviderConfBean;
     private RDBMSQueryManager rdbmsQueryManager;
 
-    public AbstractRDBMSDataProvider() throws ConfigurationException, SQLException, DataSourceException,
-            IOException, QueryMappingNotAvailableException {
-        Connection connection = getConnection(rdbmsProviderConf.getDatasourceName());
-        String databaseName = connection.getMetaData().getDatabaseProductName();
-        String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
-        rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
-        rdbmsDataProviderConfBean = DataProviderValueHolder.getConfigProvider().
-                getConfigurationObject(RDBMSDataProviderConfBean.class);
-    }
-
     @Override
     public DataProvider init(String sessionID, ProviderConfig providerConfig) throws DataProviderException {
         super.init(sessionID, providerConfig);
@@ -85,6 +75,11 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         ResultSet resultSet = null;
         try {
             connection = getConnection(rdbmsProviderConf.getDatasourceName());
+            String databaseName = connection.getMetaData().getDatabaseProductName();
+            String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
+            rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
+            rdbmsDataProviderConfBean = DataProviderValueHolder.getConfigProvider().
+                    getConfigurationObject(RDBMSDataProviderConfBean.class);
             totalRecordCountQuery = rdbmsQueryManager.getQuery(TOTAL_RECORD_COUNT_QUERY);
             if (totalRecordCountQuery != null) {
                 totalRecordCountQuery = totalRecordCountQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConf
@@ -122,7 +117,9 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                 }
             }
         } catch (SQLException | DataSourceException e) {
-            throw new DataProviderException("Failed to load purging template query.");
+            throw new DataProviderException("Failed to load purging template query: " + e.getMessage(), e);
+        } catch (IOException | QueryMappingNotAvailableException | ConfigurationException e) {
+            throw new DataProviderException("unable to load database query configuration: " + e.getMessage(), e);
         } finally {
             cleanupConnection(resultSet, statement, connection);
         }

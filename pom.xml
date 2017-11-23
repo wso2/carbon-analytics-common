@@ -583,12 +583,6 @@
                 <artifactId>org.wso2.carbon.database.query.manager</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>${org.snakeyaml.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -659,8 +653,6 @@
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
         <pax.logging.api.version>1.8.5</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
-        <org.snakeyaml.version>1.17</org.snakeyaml.version>
-
 
         <!-- Datasource -->
         <carbon.datasource.core.version>1.1.2</carbon.datasource.core.version>

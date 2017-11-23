@@ -17,12 +17,9 @@ package org.wso2.carbon.data.provider.rdbms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
-import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,11 +31,6 @@ import java.util.ArrayList;
  */
 public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSBatchDataProvider.class);
-
-    public RDBMSBatchDataProvider() throws ConfigurationException, SQLException, DataSourceException, IOException,
-            QueryMappingNotAvailableException {
-        super();
-    }
 
     @Override
     public void publish(String sessionID) {
