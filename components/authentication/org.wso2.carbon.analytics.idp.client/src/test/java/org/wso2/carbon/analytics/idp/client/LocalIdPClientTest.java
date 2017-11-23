@@ -169,8 +169,8 @@ public class LocalIdPClientTest {
                 login.get(IdPClientConstants.LOGIN_STATUS));
         String sessionId = login.get(IdPClientConstants.ACCESS_TOKEN);
         Thread.sleep(5000);
-        boolean authenticate = localIdPClient.authenticate(sessionId);
-        Assert.assertEquals(authenticate, true);
+
+        Assert.assertNotNull(localIdPClient.authenticate(sessionId));
     }
 
     @Test
@@ -282,7 +282,6 @@ public class LocalIdPClientTest {
         localIdPClient.logout(properties);
 
         String sessionId = login.get(IdPClientConstants.ACCESS_TOKEN);
-        boolean authenticate = localIdPClient.authenticate(sessionId);
-        Assert.assertEquals(authenticate, false);
+        Assert.assertNotNull(localIdPClient.authenticate(sessionId));
     }
 }

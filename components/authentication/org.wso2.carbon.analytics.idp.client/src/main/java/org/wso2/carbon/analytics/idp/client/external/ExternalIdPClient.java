@@ -344,7 +344,7 @@ public class ExternalIdPClient implements IdPClient {
     }
 
     @Override
-    public boolean authenticate(String token) throws AuthenticationException, IdPClientException {
+    public String authenticate(String token) throws AuthenticationException, IdPClientException {
         Response response = oAuth2ServiceStubs.getIntrospectionServiceStub().introspectToken(token);
 
         if (response == null) {
@@ -357,7 +357,7 @@ public class ExternalIdPClient implements IdPClient {
                 OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                         .decode(response, OAuth2IntrospectionResponse.class);
                 if (introspectResponse.isActive()) {
-                    return true;
+                    return introspectResponse.getUsername();
                 } else {
                     throw new AuthenticationException("The token is not active");
                 }

@@ -150,11 +150,11 @@ public class LocalIdPClient implements IdPClient {
                     } else {
                         Long createdAt = Calendar.getInstance().getTimeInMillis();
                         if (rememberMe) {
-                            session = new Session(userValue, false, createdAt + this.rememberMeTimeout);
+                            session = new Session(userValue, false, userName, createdAt + this.rememberMeTimeout);
                             returnProperties.put(
                                     IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.rememberMeTimeout));
                         } else {
-                            session = new Session(userValue, false, createdAt + this.sessionTimeout);
+                            session = new Session(userValue, false, userName, createdAt + this.sessionTimeout);
                             returnProperties.put(
                                     IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
                         }
@@ -179,7 +179,7 @@ public class LocalIdPClient implements IdPClient {
                 password = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
                 int userHash = (userName + ":" + password).hashCode();
                 Long createdAt = Calendar.getInstance().getTimeInMillis();
-                Session newSession = new Session(userHash, true, createdAt + this.sessionTimeout);
+                Session newSession = new Session(userHash, true, userName, createdAt + this.sessionTimeout);
                 usersToSessionMap.put(userHash, newSession);
                 sessionIdSessionMap.put(newSession.getSessionId().toString(), newSession);
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
@@ -210,16 +210,16 @@ public class LocalIdPClient implements IdPClient {
     }
 
     @Override
-    public boolean authenticate(String token) throws AuthenticationException {
+    public String authenticate(String token) throws AuthenticationException {
         Session session = sessionIdSessionMap.get(token);
         if (session == null) {
             throw new AuthenticationException("The session with id '" + token + "' is not valid.");
         }
         if (session.isInternalUser()) {
-            return true;
+            return IdPClientConstants.SYSTEM_LOGIN;
         }
         if (session.getExpiryTime() > Calendar.getInstance().getTimeInMillis()) {
-            return true;
+            return session.getUsername();
         } else {
             usersToSessionMap.remove(session.getUserHash());
             sessionIdSessionMap.remove(session.getSessionId().toString());
