@@ -106,8 +106,7 @@ public class LocalIdPClientTest {
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
-        loginProperties.put(IdPClientConstants.PASSWORD, "admin2" +
-                "");
+        loginProperties.put(IdPClientConstants.PASSWORD, "admin2");
 
         Map<String, String> login = localIdPClient.login(loginProperties);
         Assert.assertEquals(IdPClientConstants.LoginStatus.LOGIN_FAILURE,
