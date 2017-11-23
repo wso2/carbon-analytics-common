@@ -33,7 +33,6 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * component to get the registered IdPClient OSGi service.
@@ -59,13 +58,11 @@ public class ServiceComponent {
             String exclude = idPClientConfiguration.getProperties().get(IdPClientConstants.EXCLUDE_INTERCEPTOR);
             Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
             DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
-            if (isInterceptorEnabled) {
-                List<String> collect = Arrays.stream(exclude.replaceAll("\\s*", "")
-                                .split(",")).collect(Collectors.toList());
-                DataHolder.getInstance().setExcludeURLList(collect);
-            } else {
-                DataHolder.getInstance().setExcludeURLList(new ArrayList<>());
+            List<String> excludeURLList = new ArrayList<>();
+            if (exclude != null) {
+                excludeURLList =  Arrays.asList(exclude.replaceAll("\\s*", "").split(","));
             }
+            DataHolder.getInstance().setExcludeURLList(excludeURLList);
         }
     }
 
