@@ -190,13 +190,13 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
         boolean isValidQuery = true;
         if (query != null && tableName != null) {
             if (rdbmsDataProviderConfBean.getSqlSelectQuerySanitizingRegex() != null) {
-                isValidQuery = !query.matches(rdbmsDataProviderConfBean.getSqlSelectQuerySanitizingRegex());
+                isValidQuery = query.matches(rdbmsDataProviderConfBean.getSqlSelectQuerySanitizingRegex());
             }
             if (rdbmsDataProviderConfBean.getSqlWhereQuerySanitizingRegex() != null) {
-                isValidQuery = !query.matches(rdbmsDataProviderConfBean.getSqlWhereQuerySanitizingRegex());
+                isValidQuery = query.matches(rdbmsDataProviderConfBean.getSqlWhereQuerySanitizingRegex());
             }
             if (rdbmsDataProviderConfBean.getSqlTableNameSanitizingRegex() != null) {
-                isValidQuery = !tableName.matches(rdbmsDataProviderConfBean.getSqlTableNameSanitizingRegex());
+                isValidQuery = tableName.matches(rdbmsDataProviderConfBean.getSqlTableNameSanitizingRegex());
             }
         } else {
             isValidQuery = false;
