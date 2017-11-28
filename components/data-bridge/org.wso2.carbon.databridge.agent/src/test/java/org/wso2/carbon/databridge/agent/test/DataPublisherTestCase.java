@@ -49,7 +49,7 @@ public class DataPublisherTestCase {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
-    private String agentConfigFileName = "data-agent-config.xml";
+    private String agentConfigFileName = "data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -76,7 +76,7 @@ public class DataPublisherTestCase {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
             TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://localhost:9687",
                 "ssl://localhost:9787", "admin", "admin");
@@ -257,6 +257,34 @@ public class DataPublisherTestCase {
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
         testServer.resetReceivedEvents();
         testServer.stop();
+    }
+
+    @Test(expectedExceptions = DataEndpointConfigurationException.class)
+    public void endpointValidityCheck1() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException {
+
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
+        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+
+        DataPublisher dataPublisher = new DataPublisher("Binary",
+                "{tcp://" + hostName + ":9129|tcp://" + hostName + ":9229,tcp://" + hostName + ":9229}",
+                "{ssl://" + hostName + ":9130,ssl://" + hostName + ":9230}", "admin", "admin");
+
+    }
+
+    @Test(expectedExceptions = DataEndpointConfigurationException.class)
+    public void endpointValidityCheck2() throws DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
+            DataEndpointConfigurationException {
+
+        AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
+        String hostName = DataPublisherTestUtil.LOCAL_HOST;
+
+        DataPublisher dataPublisher = new DataPublisher("Binary",
+                "{tcp://" + hostName + ":9129|tcp://" + hostName + ":9229}",
+                "{ssl://" + hostName + ":9130}", "admin", "admin");
+
     }
 
 }

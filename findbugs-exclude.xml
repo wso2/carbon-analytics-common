@@ -67,18 +67,6 @@
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender"/>
-        <Bug pattern="DM_DEFAULT_ENCODING"/>
-    </Match>
-    <Match>
-        <Class name="org.wso2.carbon.databridge.agent.client.ClientPool"/>
-        <Bug pattern="DC_DOUBLECHECK, IS2_INCONSISTENT_SYNC"/>
-    </Match>
-    <Match>
-        <Class name="org.wso2.carbon.databridge.agent.endpoint.EventPublisherThreadPoolExecutor"/>
-        <Bug pattern="DMI_THREAD_PASSED_WHERE_RUNNABLE_EXPECTED"/>
-    </Match>
-    <Match>
         <Class name="org.wso2.carbon.data.provider.api.DataSetMetadata"/>
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
     </Match>
