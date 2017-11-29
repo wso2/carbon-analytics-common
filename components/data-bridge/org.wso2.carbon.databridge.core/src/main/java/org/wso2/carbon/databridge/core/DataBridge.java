@@ -19,6 +19,7 @@
 package org.wso2.carbon.databridge.core;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.config.ConfigProviderFactory;
 import org.wso2.carbon.config.ConfigurationException;
@@ -80,6 +81,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     private AtomicInteger totalEventCounter;
     private long startTime;
     private boolean isProfileReceiver;
+    private int cutoff = 100000;
 
     public DataBridge(AuthenticationHandler authenticationHandler,
                       AbstractStreamDefinitionStore streamDefinitionStore,
@@ -91,11 +93,17 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         authenticatorHandler = authenticationHandler;
         authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
         String profileReceiver = System.getProperty("profileReceiver");
+        String receiverStatsCutoff = System.getProperty("receiverStatsCutoff");
+
         if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
             isProfileReceiver = true;
             eventsReceived = new AtomicInteger();
             totalEventCounter = new AtomicInteger();
             startTime = 0;
+
+            if (receiverStatsCutoff != null && StringUtils.isNumeric(receiverStatsCutoff)) {
+                this.cutoff = Integer.parseInt(receiverStatsCutoff);
+            }
         }
     }
 
@@ -114,11 +122,17 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         authenticatorHandler = authenticationHandler;
         authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
         String profileReceiver = System.getProperty("profileReceiver");
+        String receiverStatsCutoff = System.getProperty("receiverStatsCutoff");
+
         if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
             isProfileReceiver = true;
             eventsReceived = new AtomicInteger();
             totalEventCounter = new AtomicInteger();
             startTime = 0;
+
+            if (receiverStatsCutoff != null && StringUtils.isNumeric(receiverStatsCutoff)) {
+                this.cutoff = Integer.parseInt(receiverStatsCutoff);
+            }
         }
     }
 
@@ -262,9 +276,9 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     private void endTimeMeasurement(int eventsNum) {
         if (isProfileReceiver) {
             eventsReceived.addAndGet(eventsNum);
-            if (eventsReceived.get() > 100000) {
+            if (eventsReceived.get() > cutoff) {
                 synchronized (this) {
-                    if (eventsReceived.get() > 100000) {
+                    if (eventsReceived.get() > cutoff) {
                         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                         Date date = new Date();
 

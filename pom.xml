@@ -297,6 +297,11 @@
                 <artifactId>commons-pool</artifactId>
                 <version>${commons.pool.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
 
             <!-- OSGi test -->
             <dependency>
@@ -594,6 +599,22 @@
                 <artifactId>org.wso2.carbon.database.query.manager</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
+
+            <!-- Databridge legacy dependencies for testing purposes-->
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
+                <version>4.2.3</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -707,6 +728,9 @@
         <javax.websocket.version>1.1</javax.websocket.version>
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <org.snakeyaml.import.version.range>[1.17.0,2.0.0)</org.snakeyaml.import.version.range>
+        <awaitility.version>3.0.0</awaitility.version>
+        <commons-lang3.version>3.3.2</commons-lang3.version>
+
     </properties>
 
 </project>
