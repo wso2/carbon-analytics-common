@@ -75,20 +75,27 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                     properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
         }
 
-        List<Role> roles = idPClientConfiguration.getUserStore().getRoles().stream().map(roleElement ->
-                new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplay())
+        List<Role> roles = idPClientConfiguration.getUserManager().getUserStore().getRoles().stream()
+                .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplay())
         ).collect(Collectors.toList());
 
-        List<User> users = idPClientConfiguration.getUserStore().getUsers().stream().map(userElement -> {
-            UserChildElement user = userElement.getUser();
-            List<String> roleIdList = Arrays.asList(user.getRoles().replaceAll("\\s*", "").split(","));
-            List<Role> userRolesFromId = roles.stream()
-                    .filter((role) -> roleIdList.contains(role.getId()))
-                    .collect(Collectors.toList());
+        String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
+        Role adminRole = roles.stream().filter(role -> role.getDisplayName().equalsIgnoreCase(adminRoleDisplayName))
+                .findFirst()
+                .orElseThrow(() -> new IdPClientException("Admin role '" + adminRoleDisplayName + "' is not available" +
+                        " in the User Store."));
+
+        List<User> users = idPClientConfiguration.getUserManager().getUserStore().getUsers().stream()
+                .map(userElement -> {
+                    UserChildElement user = userElement.getUser();
+                    List<String> roleIdList = Arrays.asList(user.getRoles().replaceAll("\\s*", "").split(","));
+                    List<Role> userRolesFromId = roles.stream()
+                            .filter((role) -> roleIdList.contains(role.getId()))
+                            .collect(Collectors.toList());
             return new User(user.getUsername(), user.getPassword(), user.getProperties(), userRolesFromId);
         }).collect(Collectors.toList());
 
-        return new LocalIdPClient(sessionTimeout, users, roles);
+        return new LocalIdPClient(sessionTimeout, users, roles, adminRole);
     }
 
 }

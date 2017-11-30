@@ -122,9 +122,11 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         SCIM2ServiceStub scimServiceStub = SCIM2ServiceStubFactory
                 .getSCIMServiceStub(idPBaseUrl, idPUserName, idPPassword, idPCertAlias);
 
+        String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
+
         return new ExternalIdPClient(baseUrl, kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX,
-                grantType, signingAlgo, spAppName, oAuthAppNames, dcrmServiceStub, keyManagerServiceStubs,
-                scimServiceStub);
+                grantType, signingAlgo, adminRoleDisplayName, spAppName, oAuthAppNames, dcrmServiceStub,
+                keyManagerServiceStubs, scimServiceStub);
     }
 
 }

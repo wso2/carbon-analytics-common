@@ -63,19 +63,21 @@ public class ExternalIdPClient implements IdPClient {
     private String authorizeEndpoint;
     private String grantType;
     private String signingAlgo;
+    private String adminRoleDisplayName;
 
     //Here the user given values are mapped to the constant name.
     private String spOAuthAppName;
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
 
     public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String singingAlgo,
-                             String spOAuthAppName, List<String> oAuthAppNames, DCRMServiceStub dcrmServiceStub,
-                             OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub)
-            throws IdPClientException {
+                             String adminRoleDisplayName, String spOAuthAppName, List<String> oAuthAppNames,
+                             DCRMServiceStub dcrmServiceStub, OAuth2ServiceStubs oAuth2ServiceStubs,
+                             SCIM2ServiceStub scimServiceStub) throws IdPClientException {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
         this.grantType = grantType;
         this.signingAlgo = singingAlgo;
+        this.adminRoleDisplayName = adminRoleDisplayName;
         this.spOAuthAppName = spOAuthAppName;
         this.dcrmServiceStub = dcrmServiceStub;
         this.oAuth2ServiceStubs = oAuth2ServiceStubs;
@@ -86,7 +88,7 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public List<Role> getAllRoles() throws IdPClientException {
-        Response response = scimServiceStub.getGroups();
+        Response response = scimServiceStub.getAllGroups();
         if (response == null) {
             String errorMessage = "Error occurred while retrieving all groups. Error : Response is null.";
             LOG.error(errorMessage);
@@ -111,6 +113,41 @@ public class ExternalIdPClient implements IdPClient {
         } else {
             String errorMessage = "Error occurred while retrieving groups. HTTP error code: " + response.status() +
                     " Error Response: " + getErrorMessage(response);
+            LOG.error(errorMessage);
+            throw new IdPClientException(errorMessage);
+        }
+    }
+
+    @Override
+    public Role getAdminRole() throws IdPClientException {
+        Response response = scimServiceStub
+                .getFilteredGroups(ExternalIdPClientConstants.FILTER_PREFIX_GROUP + this.adminRoleDisplayName);
+        if (response == null) {
+            String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName +
+                    "'. Error : Response is null.";
+            LOG.error(errorMessage);
+            throw new IdPClientException(errorMessage);
+        }
+        if (response.status() == 200) {
+            try {
+                SCIMGroupList scimGroups = (SCIMGroupList) new GsonDecoder().decode(response, SCIMGroupList.class);
+                List<SCIMGroupList.SCIMGroupResources> resources = scimGroups.getResources();
+                if (resources != null) {
+                    return new Role(resources.get(0).getId(), resources.get(0).getDisplayName());
+                }
+                String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName +
+                        "'. Admin role not found in the user store.";
+                LOG.error(errorMessage);
+                throw new IdPClientException(errorMessage);
+            } catch (IOException e) {
+                String errorMessage = "Error occurred while parsing the response when retrieving admin group '"
+                        + this.adminRoleDisplayName + "'. Response: '" + response.body().toString();
+                LOG.error(errorMessage, e);
+                throw new IdPClientException(errorMessage, e);
+            }
+        } else {
+            String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName + "'. " +
+                    "HTTP error code: " + response.status() + " Error Response: " + getErrorMessage(response);
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
