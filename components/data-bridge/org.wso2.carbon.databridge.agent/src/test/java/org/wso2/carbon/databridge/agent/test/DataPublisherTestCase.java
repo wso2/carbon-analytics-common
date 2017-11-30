@@ -30,7 +30,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.test.binary.BinaryTestServer;
-import org.wso2.carbon.databridge.agent.test.binary.OneEndPointDPBinaryTest;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
@@ -45,7 +44,7 @@ import java.util.Map;
  * Datapublisher Test Case.
  */
 public class DataPublisherTestCase {
-    Logger log = Logger.getLogger(OneEndPointDPBinaryTest.class);
+    Logger log = Logger.getLogger(DataPublisherTestCase.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
