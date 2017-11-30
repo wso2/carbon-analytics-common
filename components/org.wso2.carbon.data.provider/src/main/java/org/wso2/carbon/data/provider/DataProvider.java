@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.data.provider;
 
+import org.wso2.carbon.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 
 /**
@@ -28,9 +29,12 @@ public interface DataProvider {
     /**
      * Initialize the instance with the session id.
      *
-     * @param sessionID Session id of the session associated with the connection.
+     * @param topic   to receive topic messages, data provider send event with this topic.
+     * @param message provider configuration message in json format.
+     * @return data provider initialized with provider configuration.
+     * @throws DataProviderException if there any initialization failures.
      */
-    DataProvider init(String sessionID, ProviderConfig providerConfig) throws DataProviderException;
+    DataProvider init(String topic, String message) throws DataProviderException;
 
     /**
      * Start pushing data to the client from the data sources.
@@ -44,9 +48,31 @@ public interface DataProvider {
 
     /**
      * Provider configuration validator.
+     *
      * @param providerConfig provider configuration get from the client.
      * @return validation results.
      * @throws DataProviderException if the validation failed due to exception.
      */
     boolean configValidator(ProviderConfig providerConfig) throws DataProviderException;
+
+    /**
+     * Get the data provider name.
+     *
+     * @return name of the data provider.
+     */
+    String providerName();
+
+    /**
+     * Get the data provider meta data object.
+     *
+     * @return meta data of the data provider.
+     */
+    DataSetMetadata dataSetMetadata();
+
+    /**
+     * Get the data provider configuration.
+     *
+     * @return configuration of the data provider.
+     */
+    String providerConfig();
 }

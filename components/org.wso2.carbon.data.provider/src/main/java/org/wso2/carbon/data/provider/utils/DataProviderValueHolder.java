@@ -19,15 +19,23 @@
 package org.wso2.carbon.data.provider.utils;
 
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.websocket.Session;
 
 /**
  * Value holder for data provider.
  */
 public class DataProviderValueHolder {
     private static DataProviderValueHolder dataProviderHelper = null;
-    private static DataSourceService dataSourceService = null;
-    private static ConfigProvider configProvider = null;
+    private DataSourceService dataSourceService = null;
+    private ConfigProvider configProvider = null;
+    private Map<String, DataProvider> dataProviderMap = new HashMap<>();
+    private Session session;
+    private Map<String, DataProvider> topicProviderMap = new HashMap<>();
 
     public static DataProviderValueHolder getDataProviderHelper() {
         if (dataProviderHelper == null) {
@@ -36,19 +44,47 @@ public class DataProviderValueHolder {
         return dataProviderHelper;
     }
 
-    public static DataSourceService getDataSourceService() {
+    public DataSourceService getDataSourceService() {
         return dataSourceService;
     }
 
-    public static void setDataSourceService(DataSourceService dataSourceService) {
-        DataProviderValueHolder.dataSourceService = dataSourceService;
+    public void setDataSourceService(DataSourceService dataSourceService) {
+        this.dataSourceService = dataSourceService;
     }
 
-    public static ConfigProvider getConfigProvider() {
+    public ConfigProvider getConfigProvider() {
         return configProvider;
     }
 
-    public static void setConfigProvider(ConfigProvider configProvider) {
-        DataProviderValueHolder.configProvider = configProvider;
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+    }
+
+    public void setDataProvider(String providerName, DataProvider dataProvider) {
+        this.dataProviderMap.put(providerName, dataProvider);
+    }
+
+    public DataProvider getDataProvider(String providerName) {
+        return this.dataProviderMap.get(providerName);
+    }
+
+    public Map<String, DataProvider> getDataProviderMap() {
+        return dataProviderMap;
+    }
+
+    public void setTopicProvider(String dataProviderTopic, DataProvider dataProvider) {
+        this.topicProviderMap.put(dataProviderTopic, dataProvider);
+    }
+
+    public Map<String, DataProvider> getTopicProviderMap() {
+        return topicProviderMap;
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 }

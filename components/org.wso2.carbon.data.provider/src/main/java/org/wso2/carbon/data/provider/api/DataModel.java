@@ -23,11 +23,13 @@ public class DataModel {
     private final DataSetMetadata metadata;
     private final Object[][] data;
     private final int lastRow;
+    private final String topic;
 
-    public DataModel(DataSetMetadata metadata, Object[][] data, int lastRow) {
+    public DataModel(DataSetMetadata metadata, Object[][] data, int lastRow, String topic) {
         this.metadata = metadata;
         this.data = data;
         this.lastRow = lastRow;
+        this.topic = topic;
     }
 
     public DataSetMetadata getMetadata() {
@@ -40,5 +42,9 @@ public class DataModel {
 
     public int getLastRow() {
         return lastRow;
+    }
+
+    public String getTopic() {
+        return topic;
     }
 }

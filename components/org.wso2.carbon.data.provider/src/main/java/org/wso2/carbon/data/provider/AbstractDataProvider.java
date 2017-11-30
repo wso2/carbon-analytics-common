@@ -37,18 +37,17 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractDataProvider implements DataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDataProvider.class);
-    private String sessionID;
+    private String topic;
     private ScheduledExecutorService dataPublishingExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService dataPurgingExecutorService = Executors.newSingleThreadScheduledExecutor();
     private long publishingInterval;
     private long purgingInterval;
     private boolean isPurgingEnable;
 
-    @Override
-    public DataProvider init(String sessionID, ProviderConfig providerConfig)
+    public DataProvider init(String topic, ProviderConfig providerConfig)
             throws DataProviderException {
         if (configValidator(providerConfig)) {
-            this.sessionID = sessionID;
+            this.topic = topic;
             this.publishingInterval = providerConfig.getPublishingInterval();
             this.purgingInterval = providerConfig.getPurgingInterval();
             this.isPurgingEnable = providerConfig.isPurgingEnable();
@@ -69,7 +68,7 @@ public abstract class AbstractDataProvider implements DataProvider {
     @Override
     public void start() {
         dataPublishingExecutorService.scheduleAtFixedRate(() -> {
-            publish(this.sessionID);
+            publish(this.topic);
         }, 0, publishingInterval, TimeUnit.SECONDS);
         if (isPurgingEnable) {
             dataPublishingExecutorService.scheduleAtFixedRate(() -> {
@@ -78,11 +77,11 @@ public abstract class AbstractDataProvider implements DataProvider {
         }
     }
 
-    public void publishToEndPoint(ArrayList<Object[]> data, String sessionID) {
+    public void publishToEndPoint(ArrayList<Object[]> data, String topic) {
         if (data.size() > 0) {
-            DataModel dataModel = new DataModel(getMetadata(), data.toArray(new Object[0][0]), -1);
+            DataModel dataModel = new DataModel(getMetadata(), data.toArray(new Object[0][0]), -1, topic);
             try {
-                DataProviderEndPoint.sendText(new Gson().toJson(dataModel), sessionID);
+                DataProviderEndPoint.sendText(new Gson().toJson(dataModel));
             } catch (IOException e) {
                 LOGGER.error("Failed to deliver message to client " + e.getMessage(), e);
             }
@@ -92,19 +91,21 @@ public abstract class AbstractDataProvider implements DataProvider {
     @Override
     public abstract boolean configValidator(ProviderConfig providerConfig) throws DataProviderException;
 
-    public abstract void publish(String sessionID);
+    public abstract void publish(String topic);
 
     public abstract void purging();
 
     /**
      * Set the provider configuration, child class will be maintained
      * its own provider configuration bean object.
+     *
      * @param providerConfig client provided configuration.
      */
     public abstract void setProviderConfig(ProviderConfig providerConfig);
 
     /**
      * Get the meta data of the RDBMS provider.
+     *
      * @return rdbms meta data object.
      */
     public abstract DataSetMetadata getMetadata();

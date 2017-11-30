@@ -15,8 +15,10 @@
 */
 package org.wso2.carbon.data.provider.rdbms;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -32,6 +34,11 @@ import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.L
 /**
  * RDBMS streaming data provider instance.
  */
+@Component(
+        name = "rdbms-streaming-data-provider",
+        service = DataProvider.class,
+        immediate = true
+)
 public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSStreamingDataProvider.class);
     private double lastRecordValue = 0;
@@ -41,7 +48,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
     }
 
     @Override
-    public void publish(String sessionID) {
+    public void publish(String topic) {
         String customQuery = getCustomQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
@@ -87,7 +94,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                         }
                         data.add(rowData);
                     }
-                    publishToEndPoint(data, sessionID);
+                    publishToEndPoint(data, topic);
                 } catch (SQLException e) {
                     LOGGER.error("SQL exception occurred " + e.getMessage(), e);
                 } finally {

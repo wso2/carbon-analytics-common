@@ -15,8 +15,10 @@
 */
 package org.wso2.carbon.data.provider.rdbms;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -30,6 +32,11 @@ import java.util.ArrayList;
 /**
  * RDBMS batch data provider instance.
  */
+@Component(
+        name = "rdbms-batch-data-provider",
+        service = DataProvider.class,
+        immediate = true
+)
 public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSBatchDataProvider.class);
 
@@ -38,7 +45,7 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
     }
 
     @Override
-    public void publish(String sessionID) {
+    public void publish(String topic) {
         String customQuery = getCustomQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
@@ -72,7 +79,7 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
                         }
                         data.add(rowData);
                     }
-                    publishToEndPoint(data, sessionID);
+                    publishToEndPoint(data, topic);
                 } catch (SQLException e) {
                     LOGGER.error("SQL exception occurred " + e.getMessage(), e);
                 } finally {

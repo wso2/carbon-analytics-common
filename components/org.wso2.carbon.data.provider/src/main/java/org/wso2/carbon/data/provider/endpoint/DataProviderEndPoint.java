@@ -16,7 +16,6 @@
 package org.wso2.carbon.data.provider.endpoint;
 
 
-import com.google.gson.Gson;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -25,17 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.DataProvider;
-import org.wso2.carbon.data.provider.ProviderConfig;
-import org.wso2.carbon.data.provider.rdbms.RDBMSBatchDataProvider;
-import org.wso2.carbon.data.provider.rdbms.RDBMSStreamingDataProvider;
-import org.wso2.carbon.data.provider.rdbms.config.RDBMSDataProviderConf;
-import org.wso2.carbon.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -43,6 +35,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+
+import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDataProviderHelper;
 
 /**
  * Data provider web socket endpoint.
@@ -52,11 +46,9 @@ import javax.websocket.server.ServerEndpoint;
         service = WebSocketEndpoint.class,
         immediate = true
 )
-@ServerEndpoint(value = "/data-provider/{sourceType}")
+@ServerEndpoint(value = "/data-provider/{sourceType}/{topic}")
 public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderEndPoint.class);
-    private static final Map<String, Session> sessionMap = new HashMap<>();
-    private final Map<String, DataProvider> providerMap = new HashMap<>();
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -66,11 +58,11 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             unbind = "unregisterDataSourceService"
     )
     protected void registerDataSourceService(DataSourceService service) {
-        DataProviderValueHolder.setDataSourceService(service);
+        getDataProviderHelper().setDataSourceService(service);
     }
 
     protected void unregisterDataSourceService(DataSourceService service) {
-        DataProviderValueHolder.setDataSourceService(null);
+        getDataProviderHelper().setDataSourceService(null);
     }
 
     @Reference(service = ConfigProvider.class,
@@ -78,11 +70,11 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetConfigProvider")
     protected void setConfigProvider(ConfigProvider configProvider) {
-        DataProviderValueHolder.setConfigProvider(configProvider);
+        getDataProviderHelper().setConfigProvider(configProvider);
     }
 
     protected void unsetConfigProvider(ConfigProvider configProvider) {
-        DataProviderValueHolder.setConfigProvider(null);
+        getDataProviderHelper().setConfigProvider(null);
     }
 
     /**
@@ -91,41 +83,36 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      * @param session Session object associated with the connection
      */
     @OnOpen
-    public void onOpen(Session session) {
-        sessionMap.put(session.getId(), session);
+    public static void onOpen(Session session) {
+        if (getDataProviderHelper().getSession() == null) {
+            getDataProviderHelper().setSession(session);
+        }
     }
 
     /**
      * Create DataProvider instance, start it and store it in the providerMap.
      *
      * @param message    String message received from the web client
-     * @param sourceType datasource type from the Path parameter
+     * @param sourceType provider type from the Path parameter
+     * @param topic      client topic from the Path parameter
      * @param session    Session object associated with the connection
      */
     @OnMessage
-    public void onMessage(String message, @PathParam("sourceType") String sourceType, Session session) {
+    public void onMessage(String message, @PathParam("sourceType") String sourceType,
+                          @PathParam("topic") String topic, Session session) {
         try {
-            DataProvider dataProvider;
-            ProviderConfig providerConfig;
-            switch (sourceType) {
-                case "rdbms-batch":
-                    providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
-                    dataProvider = new RDBMSBatchDataProvider().init(session.getId(), providerConfig);
-                    dataProvider.start();
-                    break;
-                case "rdbms-streaming":
-                    providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
-                    dataProvider = new RDBMSStreamingDataProvider().init(session.getId(), providerConfig);
-                    dataProvider.start();
-                    break;
-                default:
-                    throw new Exception("Provider type: " + sourceType + " not registered.");
+            DataProvider dataProvider = getDataProviderHelper().getDataProvider(sourceType);
+            dataProvider.init(topic, message).start();
+            if (getDataProviderHelper().getTopicProviderMap().containsKey(topic)) {
+                getDataProviderHelper().getTopicProviderMap().get(topic).stop();
             }
-            if (providerMap.containsKey(session.getId())) {
-                providerMap.get(session.getId()).stop();
-            }
-            providerMap.put(session.getId(), dataProvider);
+            getDataProviderHelper().getTopicProviderMap().put(topic, dataProvider);
         } catch (Exception e) {
+            try {
+                sendText("Error initializing the data provider endpoint.");
+            } catch (IOException e1) {
+                //ignore
+            }
             LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType + ". "
                     + e.getMessage(), e);
             onError(e);
@@ -139,9 +126,11 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
-        providerMap.get(session.getId()).stop(); //stop the pushing service
-        providerMap.remove(session.getId()); //remove the provider from the map
-        sessionMap.remove(session.getId()); //remove the session from sessionMap
+        for (String topic : getDataProviderHelper().getTopicProviderMap().keySet()) {
+            getDataProviderHelper().getTopicProviderMap().get(topic).stop(); //stop the pushing service
+            getDataProviderHelper().getTopicProviderMap().remove(topic); //remove the provider from the map
+        }
+        getDataProviderHelper().setSession(null);
     }
 
     /**
@@ -155,11 +144,14 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     /**
      * Send message to specific client.
      *
-     * @param text      String message to be sent to the client
-     * @param sessionId String session id of the session
+     * @param text String message to be sent to the client
      * @throws IOException If there is a problem delivering the message
      */
-    public static void sendText(String text, String sessionId) throws IOException {
-        sessionMap.get(sessionId).getBasicRemote().sendText(text);
+    public static void sendText(String text) throws IOException {
+        if (getDataProviderHelper().getSession() == null) {
+            getDataProviderHelper().getSession().getBasicRemote().sendText(text);
+        }
     }
+
+
 }

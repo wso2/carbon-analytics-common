@@ -21,6 +21,7 @@ package org.wso2.carbon.data.provider.rdbms.bean;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 import org.wso2.carbon.database.query.manager.config.Queries;
+
 import java.util.ArrayList;
 
 /**
