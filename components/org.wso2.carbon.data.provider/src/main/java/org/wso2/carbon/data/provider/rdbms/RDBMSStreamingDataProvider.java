@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.api.DataSetMetadata;
-import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.sql.Connection;
@@ -42,10 +41,6 @@ import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.L
 public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDBMSStreamingDataProvider.class);
     private double lastRecordValue = 0;
-
-    public RDBMSStreamingDataProvider() throws DataProviderException {
-        super();
-    }
 
     @Override
     public void publish(String topic) {

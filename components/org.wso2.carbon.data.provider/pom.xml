@@ -113,7 +113,9 @@
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.websocket.WebSocketEndpoint"
+            osgi.service; objectClass="org.wso2.msf4j.websocket.WebSocketEndpoint",
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
+            osgi.service; objectClass="org.wso2.carbon.data.provider.DataProvider";serviceCount="2"
         </carbon.component>
     </properties>
 

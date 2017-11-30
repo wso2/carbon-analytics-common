@@ -18,9 +18,7 @@
 
 package org.wso2.carbon.data.provider.rdbms;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
@@ -70,17 +68,14 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private RDBMSDataProviderConfBean rdbmsDataProviderConfBean;
     private RDBMSQueryManager rdbmsQueryManager;
 
-    public AbstractRDBMSDataProvider() throws DataProviderException {
+    @Override
+    public DataProvider init(String topic, String message) throws DataProviderException {
         try {
             rdbmsDataProviderConfBean = getDataProviderHelper().getConfigProvider().
                     getConfigurationObject(RDBMSDataProviderConfBean.class);
         } catch (ConfigurationException e) {
             throw new DataProviderException("unable to load database query configuration: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public DataProvider init(String topic, String message) throws DataProviderException {
         ProviderConfig providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
         super.init(topic, providerConfig);
         Connection connection = null;
@@ -258,7 +253,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
 
     @Override
     public String providerName() {
-        return this.getClass().getSimpleName().replaceAll("(\\p{Ll})(\\p{Lu})", "$1 $2");
+        return this.getClass().getSimpleName();
     }
 
     @Override
@@ -268,10 +263,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
 
     @Override
     public String providerConfig() {
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES)
-                .create();
-        return gson.toJson(new RDBMSDataProviderConf());
+        return new Gson().toJson(new RDBMSDataProviderConf());
     }
 
     @Override
