@@ -380,8 +380,8 @@ public class LegacyDataPublisherTestCase {
             TransportException, AuthenticationException, AgentException,
             DifferentStreamDefinitionAlreadyDefinedException, StreamDefinitionException, InterruptedException {
 
-        startServer(7614);
-        DataPublisher dataPublisher = new DataPublisher("tcp://localhost:7614", "admin", "admin");
+        startServer(7732);
+        DataPublisher dataPublisher = new DataPublisher("tcp://localhost:7732", "admin", "admin");
 
         dataPublisher.defineStream("{" +
                 "  'name':'org.wso2.esb.MediatorStatistics'," +
