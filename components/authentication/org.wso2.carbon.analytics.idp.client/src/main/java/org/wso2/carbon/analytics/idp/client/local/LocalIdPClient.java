@@ -47,14 +47,16 @@ public class LocalIdPClient implements IdPClient {
     private int sessionTimeout;
     private int rememberMeTimeout;
     private List<User> usersList;
+    private Role adminRole;
     private List<Role> rolesList;
     private int systemLoginCount;
 
-    public LocalIdPClient(int sessionTimeOut, List<User> users, List<Role> roles) {
+    public LocalIdPClient(int sessionTimeOut, List<User> users, List<Role> roles, Role adminRole) {
         this.sessionTimeout = sessionTimeOut * 1000;
         this.systemLoginCount = 0;
         // NOTE: the rememberMe timeout is set at 7 days
         this.rememberMeTimeout = 7 * 24 * 60 * 60 * 1000;
+        this.adminRole = adminRole;
         this.rolesList = roles;
         this.usersList = users;
     }
@@ -62,6 +64,11 @@ public class LocalIdPClient implements IdPClient {
     @Override
     public List<Role> getAllRoles() {
         return rolesList;
+    }
+
+    @Override
+    public Role getAdminRole() {
+        return adminRole;
     }
 
     @Override

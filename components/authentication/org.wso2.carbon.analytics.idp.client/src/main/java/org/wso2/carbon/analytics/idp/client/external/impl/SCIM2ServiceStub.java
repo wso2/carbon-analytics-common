@@ -30,6 +30,9 @@ public interface SCIM2ServiceStub {
     Response searchUser(@Param("query") String query);
 
     @RequestLine("GET /Groups")
-    Response getGroups();
+    Response getAllGroups();
+
+    @RequestLine("GET /Groups?filter={query}")
+    Response getFilteredGroups(@Param("query") String query);
 
 }

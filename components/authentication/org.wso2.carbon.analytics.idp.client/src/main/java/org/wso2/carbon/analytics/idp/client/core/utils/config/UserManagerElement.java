@@ -20,33 +20,23 @@ package org.wso2.carbon.analytics.idp.client.core.utils.config;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * IdP configurations.
+ * User manager Element.
  */
-@Configuration(namespace = "auth.configs", description = "SP Authorization Configuration Parameters")
-public class IdPClientConfiguration {
+@Configuration(description = "User Manager Element")
+public class UserManagerElement {
 
-    @Element(description = "Client Type", required = true)
-    private String type = "local";
+    @Element(description = "Admin Role - Display name of the role defined in the user store", required = true)
+    private String adminRole = "admin";
 
-    @Element(description = "Client properties")
-    private Map<String, String> properties = new HashMap<>();
+    @Element(description = "User Store")
+    private UserStoreElement userStore = new UserStoreElement();
 
-    @Element(description = "User Manager")
-    private UserManagerElement userManager = new UserManagerElement();
-
-    public String getType() {
-        return type;
+    public String getAdminRole() {
+        return adminRole;
     }
 
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    public UserManagerElement getUserManager() {
-        return userManager;
+    public UserStoreElement getUserStore() {
+        return userStore;
     }
 }

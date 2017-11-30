@@ -71,6 +71,7 @@ public class ExternalIdPClientConstants {
     public static final String REGEX_BASE_END = ".*)";
 
     public static final String FILTER_PREFIX_USER = "userName Eq ";
+    public static final String FILTER_PREFIX_GROUP = "displayName Eq ";
     public static final String EMPTY_STRING = "";
     public static final String RESOURCES = "Resources";
 
