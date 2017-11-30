@@ -153,6 +153,15 @@ public class DefaultPermissionProvider implements PermissionProvider {
             log.debug("Check permission " + permission);
         }
         List<Role> roles = getRoles(username);
+        org.wso2.carbon.analytics.idp.client.core.models.Role adminRole;
+        try {
+            adminRole = idPClient.getAdminRole();
+            if (roles.stream().anyMatch(role -> role.getId().equals(adminRole.getId()))) {
+                return true;
+            }
+        } catch (IdPClientException e) {
+            throw new PermissionException("Failed getting admin role.");
+        }
         if (roles.size() == 0) {
             log.debug("No roles retrieved for the user.");
             return false;

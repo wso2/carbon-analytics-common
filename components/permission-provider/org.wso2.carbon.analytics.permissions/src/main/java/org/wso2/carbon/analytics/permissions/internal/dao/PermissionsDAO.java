@@ -213,22 +213,22 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        // TODO: Get the query from the QueryManager
-        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ? AND ROLE_ID IN (?)";
+        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ? AND ROLE_ID IN (";
 
-        StringBuilder sb = new StringBuilder();
-        for (Role role : roles) {
-            sb.append(",");
-            sb.append(role.getId());
+        StringBuilder sb = new StringBuilder(query);
+        for (int i = 0; i < roles.size(); i++) {
+            sb.append("?,");
         }
-        String roleIds = sb.toString().substring(1);
+        String rolesId = sb.deleteCharAt(sb.length() - 1).append(")").toString();
 
         try {
             conn = getConnection();
-            ps = conn.prepareStatement(query);
+            ps = conn.prepareStatement(rolesId);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            ps.setString(3, roleIds);
+            for (int i = 0; i < roles.size(); i++) {
+                ps.setString(i + 3, roles.get(i).getId());
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Executing query: " + query);
             }
