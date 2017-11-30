@@ -44,7 +44,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -63,7 +63,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE);
@@ -82,7 +82,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -101,7 +101,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -120,7 +120,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, "invalid_grant_type");
@@ -139,7 +139,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -157,7 +157,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -181,7 +181,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -203,7 +203,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
         List<Role> allRoles = localIdPClient.getAllRoles();
         Assert.assertEquals(allRoles, Collections.singletonList(defaultRole));
     }
@@ -215,7 +215,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
         List<Role> allRoles = localIdPClient.getUserRoles("admin");
         Assert.assertEquals(allRoles, Collections.singletonList(defaultRole));
     }
@@ -227,7 +227,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
         List<Role> allRoles = localIdPClient.getUserRoles("admin2");
         Assert.assertEquals(allRoles, new ArrayList<>());
     }
@@ -239,7 +239,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
         User admin = localIdPClient.getUser("admin");
         Assert.assertEquals(admin, defaultUser);
     }
@@ -251,7 +251,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
         Assert.assertNull(localIdPClient.getUser("admin2"));
     }
 
@@ -263,7 +263,7 @@ public class LocalIdPClientTest {
         User defaultUser = new User("admin", "YWRtaW4=", userProperties,
                 Collections.singletonList(defaultRole));
         LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole));
+                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
