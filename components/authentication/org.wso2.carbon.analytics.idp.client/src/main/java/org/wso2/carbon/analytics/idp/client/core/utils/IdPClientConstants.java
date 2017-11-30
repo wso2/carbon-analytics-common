@@ -55,7 +55,7 @@ public class IdPClientConstants {
     public static final String COOKIE_HEADER = "Cookie";
     public static final String HTTP_ONLY_COOKIE = "HttpOnly";
     public static final String SECURE_COOKIE = "Secure";
-    public static final String COOKIE_EXPIRE_TIME = "Expires=Thu, 01-Jan-1970 00:00:01 GMT";
+    public static final String EXPIRES_COOKIE = "Expires=";
 
     public static final String BEARER_PREFIX = "Bearer";
     public static final String BASIC_PREFIX = "Basic";
