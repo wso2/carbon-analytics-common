@@ -41,7 +41,7 @@ public class ExternalIdPClientConstants {
     public static final String STATUS_DB_APP_NAME = "status.dashboard.app.name";
     public static final String BR_DB_APP_NAME = "business.rules.app.name";
 
-    public static final String DEFAULT_BASE_URL = "http://localhost:9090";
+    public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
     public static final String DEFAULT_KM_DCR_URL = "https://localhost:9443/identity/connect/register";
     public static final String DEFAULT_KM_CERT_ALIAS = "wso2carbon";
