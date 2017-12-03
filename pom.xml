@@ -425,12 +425,6 @@
                 <artifactId>log4j</artifactId>
                 <version>1.2.17.wso2v1</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.feature</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-                <type>zip</type>
-            </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
@@ -677,19 +671,7 @@
             <!--Databridge related feature dependencies -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.agent.feature</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.commons.thrift.feature</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.commons.feature</artifactId>
+                <artifactId>org.wso2.carbon.databridge.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
             </dependency>
@@ -782,11 +764,6 @@
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
         <pax.logging.api.version>1.8.5</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
-
-
-        <!-- Datasource -->
-        <carbon.datasource.core.version>1.1.2</carbon.datasource.core.version>
-        <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
 
         <project.scm.id>my-scm-server</project.scm.id>
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
