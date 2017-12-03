@@ -139,23 +139,6 @@
             <type>zip</type>
         </dependency>
 
-        <!-- Metrics Features -->
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.metrics</groupId>-->
-            <!--<artifactId>org.wso2.carbon.metrics.core.feature</artifactId>-->
-            <!--<type>zip</type>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.metrics</groupId>-->
-            <!--<artifactId>org.wso2.carbon.metrics.jdbc.core.feature</artifactId>-->
-            <!--<type>zip</type>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.metrics</groupId>-->
-            <!--<artifactId>org.wso2.carbon.metrics.das.core.feature</artifactId>-->
-            <!--<type>zip</type>-->
-        <!--</dependency>-->
-
     </dependencies>
 
     <build>
@@ -326,20 +309,6 @@
                                     <version>${carbon.analytics.common.version}</version>
                                 </feature>
 
-                                <!-- Metrics Features -->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.jdbc.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.das.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-
                             </features>
                         </configuration>
                     </execution>
@@ -486,20 +455,6 @@
                                     <version>${carbon.analytics.common.version}</version>
                                 </feature>
 
-                                <!-- Metrics Features -->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.jdbc.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.das.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-
                                 <feature>
                                     <id>org.wso2.carbon.pax.exam.feature.group</id>
                                     <version>${carbon.kernel.version}</version>
@@ -592,20 +547,6 @@
                                     <version>${carbon.analytics.common.version}</version>
                                 </feature>
 
-                                <!-- Metrics Features -->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.jdbc.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.das.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-
                                 <feature>
                                     <id>org.wso2.carbon.pax.exam.feature.group</id>
                                     <version>${carbon.kernel.version}</version>
@@ -697,19 +638,6 @@
                                     <version>${carbon.analytics.common.version}</version>
                                 </feature>
 
-                                <!-- Metrics Features -->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.jdbc.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
-                                <!--<feature>-->
-                                    <!--<id>org.wso2.carbon.metrics.das.core.feature</id>-->
-                                    <!--<version>${carbon.metrics.version}</version>-->
-                                <!--</feature>-->
                             </features>
                         </configuration>
                     </execution>

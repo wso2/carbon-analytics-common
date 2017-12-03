@@ -1,5 +1,5 @@
 ################################################################################
-#   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
+#   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
 #
 #   Licensed under the Apache License, Version 2.0 (the \"License\");
 #   you may not use this file except in compliance with the License.
@@ -186,13 +186,10 @@ wso2.artifact.deployment:
 state.persistence:
   enabled: true
   intervalInMin: 1
-  revisionsToKeep: 3
-  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
-  # config:
-    # location: siddhi-app-persistence
+  revisionsToKeep: 2
+  class: org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore
   config:
-    datasource: WSO2_ANALYTICS_DB
-    table: PERSISTENCE_TABLE
+    location: siddhi-app-persistence
 
   # Secure Vault Configuration
 wso2.securevault:
@@ -206,4 +203,3 @@ wso2.securevault:
     type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
     parameters:
       masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
-
