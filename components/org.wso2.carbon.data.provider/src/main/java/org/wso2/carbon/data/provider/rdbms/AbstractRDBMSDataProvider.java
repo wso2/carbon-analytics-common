@@ -25,7 +25,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.ProviderConfig;
-import org.wso2.carbon.data.provider.api.DataSetMetadata;
+import org.wso2.carbon.data.provider.bean.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean;
 import org.wso2.carbon.data.provider.rdbms.config.RDBMSDataProviderConf;
@@ -66,10 +66,9 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private int columnCount;
     private RDBMSDataProviderConf rdbmsProviderConfig;
     private RDBMSDataProviderConfBean rdbmsDataProviderConfBean;
-    private RDBMSQueryManager rdbmsQueryManager;
 
     @Override
-    public DataProvider init(String topic, String message) throws DataProviderException {
+    public DataProvider init(String topic, String sessionId, String message) throws DataProviderException {
         try {
             rdbmsDataProviderConfBean = getDataProviderHelper().getConfigProvider().
                     getConfigurationObject(RDBMSDataProviderConfBean.class);
@@ -77,7 +76,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
             throw new DataProviderException("unable to load database query configuration: " + e.getMessage(), e);
         }
         ProviderConfig providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
-        super.init(topic, providerConfig);
+        super.init(topic, sessionId, providerConfig);
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -85,7 +84,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
             connection = getConnection(rdbmsProviderConfig.getDatasourceName());
             String databaseName = connection.getMetaData().getDatabaseProductName();
             String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
-            rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
+            RDBMSQueryManager rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
             totalRecordCountQuery = rdbmsQueryManager.getQuery(TOTAL_RECORD_COUNT_QUERY);
             if (totalRecordCountQuery != null) {
                 totalRecordCountQuery = totalRecordCountQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConfig
@@ -267,7 +266,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     }
 
     @Override
-    public void publish(String topic) {
+    public void publish(String topic, String sessionId) {
 
     }
 

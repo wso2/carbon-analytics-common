@@ -22,22 +22,21 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 
-import java.util.HashMap;
 import java.util.Map;
-import javax.websocket.Session;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Value holder for data provider.
  */
 public class DataProviderValueHolder {
-    private static DataProviderValueHolder dataProviderHelper = null;
+    private static DataProviderValueHolder dataProviderHelper;
     private DataSourceService dataSourceService = null;
     private ConfigProvider configProvider = null;
-    private Map<String, DataProvider> dataProviderMap = new HashMap<>();
-    private Session session;
-    private Map<String, DataProvider> topicProviderMap = new HashMap<>();
+    private Map<String, Map<String, DataProvider>> sessionDataProviderMap = new ConcurrentHashMap<>();
+    private Map<String, Class> dataProviderClassMap = new ConcurrentHashMap<>();
 
-    public static DataProviderValueHolder getDataProviderHelper() {
+    public static synchronized DataProviderValueHolder getDataProviderHelper() {
         if (dataProviderHelper == null) {
             dataProviderHelper = new DataProviderValueHolder();
         }
@@ -61,30 +60,48 @@ public class DataProviderValueHolder {
     }
 
     public void setDataProvider(String providerName, DataProvider dataProvider) {
-        this.dataProviderMap.put(providerName, dataProvider);
+        this.dataProviderClassMap.put(providerName, dataProvider.getClass());
     }
 
-    public DataProvider getDataProvider(String providerName) {
-        return this.dataProviderMap.get(providerName);
+    public DataProvider getDataProvider(String providerName) throws IllegalAccessException, InstantiationException {
+        return (DataProvider) this.dataProviderClassMap.get(providerName).newInstance();
     }
 
-    public Map<String, DataProvider> getDataProviderMap() {
-        return dataProviderMap;
+    public Set<String> getDataProviderNameSet() {
+        return dataProviderClassMap.keySet();
     }
 
-    public void setTopicProvider(String dataProviderTopic, DataProvider dataProvider) {
-        this.topicProviderMap.put(dataProviderTopic, dataProvider);
+    public Map<String, DataProvider> getTopicDataProviderMap(String sessionId) {
+        return sessionDataProviderMap.get(sessionId);
     }
 
-    public Map<String, DataProvider> getTopicProviderMap() {
-        return topicProviderMap;
+    public void removeDataProviderClass(String providerName) {
+        this.dataProviderClassMap.remove(providerName);
     }
 
-    public Session getSession() {
-        return session;
+    public void removeSessionData(String sessionId) {
+        this.sessionDataProviderMap.remove(sessionId);
     }
 
-    public void setSession(Session session) {
-        this.session = session;
+    public boolean removeTopic(String sessionId, String topic) {
+        if (this.sessionDataProviderMap.containsKey(sessionId)) {
+            if (this.sessionDataProviderMap.get(sessionId).containsKey(topic)) {
+                DataProvider dataProvider = this.sessionDataProviderMap.get(sessionId).remove(topic);
+                if (dataProvider != null) {
+                    dataProvider.stop();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addDataProviderToSessionMap(String sessionId, String topic, DataProvider dataProvider) {
+        if (this.sessionDataProviderMap.containsKey(sessionId)) {
+            this.sessionDataProviderMap.get(sessionId).put(topic, dataProvider);
+        } else {
+            this.sessionDataProviderMap.put(sessionId, new ConcurrentHashMap<>());
+            this.sessionDataProviderMap.get(sessionId).put(topic, dataProvider);
+        }
     }
 }

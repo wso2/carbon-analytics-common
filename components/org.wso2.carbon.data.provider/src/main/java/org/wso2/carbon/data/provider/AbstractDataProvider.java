@@ -21,8 +21,8 @@ package org.wso2.carbon.data.provider;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.data.provider.api.DataModel;
-import org.wso2.carbon.data.provider.api.DataSetMetadata;
+import org.wso2.carbon.data.provider.bean.DataModel;
+import org.wso2.carbon.data.provider.bean.DataSetMetadata;
 import org.wso2.carbon.data.provider.endpoint.DataProviderEndPoint;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 
@@ -38,16 +38,18 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractDataProvider implements DataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDataProvider.class);
     private String topic;
+    private String sessionId;
     private ScheduledExecutorService dataPublishingExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService dataPurgingExecutorService = Executors.newSingleThreadScheduledExecutor();
     private long publishingInterval;
     private long purgingInterval;
     private boolean isPurgingEnable;
 
-    public DataProvider init(String topic, ProviderConfig providerConfig)
+    public DataProvider init(String topic, String sessionId, ProviderConfig providerConfig)
             throws DataProviderException {
         if (configValidator(providerConfig)) {
             this.topic = topic;
+            this.sessionId = sessionId;
             this.publishingInterval = providerConfig.getPublishingInterval();
             this.purgingInterval = providerConfig.getPurgingInterval();
             this.isPurgingEnable = providerConfig.isPurgingEnable();
@@ -68,7 +70,7 @@ public abstract class AbstractDataProvider implements DataProvider {
     @Override
     public void start() {
         dataPublishingExecutorService.scheduleAtFixedRate(() -> {
-            publish(this.topic);
+            publish(this.topic, this.sessionId);
         }, 0, publishingInterval, TimeUnit.SECONDS);
         if (isPurgingEnable) {
             dataPublishingExecutorService.scheduleAtFixedRate(() -> {
@@ -77,11 +79,11 @@ public abstract class AbstractDataProvider implements DataProvider {
         }
     }
 
-    public void publishToEndPoint(ArrayList<Object[]> data, String topic) {
+    public void publishToEndPoint(ArrayList<Object[]> data, String sessionId, String topic) {
         if (data.size() > 0) {
             DataModel dataModel = new DataModel(getMetadata(), data.toArray(new Object[0][0]), -1, topic);
             try {
-                DataProviderEndPoint.sendText(new Gson().toJson(dataModel));
+                DataProviderEndPoint.sendText(sessionId, new Gson().toJson(dataModel));
             } catch (IOException e) {
                 LOGGER.error("Failed to deliver message to client " + e.getMessage(), e);
             }
@@ -91,7 +93,7 @@ public abstract class AbstractDataProvider implements DataProvider {
     @Override
     public abstract boolean configValidator(ProviderConfig providerConfig) throws DataProviderException;
 
-    public abstract void publish(String topic);
+    public abstract void publish(String topic, String sessionId);
 
     public abstract void purging();
 

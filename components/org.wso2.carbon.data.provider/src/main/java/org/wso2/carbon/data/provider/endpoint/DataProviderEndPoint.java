@@ -16,6 +16,7 @@
 package org.wso2.carbon.data.provider.endpoint;
 
 
+import com.google.gson.Gson;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -24,16 +25,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.DataProvider;
+import org.wso2.carbon.data.provider.bean.DataProviderConfigRoot;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDataProviderHelper;
@@ -46,9 +50,10 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
         service = WebSocketEndpoint.class,
         immediate = true
 )
-@ServerEndpoint(value = "/data-provider/{sourceType}/{topic}")
+@ServerEndpoint(value = "/data-provider")
 public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderEndPoint.class);
+    private static final Map<String, Session> sessionMap = new ConcurrentHashMap<>();
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -84,37 +89,41 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnOpen
     public static void onOpen(Session session) {
-        if (getDataProviderHelper().getSession() == null) {
-            getDataProviderHelper().setSession(session);
-        }
+        sessionMap.put(session.getId(), session);
     }
 
     /**
      * Create DataProvider instance, start it and store it in the providerMap.
      *
-     * @param message    String message received from the web client
-     * @param sourceType provider type from the Path parameter
-     * @param topic      client topic from the Path parameter
-     * @param session    Session object associated with the connection
+     * @param message String message received from the web client
+     * @param session Session object associated with the connection
      */
     @OnMessage
-    public void onMessage(String message, @PathParam("sourceType") String sourceType,
-                          @PathParam("topic") String topic, Session session) {
+    public void onMessage(String message, Session session) {
+        DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
         try {
-            DataProvider dataProvider = getDataProviderHelper().getDataProvider(sourceType);
-            dataProvider.init(topic, message).start();
-            if (getDataProviderHelper().getTopicProviderMap().containsKey(topic)) {
-                getDataProviderHelper().getTopicProviderMap().get(topic).stop();
+            if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.SUBSCRIBE.toString()
+            )) {
+                DataProvider dataProvider = getDataProviderHelper().getDataProvider(dataProviderConfigRoot
+                        .getProviderName());
+                dataProvider.init(dataProviderConfigRoot.getTopic(), session.getId(), message).start();
+                getDataProviderHelper().addDataProviderToSessionMap(session.getId(), dataProviderConfigRoot.getTopic(),
+                        dataProvider);
+            } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.UNSUBSCRIBE
+                    .toString())) {
+                getDataProviderHelper().removeTopic(session.getId(), dataProviderConfigRoot.getTopic());
+            } else {
+                throw new Exception("Invalid action " + dataProviderConfigRoot.getAction() + " given in the message." +
+                        "Valid actions are : " + Arrays.toString(DataProviderConfigRoot.Types.values()));
             }
-            getDataProviderHelper().getTopicProviderMap().put(topic, dataProvider);
         } catch (Exception e) {
             try {
-                sendText("Error initializing the data provider endpoint.");
+                sendText(session.getId(), "Error initializing the data provider endpoint.");
             } catch (IOException e1) {
                 //ignore
             }
-            LOGGER.error("Error initializing the data provider endpoint for source type " + sourceType + ". "
-                    + e.getMessage(), e);
+            LOGGER.error("Error initializing the data provider endpoint for source type " + dataProviderConfigRoot
+                    .getProviderName() + ". " + e.getMessage(), e);
             onError(e);
         }
     }
@@ -126,11 +135,11 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
-        for (String topic : getDataProviderHelper().getTopicProviderMap().keySet()) {
-            getDataProviderHelper().getTopicProviderMap().get(topic).stop(); //stop the pushing service
-            getDataProviderHelper().getTopicProviderMap().remove(topic); //remove the provider from the map
+        Map<String, DataProvider> dataProviderMap = getDataProviderHelper().getTopicDataProviderMap(session.getId());
+        for (String topic : dataProviderMap.keySet()) {
+            getDataProviderHelper().removeTopic(session.getId(), topic);
         }
-        getDataProviderHelper().setSession(null);
+        getDataProviderHelper().removeSessionData(session.getId());
     }
 
     /**
@@ -144,12 +153,15 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     /**
      * Send message to specific client.
      *
-     * @param text String message to be sent to the client
-     * @throws IOException If there is a problem delivering the message
+     * @param sessionId sessionId of the client.
+     * @param text      String message to be sent to the client.
+     * @throws IOException If there is a problem delivering the message.
      */
-    public static void sendText(String text) throws IOException {
-        if (getDataProviderHelper().getSession() == null) {
-            getDataProviderHelper().getSession().getBasicRemote().sendText(text);
+    public static void sendText(String sessionId, String text) throws IOException {
+        if (sessionMap.containsKey(sessionId)) {
+            if (sessionMap.get(sessionId) != null) {
+                sessionMap.get(sessionId).getBasicRemote().sendText(text);
+            }
         }
     }
 

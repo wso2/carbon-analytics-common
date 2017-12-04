@@ -85,7 +85,7 @@ public class ServiceComponent implements Microservice {
     public Response dataProviderList() {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(getDataProviderHelper().getDataProviderMap().keySet())
+                    .entity(getDataProviderHelper().getDataProviderNameSet())
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (Throwable ignored) {
@@ -116,12 +116,13 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     @Consumes("application/json")
     public Response validateProviderConfig(String dataProviderConfig, @PathParam("providerName") String providerName) {
-        DataProvider dataProvider = getDataProviderHelper().getDataProvider(providerName);
         try {
-            dataProvider.init("topic", dataProviderConfig);
+            DataProvider dataProvider = getDataProviderHelper().getDataProvider(providerName);
+            //mock the topic and session as it only needs to validate the configuration.
+            dataProvider.init("mock_topic", "mock_session", dataProviderConfig);
             return Response.ok(dataProvider.dataSetMetadata(), MediaType.APPLICATION_JSON)
                     .build();
-        } catch (DataProviderException e) {
+        } catch (DataProviderException | IllegalAccessException | InstantiationException e) {
             return Response.serverError().entity("failed." + e.getMessage()).build();
         }
     }
@@ -137,6 +138,7 @@ public class ServiceComponent implements Microservice {
         getDataProviderHelper().setDataProvider(dataProvider.providerName(), dataProvider);
     }
 
-    protected void unsetCarbonTransport(DataProvider serverConnector) {
+    protected void unsetCarbonTransport(DataProvider dataProvider) {
+        getDataProviderHelper().removeDataProviderClass(dataProvider.providerName());
     }
 }
