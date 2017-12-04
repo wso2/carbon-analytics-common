@@ -206,6 +206,10 @@
                                     <symbolicName>slf4j.log4j12</symbolicName>
                                     <version>${slf4j.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>slf4j.api</symbolicName>
+                                    <version>${slf4j.version}</version>
+                                </bundle>
 
                                 <!-- databridge-receiver-binary dependencies -->
                                 <bundle>
