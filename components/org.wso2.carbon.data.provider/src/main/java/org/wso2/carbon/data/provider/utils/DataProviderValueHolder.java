@@ -83,7 +83,7 @@ public class DataProviderValueHolder {
         this.sessionDataProviderMap.remove(sessionId);
     }
 
-    public boolean removeTopic(String sessionId, String topic) {
+    public boolean removeTopicIfExist(String sessionId, String topic) {
         if (this.sessionDataProviderMap.containsKey(sessionId)) {
             if (this.sessionDataProviderMap.get(sessionId).containsKey(topic)) {
                 DataProvider dataProvider = this.sessionDataProviderMap.get(sessionId).remove(topic);

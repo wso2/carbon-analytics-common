@@ -104,14 +104,16 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         try {
             if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.SUBSCRIBE.toString()
             )) {
+                getDataProviderHelper().removeTopicIfExist(session.getId(), dataProviderConfigRoot.getTopic());
                 DataProvider dataProvider = getDataProviderHelper().getDataProvider(dataProviderConfigRoot
                         .getProviderName());
-                dataProvider.init(dataProviderConfigRoot.getTopic(), session.getId(), message).start();
+                dataProvider.init(dataProviderConfigRoot.getTopic(), session.getId(),
+                        dataProviderConfigRoot.getDataProviderConfiguration()).start();
                 getDataProviderHelper().addDataProviderToSessionMap(session.getId(), dataProviderConfigRoot.getTopic(),
                         dataProvider);
             } else if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.UNSUBSCRIBE
                     .toString())) {
-                getDataProviderHelper().removeTopic(session.getId(), dataProviderConfigRoot.getTopic());
+                getDataProviderHelper().removeTopicIfExist(session.getId(), dataProviderConfigRoot.getTopic());
             } else {
                 throw new Exception("Invalid action " + dataProviderConfigRoot.getAction() + " given in the message." +
                         "Valid actions are : " + Arrays.toString(DataProviderConfigRoot.Types.values()));
@@ -137,7 +139,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     public void onClose(Session session) {
         Map<String, DataProvider> dataProviderMap = getDataProviderHelper().getTopicDataProviderMap(session.getId());
         for (String topic : dataProviderMap.keySet()) {
-            getDataProviderHelper().removeTopic(session.getId(), topic);
+            getDataProviderHelper().removeTopicIfExist(session.getId(), topic);
         }
         getDataProviderHelper().removeSessionData(session.getId());
     }
