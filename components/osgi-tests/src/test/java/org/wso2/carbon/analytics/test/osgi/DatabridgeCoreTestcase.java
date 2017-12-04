@@ -31,6 +31,14 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
+import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
+import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
+import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
+import org.wso2.carbon.databridge.core.exception.StreamDefinitionNotFoundException;
+import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import javax.inject.Inject;
 
@@ -44,6 +52,7 @@ import javax.inject.Inject;
 public class DatabridgeCoreTestcase {
 
     private static final String DATABRIDGE_CORE_BUNDLE_NAME = "org.wso2.carbon.databridge.core";
+
 //    private static final int HTTP_PORT = 9090;
 //    private static final String HOSTNAME = "localhost";
 //    private static final String API_CONTEXT_PATH = "/stores/query";
@@ -56,6 +65,9 @@ public class DatabridgeCoreTestcase {
 
     @Inject
     private BundleContext bundleContext;
+
+    @Inject
+    private DataBridgeReceiverService dataBridgeReceiverService;
 
     @Configuration
     public Option[] createConfiguration() {
@@ -81,6 +93,49 @@ public class DatabridgeCoreTestcase {
         Assert.assertEquals(coreBundle.getState(), Bundle.ACTIVE);
     }
 
+    @Test
+    public void testDefineStreamForDataReceiver() throws InterruptedException {
 
+        String sessionId = "";
+        String streamDefinition = "{" +
+                "  'name':'org.wso2.esb.MediatorStatistics'," +
+                "  'version':'2.3.0'," +
+                "  'nickName': 'Stock Quote Information'," +
+                "  'description': 'Some Desc'," +
+                "  'tags':['foo', 'bar']," +
+                "  'metaData':[" +
+                "          {'name':'ipAdd','type':'STRING'}" +
+                "  ]," +
+                "  'payloadData':[" +
+                "          {'name':'symbol','type':'STRING'}," +
+                "          {'name':'price','type':'DOUBLE'}," +
+                "          {'name':'volume','type':'INT'}," +
+                "          {'name':'max','type':'DOUBLE'}," +
+                "          {'name':'min','type':'Double'}" +
+                "  ]" +
+                "}";
+        try {
+            sessionId = dataBridgeReceiverService.login("admin", "admin");
+        } catch (AuthenticationException e) {
+            Assert.fail("Authentication error when login to databridge. " + e);
+        }
 
+        try {
+            dataBridgeReceiverService.defineStream(sessionId, streamDefinition, null);
+        } catch (DifferentStreamDefinitionAlreadyDefinedException | MalformedStreamDefinitionException |
+                SessionTimeoutException e) {
+            Assert.fail("Exception when defining stream definition. ", e);
+        }
+
+        try {
+            StreamDefinition streamDefinitionObject = dataBridgeReceiverService.getStreamDefinition(sessionId,
+                    "org.wso2.esb.MediatorStatistics", "2.3.0");
+            if (streamDefinitionObject != null) {
+                Assert.assertNotNull(streamDefinitionObject, "Defined stream definition successfully retrieved");
+            }
+        } catch (SessionTimeoutException | StreamDefinitionNotFoundException | StreamDefinitionStoreException e) {
+            Assert.fail("Exception when retrieving the defined stream definition", e);
+        }
+    }
 }
+
