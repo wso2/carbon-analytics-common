@@ -30,16 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * Value holder for data provider.
  */
 public class DataProviderValueHolder {
-    private static DataProviderValueHolder dataProviderHelper;
+    private static DataProviderValueHolder dataProviderHelper = new DataProviderValueHolder();
     private DataSourceService dataSourceService = null;
     private ConfigProvider configProvider = null;
     private Map<String, Map<String, DataProvider>> sessionDataProviderMap = new ConcurrentHashMap<>();
     private Map<String, Class> dataProviderClassMap = new ConcurrentHashMap<>();
 
-    public static synchronized DataProviderValueHolder getDataProviderHelper() {
-        if (dataProviderHelper == null) {
-            dataProviderHelper = new DataProviderValueHolder();
-        }
+    public static DataProviderValueHolder getDataProviderHelper() {
         return dataProviderHelper;
     }
 
