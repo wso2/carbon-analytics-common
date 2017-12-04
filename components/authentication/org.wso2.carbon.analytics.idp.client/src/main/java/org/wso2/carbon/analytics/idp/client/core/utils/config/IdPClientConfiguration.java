@@ -35,8 +35,8 @@ public class IdPClientConfiguration {
     @Element(description = "Client properties")
     private Map<String, String> properties = new HashMap<>();
 
-    @Element(description = "User Store")
-    private UserStoreElement userStore = new UserStoreElement();
+    @Element(description = "User Manager")
+    private UserManagerElement userManager = new UserManagerElement();
 
     public String getType() {
         return type;
@@ -46,7 +46,7 @@ public class IdPClientConfiguration {
         return properties;
     }
 
-    public UserStoreElement getUserStore() {
-        return userStore;
+    public UserManagerElement getUserManager() {
+        return userManager;
     }
 }

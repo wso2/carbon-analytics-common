@@ -27,9 +27,6 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.DataBridge;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
@@ -39,11 +36,9 @@ import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.internal.authentication.CarbonAuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
-import org.wso2.carbon.databridge.core.internal.utils.DataBridgeCoreBuilder;
 import org.wso2.carbon.kernel.CarbonRuntime;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * Service component to consume CarbonRuntime instance which has been registered as an OSGi service by Carbon Kernel.
@@ -79,24 +74,6 @@ public class DataBridgeDS {
                         resolveAndSetDatabridgeConfiguration((LinkedHashMap) DataBridgeServiceValueHolder.
                                 getConfigProvider().
                                 getConfigurationObject(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE)));
-
-
-                try {
-                    List<String> streamDefinitionStrings = DataBridgeCoreBuilder.loadStreamDefinitionYAML();
-                    for (String streamDefinitionString : streamDefinitionStrings) {
-                        try {
-                            StreamDefinition streamDefinition = EventDefinitionConverterUtils.
-                                    convertFromJson(streamDefinitionString);
-                            streamDefinitionStore.saveStreamDefinition(streamDefinition);
-
-                        } catch (MalformedStreamDefinitionException e) {
-                            log.error("Malformed Stream Definition for " + streamDefinitionString, e);
-                        }
-                    }
-                } catch (Throwable t) {
-                    log.error("Cannot load stream definitions ", t);
-                }
-
 
                 receiverServiceRegistration = bundleContext.
                         registerService(DataBridgeReceiverService.class.getName(), databridge, null);

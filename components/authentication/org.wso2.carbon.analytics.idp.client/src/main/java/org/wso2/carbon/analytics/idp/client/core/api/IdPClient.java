@@ -31,6 +31,8 @@ import java.util.Map;
 public interface IdPClient {
     List<Role> getAllRoles() throws IdPClientException;
 
+    Role getAdminRole() throws IdPClientException;
+
     User getUser(String name) throws IdPClientException;
 
     List<Role> getUserRoles(String name) throws IdPClientException;
