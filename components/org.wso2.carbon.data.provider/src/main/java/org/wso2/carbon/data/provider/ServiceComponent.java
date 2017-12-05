@@ -115,7 +115,7 @@ public class ServiceComponent implements Microservice {
     }
 
     @POST
-    @Path("/{providerName}/validator")
+    @Path("/{providerName}/validate")
     @Produces("application/json")
     @Consumes("application/json")
     public Response validateProviderConfig(String dataProviderConfig, @PathParam("providerName") String providerName) {
