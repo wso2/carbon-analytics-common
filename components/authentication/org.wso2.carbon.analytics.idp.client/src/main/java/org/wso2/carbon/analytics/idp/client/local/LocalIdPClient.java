@@ -164,11 +164,11 @@ public class LocalIdPClient implements IdPClient {
                     } else {
                         Long createdAt = Calendar.getInstance().getTimeInMillis();
                         if (rememberMe) {
-                            session = new Session(userValue, false, userName, createdAt + this.rememberMeTimeout);
+                            session = new Session(userValue, userName, createdAt + this.rememberMeTimeout);
                             returnProperties.put(
                                     IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.rememberMeTimeout));
                         } else {
-                            session = new Session(userValue, false, userName, createdAt + this.sessionTimeout);
+                            session = new Session(userValue, userName, createdAt + this.sessionTimeout);
                             returnProperties.put(
                                     IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
                         }

@@ -28,7 +28,7 @@ public class Session {
     private String username;
     private Long expiryTime;
 
-    public Session(int userHash, boolean internalUser, String username, Long expiryTime) {
+    public Session(int userHash, String username, Long expiryTime) {
         this.userHash = userHash;
         this.username = username;
         this.sessionId = UUID.randomUUID();
