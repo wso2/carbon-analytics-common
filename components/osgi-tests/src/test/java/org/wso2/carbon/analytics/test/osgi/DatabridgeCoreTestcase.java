@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.awaitility.Awaitility;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -31,6 +32,8 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.databridge.commons.Attribute;
+import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
@@ -40,6 +43,9 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionNotFoundException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 
@@ -52,6 +58,7 @@ import javax.inject.Inject;
 public class DatabridgeCoreTestcase {
 
     private static final String DATABRIDGE_CORE_BUNDLE_NAME = "org.wso2.carbon.databridge.core";
+    private String sessionId = "";
 
 //    private static final int HTTP_PORT = 9090;
 //    private static final String HOSTNAME = "localhost";
@@ -88,15 +95,16 @@ public class DatabridgeCoreTestcase {
     }
 
     @Test
-    public void testStoreApiBundle() {
+    public void testDatabridgeCoreBundle() {
         Bundle coreBundle = getBundle(DATABRIDGE_CORE_BUNDLE_NAME);
         Assert.assertEquals(coreBundle.getState(), Bundle.ACTIVE);
     }
 
-    @Test
-    public void testDefineStreamForDataReceiver() throws InterruptedException {
+    @Test(dependsOnMethods = "testDatabridgeCoreBundle")
+    public void defineStreamForDataReceiver() throws InterruptedException {
 
-        String sessionId = "";
+        Awaitility.await().atLeast(4000, TimeUnit.MILLISECONDS);
+
         String streamDefinition = "{" +
                 "  'name':'org.wso2.esb.MediatorStatistics'," +
                 "  'version':'2.3.0'," +
@@ -114,12 +122,15 @@ public class DatabridgeCoreTestcase {
                 "          {'name':'min','type':'Double'}" +
                 "  ]" +
                 "}";
+
+        //Verify the Databridge Receiver Login operataion
         try {
             sessionId = dataBridgeReceiverService.login("admin", "admin");
         } catch (AuthenticationException e) {
             Assert.fail("Authentication error when login to databridge. " + e);
         }
 
+        //Verify define stream API
         try {
             dataBridgeReceiverService.defineStream(sessionId, streamDefinition, null);
         } catch (DifferentStreamDefinitionAlreadyDefinedException | MalformedStreamDefinitionException |
@@ -127,6 +138,7 @@ public class DatabridgeCoreTestcase {
             Assert.fail("Exception when defining stream definition. ", e);
         }
 
+        //Verify the getStreamDefinition method of Databridge Receiver
         try {
             StreamDefinition streamDefinitionObject = dataBridgeReceiverService.getStreamDefinition(sessionId,
                     "org.wso2.esb.MediatorStatistics", "2.3.0");
@@ -137,5 +149,77 @@ public class DatabridgeCoreTestcase {
             Assert.fail("Exception when retrieving the defined stream definition", e);
         }
     }
+
+    @Test(dependsOnMethods = "defineStreamForDataReceiver")
+    public void saveStreamDefinitionForDataReceiver() throws InterruptedException {
+
+        //Verify the Databridge Receiver Login operataion
+        try {
+            sessionId = dataBridgeReceiverService.login("admin", "admin");
+        } catch (AuthenticationException e) {
+            Assert.fail("Authentication error when login to databridge. " + e);
+        }
+
+        try {
+            StreamDefinition newStreamDefinition = new StreamDefinition("org.wso2.sp.temperatureStream", "1.0.0");
+
+            List<Attribute> payloadAttributeList = new ArrayList<>();
+            payloadAttributeList.add(new Attribute("sensorId", AttributeType.INT));
+            payloadAttributeList.add(new Attribute("temperature", AttributeType.DOUBLE));
+            payloadAttributeList.add(new Attribute("location", AttributeType.STRING));
+            newStreamDefinition.setPayloadData(payloadAttributeList);
+
+            newStreamDefinition.setPayloadData(payloadAttributeList);
+            try {
+                dataBridgeReceiverService.saveStreamDefinition(sessionId, newStreamDefinition);
+
+                StreamDefinition streamDefinitionObject = null;
+                try {
+                    streamDefinitionObject = dataBridgeReceiverService.getStreamDefinition(sessionId,
+                            "org.wso2.sp.temperatureStream", "1.0.0");
+                    if (streamDefinitionObject != null) {
+                        Assert.assertNotNull(streamDefinitionObject,
+                                "Defined stream definition successfully retrieved");
+                    }
+                } catch (StreamDefinitionNotFoundException e) {
+                    Assert.fail("Exception when retrieving the defined stream definition", e);
+                }
+
+            } catch (SessionTimeoutException | StreamDefinitionStoreException |
+                    DifferentStreamDefinitionAlreadyDefinedException e) {
+                Assert.fail("Exception when saving the stream definition", e);
+            }
+
+        } catch (MalformedStreamDefinitionException e) {
+            Assert.fail("Exception when initialising the stream definition", e);
+        }
+    }
+
+    @Test(dependsOnMethods = "saveStreamDefinitionForDataReceiver")
+    public void getAllStreamDefinitionsForDataReceiver() throws InterruptedException {
+
+        //Verify the Databridge Receiver Login operataion
+        try {
+            sessionId = dataBridgeReceiverService.login("admin", "admin");
+        } catch (AuthenticationException e) {
+            Assert.fail("Authentication error when login to databridge. " + e);
+        }
+
+        try {
+            List<StreamDefinition> streamDefinitionList = dataBridgeReceiverService.getAllStreamDefinitions(sessionId);
+            Assert.assertEquals(streamDefinitionList.size(), 2, "Expected stream definition count is not retrieved");
+
+        } catch (SessionTimeoutException e) {
+            Assert.fail("Exception when retrieving all the stream definitions defined in the server");
+        }
+
+        try {
+            dataBridgeReceiverService.logout(sessionId);
+        } catch (Exception e) {
+            Assert.fail("Exception when logout the databridge receiver session.", e);
+        }
+    }
+
+
 }
 
