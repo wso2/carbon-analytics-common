@@ -92,8 +92,8 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                     List<Role> userRolesFromId = roles.stream()
                             .filter((role) -> roleIdList.contains(role.getId()))
                             .collect(Collectors.toList());
-                    return new LocalUser(
-                            user.getUsername(), user.getPassword().toCharArray(), user.getProperties(), userRolesFromId);
+                    return new LocalUser(user.getUsername(), user.getPassword().toCharArray(), user.getProperties(),
+                            userRolesFromId);
         }).collect(Collectors.toList());
 
         return new LocalIdPClient(sessionTimeout, users, roles, adminRole);

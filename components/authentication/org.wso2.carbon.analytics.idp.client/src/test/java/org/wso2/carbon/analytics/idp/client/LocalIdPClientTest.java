@@ -69,18 +69,6 @@ public class LocalIdPClientTest {
     }
 
     @Test
-    public void testLoginSuccessClientCredentialsGrantType() throws IdPClientException {
-        Map<String, String> loginProperties = new HashMap<>();
-        loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE);
-        loginProperties.put(IdPClientConstants.USERNAME, "admin");
-        loginProperties.put(IdPClientConstants.PASSWORD, "admin");
-
-        Map<String, String> login = localIdPClient.login(loginProperties);
-        Assert.assertEquals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS,
-                login.get(IdPClientConstants.LOGIN_STATUS));
-    }
-
-    @Test
     public void testLoginFailureUserNotFound() throws IdPClientException, AuthenticationException {
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);

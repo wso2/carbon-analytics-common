@@ -185,22 +185,6 @@ public class OAuth2ServiceStubs {
             return generateAccessToken(authToken, IdPClientConstants.REFRESH_GRANT_TYPE, null,
                     null, refreshToken, null, null, scopes);
         }
-
-        /**
-         * Get a access token by Client Credentials grant type.
-         *
-         * @param scopes       Required scopes (space separated) for the access token
-         * @param clientId     Consumer Key of the application
-         * @param clientSecret Consumer Secret of the application
-         * @return Feign Response Object
-         */
-        default Response generateClientCredentialsGrantAccessToken(String scopes, String clientId,
-                                                                   String clientSecret) {
-            String credentials = clientId + ':' + clientSecret;
-            String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-            return generateAccessToken(authToken, IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE,
-                    null, null, null, null, null, scopes);
-        }
     }
 
     /**
@@ -212,11 +196,6 @@ public class OAuth2ServiceStubs {
         @RequestLine("POST /")
         @Headers("Authorization: Basic {auth_token}")
         Response revokeToken(@Param("auth_token") String authToken, @Param("token") String token);
-
-        @RequestLine("POST /")
-        @Headers("Authorization: Basic {auth_token}")
-        Response revokeToken(@Param("auth_token") String authToken, @Param("token") String token,
-                             @Param("token_type_hint") String tokenTypeHint);
 
         /**
          * Revoke access token.
@@ -240,9 +219,6 @@ public class OAuth2ServiceStubs {
     public interface IntrospectionServiceStub {
         @RequestLine("POST /")
         Response introspectToken(@Param("token") String token);
-
-        @RequestLine("POST /")
-        Response introspectToken(@Param("token") String token, @Param("token_type_hint") String tokenTypeHint);
     }
 
     private static class FormEncoder implements Encoder {

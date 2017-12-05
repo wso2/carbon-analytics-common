@@ -52,11 +52,9 @@ public class LocalIdPClient implements IdPClient {
     private List<LocalUser> usersList;
     private Role adminRole;
     private List<Role> rolesList;
-    private int systemLoginCount;
 
     public LocalIdPClient(int sessionTimeOut, List<LocalUser> users, List<Role> roles, Role adminRole) {
         this.sessionTimeout = sessionTimeOut * 1000;
-        this.systemLoginCount = 0;
         // NOTE: the rememberMe timeout is set at 7 days
         this.rememberMeTimeout = 7 * 24 * 60 * 60 * 1000;
         this.adminRole = adminRole;
@@ -189,21 +187,6 @@ public class LocalIdPClient implements IdPClient {
                             "login are invalid, username : '" + userName + "'.");
                     return returnProperties;
                 }
-            case IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE:
-                //Login for any system service to access API's
-                userName = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
-                password = IdPClientConstants.SYSTEM_LOGIN + (++this.systemLoginCount);
-                int userHash = (userName + ":" + password).hashCode();
-                Long createdAt = Calendar.getInstance().getTimeInMillis();
-                Session newSession = new Session(userHash, true, userName, createdAt + this.sessionTimeout);
-                usersToSessionMap.put(userHash, newSession);
-                sessionIdSessionMap.put(newSession.getSessionId().toString(), newSession);
-                returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
-                returnProperties.put(IdPClientConstants.ACCESS_TOKEN, newSession.getSessionId().toString());
-                returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
-                returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
-                return returnProperties;
-
             default:
                 errorMessage = "The Grant Type '" + grantType + "' is not" +
                         "supported by the IdPClient '" + LocalIdPClient.class.getName();
@@ -230,9 +213,6 @@ public class LocalIdPClient implements IdPClient {
         Session session = sessionIdSessionMap.get(token);
         if (session == null) {
             throw new AuthenticationException("The session with id '" + token + "' is not valid.");
-        }
-        if (session.isInternalUser()) {
-            return IdPClientConstants.SYSTEM_LOGIN;
         }
         if (session.getExpiryTime() > Calendar.getInstance().getTimeInMillis()) {
             return session.getUsername();

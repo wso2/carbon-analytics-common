@@ -24,7 +24,6 @@ import java.util.UUID;
  */
 public class Session {
     private UUID sessionId;
-    private boolean internalUser;
     private int userHash;
     private String username;
     private Long expiryTime;
@@ -32,7 +31,6 @@ public class Session {
     public Session(int userHash, boolean internalUser, String username, Long expiryTime) {
         this.userHash = userHash;
         this.username = username;
-        this.internalUser = internalUser;
         this.sessionId = UUID.randomUUID();
         this.expiryTime = expiryTime;
     }
@@ -51,10 +49,6 @@ public class Session {
 
     public int getUserHash() {
         return userHash;
-    }
-
-    public boolean isInternalUser() {
-        return internalUser;
     }
 
     public String getUsername() {
