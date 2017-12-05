@@ -76,7 +76,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
         }
 
         List<Role> roles = idPClientConfiguration.getUserManager().getUserStore().getRoles().stream()
-                .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplay())
+                .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplayName())
         ).collect(Collectors.toList());
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
