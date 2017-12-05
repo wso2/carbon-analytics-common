@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
-import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.UserChildElement;
+import org.wso2.carbon.analytics.idp.client.local.models.LocalUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -85,14 +85,15 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                 .orElseThrow(() -> new IdPClientException("Admin role '" + adminRoleDisplayName + "' is not available" +
                         " in the User Store."));
 
-        List<User> users = idPClientConfiguration.getUserManager().getUserStore().getUsers().stream()
+        List<LocalUser> users = idPClientConfiguration.getUserManager().getUserStore().getUsers().stream()
                 .map(userElement -> {
                     UserChildElement user = userElement.getUser();
                     List<String> roleIdList = Arrays.asList(user.getRoles().replaceAll("\\s*", "").split(","));
                     List<Role> userRolesFromId = roles.stream()
                             .filter((role) -> roleIdList.contains(role.getId()))
                             .collect(Collectors.toList());
-            return new User(user.getUsername(), user.getPassword(), user.getProperties(), userRolesFromId);
+                    return new LocalUser(
+                            user.getUsername(), user.getPassword().toCharArray(), user.getProperties(), userRolesFromId);
         }).collect(Collectors.toList());
 
         return new LocalIdPClient(sessionTimeout, users, roles, adminRole);

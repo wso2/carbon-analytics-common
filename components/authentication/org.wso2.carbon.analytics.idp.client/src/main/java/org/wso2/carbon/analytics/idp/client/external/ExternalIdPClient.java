@@ -199,7 +199,7 @@ public class ExternalIdPClient implements IdPClient {
                             userProperties.put(entry.getKey(), entry.getValue().toString());
                     }
                 }
-                return new User(name, null, userProperties, userRoles);
+                return new User(name, userProperties, userRoles);
             } else {
                 return null;
             }

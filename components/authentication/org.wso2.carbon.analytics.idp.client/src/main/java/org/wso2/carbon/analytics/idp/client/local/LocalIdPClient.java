@@ -24,8 +24,11 @@ import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationExcepti
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.local.models.LocalUser;
 import org.wso2.carbon.analytics.idp.client.local.models.Session;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,12 +49,12 @@ public class LocalIdPClient implements IdPClient {
 
     private int sessionTimeout;
     private int rememberMeTimeout;
-    private List<User> usersList;
+    private List<LocalUser> usersList;
     private Role adminRole;
     private List<Role> rolesList;
     private int systemLoginCount;
 
-    public LocalIdPClient(int sessionTimeOut, List<User> users, List<Role> roles, Role adminRole) {
+    public LocalIdPClient(int sessionTimeOut, List<LocalUser> users, List<Role> roles, Role adminRole) {
         this.sessionTimeout = sessionTimeOut * 1000;
         this.systemLoginCount = 0;
         // NOTE: the rememberMe timeout is set at 7 days
@@ -73,17 +76,16 @@ public class LocalIdPClient implements IdPClient {
 
     @Override
     public User getUser(String name) {
-        User user = getUserFromUsersList(name);
+        LocalUser user = getUserFromUsersList(name);
         if (user != null) {
-            user.setPassword(null);
-            return user;
+            return new User(user.getUsername(), user.getProperties(), user.getRoles());
         }
         return null;
     }
 
     @Override
     public List<Role> getUserRoles(String name) {
-        User user = getUserFromUsersList(name);
+        LocalUser user = getUserFromUsersList(name);
         if (user != null) {
             return user.getRoles();
         }
@@ -140,9 +142,16 @@ public class LocalIdPClient implements IdPClient {
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
                     return returnProperties;
                 }
-                User user = getUserFromUsersList(userName);
+                LocalUser user = getUserFromUsersList(userName);
                 if (user != null) {
-                    byte[] plainUserPassword = Base64.getDecoder().decode(user.getPassword());
+
+                    CharBuffer charBuffer = CharBuffer.wrap(user.getPassword());
+                    ByteBuffer byteBuffer = Base64.getDecoder().decode(Charset.forName("UTF-8").encode(charBuffer));
+                    byte[] plainUserPassword = Arrays.copyOfRange(byteBuffer.array(),
+                            byteBuffer.position(), byteBuffer.limit());
+                    Arrays.fill(charBuffer.array(), '\u0000'); // clear sensitive data
+                    Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
+
                     if (!Arrays.equals(plainUserPassword, password.getBytes(Charset.forName("UTF-8")))) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Password did not match with the configured user, userName: '" +
@@ -234,7 +243,7 @@ public class LocalIdPClient implements IdPClient {
         }
     }
 
-    private User getUserFromUsersList(String name) {
+    private LocalUser getUserFromUsersList(String name) {
         return this.usersList.stream()
                 .filter(user -> user.getUsername().equals(name))
                 .findFirst()

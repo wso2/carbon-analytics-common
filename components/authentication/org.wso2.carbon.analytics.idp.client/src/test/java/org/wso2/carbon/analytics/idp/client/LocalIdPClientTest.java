@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.idp.client;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationException;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
@@ -25,6 +26,7 @@ import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.local.LocalIdPClient;
+import org.wso2.carbon.analytics.idp.client.local.models.LocalUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,14 +39,24 @@ import java.util.Map;
  */
 public class LocalIdPClientTest {
 
+    private Role defaultRole;
+    private LocalUser defaultUser;
+    private LocalIdPClient localIdPClient;
+
+    @BeforeMethod
+    public void initializeIdPClient() {
+        Map<String, String> userProperties = new HashMap<>();
+        this.defaultRole = new Role("1", "admin");
+        char[] password = "YWRtaW4=".toCharArray();
+        this.defaultUser = new LocalUser("admin", password, userProperties,
+                Collections.singletonList(defaultRole));
+        this.localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
+                Collections.singletonList(defaultRole), defaultRole);
+
+    }
+
     @Test
     public void testLoginSuccessPasswordGrantType() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
 
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
@@ -58,13 +70,6 @@ public class LocalIdPClientTest {
 
     @Test
     public void testLoginSuccessClientCredentialsGrantType() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
@@ -77,13 +82,6 @@ public class LocalIdPClientTest {
 
     @Test
     public void testLoginFailureUserNotFound() throws IdPClientException, AuthenticationException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin2");
@@ -96,13 +94,6 @@ public class LocalIdPClientTest {
 
     @Test
     public void testLoginFailureWrongPassword() throws IdPClientException, AuthenticationException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
@@ -115,13 +106,6 @@ public class LocalIdPClientTest {
 
     @Test
     public void testLoginFailureUnsupportedGrantType() throws IdPClientException, AuthenticationException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, "invalid_grant_type");
         loginProperties.put(IdPClientConstants.USERNAME, "admin2");
@@ -134,13 +118,6 @@ public class LocalIdPClientTest {
 
     @Test
     public void testLoginFailureNullValue() throws IdPClientException, AuthenticationException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.PASSWORD, "admin");
@@ -152,13 +129,6 @@ public class LocalIdPClientTest {
 
     @Test(expectedExceptions = AuthenticationException.class)
     public void testSessionTimeout() throws InterruptedException, IdPClientException, AuthenticationException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
@@ -176,13 +146,6 @@ public class LocalIdPClientTest {
 
     @Test
     public void testLoginSuccessWithinSessionTime() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
@@ -198,73 +161,36 @@ public class LocalIdPClientTest {
 
     @Test
     public void testGetAllRoles() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
         List<Role> allRoles = localIdPClient.getAllRoles();
         Assert.assertEquals(allRoles, Collections.singletonList(defaultRole));
     }
 
     @Test
     public void testGetUserRoles() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
         List<Role> allRoles = localIdPClient.getUserRoles("admin");
         Assert.assertEquals(allRoles, Collections.singletonList(defaultRole));
     }
 
     @Test
     public void testGetUserRolesFailure() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
         List<Role> allRoles = localIdPClient.getUserRoles("admin2");
         Assert.assertEquals(allRoles, new ArrayList<>());
     }
 
     @Test
     public void testGetUser() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
         User admin = localIdPClient.getUser("admin");
-        Assert.assertEquals(admin, defaultUser);
+        Assert.assertEquals(admin.getUsername(), "admin");
     }
 
     @Test
     public void testGetUserFailure() throws IdPClientException {
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
         Assert.assertNull(localIdPClient.getUser("admin2"));
     }
 
     @Test(expectedExceptions = AuthenticationException.class)
     public void testLogout() throws IdPClientException, AuthenticationException {
         //logging in
-        Map<String, String> userProperties = new HashMap<>();
-        Role defaultRole = new Role("1", "admin");
-        User defaultUser = new User("admin", "YWRtaW4=", userProperties,
-                Collections.singletonList(defaultRole));
-        LocalIdPClient localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
-                Collections.singletonList(defaultRole), defaultRole);
-
         Map<String, String> loginProperties = new HashMap<>();
         loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
         loginProperties.put(IdPClientConstants.USERNAME, "admin");
