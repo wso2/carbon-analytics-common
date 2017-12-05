@@ -19,36 +19,86 @@
 package org.wso2.carbon.data.provider.utils;
 
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Value holder for data provider.
  */
 public class DataProviderValueHolder {
-    private static DataProviderValueHolder dataProviderHelper = null;
-    private static DataSourceService dataSourceService = null;
-    private static ConfigProvider configProvider = null;
+    private static DataProviderValueHolder dataProviderHelper = new DataProviderValueHolder();
+    private DataSourceService dataSourceService = null;
+    private ConfigProvider configProvider = null;
+    private Map<String, Map<String, DataProvider>> sessionDataProviderMap = new ConcurrentHashMap<>();
+    private Map<String, Class> dataProviderClassMap = new ConcurrentHashMap<>();
 
     public static DataProviderValueHolder getDataProviderHelper() {
-        if (dataProviderHelper == null) {
-            dataProviderHelper = new DataProviderValueHolder();
-        }
         return dataProviderHelper;
     }
 
-    public static DataSourceService getDataSourceService() {
+    public DataSourceService getDataSourceService() {
         return dataSourceService;
     }
 
-    public static void setDataSourceService(DataSourceService dataSourceService) {
-        DataProviderValueHolder.dataSourceService = dataSourceService;
+    public void setDataSourceService(DataSourceService dataSourceService) {
+        this.dataSourceService = dataSourceService;
     }
 
-    public static ConfigProvider getConfigProvider() {
+    public ConfigProvider getConfigProvider() {
         return configProvider;
     }
 
-    public static void setConfigProvider(ConfigProvider configProvider) {
-        DataProviderValueHolder.configProvider = configProvider;
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+    }
+
+    public void setDataProvider(String providerName, DataProvider dataProvider) {
+        this.dataProviderClassMap.put(providerName, dataProvider.getClass());
+    }
+
+    public DataProvider getDataProvider(String providerName) throws IllegalAccessException, InstantiationException {
+        return (DataProvider) this.dataProviderClassMap.get(providerName).newInstance();
+    }
+
+    public Set<String> getDataProviderNameSet() {
+        return dataProviderClassMap.keySet();
+    }
+
+    public Map<String, DataProvider> getTopicDataProviderMap(String sessionId) {
+        return sessionDataProviderMap.get(sessionId);
+    }
+
+    public void removeDataProviderClass(String providerName) {
+        this.dataProviderClassMap.remove(providerName);
+    }
+
+    public void removeSessionData(String sessionId) {
+        this.sessionDataProviderMap.remove(sessionId);
+    }
+
+    public boolean removeTopicIfExist(String sessionId, String topic) {
+        if (this.sessionDataProviderMap.containsKey(sessionId)) {
+            if (this.sessionDataProviderMap.get(sessionId).containsKey(topic)) {
+                DataProvider dataProvider = this.sessionDataProviderMap.get(sessionId).remove(topic);
+                if (dataProvider != null) {
+                    dataProvider.stop();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addDataProviderToSessionMap(String sessionId, String topic, DataProvider dataProvider) {
+        if (this.sessionDataProviderMap.containsKey(sessionId)) {
+            this.sessionDataProviderMap.get(sessionId).put(topic, dataProvider);
+        } else {
+            this.sessionDataProviderMap.put(sessionId, new ConcurrentHashMap<>());
+            this.sessionDataProviderMap.get(sessionId).put(topic, dataProvider);
+        }
     }
 }

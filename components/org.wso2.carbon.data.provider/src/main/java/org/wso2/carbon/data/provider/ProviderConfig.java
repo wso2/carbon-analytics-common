@@ -24,18 +24,21 @@ package org.wso2.carbon.data.provider;
 public interface ProviderConfig {
     /**
      * Get publishing interval.
+     *
      * @return interval as long value.
      */
     long getPublishingInterval();
 
     /**
      * Get purging interval.
+     *
      * @return interval as long value.
      */
     long getPurgingInterval();
 
     /**
      * Get purging enable or disable state.
+     *
      * @return enable or disable state as boolean value.
      */
     boolean isPurgingEnable();

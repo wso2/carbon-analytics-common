@@ -2,7 +2,6 @@ package org.wso2.carbon.data.provider.rdbms.utils;
 
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean;
-import org.wso2.carbon.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
@@ -15,6 +14,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+
+import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDataProviderHelper;
 
 /**
  * Holds the database queries.
@@ -31,7 +32,7 @@ public class RDBMSQueryManager {
     private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
             QueryMappingNotAvailableException, IOException {
         try {
-            RDBMSDataProviderConfBean deploymentConfigurations = DataProviderValueHolder.getConfigProvider()
+            RDBMSDataProviderConfBean deploymentConfigurations = getDataProviderHelper().getConfigProvider()
                     .getConfigurationObject(RDBMSDataProviderConfBean.class);
             ArrayList<Queries> deploymentQueries = deploymentConfigurations.getQueries();
             ArrayList<Queries> componentQueries;
