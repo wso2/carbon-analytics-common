@@ -125,7 +125,7 @@ public class LocalIdPClient implements IdPClient {
                         } else {
                             oldSession.setExpiryTime(createdAt + this.sessionTimeout);
                             returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
                         }
                         usersToSessionMap.replace(userValue, oldSession);
                         sessionIdSessionMap.replace(oldSession.getSessionId().toString(), oldSession);
@@ -172,7 +172,7 @@ public class LocalIdPClient implements IdPClient {
                         } else {
                             session = new Session(userValue, false, userName, createdAt + this.sessionTimeout);
                             returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
                         }
                         usersToSessionMap.put(userValue, session);
                         sessionIdSessionMap.put(session.getSessionId().toString(), session);
@@ -201,7 +201,7 @@ public class LocalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                 returnProperties.put(IdPClientConstants.ACCESS_TOKEN, newSession.getSessionId().toString());
                 returnProperties.put(IdPClientConstants.CREATED_AT, createdAt.toString());
-                returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                returnProperties.put(IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
                 return returnProperties;
 
             default:
