@@ -41,6 +41,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -580,7 +581,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                     }
                 } else {
                     throw new OutputEventAdapterException("Cannot Execute Insert/Update. Null value detected for " +
-                            "attribute : " + attribute.getName());
+                            "attribute : " + attribute.getName() + " ,attribute type : " + attribute.getType());
                 }
             }
         } catch (SQLException e) {
@@ -839,7 +840,7 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
 
         String[] entries = attributeDefinition.split(RDBMSEventAdapterConstants.ATTRIBUTE_SEPARATOR);
         String[] keyValue;
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new LinkedHashMap<>();
         for (String attributeWithType : entries) {
             try {
                 keyValue = attributeWithType.split(RDBMSEventAdapterConstants.ENTRY_SEPARATOR, 2);
