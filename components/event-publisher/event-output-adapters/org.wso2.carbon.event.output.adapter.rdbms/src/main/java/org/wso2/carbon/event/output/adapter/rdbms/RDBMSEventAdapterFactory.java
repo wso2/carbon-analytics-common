@@ -86,6 +86,14 @@ public class RDBMSEventAdapterFactory extends OutputEventAdapterFactory {
                 .setHint(resourceBundle.getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_UPDATE_KEYS_HINT));
         staticPropertyList.add(updateColumnKeys);
 
+        Property attributesWithTypes = new Property(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_TABLE_ATTRIBUTES);
+        attributesWithTypes.setDisplayName(resourceBundle.
+                getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_TABLE_ATTRIBUTES));
+        attributesWithTypes.setHint(resourceBundle.
+                getString(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_TABLE_ATTRIBUTES_HINT));
+        attributesWithTypes.setRequired(false);
+        staticPropertyList.add(attributesWithTypes);
+
         return staticPropertyList;
     }
 
