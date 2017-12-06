@@ -37,6 +37,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Local IdP Client.
@@ -46,17 +47,18 @@ public class LocalIdPClient implements IdPClient {
     private static final Logger LOG = LoggerFactory.getLogger(LocalIdPClient.class);
     private Map<Integer, Session> usersToSessionMap = new HashMap<>();
     private Map<String, Session> sessionIdSessionMap = new HashMap<>();
+    private Map<String, Session> refreshIdSessionMap = new HashMap<>();
 
     private int sessionTimeout;
-    private int rememberMeTimeout;
+    private int refreshTimeout;
     private List<LocalUser> usersList;
     private Role adminRole;
     private List<Role> rolesList;
 
-    public LocalIdPClient(int sessionTimeOut, List<LocalUser> users, List<Role> roles, Role adminRole) {
+    public LocalIdPClient(int sessionTimeOut, int refreshTimeout, List<LocalUser> users, List<Role> roles,
+                          Role adminRole) {
         this.sessionTimeout = sessionTimeOut;
-        // NOTE: the rememberMe timeout is set at 7 days
-        this.rememberMeTimeout = 7 * 24 * 60 * 60;
+        this.refreshTimeout = refreshTimeout;
         this.adminRole = adminRole;
         this.rolesList = roles;
         this.usersList = users;
@@ -98,7 +100,6 @@ public class LocalIdPClient implements IdPClient {
         Map<String, String> returnProperties = new HashMap<>();
         String grantType = properties.getOrDefault(IdPClientConstants.GRANT_TYPE,
                 IdPClientConstants.PASSWORD_GRANT_TYPE);
-        boolean rememberMe = Boolean.parseBoolean(properties.getOrDefault(IdPClientConstants.REMEMBER_ME, "true"));
         String userName, password, errorMessage;
         switch (grantType) {
             case IdPClientConstants.PASSWORD_GRANT_TYPE:
@@ -110,26 +111,27 @@ public class LocalIdPClient implements IdPClient {
                     //Checking if session is already present and update expiry time.
                     Session oldSession = this.usersToSessionMap.get(userValue);
                     if (oldSession != null) {
-                        returnProperties.put(IdPClientConstants.LOGIN_STATUS,
-                                IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
-                        returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oldSession.getSessionId().toString());
-
                         ZonedDateTime createdAt = ZonedDateTime.now();
+                        oldSession.setExpiryTime(createdAt.plusSeconds(this.sessionTimeout));
+                        oldSession.setRefreshExpiryTime(createdAt.plusSeconds(this.refreshTimeout));
 
-                        if (rememberMe) {
-                            oldSession.setExpiryTime(createdAt.plusSeconds(this.rememberMeTimeout));
-                            returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
-                                    String.valueOf(this.rememberMeTimeout));
-                        } else {
-                            oldSession.setExpiryTime(createdAt.plusSeconds(this.sessionTimeout));
-                            returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
-                        }
                         usersToSessionMap.replace(userValue, oldSession);
                         sessionIdSessionMap.replace(oldSession.getSessionId().toString(), oldSession);
+                        refreshIdSessionMap.replace(oldSession.getRefreshId().toString(), oldSession);
+
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("User '" + userName + "' session is extended.");
                         }
+
+                        returnProperties.put(IdPClientConstants.LOGIN_STATUS,
+                                IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oldSession.getSessionId().toString());
+                        returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oldSession.getRefreshId().toString());
+                        returnProperties.put(
+                                IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                        returnProperties.put(
+                                IdPClientConstants.REFRESH_VALIDITY_PERIOD, String.valueOf(this.refreshTimeout));
+
                         return returnProperties;
                     }
                 } else {
@@ -163,20 +165,30 @@ public class LocalIdPClient implements IdPClient {
                         return returnProperties;
                     } else {
                         ZonedDateTime createdAt = ZonedDateTime.now();
-                        if (rememberMe) {
-                            session = new Session(userValue, userName, createdAt.plusSeconds(this.rememberMeTimeout));
-                            returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.rememberMeTimeout));
-                        } else {
-                            session = new Session(userValue, userName,  createdAt.plusSeconds(this.sessionTimeout));
-                            returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
-                        }
+                        session = new Session(userValue, userName, createdAt.plusSeconds(this.sessionTimeout),
+                                createdAt.plusSeconds(this.refreshTimeout));
+                        returnProperties.put(
+                                IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                        returnProperties.put(
+                                IdPClientConstants.REFRESH_VALIDITY_PERIOD, String.valueOf(this.refreshTimeout));
+
                         usersToSessionMap.put(userValue, session);
                         sessionIdSessionMap.put(session.getSessionId().toString(), session);
+                        refreshIdSessionMap.put(session.getRefreshId().toString(), session);
+
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("User '" + userName + "' is logged in.");
+                        }
+
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                         returnProperties.put(IdPClientConstants.ACCESS_TOKEN, session.getSessionId().toString());
+                        returnProperties.put(IdPClientConstants.REFRESH_TOKEN, session.getRefreshId().toString());
+                        returnProperties.put(
+                                IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                        returnProperties.put(
+                                IdPClientConstants.REFRESH_VALIDITY_PERIOD, String.valueOf(this.refreshTimeout));
+
                         return returnProperties;
                     }
                 } else {
@@ -185,6 +197,55 @@ public class LocalIdPClient implements IdPClient {
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, "The login credential used for " +
                             "login are invalid, username : '" + userName + "'.");
+                    return returnProperties;
+                }
+            case IdPClientConstants.REFRESH_GRANT_TYPE:
+                String refreshId = properties.get(IdPClientConstants.REFRESH_TOKEN);
+                Session refreshSession = refreshIdSessionMap.remove(refreshId);
+                if (refreshSession != null) {
+                    usersToSessionMap.remove(refreshSession.getUserHash());
+                    sessionIdSessionMap.remove(refreshSession.getSessionId().toString());
+                    if (refreshSession.getRefreshExpiryTime().isAfter(ZonedDateTime.now())) {
+                        ZonedDateTime refreshedAt = ZonedDateTime.now();
+                        refreshSession.setSessionId(UUID.randomUUID());
+                        refreshSession.setExpiryTime(refreshedAt.plusSeconds(this.sessionTimeout));
+                        refreshSession.setRefreshId(UUID.randomUUID());
+                        refreshSession.setRefreshExpiryTime(refreshedAt.plusSeconds(this.refreshTimeout));
+
+                        usersToSessionMap.put(refreshSession.getUserHash(), refreshSession);
+                        sessionIdSessionMap.put(refreshSession.getSessionId().toString(), refreshSession);
+                        refreshIdSessionMap.put(refreshSession.getRefreshId().toString(), refreshSession);
+
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("User '" + refreshSession.getUsername() + "' session is refreshed.");
+                        }
+
+                        returnProperties.put(IdPClientConstants.LOGIN_STATUS,
+                                IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.ACCESS_TOKEN, refreshSession.getSessionId().toString());
+                        returnProperties.put(
+                                IdPClientConstants.REFRESH_TOKEN, refreshSession.getRefreshId().toString());
+                        returnProperties.put(
+                                IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
+                        returnProperties.put(
+                                IdPClientConstants.REFRESH_VALIDITY_PERIOD, String.valueOf(this.refreshTimeout));
+                        return returnProperties;
+                    } else {
+                        errorMessage = "The refresh token used for login is expired, Refresh token : '"
+                                + refreshId + "'.";
+                        LOG.error(errorMessage);
+                        returnProperties.put(
+                                IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
+                        returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
+                        returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
+                        return returnProperties;
+                    }
+                } else {
+                    errorMessage = "The refresh token used for login are invalid, Refresh token : '" + refreshId + "'.";
+                    LOG.error(errorMessage);
+                    returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
+                    returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
+                    returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
                     return returnProperties;
                 }
             default:
@@ -220,6 +281,9 @@ public class LocalIdPClient implements IdPClient {
         } else {
             usersToSessionMap.remove(session.getUserHash());
             sessionIdSessionMap.remove(session.getSessionId().toString());
+            if (session.getRefreshExpiryTime().isAfter(now)) {
+                refreshIdSessionMap.remove(session.getRefreshId().toString());
+            }
             throw new AuthenticationException("The session with id '" + token + "' has expired.");
         }
     }

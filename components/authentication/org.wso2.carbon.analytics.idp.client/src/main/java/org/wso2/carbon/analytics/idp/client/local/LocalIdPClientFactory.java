@@ -66,10 +66,13 @@ public class LocalIdPClientFactory implements IdPClientFactory {
     @Override
     public IdPClient getIdPClient(IdPClientConfiguration idPClientConfiguration) throws IdPClientException {
         int sessionTimeout;
+        int refreshTimeout;
         Map<String, String> properties = idPClientConfiguration.getProperties();
         try {
             sessionTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_SESSION_TIMEOUT));
+            refreshTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT,
+                    LocalIdPClientConstants.DEFAULT_REFRESH_SESSION_TIMEOUT));
         } catch (NumberFormatException e) {
             throw new IdPClientException("Session timeout overridden property '" +
                     properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
@@ -96,7 +99,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                             userRolesFromId);
         }).collect(Collectors.toList());
 
-        return new LocalIdPClient(sessionTimeout, users, roles, adminRole);
+        return new LocalIdPClient(sessionTimeout, refreshTimeout, users, roles, adminRole);
     }
 
 }

@@ -28,12 +28,17 @@ public class Session {
     private int userHash;
     private String username;
     private ZonedDateTime expiryTime;
+    private UUID refreshId;
+    private ZonedDateTime refreshExpiryTime;
 
-    public Session(int userHash, String username, ZonedDateTime expiryTime) {
+    public Session(int userHash, String username, ZonedDateTime expiryTime, ZonedDateTime refreshExpiryTime) {
         this.userHash = userHash;
         this.username = username;
         this.sessionId = UUID.randomUUID();
         this.expiryTime = expiryTime;
+        this.refreshId = UUID.randomUUID();
+        this.refreshExpiryTime = refreshExpiryTime;
+
     }
 
     public UUID getSessionId() {
@@ -54,5 +59,25 @@ public class Session {
 
     public String getUsername() {
         return username;
+    }
+
+    public UUID getRefreshId() {
+        return refreshId;
+    }
+
+    public ZonedDateTime getRefreshExpiryTime() {
+        return refreshExpiryTime;
+    }
+
+    public void setRefreshExpiryTime(ZonedDateTime refreshExpiryTime) {
+        this.refreshExpiryTime = refreshExpiryTime;
+    }
+
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public void setRefreshId(UUID refreshId) {
+        this.refreshId = refreshId;
     }
 }

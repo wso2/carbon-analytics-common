@@ -50,7 +50,7 @@ public class LocalIdPClientTest {
         char[] password = "YWRtaW4=".toCharArray();
         this.defaultUser = new LocalUser("admin", password, userProperties,
                 Collections.singletonList(defaultRole));
-        this.localIdPClient = new LocalIdPClient(1, Collections.singletonList(defaultUser),
+        this.localIdPClient = new LocalIdPClient(1, 5, Collections.singletonList(defaultUser),
                 Collections.singletonList(defaultRole), defaultRole);
 
     }
