@@ -60,16 +60,6 @@ public class DatabridgeCoreTestcase {
     private static final String DATABRIDGE_CORE_BUNDLE_NAME = "org.wso2.carbon.databridge.core";
     private String sessionId = "";
 
-//    private static final int HTTP_PORT = 9090;
-//    private static final String HOSTNAME = "localhost";
-//    private static final String API_CONTEXT_PATH = "/stores/query";
-//    private static final String CONTENT_TYPE_JSON = "application/json";
-//    private static final String HTTP_METHOD_POST = "POST";
-//    private static final String TABLENAME = "SmartHomeTable";
-//    private final String DEFAULT_USER_NAME = "admin";
-//    private final String DEFAULT_PASSWORD = "admin";
-//    private final Gson gson = new Gson();
-
     @Inject
     private BundleContext bundleContext;
 
