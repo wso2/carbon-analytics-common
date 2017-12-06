@@ -24,13 +24,11 @@ import java.util.Map;
 public class User {
 
     private String username;
-    private String password;
     private Map<String, String> properties;
     private List<Role> roles;
 
-    public User(String username, String password, Map<String, String> properties, List<Role> roles) {
+    public User(String username, Map<String, String> properties, List<Role> roles) {
         this.username = username;
-        this.password = password;
         this.properties = properties;
         this.roles = roles;
     }
@@ -41,14 +39,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Map<String, String> getProperties() {

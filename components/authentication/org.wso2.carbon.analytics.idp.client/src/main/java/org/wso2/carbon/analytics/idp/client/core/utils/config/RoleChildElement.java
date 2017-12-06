@@ -30,13 +30,13 @@ public class RoleChildElement {
     private String id = "1";
 
     @Element(description = "Role Display Name", required = true)
-    private String display = "admin";
+    private String displayName = "admin";
 
     public String getId() {
         return id;
     }
 
-    public String getDisplay() {
-        return display;
+    public String getDisplayName() {
+        return displayName;
     }
 }
