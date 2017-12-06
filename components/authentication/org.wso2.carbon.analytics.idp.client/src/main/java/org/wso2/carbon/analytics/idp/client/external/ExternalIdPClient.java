@@ -65,25 +65,36 @@ public class ExternalIdPClient implements IdPClient {
     private String signingAlgo;
     private String adminRoleDisplayName;
 
-    //Here the user given values are mapped to the constant name.
-    private String spOAuthAppName;
+    //Here the user given context are mapped to the OAuthApp Info.
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
 
     public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String singingAlgo,
-                             String adminRoleDisplayName, String spOAuthAppName, List<String> oAuthAppNames,
+                             String adminRoleDisplayName,  Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
                              DCRMServiceStub dcrmServiceStub, OAuth2ServiceStubs oAuth2ServiceStubs,
                              SCIM2ServiceStub scimServiceStub) throws IdPClientException {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
         this.grantType = grantType;
         this.signingAlgo = singingAlgo;
+        this.oAuthAppInfoMap = oAuthAppInfoMap;
         this.adminRoleDisplayName = adminRoleDisplayName;
-        this.spOAuthAppName = spOAuthAppName;
         this.dcrmServiceStub = dcrmServiceStub;
         this.oAuth2ServiceStubs = oAuth2ServiceStubs;
         this.scimServiceStub = scimServiceStub;
-        oAuthAppInfoMap = new HashMap<>();
-        createDCRApplication(oAuthAppNames);
+    }
+
+    public void init() throws IdPClientException {
+        for (Map.Entry<String, OAuthApplicationInfo> oAuthApplicationInfoEntry : this.oAuthAppInfoMap.entrySet()) {
+            String clientId = oAuthApplicationInfoEntry.getValue().getClientId();
+            String clientSecret = oAuthApplicationInfoEntry.getValue().getClientSecret();
+
+            if (clientId == null && clientSecret == null) {
+                registerApplication(oAuthApplicationInfoEntry.getKey(),
+                        oAuthApplicationInfoEntry.getValue().getClientName());
+            } else if (clientId == null ^ clientSecret == null) {
+                throw new IdPClientException("Both values must be overriden..");
+            }
+        }
     }
 
     @Override
@@ -199,7 +210,7 @@ public class ExternalIdPClient implements IdPClient {
                             userProperties.put(entry.getKey(), entry.getValue().toString());
                     }
                 }
-                return new User(name, null, userProperties, userRoles);
+                return new User(name, userProperties, userRoles);
             } else {
                 return null;
             }
@@ -233,10 +244,8 @@ public class ExternalIdPClient implements IdPClient {
         String oAuthAppContext = properties.get(IdPClientConstants.APP_NAME);
 
         //Checking if these are the frontend-if not use sp
-        List<String> list = new ArrayList<>(oAuthAppInfoMap.keySet());
-        list.remove(this.spOAuthAppName);
-        if (!list.contains(oAuthAppContext)) {
-            oAuthAppContext = this.spOAuthAppName;
+        if (!this.oAuthAppInfoMap.keySet().contains(oAuthAppContext)) {
+            oAuthAppContext = ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT;
         }
 
         if (IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE.equals(grantType)) {
@@ -252,10 +261,6 @@ public class ExternalIdPClient implements IdPClient {
                     properties.get(IdPClientConstants.USERNAME), properties.get(IdPClientConstants.PASSWORD),
                     null, this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                     this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
-        } else if (IdPClientConstants.CLIENT_CREDENTIALS_GRANT_TYPE.equals(grantType)) {
-            response = oAuth2ServiceStubs.getTokenServiceStub().generateClientCredentialsGrantAccessToken(null,
-                    this.oAuthAppInfoMap.get(this.spOAuthAppName).getClientId(),
-                    this.oAuthAppInfoMap.get(this.spOAuthAppName).getClientSecret());
         } else {
             response = oAuth2ServiceStubs.getTokenServiceStub().generateRefreshGrantAccessToken(
                     properties.get(IdPClientConstants.REFRESH_TOKEN), null,
@@ -308,10 +313,13 @@ public class ExternalIdPClient implements IdPClient {
 
     public Map<String, String> authCodeLogin(String appContext, String code) throws IdPClientException {
         Map<String, String> returnProperties = new HashMap<>();
-        String oAuthAppName = appContext.split("/\\|?")[0];
-        OAuthApplicationInfo oAuthApplicationInfo = this.oAuthAppInfoMap.get(oAuthAppName);
+        String oAuthAppContext = appContext.split("/\\|?")[0];
+        if (!this.oAuthAppInfoMap.keySet().contains(oAuthAppContext)) {
+            oAuthAppContext = ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT;
+        }
+        OAuthApplicationInfo oAuthApplicationInfo = this.oAuthAppInfoMap.get(oAuthAppContext);
         Response response = oAuth2ServiceStubs.getTokenServiceStub().generateAuthCodeGrantAccessToken(code,
-                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + oAuthAppName, null,
+                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + oAuthAppContext, null,
                 oAuthApplicationInfo.getClientId(), oAuthApplicationInfo.getClientSecret());
         if (response == null) {
             String error = "Error occurred while generating an access token from code '" + code + "'. " +
@@ -373,11 +381,15 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public void logout(Map<String, String> properties) throws IdPClientException {
-        String appName = properties.getOrDefault(properties.get(IdPClientConstants.APP_NAME), this.spOAuthAppName);
+        String oAuthAppContext = properties.getOrDefault(IdPClientConstants.APP_NAME,
+                ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT);
+        if (!this.oAuthAppInfoMap.keySet().contains(oAuthAppContext)) {
+            oAuthAppContext = ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT;
+        }
         oAuth2ServiceStubs.getRevokeServiceStub().revokeAccessToken(
                 properties.get(IdPClientConstants.ACCESS_TOKEN),
-                this.oAuthAppInfoMap.get(appName).getClientId(),
-                this.oAuthAppInfoMap.get(appName).getClientSecret());
+                this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
+                this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
     }
 
     @Override
@@ -416,93 +428,77 @@ public class ExternalIdPClient implements IdPClient {
         }
     }
 
-    private void createDCRApplication(List<String> oAuthAppNames) throws IdPClientException {
-        for (String oAuthAppName : oAuthAppNames) {
-            List<String> grantTypes = new ArrayList<>();
-            grantTypes.add(IdPClientConstants.PASSWORD_GRANT_TYPE);
-            grantTypes.add(IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
-            grantTypes.add(IdPClientConstants.REFRESH_GRANT_TYPE);
+    private void registerApplication(String appContext, String clientName) throws IdPClientException {
+        List<String> grantTypes = new ArrayList<>();
+        grantTypes.add(IdPClientConstants.PASSWORD_GRANT_TYPE);
+        grantTypes.add(IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
+        grantTypes.add(IdPClientConstants.REFRESH_GRANT_TYPE);
 
-            String callBackUrl;
-            if (oAuthAppName.equals(this.spOAuthAppName)) {
-                callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                        ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH +
-                        ExternalIdPClientConstants.REGEX_BASE_END;
-            } else {
-                callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                        ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH
-                        + oAuthAppName + ExternalIdPClientConstants.REGEX_BASE_END;
-            }
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Creating OAuth2 application.");
-            }
-            DCRClientInfo dcrClientInfo = new DCRClientInfo();
-            dcrClientInfo.setClientName(oAuthAppName);
-            dcrClientInfo.setGrantTypes(grantTypes);
-            dcrClientInfo.addCallbackUrl(callBackUrl);
-            dcrClientInfo.setUserinfoSignedResponseAlg(signingAlgo);
-
-            Response response = dcrmServiceStub.registerApplication(dcrClientInfo);
-            if (response == null) {
-                String error = "Error occurred while DCR application '" + dcrClientInfo + "' creation. " +
-                        "Response is null.";
-                LOG.error(error);
-                throw new IdPClientException(error);
-            }
-            if (response.status() == 201) {  //201 - Created
-                try {
-                    OAuthApplicationInfo oAuthApplicationInfo = getOAuthApplicationInfo(response);
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("OAuth2 application created: " + oAuthApplicationInfo.toString());
-                    }
-                    this.oAuthAppInfoMap.put(oAuthAppName, oAuthApplicationInfo);
-                } catch (IOException e) {
-                    String error = "Error occurred while parsing the DCR application creation response " +
-                            "message. Response: '" + response.body().toString() + "'.";
-                    LOG.error(error, e);
-                    throw new IdPClientException(error, e);
-                }
-            } else if (response.status() == 400) {  //400 - Known Error
-                try {
-                    DCRError error = (DCRError) new GsonDecoder().decode(response, DCRError.class);
-                    if (!error.getErrorDescription().contains("admin_" + oAuthAppName + " already registered")) {
-                        String errorMessage = "Error occurred while DCR application creation. Error: " +
-                                error.getError() + ". Error Description: " + error.getErrorDescription() +
-                                ". Status Code: " + response.status();
-                        LOG.error(errorMessage);
-                        throw new IdPClientException(errorMessage);
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Service Provider 'admin_" + oAuthAppName + "' already registered.");
-                    }
-                } catch (IOException e) {
-                    String error = "Error occurred while parsing the DCR error message. Error: " +
-                            "'" + getErrorMessage(response) + "'.";
-                    LOG.error(error, e);
-                    throw new IdPClientException(error, e);
-                }
-            } else {  //Unknown Error
-                String error = "Error occurred while DCR application creation. Error: " +
-                        response.body().toString() + " Status Code: '" + response.status() + "'.";
-                LOG.error(error);
-                throw new IdPClientException(error);
-            }
-
+        String callBackUrl;
+        if (clientName.equals(ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT)) {
+            callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
+                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH +
+                    ExternalIdPClientConstants.REGEX_BASE_END;
+        } else {
+            callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
+                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH
+                    + appContext + ExternalIdPClientConstants.REGEX_BASE_END;
         }
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating OAuth2 application of name '" + clientName + "'.");
+        }
+        DCRClientInfo dcrClientInfo = new DCRClientInfo();
+        dcrClientInfo.setClientName(clientName);
+        dcrClientInfo.setGrantTypes(grantTypes);
+        dcrClientInfo.addCallbackUrl(callBackUrl);
+        dcrClientInfo.setUserinfoSignedResponseAlg(signingAlgo);
 
-    }
-
-    private OAuthApplicationInfo getOAuthApplicationInfo(Response response) throws IOException {
-        OAuthApplicationInfo oAuthApplicationInfoResponse = new OAuthApplicationInfo();
-        DCRClientInfo dcrClientInfoResponse = (DCRClientInfo) new GsonDecoder().decode(response, DCRClientInfo.class);
-        oAuthApplicationInfoResponse.setClientName(dcrClientInfoResponse.getClientName());
-        oAuthApplicationInfoResponse.setClientId(dcrClientInfoResponse.getClientId());
-        oAuthApplicationInfoResponse.setClientSecret(dcrClientInfoResponse.getClientSecret());
-        oAuthApplicationInfoResponse.setGrantTypes(dcrClientInfoResponse.getGrantTypes());
-        oAuthApplicationInfoResponse.setCallBackURL(dcrClientInfoResponse.getRedirectURIs().get(0));
-        return oAuthApplicationInfoResponse;
+        Response response = dcrmServiceStub.registerApplication(dcrClientInfo);
+        if (response == null) {
+            String error = "Error occurred while DCR application '" + dcrClientInfo + "' creation. " +
+                    "Response is null.";
+            LOG.error(error);
+            throw new IdPClientException(error);
+        }
+        if (response.status() == 201) {  //201 - Created
+            try {
+                DCRClientInfo dcrClientInfoResponse = (DCRClientInfo) new GsonDecoder()
+                        .decode(response, DCRClientInfo.class);
+                OAuthApplicationInfo oAuthApplicationInfo = new OAuthApplicationInfo(
+                        dcrClientInfoResponse.getClientName(), dcrClientInfoResponse.getClientId(),
+                        dcrClientInfoResponse.getClientSecret()
+                );
+                this.oAuthAppInfoMap.replace(appContext, oAuthApplicationInfo);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("OAuth2 application created: " + oAuthApplicationInfo.toString());
+                }
+            } catch (IOException e) {
+                String error = "Error occurred while parsing the DCR application creation response " +
+                        "message. Response: '" + response.body().toString() + "'.";
+                LOG.error(error, e);
+                throw new IdPClientException(error, e);
+            }
+        } else if (response.status() == 400) {  //400 - Known Error
+            try {
+                DCRError error = (DCRError) new GsonDecoder().decode(response, DCRError.class);
+                String errorMessage = "Error occurred while DCR application creation. Error: " +
+                        error.getError() + ". Error Description: " + error.getErrorDescription() +
+                        ". Status Code: " + response.status();
+                LOG.error(errorMessage);
+                throw new IdPClientException(errorMessage);
+            } catch (IOException e) {
+                String error = "Error occurred while parsing the DCR error message. Error: " +
+                        "'" + getErrorMessage(response) + "'.";
+                LOG.error(error, e);
+                throw new IdPClientException(error, e);
+            }
+        } else {  //Unknown Error
+            String error = "Error occurred while DCR application creation. Error: " +
+                    response.body().toString() + " Status Code: '" + response.status() + "'.";
+            LOG.error(error);
+            throw new IdPClientException(error);
+        }
     }
 
     private String getErrorMessage(Response response) {

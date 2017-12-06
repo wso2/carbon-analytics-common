@@ -21,6 +21,7 @@ package org.wso2.carbon.data.provider.rdbms.bean;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 import org.wso2.carbon.database.query.manager.config.Queries;
+
 import java.util.ArrayList;
 
 /**
@@ -38,7 +39,7 @@ public class RDBMSDataProviderConfBean {
     String sqlTableNameSanitizingRegex = null;
 
     @Element(description = "Database queries template array list.")
-    private ArrayList<Queries> queries = new ArrayList<>();
+    ArrayList<Queries> queries = new ArrayList<>();
 
     @Element(description = "Array of linear column types in the database.")
     String[] linearTypes = new String[]{"INTEGER", "INT", "SMALLINT", "TINYINT", "MEDIUMINT", "BIGINT",

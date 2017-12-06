@@ -45,6 +45,7 @@ public class IdPClientConstants {
     public static final String AUTH_USER = "UserName";
     public static final String CREATED_AT = "Created_At";
     public static final String VALIDITY_PERIOD = "Validity_Period";
+    public static final String REFRESH_VALIDITY_PERIOD = "Refresh_Validity_Period";
     public static final String REMEMBER_ME = "Remember_Me";
 
 

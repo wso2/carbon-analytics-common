@@ -36,10 +36,17 @@ public class ExternalIdPClientConstants {
     public static final String IDP_CERT_ALIAS = "idp.cert.alias";
     public static final String IDP_USERNAME = "idp.username";
     public static final String IDP_PASSWORD = "idp.password";
-    public static final String SP_APP_NAME = "sp.app.name";
-    public static final String PORTAL_APP_NAME = "portal.app.name";
-    public static final String STATUS_DB_APP_NAME = "status.dashboard.app.name";
-    public static final String BR_DB_APP_NAME = "business.rules.app.name";
+    public static final String PORTAL_APP_CONTEXT = "portal.app.context";
+    public static final String STATUS_DB_APP_CONTEXT = "status.dashboard.app.context";
+    public static final String BR_DB_APP_CONTEXT = "business.rules.app.context";
+    public static final String SP_CLIENT_ID = "sp.client.id";
+    public static final String PORTAL_CLIENT_ID = "portal.client.id";
+    public static final String STATUS_DB_CLIENT_ID = "status.dashboard.client.id";
+    public static final String BR_DB_CLIENT_ID = "business.rules.client.id";
+    public static final String SP_CLIENT_SECRET = "sp.client.secret";
+    public static final String PORTAL_CLIENT_SECRET = "portal.client.secret";
+    public static final String STATUS_DB_CLIENT_SECRET = "status.dashboard.client.secret";
+    public static final String BR_DB_CLIENT_SECRET = "business.rules.client.secret";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
@@ -52,11 +59,15 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_IDP_CERT_ALIAS = "wso2carbon";
     public static final String DEFAULT_IDP_USERNAME = "admin";
     public static final String DEFAULT_IDP_PASSWORD = "admin";
-    public static final String DEFAULT_SP_APP_NAME = "sp";
-    public static final String DEFAULT_PORTAL_APP_NAME = "portal";
-    public static final String DEFAULT_STATUS_DB_APP_NAME = "monitoring";
-    public static final String DEFAULT_BR_DB_APP_NAME = "business-rules";
+    public static final String DEFAULT_SP_APP_CONTEXT = "sp";
+    public static final String DEFAULT_PORTAL_APP_CONTEXT = "portal";
+    public static final String DEFAULT_STATUS_DB_APP_CONTEXT = "monitoring";
+    public static final String DEFAULT_BR_DB_APP_CONTEXT = "business-rules";
 
+    public static final String SP_APP_NAME = "sp";
+    public static final String PORTAL_APP_NAME = "sp_portal";
+    public static final String STATUS_DB_APP_NAME = "sp_status_dashboard";
+    public static final String BR_DB_APP_NAME = "sp_business_rules";
 
     public static final String TOKEN_ID = "Token_Id";
     public static final String EXPIRES_IN = "Expires_In";
@@ -83,7 +94,6 @@ public class ExternalIdPClientConstants {
     public static final String SCIM2_USERNAME = "userName";
     public static final String SCIM2_GROUPS = "groups";
     public static final String SCIM2_DISPLAY = "display";
-
 
     private ExternalIdPClientConstants() {
     }
