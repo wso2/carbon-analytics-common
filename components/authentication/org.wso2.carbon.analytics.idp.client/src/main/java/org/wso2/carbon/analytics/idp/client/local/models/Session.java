@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.analytics.idp.client.local.models;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
@@ -26,9 +27,9 @@ public class Session {
     private UUID sessionId;
     private int userHash;
     private String username;
-    private Long expiryTime;
+    private ZonedDateTime expiryTime;
 
-    public Session(int userHash, String username, Long expiryTime) {
+    public Session(int userHash, String username, ZonedDateTime expiryTime) {
         this.userHash = userHash;
         this.username = username;
         this.sessionId = UUID.randomUUID();
@@ -39,11 +40,11 @@ public class Session {
         return sessionId;
     }
 
-    public Long getExpiryTime() {
+    public ZonedDateTime getExpiryTime() {
         return expiryTime;
     }
 
-    public void setExpiryTime(Long expiryTime) {
+    public void setExpiryTime(ZonedDateTime expiryTime) {
         this.expiryTime = expiryTime;
     }
 

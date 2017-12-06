@@ -30,10 +30,10 @@ import org.wso2.carbon.analytics.idp.client.local.models.Session;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +54,9 @@ public class LocalIdPClient implements IdPClient {
     private List<Role> rolesList;
 
     public LocalIdPClient(int sessionTimeOut, List<LocalUser> users, List<Role> roles, Role adminRole) {
-        this.sessionTimeout = sessionTimeOut * 1000;
+        this.sessionTimeout = sessionTimeOut;
         // NOTE: the rememberMe timeout is set at 7 days
-        this.rememberMeTimeout = 7 * 24 * 60 * 60 * 1000;
+        this.rememberMeTimeout = 7 * 24 * 60 * 60;
         this.adminRole = adminRole;
         this.rolesList = roles;
         this.usersList = users;
@@ -114,16 +114,16 @@ public class LocalIdPClient implements IdPClient {
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                         returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oldSession.getSessionId().toString());
 
-                        Long createdAt = Calendar.getInstance().getTimeInMillis();
+                        ZonedDateTime createdAt = ZonedDateTime.now();
 
                         if (rememberMe) {
-                            oldSession.setExpiryTime(createdAt + this.rememberMeTimeout);
+                            oldSession.setExpiryTime(createdAt.plusSeconds(this.rememberMeTimeout));
                             returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                                     String.valueOf(this.rememberMeTimeout));
                         } else {
-                            oldSession.setExpiryTime(createdAt + this.sessionTimeout);
+                            oldSession.setExpiryTime(createdAt.plusSeconds(this.sessionTimeout));
                             returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
+                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
                         }
                         usersToSessionMap.replace(userValue, oldSession);
                         sessionIdSessionMap.replace(oldSession.getSessionId().toString(), oldSession);
@@ -162,15 +162,15 @@ public class LocalIdPClient implements IdPClient {
                                 "for login are invalid, username : '" + userName + "'.");
                         return returnProperties;
                     } else {
-                        Long createdAt = Calendar.getInstance().getTimeInMillis();
+                        ZonedDateTime createdAt = ZonedDateTime.now();
                         if (rememberMe) {
-                            session = new Session(userValue, userName, createdAt + this.rememberMeTimeout);
+                            session = new Session(userValue, userName, createdAt.plusSeconds(this.rememberMeTimeout));
                             returnProperties.put(
                                     IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.rememberMeTimeout));
                         } else {
-                            session = new Session(userValue, userName, createdAt + this.sessionTimeout);
+                            session = new Session(userValue, userName,  createdAt.plusSeconds(this.sessionTimeout));
                             returnProperties.put(
-                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout / 1000));
+                                    IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
                         }
                         usersToSessionMap.put(userValue, session);
                         sessionIdSessionMap.put(session.getSessionId().toString(), session);
@@ -214,7 +214,8 @@ public class LocalIdPClient implements IdPClient {
         if (session == null) {
             throw new AuthenticationException("The session with id '" + token + "' is not valid.");
         }
-        if (session.getExpiryTime() > Calendar.getInstance().getTimeInMillis()) {
+        ZonedDateTime now = ZonedDateTime.now();
+        if (session.getExpiryTime().isAfter(now)) {
             return session.getUsername();
         } else {
             usersToSessionMap.remove(session.getUserHash());
