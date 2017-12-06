@@ -658,6 +658,12 @@
                 <version>${carbon.coordination.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>carbon-analytics-common-osgi-tests</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
 
             <!--Databridge related feature dependencies -->
             <dependency>
