@@ -22,9 +22,9 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,8 +47,8 @@ public class QueryProvider {
      * @throws QueryMappingNotAvailableException
      */
     public static Map<String, String> mergeMapping(String databaseType, String databaseVersion,
-                                                   ArrayList<Queries> componentQueries,
-                                                   ArrayList<Queries> deploymentQueries)
+                                                   List<Queries> componentQueries,
+                                                   List<Queries> deploymentQueries)
             throws QueryMappingNotAvailableException {
         Set<String> defaultConfigSet = new HashSet<>();
         Map<String, String> deploymentConfigMap = new HashMap<>();
