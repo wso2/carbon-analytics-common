@@ -307,8 +307,8 @@ public class ExternalIdPClient implements IdPClient {
 
         if (response == null) {
             String error = "Error occurred while generating an access token for grant type '" +
-                    grantType + "'. Response is null.";
-            LOG.error(getEncodedString(error));
+                    getEncodedString(grantType) + "'. Response is null.";
+            LOG.error(error);
             throw new IdPClientException(error);
         }
         if (response.status() == 200) {   //200 - Success
