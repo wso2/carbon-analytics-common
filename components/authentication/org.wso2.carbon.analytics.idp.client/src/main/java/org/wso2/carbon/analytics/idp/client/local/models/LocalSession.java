@@ -23,7 +23,7 @@ import java.util.UUID;
 /**
  * Session class.
  */
-public class Session {
+public class LocalSession {
     private UUID sessionId;
     private int userHash;
     private String username;
@@ -31,7 +31,7 @@ public class Session {
     private UUID refreshId;
     private ZonedDateTime refreshExpiryTime;
 
-    public Session(int userHash, String username, ZonedDateTime expiryTime, ZonedDateTime refreshExpiryTime) {
+    public LocalSession(int userHash, String username, ZonedDateTime expiryTime, ZonedDateTime refreshExpiryTime) {
         this.userHash = userHash;
         this.username = username;
         this.sessionId = UUID.randomUUID();
