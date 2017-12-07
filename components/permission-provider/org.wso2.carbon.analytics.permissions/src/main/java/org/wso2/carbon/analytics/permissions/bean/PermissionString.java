@@ -19,56 +19,30 @@
 package org.wso2.carbon.analytics.permissions.bean;
 
 /**
- *
+ * Bean class for PermissionString
  */
 public class PermissionString {
-    /**
-     *
-     */
+
     private String permissionID;
-    /**
-     *
-     */
     private String permissionString;
 
-    /**
-     *
-     * @param permissionID
-     * @param permissionString
-     */
     public PermissionString(String permissionID, String permissionString) {
         this.permissionID = permissionID;
         this.permissionString = permissionString;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getPermissionID() {
         return permissionID;
     }
 
-    /**
-     *
-     * @param permissionID
-     */
     public void setPermissionID(String permissionID) {
         this.permissionID = permissionID;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getPermissionString() {
         return permissionString;
     }
 
-    /**
-     *
-     * @param permissionString
-     */
     public void setPermissionString(String permissionString) {
         this.permissionString = permissionString;
     }

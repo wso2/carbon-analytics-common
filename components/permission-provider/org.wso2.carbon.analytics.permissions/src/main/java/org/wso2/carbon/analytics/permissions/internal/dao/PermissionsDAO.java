@@ -25,6 +25,7 @@ import org.wso2.carbon.analytics.permissions.bean.PermissionConfig;
 import org.wso2.carbon.analytics.permissions.bean.PermissionString;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.analytics.permissions.exceptions.PermissionException;
+import org.wso2.carbon.analytics.permissions.internal.util.PermissionUtil;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
@@ -236,7 +237,7 @@ public class PermissionsDAO {
     public void grantPermission(Permission permission, Role role) {
         Connection conn = null;
         PreparedStatement ps = null;
-        String uuid = UUID.nameUUIDFromBytes(permission.toString().getBytes(Charset.forName("UTF-8"))).toString();
+        String uuid= PermissionUtil.createPermissionID(permission);
         // TODO: Get the query from the QueryManager
         String query = "INSERT INTO ROLE_PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING, ROLE_ID) "
                 + "VALUES(?, ?, ?, ?)";
