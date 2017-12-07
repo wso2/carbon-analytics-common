@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 
 /**
- * Permission Util Class
+ * Permission Util Class.
  */
 public class PermissionUtil {
     private static final Charset charset = Charset.forName("UTF-8");
@@ -39,6 +39,6 @@ public class PermissionUtil {
     }
 
     public static Permission mapPermissionModel(org.wso2.carbon.analytics.permissions.api.model.Permission model) {
-       return new Permission(model.getAppName(), model.getPermissionString());
+        return new Permission(model.getAppName(), model.getPermissionString());
     }
 }

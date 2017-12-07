@@ -19,7 +19,7 @@
 package org.wso2.carbon.analytics.permissions.bean;
 
 /**
- * Bean class for PermissionString
+ * Bean class for PermissionString.
  */
 public class PermissionString {
 

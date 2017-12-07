@@ -37,7 +37,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
- * PermissionsApi Services Implementation
+ * PermissionsApi Services Implementation.
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-12-07T14:05:52.168Z")

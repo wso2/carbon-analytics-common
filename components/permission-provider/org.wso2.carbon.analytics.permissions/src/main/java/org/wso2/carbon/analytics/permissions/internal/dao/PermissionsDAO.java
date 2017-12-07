@@ -176,6 +176,7 @@ public class PermissionsDAO {
 
     /**
      * Delete permission.
+     *
      * @param permission
      */
     public void deletePermission(Permission permission) {
@@ -237,7 +238,7 @@ public class PermissionsDAO {
     public void grantPermission(Permission permission, Role role) {
         Connection conn = null;
         PreparedStatement ps = null;
-        String uuid= PermissionUtil.createPermissionID(permission);
+        String uuid = PermissionUtil.createPermissionID(permission);
         // TODO: Get the query from the QueryManager
         String query = "INSERT INTO ROLE_PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING, ROLE_ID) "
                 + "VALUES(?, ?, ?, ?)";
@@ -293,6 +294,7 @@ public class PermissionsDAO {
 
     /**
      * Revoke permission for PermissionID.
+     *
      * @param permissionID
      */
     public void revokePermission(String permissionID) {
@@ -351,6 +353,7 @@ public class PermissionsDAO {
 
     /**
      * Revoke Permission.
+     *
      * @param permission
      * @param roleID
      */
@@ -380,6 +383,7 @@ public class PermissionsDAO {
 
     /**
      * Check set of roles for specific permission.
+     *
      * @param roles
      * @param permission
      * @return
@@ -421,7 +425,6 @@ public class PermissionsDAO {
     }
 
     /**
-     *
      * @param roles
      * @param permissionID
      * @return
@@ -496,7 +499,6 @@ public class PermissionsDAO {
     }
 
     /**
-     *
      * @param permissionID
      * @return
      */
