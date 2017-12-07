@@ -77,6 +77,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,6 +109,7 @@
             org.json.simple.*
         </export.package>
         <import.package>
+            com.google.common.*,
             feign.*,
             feign.gson.*;version="${feign.version}",
             org.json.simple.*,

@@ -127,6 +127,15 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         oAuthAppInfoMap.put(statusAppContext, statusOAuthApp);
         oAuthAppInfoMap.put(businessAppContext, businessOAuthApp);
 
+        int cacheTimeout;
+        try {
+            cacheTimeout = Integer.parseInt(properties.getOrDefault(ExternalIdPClientConstants.CACHE_TIMEOUT,
+                    ExternalIdPClientConstants.DEFAULT_CACHE_TIMEOUT));
+        } catch (NumberFormatException e) {
+            throw new IdPClientException("Cache timeout overriding property '" +
+                    properties.get(ExternalIdPClientConstants.CACHE_TIMEOUT) + "' is invalid.");
+        }
+
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
                 .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword, kmCertAlias);
         OAuth2ServiceStubs keyManagerServiceStubs = OAuth2ServiceStubFactory.getKeyManagerServiceStubs(
@@ -141,7 +150,8 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
         ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
                 kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
-                adminRoleDisplayName, oAuthAppInfoMap, dcrmServiceStub, keyManagerServiceStubs, scimServiceStub);
+                adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, dcrmServiceStub, keyManagerServiceStubs,
+                scimServiceStub);
         externalIdPClient.init();
         return externalIdPClient;
     }

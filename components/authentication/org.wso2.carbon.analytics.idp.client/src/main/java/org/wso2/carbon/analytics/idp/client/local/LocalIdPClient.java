@@ -24,8 +24,8 @@ import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationExcepti
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.local.models.LocalSession;
 import org.wso2.carbon.analytics.idp.client.local.models.LocalUser;
-import org.wso2.carbon.analytics.idp.client.local.models.Session;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -45,10 +45,10 @@ import java.util.UUID;
 public class LocalIdPClient implements IdPClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalIdPClient.class);
-    private Map<Integer, Session> usersToSessionMap = new HashMap<>();
-    private Map<String, Session> sessionIdSessionMap = new HashMap<>();
-    private Map<String, Session> refreshIdSessionMap = new HashMap<>();
 
+    private Map<Integer, LocalSession> usersToSessionMap;
+    private Map<String, LocalSession> sessionIdSessionMap;
+    private Map<String, LocalSession> refreshIdSessionMap;
     private int sessionTimeout;
     private int refreshTimeout;
     private List<LocalUser> usersList;
@@ -62,6 +62,9 @@ public class LocalIdPClient implements IdPClient {
         this.adminRole = adminRole;
         this.rolesList = roles;
         this.usersList = users;
+        this.usersToSessionMap = new HashMap<>();
+        this.sessionIdSessionMap = new HashMap<>();
+        this.refreshIdSessionMap = new HashMap<>();
     }
 
     @Override
@@ -105,11 +108,11 @@ public class LocalIdPClient implements IdPClient {
             case IdPClientConstants.PASSWORD_GRANT_TYPE:
                 userName = properties.get(IdPClientConstants.USERNAME);
                 password = properties.get(IdPClientConstants.PASSWORD);
-                Session session;
+                LocalSession session;
                 int userValue = (userName + ":" + password).hashCode();
                 if (userName != null & password != null) {
                     //Checking if session is already present and update expiry time.
-                    Session oldSession = this.usersToSessionMap.get(userValue);
+                    LocalSession oldSession = this.usersToSessionMap.get(userValue);
                     if (oldSession != null) {
                         ZonedDateTime createdAt = ZonedDateTime.now();
                         oldSession.setExpiryTime(createdAt.plusSeconds(this.sessionTimeout));
@@ -125,6 +128,7 @@ public class LocalIdPClient implements IdPClient {
 
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.USERNAME, userName);
                         returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oldSession.getSessionId().toString());
                         returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oldSession.getRefreshId().toString());
                         returnProperties.put(
@@ -165,7 +169,7 @@ public class LocalIdPClient implements IdPClient {
                         return returnProperties;
                     } else {
                         ZonedDateTime createdAt = ZonedDateTime.now();
-                        session = new Session(userValue, userName, createdAt.plusSeconds(this.sessionTimeout),
+                        session = new LocalSession(userValue, userName, createdAt.plusSeconds(this.sessionTimeout),
                                 createdAt.plusSeconds(this.refreshTimeout));
                         returnProperties.put(
                                 IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
@@ -182,12 +186,11 @@ public class LocalIdPClient implements IdPClient {
 
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.USERNAME, userName);
                         returnProperties.put(IdPClientConstants.ACCESS_TOKEN, session.getSessionId().toString());
                         returnProperties.put(IdPClientConstants.REFRESH_TOKEN, session.getRefreshId().toString());
                         returnProperties.put(
                                 IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
-                        returnProperties.put(
-                                IdPClientConstants.REFRESH_VALIDITY_PERIOD, String.valueOf(this.refreshTimeout));
 
                         return returnProperties;
                     }
@@ -201,7 +204,7 @@ public class LocalIdPClient implements IdPClient {
                 }
             case IdPClientConstants.REFRESH_GRANT_TYPE:
                 String refreshId = properties.get(IdPClientConstants.REFRESH_TOKEN);
-                Session refreshSession = refreshIdSessionMap.remove(refreshId);
+                LocalSession refreshSession = refreshIdSessionMap.remove(refreshId);
                 if (refreshSession != null) {
                     usersToSessionMap.remove(refreshSession.getUserHash());
                     sessionIdSessionMap.remove(refreshSession.getSessionId().toString());
@@ -227,8 +230,6 @@ public class LocalIdPClient implements IdPClient {
                                 IdPClientConstants.REFRESH_TOKEN, refreshSession.getRefreshId().toString());
                         returnProperties.put(
                                 IdPClientConstants.VALIDITY_PERIOD, String.valueOf(this.sessionTimeout));
-                        returnProperties.put(
-                                IdPClientConstants.REFRESH_VALIDITY_PERIOD, String.valueOf(this.refreshTimeout));
                         return returnProperties;
                     } else {
                         errorMessage = "The refresh token used for login is expired, Refresh token : '"
@@ -262,7 +263,7 @@ public class LocalIdPClient implements IdPClient {
     @Override
     public void logout(Map<String, String> properties) {
         String token = properties.get(IdPClientConstants.ACCESS_TOKEN);
-        Session session = sessionIdSessionMap.get(token);
+        LocalSession session = sessionIdSessionMap.get(token);
         if (session != null) {
             usersToSessionMap.remove(session.getUserHash());
             sessionIdSessionMap.remove(token);
@@ -271,7 +272,7 @@ public class LocalIdPClient implements IdPClient {
 
     @Override
     public String authenticate(String token) throws AuthenticationException {
-        Session session = sessionIdSessionMap.get(token);
+        LocalSession session = sessionIdSessionMap.get(token);
         if (session == null) {
             throw new AuthenticationException("The session with id '" + token + "' is not valid.");
         }
