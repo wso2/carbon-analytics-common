@@ -22,7 +22,7 @@ import org.wso2.carbon.analytics.permissions.api.PermissionsApiService;
 import org.wso2.carbon.analytics.permissions.impl.PermissionsApiServiceImpl;
 
 /**
- * Permissions Api Service Factory
+ * Permissions Api Service Factory.
  */
 public class PermissionsApiServiceFactory {
     private static final PermissionsApiService service = new PermissionsApiServiceImpl();
