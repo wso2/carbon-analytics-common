@@ -82,6 +82,17 @@ public class DefaultPermissionProvider implements PermissionProvider {
     }
 
     /**
+     * Check permission.
+     *
+     * @param permission this is the permission object with app name and permission string parameters.
+     * @throws PermissionException throws when exception occurred while executing query.
+     */
+    @Override
+    public boolean isPermissionExists(Permission permission) throws PermissionException {
+        return this.getPermissionsDAO().isPermissionExists(permission);
+    }
+
+    /**
      * Delete permission.
      *
      * @param permission

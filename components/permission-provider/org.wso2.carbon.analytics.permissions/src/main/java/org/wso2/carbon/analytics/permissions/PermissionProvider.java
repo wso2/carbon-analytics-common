@@ -38,6 +38,13 @@ public interface PermissionProvider {
     void addPermission(Permission permission) throws PermissionException;
 
     /**
+     * Check permission.
+     *
+     * @param permission this is the permission object with app name and permission string parameters.
+     * @throws PermissionException throws when exception occurred while executing query.
+     */
+    boolean isPermissionExists(Permission permission) throws PermissionException;
+    /**
      * Delete permission.
      *
      * @param permission
