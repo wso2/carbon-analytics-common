@@ -38,6 +38,13 @@ public interface PermissionProvider {
     void addPermission(Permission permission) throws PermissionException;
 
     /**
+     * Check permission.
+     *
+     * @param permission
+     * @throws PermissionException
+     */
+    boolean isPermissionExists(Permission permission) throws PermissionException;
+    /**
      * Delete permission.
      *
      * @param permission
