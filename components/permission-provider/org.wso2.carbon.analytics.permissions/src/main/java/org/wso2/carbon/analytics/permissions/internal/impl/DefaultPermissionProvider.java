@@ -84,8 +84,8 @@ public class DefaultPermissionProvider implements PermissionProvider {
     /**
      * Check permission.
      *
-     * @param permission
-     * @throws PermissionException
+     * @param permission this is the permission object with app name and permission string parameters.
+     * @throws PermissionException throws when exception occurred while executing query.
      */
     @Override
     public boolean isPermissionExists(Permission permission) throws PermissionException {
