@@ -93,9 +93,10 @@ public class QueryProvider {
                         deploymentConfigMap.containsKey(defaultEntry)) {
                     value = deploymentConfigMap.get(defaultEntry);
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(getEncodedString("Override the query : '" + defaultEntry + "' with deployment " +
-                                "config value: '" + value + "'  for database type: '" + databaseType
-                                + "' and version '" + databaseVersion + "'."));
+                        LOGGER.debug("Override the query : '" + getEncodedString(defaultEntry) + "' with deployment " +
+                                "config value: '" + getEncodedString(value) + "'  for database type: '" +
+                                getEncodedString(databaseType) + "' and version '" + getEncodedString(databaseVersion)
+                                + "'.");
                     }
                 } else {
                     if (componentConfigMap != null && !componentConfigMap.isEmpty()
