@@ -86,7 +86,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
 
         List<Role> roles = idPClientConfiguration.getUserManager().getUserStore().getRoles().stream()
                 .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplayName())
-        ).collect(Collectors.toList());
+                ).collect(Collectors.toList());
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
         Role adminRole = roles.stream().filter(role -> role.getDisplayName().equalsIgnoreCase(adminRoleDisplayName))
@@ -103,7 +103,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                             .collect(Collectors.toList());
                     return new LocalUser(user.getUsername(), user.getPassword().toCharArray(), user.getProperties(),
                             userRolesFromId);
-        }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
 
         return new LocalIdPClient(sessionTimeout, refreshTimeout, users, roles, adminRole);
     }

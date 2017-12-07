@@ -24,10 +24,10 @@ public class LocalIdPClientConstants {
 
     public static final String LOCAL_IDP_CLIENT_TYPE = "local";
 
-    public static final String SESSION_TIME_OUT = "session.timeout";
+    public static final String SESSION_TIME_OUT = "sessionTimeout";
     public static final String DEFAULT_SESSION_TIMEOUT = "3600";
 
-    public static final String REFRESH_SESSION_TIME_OUT = "refresh.session.timeout";
+    public static final String REFRESH_SESSION_TIME_OUT = "refreshSessionTimeout";
     public static final String DEFAULT_REFRESH_SESSION_TIMEOUT = "86400";
 
     private LocalIdPClientConstants() {

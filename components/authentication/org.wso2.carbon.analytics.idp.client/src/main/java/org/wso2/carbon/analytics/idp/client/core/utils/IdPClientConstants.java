@@ -36,8 +36,6 @@ public class IdPClientConstants {
     public static final String REFRESH_GRANT_TYPE = "refresh_token";
 
     public static final String SP_AUTH_NAMESPACE = "auth.configs";
-    public static final String ENABLE_INTERCEPTOR = "rest.api.enable.auth";
-    public static final String EXCLUDE_INTERCEPTOR = "rest.api.exclude";
 
     public static final String LOGIN_STATUS = "Status";
     public static final String REDIRECTION_URL = "Redirect_Url";
@@ -47,11 +45,9 @@ public class IdPClientConstants {
     public static final String ACCESS_TOKEN = "Access_Token";
     public static final String REFRESH_TOKEN = "Refresh_Token";
     public static final String AUTH_USER = "UserName";
-    public static final String CREATED_AT = "Created_At";
     public static final String VALIDITY_PERIOD = "Validity_Period";
     public static final String REFRESH_VALIDITY_PERIOD = "Refresh_Validity_Period";
     public static final String REMEMBER_ME = "Remember_Me";
-
 
     public static final String USERNAME = "Username";
     public static final String PASSWORD = "Password";
