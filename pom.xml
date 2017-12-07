@@ -717,6 +717,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+                <artifactId>encoder</artifactId>
+                <version>${owasp.encoder.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.common.test.distribution</artifactId>
                 <type>zip</type>
@@ -859,6 +865,7 @@
         <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
         <osgi.test.util.version>5.1.1</osgi.test.util.version>
 
+        <owasp.encoder.version>1.2.0.wso2v2</owasp.encoder.version>
     </properties>
 
 </project>

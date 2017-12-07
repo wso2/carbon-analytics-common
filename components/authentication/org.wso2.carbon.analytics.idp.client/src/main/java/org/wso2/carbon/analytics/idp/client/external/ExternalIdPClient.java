@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import feign.Response;
 import feign.gson.GsonDecoder;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
@@ -282,7 +283,7 @@ public class ExternalIdPClient implements IdPClient {
         if (response == null) {
             String error = "Error occurred while generating an access token for grant type '" +
                     grantType + "'. Response is null.";
-            LOG.error(error);
+            LOG.error(getEncodedString(error));
             throw new IdPClientException(error);
         }
         if (response.status() == 200) {   //200 - Success
@@ -534,5 +535,14 @@ public class ExternalIdPClient implements IdPClient {
             }
         }
         return errorMessage.toString();
+    }
+
+    private static String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
     }
 }
