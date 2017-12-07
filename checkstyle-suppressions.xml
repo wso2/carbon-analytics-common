@@ -27,6 +27,7 @@
     <suppress checks="." files="[\\/]org.wso2.carbon.databridge.commons.thrift.data[\\/].*\.java$"/>
     <suppress checks="." files="[\\/]org.wso2.carbon.databridge.commons.thrift.exception[\\/].*\.java$"/>
     <suppress checks="." files="[\\/]org.wso2.carbon.databridge.commons.thrift.service[\\/].*\.java$"/>
+    <suppress checks="." files="[\\/]org.wso2.carbon.analytics.permissions.api[\\/].*\.java$"/>
 
 
 </suppressions>
