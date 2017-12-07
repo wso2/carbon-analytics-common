@@ -84,7 +84,7 @@ public class PermissionsDAO {
     /**
      * Check Permission already there.
      *
-     * @param permission
+     * @param permission this is the permission object with app name and permission string parameters.
      */
     public boolean isPermissionExists(Permission permission) {
         boolean hasPermission = false;
@@ -106,7 +106,7 @@ public class PermissionsDAO {
                 hasPermission = true;
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to check permissions exist. [Query=" + query + "]", e);
+            throw new PermissionException("Unable to execute check permissions query.", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
