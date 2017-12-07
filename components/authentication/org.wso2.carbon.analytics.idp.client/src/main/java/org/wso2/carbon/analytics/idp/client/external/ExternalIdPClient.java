@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.external.dao.OAuthAppDAO;
 import org.wso2.carbon.analytics.idp.client.external.dto.DCRClientInfo;
 import org.wso2.carbon.analytics.idp.client.external.dto.DCRError;
 import org.wso2.carbon.analytics.idp.client.external.dto.OAuth2IntrospectionResponse;
@@ -69,6 +70,7 @@ public class ExternalIdPClient implements IdPClient {
     private String grantType;
     private String signingAlgo;
     private String adminRoleDisplayName;
+    private OAuthAppDAO oAuthAppDAO;
 
     private Cache<String, ExternalSession> tokenCache;
 
@@ -77,14 +79,16 @@ public class ExternalIdPClient implements IdPClient {
 
     public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String singingAlgo,
                              String adminRoleDisplayName, Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
-                             int cacheTimeout, DCRMServiceStub dcrmServiceStub, OAuth2ServiceStubs oAuth2ServiceStubs,
-                             SCIM2ServiceStub scimServiceStub) throws IdPClientException {
+                             int cacheTimeout, OAuthAppDAO oAuthAppDAO, DCRMServiceStub dcrmServiceStub,
+                             OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub)
+            throws IdPClientException {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
         this.grantType = grantType;
         this.signingAlgo = singingAlgo;
         this.oAuthAppInfoMap = oAuthAppInfoMap;
         this.adminRoleDisplayName = adminRoleDisplayName;
+        this.oAuthAppDAO = oAuthAppDAO;
         this.dcrmServiceStub = dcrmServiceStub;
         this.oAuth2ServiceStubs = oAuth2ServiceStubs;
         this.scimServiceStub = scimServiceStub;
@@ -93,16 +97,37 @@ public class ExternalIdPClient implements IdPClient {
                 .build();
     }
 
+    private static String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
+    }
+
     public void init() throws IdPClientException {
+        this.oAuthAppDAO.init();
+        this.oAuthAppDAO.createTable();
         for (Map.Entry<String, OAuthApplicationInfo> oAuthApplicationInfoEntry : this.oAuthAppInfoMap.entrySet()) {
             String clientId = oAuthApplicationInfoEntry.getValue().getClientId();
             String clientSecret = oAuthApplicationInfoEntry.getValue().getClientSecret();
-
-            if (clientId == null && clientSecret == null) {
+            OAuthApplicationInfo persistedOAuthApp =
+                    this.oAuthAppDAO.getOAuthApp(oAuthApplicationInfoEntry.getValue().getClientName());
+            if (persistedOAuthApp != null) {
+                if (clientId != null || clientSecret != null) {
+                    if (clientId != null) {
+                        persistedOAuthApp.setClientId(clientId);
+                    }
+                    if (clientSecret != null) {
+                        persistedOAuthApp.setClientSecret(clientSecret);
+                    }
+                    this.oAuthAppDAO.updateOAuthApp(persistedOAuthApp);
+                }
+                this.oAuthAppInfoMap.replace(oAuthApplicationInfoEntry.getKey(), persistedOAuthApp);
+            } else {
                 registerApplication(oAuthApplicationInfoEntry.getKey(),
                         oAuthApplicationInfoEntry.getValue().getClientName());
-            } else if (clientId == null ^ clientSecret == null) {
-                throw new IdPClientException("Both values must be overriden..");
             }
         }
     }
@@ -487,10 +512,11 @@ public class ExternalIdPClient implements IdPClient {
                 DCRClientInfo dcrClientInfoResponse = (DCRClientInfo) new GsonDecoder()
                         .decode(response, DCRClientInfo.class);
                 OAuthApplicationInfo oAuthApplicationInfo = new OAuthApplicationInfo(
-                        dcrClientInfoResponse.getClientName(), dcrClientInfoResponse.getClientId(),
+                        clientName, dcrClientInfoResponse.getClientId(),
                         dcrClientInfoResponse.getClientSecret()
                 );
                 this.oAuthAppInfoMap.replace(appContext, oAuthApplicationInfo);
+                this.oAuthAppDAO.addOAuthApp(oAuthApplicationInfo);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("OAuth2 application created: " + oAuthApplicationInfo.toString());
                 }
@@ -535,14 +561,5 @@ public class ExternalIdPClient implements IdPClient {
             }
         }
         return errorMessage.toString();
-    }
-
-    private static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
     }
 }

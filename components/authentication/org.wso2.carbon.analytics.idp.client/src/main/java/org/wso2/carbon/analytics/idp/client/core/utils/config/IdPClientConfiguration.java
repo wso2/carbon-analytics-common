@@ -19,7 +19,9 @@ package org.wso2.carbon.analytics.idp.client.core.utils.config;
 
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
+import org.wso2.carbon.database.query.manager.config.Queries;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +43,9 @@ public class IdPClientConfiguration {
     @Element(description = "User Manager")
     private UserManagerElement userManager = new UserManagerElement();
 
+    @Element(description = "Database query map")
+    private ArrayList<Queries> queries = new ArrayList<>();
+
     public String getType() {
         return type;
     }
@@ -55,5 +60,9 @@ public class IdPClientConfiguration {
 
     public UserManagerElement getUserManager() {
         return userManager;
+    }
+
+    public ArrayList<Queries> getQueries() {
+        return queries;
     }
 }

@@ -45,6 +45,10 @@ public class LocalSession {
         return sessionId;
     }
 
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
+
     public ZonedDateTime getExpiryTime() {
         return expiryTime;
     }
@@ -65,19 +69,15 @@ public class LocalSession {
         return refreshId;
     }
 
+    public void setRefreshId(UUID refreshId) {
+        this.refreshId = refreshId;
+    }
+
     public ZonedDateTime getRefreshExpiryTime() {
         return refreshExpiryTime;
     }
 
     public void setRefreshExpiryTime(ZonedDateTime refreshExpiryTime) {
         this.refreshExpiryTime = refreshExpiryTime;
-    }
-
-    public void setSessionId(UUID sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public void setRefreshId(UUID refreshId) {
-        this.refreshId = refreshId;
     }
 }
