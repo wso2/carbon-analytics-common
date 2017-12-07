@@ -18,11 +18,6 @@
 
 package org.wso2.carbon.analytics.idp.client.external.models;
 
-import org.json.simple.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,28 +25,14 @@ import java.util.Objects;
  */
 public final class OAuthApplicationInfo {
 
-    private String keyType;
-    private String clientId;
     private String clientName;
-    private String callBackURL;
-    private List<String> grantTypes;
+    private String clientId;
     private String clientSecret;
-    private Map<String, Object> parameters = new HashMap<>();
 
-    public String getKeyType() {
-        return keyType;
-    }
-
-    public void setKeyType(String keyType) {
-        this.keyType = keyType;
-    }
-
-    public String getCallBackURL() {
-        return callBackURL;
-    }
-
-    public void setCallBackURL(String callBackURL) {
-        this.callBackURL = callBackURL;
+    public OAuthApplicationInfo(String clientName, String clientId, String clientSecret) {
+        this.clientName = clientName;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
     }
 
     public String getClientId() {
@@ -70,19 +51,6 @@ public final class OAuthApplicationInfo {
         this.clientSecret = clientSecret;
     }
 
-    public void addParameter(String name, Object value) {
-        parameters.put(name, value);
-    }
-
-    public Object getParameter(String name) {
-        return parameters.get(name);
-    }
-
-    public String getJSONString() {
-        return JSONObject.toJSONString(parameters);
-
-    }
-
     public String getClientName() {
         return clientName;
     }
@@ -91,38 +59,11 @@ public final class OAuthApplicationInfo {
         this.clientName = clientName;
     }
 
-    public List<String> getGrantTypes() {
-        return grantTypes;
-    }
-
-    public void setGrantTypes(List<String> grantTypes) {
-        this.grantTypes = grantTypes;
-    }
-
-    public void putAll(Map<String, Object> parameters) {
-        this.parameters.putAll(parameters);
-    }
-
-    public void removeParameter(String key) {
-        this.parameters.remove(key);
-    }
-
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(Map<String, Object> parameters) {
-        this.parameters = parameters;
-    }
-
     @Override
     public String toString() {
         return "OAuthApplicationInfo{" +
                 "clientId='" + clientId + '\'' +
                 ", clientName='" + clientName + '\'' +
-                ", callBackURL='" + callBackURL + '\'' +
-                ", parameters=" + parameters.toString() +
-                ", grantTypes=" + grantTypes +
                 '}';
     }
 
@@ -137,13 +78,11 @@ public final class OAuthApplicationInfo {
         OAuthApplicationInfo that = (OAuthApplicationInfo) o;
         return Objects.equals(clientId, that.clientId) &&
                 Objects.equals(clientName, that.clientName) &&
-                Objects.equals(callBackURL, that.callBackURL) &&
-                Objects.equals(grantTypes, that.grantTypes) &&
                 Objects.equals(clientSecret, that.clientSecret);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, clientName, callBackURL, grantTypes, clientSecret);
+        return Objects.hash(clientId, clientName, clientSecret);
     }
 }

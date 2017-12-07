@@ -18,18 +18,18 @@
 
 package org.wso2.carbon.data.provider.rdbms;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.ProviderConfig;
-import org.wso2.carbon.data.provider.api.DataSetMetadata;
+import org.wso2.carbon.data.provider.bean.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean;
 import org.wso2.carbon.data.provider.rdbms.config.RDBMSDataProviderConf;
 import org.wso2.carbon.data.provider.rdbms.utils.RDBMSQueryManager;
-import org.wso2.carbon.data.provider.utils.DataProviderValueHolder;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
@@ -50,6 +50,7 @@ import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.R
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.RECORD_LIMIT_QUERY;
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.TABLE_NAME_PLACEHOLDER;
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.TOTAL_RECORD_COUNT_QUERY;
+import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDataProviderHelper;
 
 /**
  * RDBMS data provider abstract class.
@@ -65,20 +66,17 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private int columnCount;
     private RDBMSDataProviderConf rdbmsProviderConfig;
     private RDBMSDataProviderConfBean rdbmsDataProviderConfBean;
-    private RDBMSQueryManager rdbmsQueryManager;
 
-    public AbstractRDBMSDataProvider() throws DataProviderException {
+    @Override
+    public DataProvider init(String topic, String sessionId, String message) throws DataProviderException {
         try {
-            rdbmsDataProviderConfBean = DataProviderValueHolder.getConfigProvider().
+            rdbmsDataProviderConfBean = getDataProviderHelper().getConfigProvider().
                     getConfigurationObject(RDBMSDataProviderConfBean.class);
         } catch (ConfigurationException e) {
             throw new DataProviderException("unable to load database query configuration: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public DataProvider init(String sessionID, ProviderConfig providerConfig) throws DataProviderException {
-        super.init(sessionID, providerConfig);
+        ProviderConfig providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
+        super.init(topic, sessionId, providerConfig);
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -86,7 +84,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
             connection = getConnection(rdbmsProviderConfig.getDatasourceName());
             String databaseName = connection.getMetaData().getDatabaseProductName();
             String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
-            rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
+            RDBMSQueryManager rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
             totalRecordCountQuery = rdbmsQueryManager.getQuery(TOTAL_RECORD_COUNT_QUERY);
             if (totalRecordCountQuery != null) {
                 totalRecordCountQuery = totalRecordCountQuery.replace(TABLE_NAME_PLACEHOLDER, rdbmsProviderConfig
@@ -140,7 +138,7 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
      */
     public static Connection getConnection(String dataSourceName)
             throws SQLException, DataSourceException {
-        return ((DataSource) DataProviderValueHolder.getDataSourceService().
+        return ((DataSource) getDataProviderHelper().getDataSourceService().
                 getDataSource(dataSourceName)).getConnection();
     }
 
@@ -253,7 +251,22 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     }
 
     @Override
-    public void publish(String sessionID) {
+    public String providerName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public DataSetMetadata dataSetMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public String providerConfig() {
+        return new Gson().toJson(new RDBMSDataProviderConf());
+    }
+
+    @Override
+    public void publish(String topic, String sessionId) {
 
     }
 

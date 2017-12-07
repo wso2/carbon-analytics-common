@@ -24,22 +24,29 @@ public class ExternalIdPClientConstants {
 
     public static final String EXTERNAL_IDP_CLIENT_TYPE = "external";
 
-    public static final String BASE_URL = "base.url";
-    public static final String GRANT_TYPE = "grant.type";
-    public static final String KM_TOKEN_URL = "km.token.url";
-    public static final String KM_DCR_URL = "km.dcr.url";
-    public static final String KM_CERT_ALIAS = "km.cert.alias";
-    public static final String KM_USERNAME = "km.username";
-    public static final String KM_PASSWORD = "km.password";
-    public static final String OIDC_USER_INFO_ALGO = "oidc.user.info.algo";
-    public static final String IDP_BASE_URL = "idp.base.url";
-    public static final String IDP_CERT_ALIAS = "idp.cert.alias";
-    public static final String IDP_USERNAME = "idp.username";
-    public static final String IDP_PASSWORD = "idp.password";
-    public static final String SP_APP_NAME = "sp.app.name";
-    public static final String PORTAL_APP_NAME = "portal.app.name";
-    public static final String STATUS_DB_APP_NAME = "status.dashboard.app.name";
-    public static final String BR_DB_APP_NAME = "business.rules.app.name";
+    public static final String BASE_URL = "baseUrl";
+    public static final String GRANT_TYPE = "grantType";
+    public static final String KM_TOKEN_URL = "kmTokenUrl";
+    public static final String KM_DCR_URL = "kmDcrUrl";
+    public static final String KM_CERT_ALIAS = "kmCertAlias";
+    public static final String KM_USERNAME = "kmUsername";
+    public static final String KM_PASSWORD = "kmPassword";
+    public static final String OIDC_USER_INFO_ALGO = "oidcUserInfoAlgo";
+    public static final String IDP_BASE_URL = "idpBaseUrl";
+    public static final String IDP_CERT_ALIAS = "idpCertAlias";
+    public static final String IDP_USERNAME = "idpUsername";
+    public static final String IDP_PASSWORD = "idpPassword";
+    public static final String PORTAL_APP_CONTEXT = "portalAppContext";
+    public static final String STATUS_DB_APP_CONTEXT = "statusDashboardAppContext";
+    public static final String BR_DB_APP_CONTEXT = "businessRulesAppContext";
+    public static final String SP_CLIENT_ID = "spClientId";
+    public static final String PORTAL_CLIENT_ID = "portalClientId";
+    public static final String STATUS_DB_CLIENT_ID = "statusDashboardClientId";
+    public static final String BR_DB_CLIENT_ID = "businessRulesClientId";
+    public static final String SP_CLIENT_SECRET = "spClientSecret";
+    public static final String PORTAL_CLIENT_SECRET = "portalClientSecret";
+    public static final String STATUS_DB_CLIENT_SECRET = "statusDashboardClientSecret";
+    public static final String BR_DB_CLIENT_SECRET = "businessRulesClientSecret";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
@@ -52,14 +59,17 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_IDP_CERT_ALIAS = "wso2carbon";
     public static final String DEFAULT_IDP_USERNAME = "admin";
     public static final String DEFAULT_IDP_PASSWORD = "admin";
-    public static final String DEFAULT_SP_APP_NAME = "sp";
-    public static final String DEFAULT_PORTAL_APP_NAME = "portal";
-    public static final String DEFAULT_STATUS_DB_APP_NAME = "monitoring";
-    public static final String DEFAULT_BR_DB_APP_NAME = "business-rules";
+    public static final String DEFAULT_SP_APP_CONTEXT = "sp";
+    public static final String DEFAULT_PORTAL_APP_CONTEXT = "portal";
+    public static final String DEFAULT_STATUS_DB_APP_CONTEXT = "monitoring";
+    public static final String DEFAULT_BR_DB_APP_CONTEXT = "business-rules";
 
+    public static final String SP_APP_NAME = "sp";
+    public static final String PORTAL_APP_NAME = "sp_portal";
+    public static final String STATUS_DB_APP_NAME = "sp_status_dashboard";
+    public static final String BR_DB_APP_NAME = "sp_business_rules";
 
     public static final String TOKEN_ID = "Token_Id";
-    public static final String EXPIRES_IN = "Expires_In";
     public static final String CLIENT_ID = "Client_Id";
     public static final String REDIRECT_URL = "Redirect_Url";
     public static final String CALLBACK_URL_NAME = "Callback_Url";
@@ -83,7 +93,6 @@ public class ExternalIdPClientConstants {
     public static final String SCIM2_USERNAME = "userName";
     public static final String SCIM2_GROUPS = "groups";
     public static final String SCIM2_DISPLAY = "display";
-
 
     private ExternalIdPClientConstants() {
     }

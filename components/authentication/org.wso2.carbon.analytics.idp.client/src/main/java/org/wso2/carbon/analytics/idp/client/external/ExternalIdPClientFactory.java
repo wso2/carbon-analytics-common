@@ -34,9 +34,9 @@ import org.wso2.carbon.analytics.idp.client.external.factories.SCIM2ServiceStubF
 import org.wso2.carbon.analytics.idp.client.external.impl.DCRMServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
+import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -96,21 +96,36 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         String signingAlgo = properties.getOrDefault(ExternalIdPClientConstants.OIDC_USER_INFO_ALGO,
                 ExternalIdPClientConstants.DEFAULT_OIDC_USER_INFO_ALGO);
 
-        String spAppName = properties.getOrDefault(ExternalIdPClientConstants.SP_APP_NAME,
-                ExternalIdPClientConstants.DEFAULT_SP_APP_NAME);
 
-        String portalAppName = properties.getOrDefault(ExternalIdPClientConstants.PORTAL_APP_NAME,
-                ExternalIdPClientConstants.DEFAULT_PORTAL_APP_NAME);
-        String statusAppName = properties.getOrDefault(ExternalIdPClientConstants.STATUS_DB_APP_NAME,
-                ExternalIdPClientConstants.DEFAULT_STATUS_DB_APP_NAME);
-        String businessAppName = properties.getOrDefault(ExternalIdPClientConstants.BR_DB_APP_NAME,
-                ExternalIdPClientConstants.DEFAULT_BR_DB_APP_NAME);
+        String portalAppContext = properties.getOrDefault(ExternalIdPClientConstants.PORTAL_APP_CONTEXT,
+                ExternalIdPClientConstants.DEFAULT_PORTAL_APP_CONTEXT);
+        String statusAppContext = properties.getOrDefault(ExternalIdPClientConstants.STATUS_DB_APP_CONTEXT,
+                ExternalIdPClientConstants.DEFAULT_STATUS_DB_APP_CONTEXT);
+        String businessAppContext = properties.getOrDefault(ExternalIdPClientConstants.BR_DB_APP_CONTEXT,
+                ExternalIdPClientConstants.DEFAULT_BR_DB_APP_CONTEXT);
 
-        List<String> oAuthAppNames = new ArrayList<>();
-        oAuthAppNames.add(spAppName);
-        oAuthAppNames.add(portalAppName);
-        oAuthAppNames.add(statusAppName);
-        oAuthAppNames.add(businessAppName);
+        OAuthApplicationInfo spOAuthApp = new OAuthApplicationInfo(
+                ExternalIdPClientConstants.SP_APP_NAME,
+                properties.get(ExternalIdPClientConstants.SP_CLIENT_ID),
+                properties.get(ExternalIdPClientConstants.SP_CLIENT_SECRET));
+        OAuthApplicationInfo portalOAuthApp = new OAuthApplicationInfo(
+                ExternalIdPClientConstants.PORTAL_APP_NAME,
+                properties.get(ExternalIdPClientConstants.PORTAL_CLIENT_ID),
+                properties.get(ExternalIdPClientConstants.PORTAL_CLIENT_SECRET));
+        OAuthApplicationInfo statusOAuthApp = new OAuthApplicationInfo(
+                ExternalIdPClientConstants.STATUS_DB_APP_NAME,
+                properties.get(ExternalIdPClientConstants.STATUS_DB_CLIENT_ID),
+                properties.get(ExternalIdPClientConstants.STATUS_DB_CLIENT_SECRET));
+        OAuthApplicationInfo businessOAuthApp = new OAuthApplicationInfo(
+                ExternalIdPClientConstants.BR_DB_APP_NAME,
+                properties.get(ExternalIdPClientConstants.BR_DB_CLIENT_ID),
+                properties.get(ExternalIdPClientConstants.BR_DB_CLIENT_SECRET));
+
+        Map<String, OAuthApplicationInfo> oAuthAppInfoMap = new HashMap<>();
+        oAuthAppInfoMap.put(ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT, spOAuthApp);
+        oAuthAppInfoMap.put(portalAppContext, portalOAuthApp);
+        oAuthAppInfoMap.put(statusAppContext, statusOAuthApp);
+        oAuthAppInfoMap.put(businessAppContext, businessOAuthApp);
 
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
                 .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword, kmCertAlias);
@@ -124,9 +139,11 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
 
-        return new ExternalIdPClient(baseUrl, kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX,
-                grantType, signingAlgo, adminRoleDisplayName, spAppName, oAuthAppNames, dcrmServiceStub,
-                keyManagerServiceStubs, scimServiceStub);
+        ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
+                kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
+                adminRoleDisplayName, oAuthAppInfoMap, dcrmServiceStub, keyManagerServiceStubs, scimServiceStub);
+        externalIdPClient.init();
+        return externalIdPClient;
     }
 
 }

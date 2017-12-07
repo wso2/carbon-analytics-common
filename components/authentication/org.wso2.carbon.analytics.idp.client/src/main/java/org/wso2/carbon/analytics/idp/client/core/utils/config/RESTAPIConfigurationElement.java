@@ -20,23 +20,26 @@ package org.wso2.carbon.analytics.idp.client.core.utils.config;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Role Child Element.
+ * REST API Authentication config Element.
  */
-@Configuration(description = "Role Child Element configuration")
-public class RoleChildElement {
+@Configuration(description = "REST API Auth configurations")
+public class RESTAPIConfigurationElement {
 
-    @Element(description = "Role Id", required = true)
-    private String id = "1";
+    @Element(description = "Enable authentication for REST API", required = true)
+    private String authEnable = "true";
 
-    @Element(description = "Role Display Name", required = true)
-    private String displayName = "admin";
+    @Element(description = "APIs to be excluded when auth is enabled", required = true)
+    private List<String> exclude = new ArrayList<>();
 
-    public String getId() {
-        return id;
+    public String getAuthEnable() {
+        return authEnable;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public List<String> getExclude() {
+        return exclude;
     }
 }

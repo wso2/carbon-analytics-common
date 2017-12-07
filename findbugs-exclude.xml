@@ -67,11 +67,11 @@
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.data.provider.api.DataSetMetadata"/>
+        <Class name="org.wso2.carbon.data.provider.bean.DataSetMetadata"/>
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.data.provider.api.DataModel"/>
+        <Class name="org.wso2.carbon.data.provider.bean.DataModel"/>
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
     </Match>
     <Match>

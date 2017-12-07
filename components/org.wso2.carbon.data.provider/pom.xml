@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
-        <version>6.0.23-SNAPSHOT</version>
+        <version>6.0.26-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -88,6 +88,10 @@
             <groupId>org.wso2.orbit.org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -113,7 +117,9 @@
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.websocket.WebSocketEndpoint"
+            osgi.service; objectClass="org.wso2.msf4j.websocket.WebSocketEndpoint",
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
+            osgi.service; objectClass="org.wso2.carbon.data.provider.DataProvider";serviceCount="2"
         </carbon.component>
     </properties>
 

@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.analytics.idp.client.local.models;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
@@ -24,28 +25,31 @@ import java.util.UUID;
  */
 public class Session {
     private UUID sessionId;
-    private boolean internalUser;
     private int userHash;
     private String username;
-    private Long expiryTime;
+    private ZonedDateTime expiryTime;
+    private UUID refreshId;
+    private ZonedDateTime refreshExpiryTime;
 
-    public Session(int userHash, boolean internalUser, String username, Long expiryTime) {
+    public Session(int userHash, String username, ZonedDateTime expiryTime, ZonedDateTime refreshExpiryTime) {
         this.userHash = userHash;
         this.username = username;
-        this.internalUser = internalUser;
         this.sessionId = UUID.randomUUID();
         this.expiryTime = expiryTime;
+        this.refreshId = UUID.randomUUID();
+        this.refreshExpiryTime = refreshExpiryTime;
+
     }
 
     public UUID getSessionId() {
         return sessionId;
     }
 
-    public Long getExpiryTime() {
+    public ZonedDateTime getExpiryTime() {
         return expiryTime;
     }
 
-    public void setExpiryTime(Long expiryTime) {
+    public void setExpiryTime(ZonedDateTime expiryTime) {
         this.expiryTime = expiryTime;
     }
 
@@ -53,11 +57,27 @@ public class Session {
         return userHash;
     }
 
-    public boolean isInternalUser() {
-        return internalUser;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public UUID getRefreshId() {
+        return refreshId;
+    }
+
+    public ZonedDateTime getRefreshExpiryTime() {
+        return refreshExpiryTime;
+    }
+
+    public void setRefreshExpiryTime(ZonedDateTime refreshExpiryTime) {
+        this.refreshExpiryTime = refreshExpiryTime;
+    }
+
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public void setRefreshId(UUID refreshId) {
+        this.refreshId = refreshId;
     }
 }

@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
-import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.UserChildElement;
+import org.wso2.carbon.analytics.idp.client.local.models.LocalUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,18 +66,27 @@ public class LocalIdPClientFactory implements IdPClientFactory {
     @Override
     public IdPClient getIdPClient(IdPClientConfiguration idPClientConfiguration) throws IdPClientException {
         int sessionTimeout;
+        int refreshTimeout;
         Map<String, String> properties = idPClientConfiguration.getProperties();
         try {
             sessionTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_SESSION_TIMEOUT));
         } catch (NumberFormatException e) {
-            throw new IdPClientException("Session timeout overridden property '" +
+            throw new IdPClientException("Session timeout overriding property '" +
                     properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
         }
 
+        try {
+            refreshTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT,
+                    LocalIdPClientConstants.DEFAULT_REFRESH_SESSION_TIMEOUT));
+        } catch (NumberFormatException e) {
+            throw new IdPClientException("Refresh session timeout overriding property '" +
+                    properties.get(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT) + "' is invalid.");
+        }
+
         List<Role> roles = idPClientConfiguration.getUserManager().getUserStore().getRoles().stream()
-                .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplay())
-        ).collect(Collectors.toList());
+                .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplayName())
+                ).collect(Collectors.toList());
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
         Role adminRole = roles.stream().filter(role -> role.getDisplayName().equalsIgnoreCase(adminRoleDisplayName))
@@ -85,17 +94,18 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                 .orElseThrow(() -> new IdPClientException("Admin role '" + adminRoleDisplayName + "' is not available" +
                         " in the User Store."));
 
-        List<User> users = idPClientConfiguration.getUserManager().getUserStore().getUsers().stream()
+        List<LocalUser> users = idPClientConfiguration.getUserManager().getUserStore().getUsers().stream()
                 .map(userElement -> {
                     UserChildElement user = userElement.getUser();
                     List<String> roleIdList = Arrays.asList(user.getRoles().replaceAll("\\s*", "").split(","));
                     List<Role> userRolesFromId = roles.stream()
                             .filter((role) -> roleIdList.contains(role.getId()))
                             .collect(Collectors.toList());
-            return new User(user.getUsername(), user.getPassword(), user.getProperties(), userRolesFromId);
-        }).collect(Collectors.toList());
+                    return new LocalUser(user.getUsername(), user.getPassword().toCharArray(), user.getProperties(),
+                            userRolesFromId);
+                }).collect(Collectors.toList());
 
-        return new LocalIdPClient(sessionTimeout, users, roles, adminRole);
+        return new LocalIdPClient(sessionTimeout, refreshTimeout, users, roles, adminRole);
     }
 
 }

@@ -48,7 +48,7 @@ public class LogoutApiServiceImpl extends LogoutApiService {
         String appContext = "/" + trimmedAppName;
 
         String accessToken = AuthUtil
-                .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_TOKEN_2);
+                .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_TOKEN);
         if (accessToken != null) {
             try {
                 Map<String, String> logoutProperties = new HashMap<>();
@@ -58,22 +58,23 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 DataHolder.getInstance().getIdPClient().logout(logoutProperties);
 
                 // Lets invalidate all the cookies saved.
-                NewCookie appContextCookieHttp = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_1, "", appContext, true, false,
-                                0);
                 NewCookie appContextCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, "", appContext, true, true,
                                 0);
+                NewCookie logoutContextAccessToken = AuthUtil
+                        .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, "",
+                                IdPClientConstants.LOGOUT_CONTEXT + appContext, true, true, 0);
 
-                NewCookie refreshTokenCookie = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_1, "", appContext, true, false,
-                                0);
                 NewCookie refreshTokenHttpOnlyCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, "", appContext, true, true,
                                 0);
+                NewCookie loginContextRefreshToken = AuthUtil
+                        .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN, "",
+                                IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, 0);
 
                 return Response.ok()
-                        .cookie(appContextCookieHttp, appContextCookie, refreshTokenCookie, refreshTokenHttpOnlyCookie)
+                        .cookie(appContextCookie, logoutContextAccessToken,
+                                refreshTokenHttpOnlyCookie, loginContextRefreshToken)
                         .build();
             } catch (IdPClientException e) {
                 LOG.error("Error in logout for uri '" + appName + "', with token, '" + accessToken + "'.", e);
