@@ -23,13 +23,17 @@ package org.wso2.carbon.analytics.idp.client.core.utils;
 public class IdPClientConstants {
     public static final String WSO2_SP_TOKEN_1 = "WSO2_SP_TOKEN_1";
     public static final String WSO2_SP_TOKEN_2 = "WSO2_SP_TOKEN_2";
+    public static final String WSO2_SP_TOKEN = "WSO2_SP_TOKEN";
     public static final String WSO2_SP_REFRESH_TOKEN_1 = "WSO2_SP_REFRESH_TOKEN_1";
     public static final String WSO2_SP_REFRESH_TOKEN_2 = "WSO2_SP_REFRESH_TOKEN_2";
+    public static final String WSO2_SP_REFRESH_TOKEN = "WSO2_SP_REFRESH_TOKEN";
+
+    public static final String LOGIN_CONTEXT = "/login";
+    public static final String LOGOUT_CONTEXT = "/login";
 
     public static final String PASSWORD_GRANT_TYPE = "password";
     public static final String AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code";
     public static final String REFRESH_GRANT_TYPE = "refresh_token";
-    public static final String CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
 
     public static final String SP_AUTH_NAMESPACE = "auth.configs";
     public static final String ENABLE_INTERCEPTOR = "rest.api.enable.auth";
@@ -63,8 +67,6 @@ public class IdPClientConstants {
 
     public static final String ERROR = "Error";
     public static final String ERROR_DESCRIPTION = "Error_Description";
-
-    public static final String SYSTEM_LOGIN = "system";
 
     private IdPClientConstants() {
     }
