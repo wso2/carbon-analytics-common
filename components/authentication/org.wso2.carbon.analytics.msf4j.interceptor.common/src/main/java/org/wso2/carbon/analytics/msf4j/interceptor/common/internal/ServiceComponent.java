@@ -30,8 +30,6 @@ import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfigura
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,23 +45,18 @@ public class ServiceComponent {
     @Activate
     protected void start(BundleContext bundleContext) throws ConfigurationException {
         ConfigProvider configProvider = DataHolder.getInstance().getConfigProvider();
+        IdPClientConfiguration idPClientConfiguration;
         if (configProvider.getConfigurationObject(IdPClientConstants.SP_AUTH_NAMESPACE) == null) {
-            DataHolder.getInstance().setInterceptorEnabled(true);
-            DataHolder.getInstance().setExcludeURLList(new ArrayList<>());
+            idPClientConfiguration = new IdPClientConfiguration();
         } else {
-            IdPClientConfiguration idPClientConfiguration = configProvider.
-                    getConfigurationObject(IdPClientConfiguration.class);
-            String enableInterceptor = idPClientConfiguration.getProperties()
-                    .getOrDefault(IdPClientConstants.ENABLE_INTERCEPTOR, "true");
-            String exclude = idPClientConfiguration.getProperties().get(IdPClientConstants.EXCLUDE_INTERCEPTOR);
-            Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
-            DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
-            List<String> excludeURLList = new ArrayList<>();
-            if (exclude != null) {
-                excludeURLList =  Arrays.asList(exclude.replaceAll("\\s*", "").split(","));
-            }
-            DataHolder.getInstance().setExcludeURLList(excludeURLList);
+            idPClientConfiguration = configProvider.getConfigurationObject(IdPClientConfiguration.class);
         }
+        String enableInterceptor = idPClientConfiguration.getRestAPIAuthConfigs().getAuthEnable();
+        Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
+        DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
+
+        List<String> excludeURI = idPClientConfiguration.getRestAPIAuthConfigs().getExclude();
+        DataHolder.getInstance().setExcludeURLList(excludeURI);
     }
 
     @Deactivate
