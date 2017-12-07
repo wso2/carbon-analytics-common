@@ -30,7 +30,6 @@ import feign.codec.Encoder;
 import feign.gson.GsonDecoder;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
-import org.wso2.carbon.analytics.idp.client.external.util.SPSSLSocketFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -47,7 +46,6 @@ public class OAuth2ServiceStubs {
     private String tokenEndpoint;
     private String revokeEndpoint;
     private String introspectEndpoint;
-    private String kmCertAlias;
     private String username;
     private String password;
 
@@ -57,16 +55,14 @@ public class OAuth2ServiceStubs {
      * @param tokenEndpoint      Token endpoint URL
      * @param revokeEndpoint     Revoke endpoint URL
      * @param introspectEndpoint Token introspection endpoint
-     * @param kmCertAlias        Key manager certificate alias
      * @param username           Username of Key Manager
      * @param password           Password of Key Manager
      */
     public OAuth2ServiceStubs(String tokenEndpoint, String revokeEndpoint, String introspectEndpoint,
-                              String kmCertAlias, String username, String password) {
+                              String username, String password) {
         this.tokenEndpoint = tokenEndpoint;
         this.revokeEndpoint = revokeEndpoint;
         this.introspectEndpoint = introspectEndpoint;
-        this.kmCertAlias = kmCertAlias;
         this.username = username;
         this.password = password;
     }
@@ -81,8 +77,7 @@ public class OAuth2ServiceStubs {
         return Feign.builder()
                 .encoder(new FormEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(SPSSLSocketFactory.getSSLSocketFactory(kmCertAlias),
-                        (hostname, sslSession) -> true))
+                .client(new Client.Default(null, null))
                 .target(OAuth2ServiceStubs.TokenServiceStub.class, tokenEndpoint);
     }
 
@@ -95,8 +90,7 @@ public class OAuth2ServiceStubs {
     public OAuth2ServiceStubs.RevokeServiceStub getRevokeServiceStub() throws IdPClientException {
         return Feign.builder()
                 .encoder(new FormEncoder())
-                .client(new Client.Default(SPSSLSocketFactory.getSSLSocketFactory(kmCertAlias),
-                        (hostname, sslSession) -> true))
+                .client(new Client.Default(null, null))
                 .target(OAuth2ServiceStubs.RevokeServiceStub.class, revokeEndpoint);
     }
 
@@ -111,8 +105,7 @@ public class OAuth2ServiceStubs {
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .encoder(new FormEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(SPSSLSocketFactory.getSSLSocketFactory(kmCertAlias),
-                        (hostname, sslSession) -> true))
+                .client(new Client.Default(null, null))
                 .target(OAuth2ServiceStubs.IntrospectionServiceStub.class, introspectEndpoint);
     }
 
