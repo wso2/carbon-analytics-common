@@ -119,7 +119,7 @@
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
             org.wso2.carbon.kernel.*;version="${carbon.kernel.package.import.version.range}",
-            org.wso2.orbit.org.owasp.encoder.*;version="0.0.0",
+            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
             *;resolution:=optional
         </import.package>
         <dynamic.import.package>*</dynamic.import.package>

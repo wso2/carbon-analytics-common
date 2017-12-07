@@ -866,6 +866,7 @@
         <osgi.test.util.version>5.1.1</osgi.test.util.version>
 
         <owasp.encoder.version>1.2.0.wso2v2</owasp.encoder.version>
+        <owasp.encoder.version.range>[1.2.0, 1.3.0)</owasp.encoder.version.range>
     </properties>
 
 </project>

@@ -70,7 +70,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.osgi.framework.*;version="[1.8.0, 2.0.0)",
-                            org.wso2.orbit.org.owasp.encoder.*;version="0.0.0",
+                            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
