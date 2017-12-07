@@ -40,6 +40,7 @@
         <module>features/data-bridge</module>
         <module>features/permission-provider</module>
         <module>features/org.wso2.carbon.data.provider.feature</module>
+        <module>features/org.wso2.orbit.org.owasp.encoder.feature</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
         <module>coverage-reports</module>
@@ -720,6 +721,12 @@
                 <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
                 <artifactId>encoder</artifactId>
                 <version>${owasp.encoder.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.orbit.org.owasp.encoder.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
             </dependency>
 
             <dependency>
