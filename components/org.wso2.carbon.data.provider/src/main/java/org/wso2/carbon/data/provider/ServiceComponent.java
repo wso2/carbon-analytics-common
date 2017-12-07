@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.data.provider;
 
+import com.google.gson.JsonElement;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -51,7 +52,7 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
         service = Microservice.class,
         immediate = true
 )
-@Path("/data-provider")
+@Path("/portal/apis/data-provider")
 @RequestInterceptor(AuthenticationInterceptor.class)
 public class ServiceComponent implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
@@ -118,7 +119,8 @@ public class ServiceComponent implements Microservice {
     @Path("/{providerName}/validate")
     @Produces("application/json")
     @Consumes("application/json")
-    public Response validateProviderConfig(String dataProviderConfig, @PathParam("providerName") String providerName) {
+    public Response validateProviderConfig(JsonElement dataProviderConfig, @PathParam("providerName")
+            String providerName) {
         try {
             DataProvider dataProvider = getDataProviderHelper().getDataProvider(providerName);
             //mock the topic and session as it only needs to validate the configuration.

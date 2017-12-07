@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.data.provider.bean;
 
+import com.google.gson.JsonElement;
 /**
  * Root bean class for data provider configuration.
  */
@@ -25,7 +26,7 @@ public class DataProviderConfigRoot {
     private String topic;
     private String providerName;
     private String action;
-    private String dataProviderConfiguration;
+    private JsonElement dataProviderConfiguration;
 
     /**
      * enum for define the supportive data column types.
@@ -38,7 +39,7 @@ public class DataProviderConfigRoot {
         this.topic = "";
         this.providerName = "";
         this.action = "";
-        this.dataProviderConfiguration = "";
+        this.dataProviderConfiguration = null;
     }
 
     public String getTopic() {
@@ -65,11 +66,11 @@ public class DataProviderConfigRoot {
         this.action = action;
     }
 
-    public String getDataProviderConfiguration() {
+    public JsonElement getDataProviderConfiguration() {
         return dataProviderConfiguration;
     }
 
-    public void setDataProviderConfiguration(String dataProviderConfiguration) {
+    public void setDataProviderConfiguration(JsonElement dataProviderConfiguration) {
         this.dataProviderConfiguration = dataProviderConfiguration;
     }
 }

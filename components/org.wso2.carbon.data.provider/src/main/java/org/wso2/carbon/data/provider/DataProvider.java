@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.data.provider;
 
+import com.google.gson.JsonElement;
 import org.wso2.carbon.data.provider.bean.DataSetMetadata;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 
@@ -31,11 +32,11 @@ public interface DataProvider {
      *
      * @param topic   to receive topic messages, data provider send event with this topic.
      * @param sessionId   data provider send event for this session.
-     * @param message provider configuration message in json format.
+     * @param jsonElement provider configuration message in json format.
      * @return data provider initialized with provider configuration.
      * @throws DataProviderException if there any initialization failures.
      */
-    DataProvider init(String topic, String sessionId, String message) throws DataProviderException;
+    DataProvider init(String topic, String sessionId, JsonElement jsonElement) throws DataProviderException;
 
     /**
      * Start pushing data to the client from the data sources.
