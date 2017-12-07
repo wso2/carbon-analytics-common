@@ -82,6 +82,17 @@ public class DefaultPermissionProvider implements PermissionProvider {
     }
 
     /**
+     * Check permission.
+     *
+     * @param permission
+     * @throws PermissionException
+     */
+    @Override
+    public boolean isPermissionExists(Permission permission) throws PermissionException {
+        return this.getPermissionsDAO().isPermissionExists(permission);
+    }
+
+    /**
      * Delete permission.
      *
      * @param permission

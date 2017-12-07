@@ -82,6 +82,38 @@ public class PermissionsDAO {
     }
 
     /**
+     * Check Permission already there.
+     *
+     * @param permission
+     */
+    public boolean isPermissionExists(Permission permission) {
+        boolean hasPermission = false;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet resultSet = null;
+        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
+
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, permission.getAppName());
+            ps.setString(2, permission.getPermissionString());
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + query);
+            }
+            resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                hasPermission = true;
+            }
+        } catch (SQLException e) {
+            throw new PermissionException("Unable to check permissions exist. [Query=" + query + "]", e);
+        } finally {
+            closeConnection(conn, ps, resultSet);
+        }
+        return hasPermission;
+    }
+
+    /**
      * Delete permission.
      *
      * @param permission
