@@ -124,8 +124,7 @@ public class PermissionsApiServiceImpl extends PermissionsApiService {
     }
 
     @Override
-    public Response manipulateRolePermission(Permission body, String roleID, String action
-    ) throws NotFoundException {
+    public Response manipulateRolePermission(Permission body, String roleID, String action) throws NotFoundException {
         final String revokeAction = "revoke";
         final String grantAction = "grant";
         org.wso2.carbon.analytics.permissions.bean.Permission permission = PermissionUtil.mapPermissionModel(body);

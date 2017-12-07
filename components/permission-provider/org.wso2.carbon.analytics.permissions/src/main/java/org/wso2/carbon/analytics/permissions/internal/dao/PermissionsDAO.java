@@ -122,7 +122,7 @@ public class PermissionsDAO {
         PreparedStatement ps = null;
         // TODO: Get the query from the QueryManager
         String query = "INSERT INTO PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING) VALUES(?, ?, ?)";
-        String uuid = UUID.nameUUIDFromBytes(permission.toString().getBytes(Charset.forName("UTF-8"))).toString();
+        String uuid = PermissionUtil.createPermissionID(permission);
         try {
             conn = getConnection();
             conn.setAutoCommit(false);
