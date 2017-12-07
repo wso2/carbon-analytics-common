@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.analytics.idp.client.external;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,6 +42,7 @@ import org.wso2.carbon.analytics.idp.client.external.dto.SCIMGroupList;
 import org.wso2.carbon.analytics.idp.client.external.impl.DCRMServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
+import org.wso2.carbon.analytics.idp.client.external.models.ExternalSession;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
 
 import java.io.IOException;
@@ -47,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -65,12 +69,14 @@ public class ExternalIdPClient implements IdPClient {
     private String signingAlgo;
     private String adminRoleDisplayName;
 
+    private Cache<String, ExternalSession> tokenCache;
+
     //Here the user given context are mapped to the OAuthApp Info.
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
 
     public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String singingAlgo,
-                             String adminRoleDisplayName,  Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
-                             DCRMServiceStub dcrmServiceStub, OAuth2ServiceStubs oAuth2ServiceStubs,
+                             String adminRoleDisplayName, Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
+                             int cacheTimeout, DCRMServiceStub dcrmServiceStub, OAuth2ServiceStubs oAuth2ServiceStubs,
                              SCIM2ServiceStub scimServiceStub) throws IdPClientException {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
@@ -81,6 +87,9 @@ public class ExternalIdPClient implements IdPClient {
         this.dcrmServiceStub = dcrmServiceStub;
         this.oAuth2ServiceStubs = oAuth2ServiceStubs;
         this.scimServiceStub = scimServiceStub;
+        this.tokenCache = CacheBuilder.newBuilder()
+                .expireAfterWrite(cacheTimeout, TimeUnit.SECONDS)
+                .build();
     }
 
     public void init() throws IdPClientException {
@@ -248,6 +257,8 @@ public class ExternalIdPClient implements IdPClient {
             oAuthAppContext = ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT;
         }
 
+        String username = properties.get(IdPClientConstants.USERNAME);
+
         if (IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE.equals(grantType)) {
             String callbackUrl = properties.get(IdPClientConstants.CALLBACK_URL);
             returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_REDIRECTION);
@@ -258,7 +269,7 @@ public class ExternalIdPClient implements IdPClient {
             return returnProperties;
         } else if (IdPClientConstants.PASSWORD_GRANT_TYPE.equals(grantType)) {
             response = oAuth2ServiceStubs.getTokenServiceStub().generatePasswordGrantAccessToken(
-                    properties.get(IdPClientConstants.USERNAME), properties.get(IdPClientConstants.PASSWORD),
+                    username, properties.get(IdPClientConstants.PASSWORD),
                     null, this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                     this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
         } else {
@@ -281,13 +292,14 @@ public class ExternalIdPClient implements IdPClient {
             try {
                 OAuth2TokenInfo oAuth2TokenInfo = (OAuth2TokenInfo) new GsonDecoder().decode(response,
                         OAuth2TokenInfo.class);
-                returnProperties.put(IdPClientConstants.AUTH_USER, properties.get(IdPClientConstants.USERNAME));
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                returnProperties.put(IdPClientConstants.USERNAME, username);
                 returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oAuth2TokenInfo.getAccessToken());
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
-                returnProperties.put(ExternalIdPClientConstants.TOKEN_ID, oAuth2TokenInfo.getIdToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
+                tokenCache.put(oAuth2TokenInfo.getAccessToken(),
+                        new ExternalSession(username, oAuth2TokenInfo.getAccessToken()));
                 return returnProperties;
             } catch (IOException e) {
                 String error = "Error occurred while parsing token response for user. Response: '" +
@@ -297,7 +309,7 @@ public class ExternalIdPClient implements IdPClient {
             }
         } else if (response.status() == 401) {
             String invalidResponse = "Unable to get access token for the request with grant type : '" + grantType +
-                    "', for the user '" + properties.get(IdPClientConstants.USERNAME) + "'.";
+                    "', for the user '" + username + "'.";
             LOG.error(invalidResponse);
             returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
             returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
@@ -337,19 +349,19 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                 returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oAuth2TokenInfo.getAccessToken());
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
-                returnProperties.put(ExternalIdPClientConstants.TOKEN_ID, oAuth2TokenInfo.getIdToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
                 returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + appContext);
 
                 Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
                         .introspectToken(oAuth2TokenInfo.getAccessToken());
+                String authUser = null;
                 if (introspectTokenResponse.status() == 200) {   //200 - Success
                     OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                             .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
                     String username = introspectResponse.getUsername();
-                    String authUser = username.substring(0, username.indexOf("@carbon.super"));
-                    returnProperties.put(IdPClientConstants.AUTH_USER, authUser);
+                    authUser = username.substring(0, username.indexOf("@carbon.super"));
+                    returnProperties.put(IdPClientConstants.USERNAME, authUser);
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Unable to get the username from introspection of the token '" +
@@ -357,6 +369,8 @@ public class ExternalIdPClient implements IdPClient {
                                 introspectTokenResponse.toString());
                     }
                 }
+                tokenCache.put(oAuth2TokenInfo.getAccessToken(),
+                        new ExternalSession(authUser, oAuth2TokenInfo.getAccessToken()));
                 return returnProperties;
             } catch (IOException e) {
                 String error = "Error occurred while parsing token response. Response : '" +
@@ -381,19 +395,25 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public void logout(Map<String, String> properties) throws IdPClientException {
+        String token = properties.get(IdPClientConstants.ACCESS_TOKEN);
         String oAuthAppContext = properties.getOrDefault(IdPClientConstants.APP_NAME,
                 ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT);
         if (!this.oAuthAppInfoMap.keySet().contains(oAuthAppContext)) {
             oAuthAppContext = ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT;
         }
+        tokenCache.invalidate(token);
         oAuth2ServiceStubs.getRevokeServiceStub().revokeAccessToken(
-                properties.get(IdPClientConstants.ACCESS_TOKEN),
+                token,
                 this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                 this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
     }
 
     @Override
     public String authenticate(String token) throws AuthenticationException, IdPClientException {
+        ExternalSession ifPresent = tokenCache.getIfPresent(token);
+        if (ifPresent != null) {
+            return ifPresent.getUserName();
+        }
         Response response = oAuth2ServiceStubs.getIntrospectionServiceStub().introspectToken(token);
 
         if (response == null) {
