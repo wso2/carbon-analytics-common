@@ -97,11 +97,13 @@ public class PermissionsApiServiceImpl extends PermissionsApiService {
             Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
             List<PermissionString> permissionStrings =
                     DataHolder.getInstance().getPermissionProvider().getPermissionStrings(appName);
-            String successMsg = String.format("Getting permissions for app, %s successful", appName);
+            String successMsg = String.format("Getting permissions for app, %s successful",
+                    PermissionUtil.getEncodedString(appName));
             LOG.info(successMsg);
             return Response.ok().entity(gson.toJson(permissionStrings)).build();
         } catch (PermissionException e) {
-            String errorMsg = String.format("Failed to retrieve permissions for app name: %s ", appName);
+            String errorMsg = String.format("Failed to retrieve permissions for app name: %s ",
+                    PermissionUtil.getEncodedString(appName));
             LOG.error(errorMsg, e);
             return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, errorMsg)).build();
         }
@@ -113,11 +115,12 @@ public class PermissionsApiServiceImpl extends PermissionsApiService {
             Boolean hasPermission =
                     DataHolder.getInstance().getPermissionProvider().hasPermission(roleName, permissionID);
             String successMsg = String.format("Checking permission for app:%s role: %s successful",
-                    permissionID, roleName);
+                    permissionID, PermissionUtil.getEncodedString(roleName));
             LOG.info(successMsg);
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, successMsg)).build();
         } catch (PermissionException e) {
-            String errorMsg = String.format("Checking permission for app:%s role: %s failed", permissionID, roleName);
+            String errorMsg = String.format("Checking permission for app:%s role: %s failed",
+                    permissionID, PermissionUtil.getEncodedString(roleName));
             LOG.error(errorMsg, e);
             return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, errorMsg)).build();
         }
@@ -140,18 +143,20 @@ public class PermissionsApiServiceImpl extends PermissionsApiService {
                     break;
                 default:
                     String errorMsg = String.format("Invalid input. Action should be "
-                            + "grant/revoke. But found %s", action);
+                            + "grant/revoke. But found %s", PermissionUtil.getEncodedString(action));
                     LOG.error(errorMsg);
                     return Response.serverError().
                             entity(new ApiResponseMessage(ApiResponseMessage.ERROR, errorMsg)).build();
             }
             String successMsg = String.format("Action, %s for permission, %s successful.",
-                    action, permission.toString());
+                    PermissionUtil.getEncodedString(action),
+                    PermissionUtil.getEncodedString(permission.toString()));
             LOG.info(successMsg);
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, successMsg)).build();
         } catch (PermissionException e) {
             String errorMsg = String.format("Failed to perform action, %s on permission %s",
-                    action, permission.toString());
+                    PermissionUtil.getEncodedString(action),
+                    PermissionUtil.getEncodedString(permission.toString()));
             LOG.error(errorMsg, e);
             return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, errorMsg)).build();
         }
