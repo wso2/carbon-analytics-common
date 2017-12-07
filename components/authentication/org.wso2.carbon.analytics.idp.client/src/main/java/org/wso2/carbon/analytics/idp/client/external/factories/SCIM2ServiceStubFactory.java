@@ -24,20 +24,18 @@ import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
-import org.wso2.carbon.analytics.idp.client.external.util.SPSSLSocketFactory;
 
 /**
  * SCIM2 service stub factory.
  */
 public class SCIM2ServiceStubFactory {
-    public static SCIM2ServiceStub getSCIMServiceStub(String idpBaseUrl, String username, String password,
-                                                      String idpCertAlias) throws IdPClientException {
+    public static SCIM2ServiceStub getSCIMServiceStub(String idpBaseUrl, String username, String password)
+            throws IdPClientException {
         return Feign.builder()
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(SPSSLSocketFactory.getSSLSocketFactory(idpCertAlias),
-                        (hostname, sslSession) -> true))
+                .client(new Client.Default(null, null))
                 .target(SCIM2ServiceStub.class, idpBaseUrl);
 
     }

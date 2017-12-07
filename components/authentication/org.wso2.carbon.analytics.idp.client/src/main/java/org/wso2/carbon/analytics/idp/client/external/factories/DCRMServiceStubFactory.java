@@ -24,20 +24,18 @@ import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.external.impl.DCRMServiceStub;
-import org.wso2.carbon.analytics.idp.client.external.util.SPSSLSocketFactory;
 
 /**
  * DCRM service stub factory.
  */
 public class DCRMServiceStubFactory {
-    public static DCRMServiceStub getDCRMServiceStub(String dcrEndpoint, String username, String password,
-                                                     String kmCertAlias) throws IdPClientException {
+    public static DCRMServiceStub getDCRMServiceStub(String dcrEndpoint, String username, String password)
+            throws IdPClientException {
         return Feign.builder()
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(SPSSLSocketFactory.getSSLSocketFactory(kmCertAlias),
-                        (hostname, sslSession) -> true))
+                .client(new Client.Default(null, null))
                 .target(DCRMServiceStub.class, dcrEndpoint);
 
     }

@@ -107,15 +107,11 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 ExternalIdPClientConstants.DEFAULT_KM_USERNAME);
         String kmPassword = properties.getOrDefault(ExternalIdPClientConstants.KM_PASSWORD,
                 ExternalIdPClientConstants.DEFAULT_KM_PASSWORD);
-        String kmCertAlias = properties.getOrDefault(ExternalIdPClientConstants.KM_CERT_ALIAS,
-                ExternalIdPClientConstants.DEFAULT_KM_CERT_ALIAS);
         String kmTokenUrl = properties.getOrDefault(ExternalIdPClientConstants.KM_TOKEN_URL,
                 ExternalIdPClientConstants.DEFAULT_KM_TOKEN_URL);
 
         String idPBaseUrl = properties.getOrDefault(ExternalIdPClientConstants.IDP_BASE_URL,
                 ExternalIdPClientConstants.DEFAULT_IDP_BASE_URL);
-        String idPCertAlias = properties.getOrDefault(ExternalIdPClientConstants.IDP_CERT_ALIAS,
-                ExternalIdPClientConstants.DEFAULT_IDP_CERT_ALIAS);
         String idPUserName = properties.getOrDefault(ExternalIdPClientConstants.IDP_USERNAME,
                 ExternalIdPClientConstants.DEFAULT_IDP_USERNAME);
         String idPPassword = properties.getOrDefault(ExternalIdPClientConstants.IDP_PASSWORD,
@@ -174,14 +170,14 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 idPClientConfiguration.getQueries());
 
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
-                .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword, kmCertAlias);
+                .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword);
         OAuth2ServiceStubs keyManagerServiceStubs = OAuth2ServiceStubFactory.getKeyManagerServiceStubs(
                 kmTokenUrl + ExternalIdPClientConstants.TOKEN_POSTFIX,
                 kmTokenUrl + ExternalIdPClientConstants.REVOKE_POSTFIX,
                 kmTokenUrl + ExternalIdPClientConstants.INTROSPECT_POSTFIX,
-                kmCertAlias, kmUsername, kmPassword);
+                kmUsername, kmPassword);
         SCIM2ServiceStub scimServiceStub = SCIM2ServiceStubFactory
-                .getSCIMServiceStub(idPBaseUrl, idPUserName, idPPassword, idPCertAlias);
+                .getSCIMServiceStub(idPBaseUrl, idPUserName, idPPassword);
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
 

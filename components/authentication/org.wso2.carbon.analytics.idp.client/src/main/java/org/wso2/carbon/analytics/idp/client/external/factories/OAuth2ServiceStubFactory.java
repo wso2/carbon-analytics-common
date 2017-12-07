@@ -27,10 +27,9 @@ import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 public class OAuth2ServiceStubFactory {
 
     public static OAuth2ServiceStubs getKeyManagerServiceStubs(String tokenEndpoint, String revokeEndpoint,
-                                                               String introspectEndpoint, String kmCertAlias,
-                                                               String username, String password)
-            throws IdPClientException {
+                                                               String introspectEndpoint, String username,
+                                                               String password) throws IdPClientException {
         return new OAuth2ServiceStubs(tokenEndpoint, revokeEndpoint, introspectEndpoint,
-                kmCertAlias, username, password);
+                username, password);
     }
 }
