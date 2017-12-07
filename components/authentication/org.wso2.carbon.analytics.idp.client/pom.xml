@@ -16,7 +16,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -85,6 +86,10 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.datasources</groupId>
+            <artifactId>org.wso2.carbon.datasource.core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -118,6 +123,7 @@
             org.json.simple.*,
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
+            org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
             org.wso2.carbon.kernel.*;version="${carbon.kernel.package.import.version.range}",
             org.owasp.encoder.*;version="${owasp.encoder.version.range}",
             *;resolution:=optional
@@ -128,7 +134,8 @@
             componentName="sp-idp-service";
             requiredService="org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory",
             osgi.service;
-            objectClass="org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory"
+            objectClass="org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory";
+            serviceCount="2"
         </carbon.component>
     </properties>
 </project>

@@ -48,6 +48,7 @@ public class ExternalIdPClientConstants {
     public static final String STATUS_DB_CLIENT_SECRET = "statusDashboardClientSecret";
     public static final String BR_DB_CLIENT_SECRET = "businessRulesClientSecret";
     public static final String CACHE_TIMEOUT = "cacheTimeout";
+    public static final String DATABASE_NAME = "databaseName";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
@@ -65,13 +66,13 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_STATUS_DB_APP_CONTEXT = "monitoring";
     public static final String DEFAULT_BR_DB_APP_CONTEXT = "business-rules";
     public static final String DEFAULT_CACHE_TIMEOUT = "900";
+    public static final String DEFAULT_DATABASE_NAME = "WSO2_OAUTH_APP_DB";
 
     public static final String SP_APP_NAME = "sp";
     public static final String PORTAL_APP_NAME = "sp_portal";
     public static final String STATUS_DB_APP_NAME = "sp_status_dashboard";
     public static final String BR_DB_APP_NAME = "sp_business_rules";
 
-    public static final String TOKEN_ID = "Token_Id";
     public static final String CLIENT_ID = "Client_Id";
     public static final String REDIRECT_URL = "Redirect_Url";
     public static final String CALLBACK_URL_NAME = "Callback_Url";

@@ -21,6 +21,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
@@ -28,6 +31,7 @@ import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.analytics.idp.client.external.dao.OAuthAppDAO;
 import org.wso2.carbon.analytics.idp.client.external.factories.DCRMServiceStubFactory;
 import org.wso2.carbon.analytics.idp.client.external.factories.OAuth2ServiceStubFactory;
 import org.wso2.carbon.analytics.idp.client.external.factories.SCIM2ServiceStubFactory;
@@ -35,6 +39,7 @@ import org.wso2.carbon.analytics.idp.client.external.impl.DCRMServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +53,7 @@ import java.util.Map;
 )
 public class ExternalIdPClientFactory implements IdPClientFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalIdPClientFactory.class);
+    private DataSourceService dataSourceService;
 
     @Activate
     protected void activate(BundleContext bundleContext) {
@@ -59,6 +65,32 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
     }
+
+    /**
+     * Register datasource service.
+     *
+     * @param dataSourceService
+     */
+    @Reference(
+            name = "org.wso2.carbon.datasource.DataSourceService",
+            service = DataSourceService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterDataSourceService"
+    )
+    protected void registerDataSourceService(DataSourceService dataSourceService) {
+        this.dataSourceService = dataSourceService;
+    }
+
+    /**
+     * Unregister datasource service.
+     *
+     * @param dataSourceService datasource service
+     */
+    protected void unregisterDataSourceService(DataSourceService dataSourceService) {
+        this.dataSourceService = null;
+    }
+
 
     @Override
     public String getType() {
@@ -136,6 +168,10 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                     properties.get(ExternalIdPClientConstants.CACHE_TIMEOUT) + "' is invalid.");
         }
 
+        String databaseName = properties.getOrDefault(ExternalIdPClientConstants.DATABASE_NAME,
+                ExternalIdPClientConstants.DEFAULT_DATABASE_NAME);
+        OAuthAppDAO oAuthAppDAO = new OAuthAppDAO(this.dataSourceService, databaseName);
+
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
                 .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword, kmCertAlias);
         OAuth2ServiceStubs keyManagerServiceStubs = OAuth2ServiceStubFactory.getKeyManagerServiceStubs(
@@ -150,8 +186,8 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
         ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
                 kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
-                adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, dcrmServiceStub, keyManagerServiceStubs,
-                scimServiceStub);
+                adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
+                keyManagerServiceStubs, scimServiceStub);
         externalIdPClient.init();
         return externalIdPClient;
     }
