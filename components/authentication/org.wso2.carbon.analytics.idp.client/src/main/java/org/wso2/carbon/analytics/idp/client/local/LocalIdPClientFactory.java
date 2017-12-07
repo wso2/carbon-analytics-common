@@ -71,11 +71,17 @@ public class LocalIdPClientFactory implements IdPClientFactory {
         try {
             sessionTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_SESSION_TIMEOUT));
+        } catch (NumberFormatException e) {
+            throw new IdPClientException("Session timeout overriding property '" +
+                    properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
+        }
+
+        try {
             refreshTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_REFRESH_SESSION_TIMEOUT));
         } catch (NumberFormatException e) {
-            throw new IdPClientException("Session timeout overridden property '" +
-                    properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
+            throw new IdPClientException("Refresh session timeout overriding property '" +
+                    properties.get(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT) + "' is invalid.");
         }
 
         List<Role> roles = idPClientConfiguration.getUserManager().getUserStore().getRoles().stream()
