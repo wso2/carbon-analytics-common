@@ -19,6 +19,7 @@
 package org.wso2.carbon.data.provider.rdbms;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
@@ -68,14 +69,14 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private RDBMSDataProviderConfBean rdbmsDataProviderConfBean;
 
     @Override
-    public DataProvider init(String topic, String sessionId, String message) throws DataProviderException {
+    public DataProvider init(String topic, String sessionId, JsonElement jsonElement) throws DataProviderException {
         try {
             rdbmsDataProviderConfBean = getDataProviderHelper().getConfigProvider().
                     getConfigurationObject(RDBMSDataProviderConfBean.class);
         } catch (ConfigurationException e) {
             throw new DataProviderException("unable to load database query configuration: " + e.getMessage(), e);
         }
-        ProviderConfig providerConfig = new Gson().fromJson(message, RDBMSDataProviderConf.class);
+        ProviderConfig providerConfig = new Gson().fromJson(jsonElement, RDBMSDataProviderConf.class);
         super.init(topic, sessionId, providerConfig);
         Connection connection = null;
         PreparedStatement statement = null;
