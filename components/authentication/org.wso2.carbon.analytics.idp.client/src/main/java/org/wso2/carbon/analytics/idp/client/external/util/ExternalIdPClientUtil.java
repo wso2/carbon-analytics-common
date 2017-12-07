@@ -28,7 +28,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +48,7 @@ public class ExternalIdPClientUtil {
             } else {
                 throw new RuntimeException("Unable to load queries.yaml file.");
             }
-            return QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>) componentQueries,
-                    (ArrayList<Queries>) deploymentQueries);
+            return QueryProvider.mergeMapping(databaseType, databaseVersion, componentQueries, deploymentQueries);
         } catch (QueryMappingNotAvailableException e) {
             throw new QueryMappingNotAvailableException("Unable to load queries.", e);
         } catch (IOException e) {
