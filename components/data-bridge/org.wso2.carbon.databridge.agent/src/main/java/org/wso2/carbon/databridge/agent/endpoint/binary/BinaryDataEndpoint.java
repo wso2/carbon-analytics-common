@@ -20,6 +20,7 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointLoginException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
 import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
@@ -35,7 +36,8 @@ import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender
 public class BinaryDataEndpoint extends DataEndpoint {
 
     @Override
-    protected String login(Object client, String userName, String password) throws DataEndpointAuthenticationException {
+    protected String login(Object client, String userName, String password)
+            throws DataEndpointAuthenticationException, DataEndpointLoginException {
         Socket socket = (Socket) client;
         try {
             sendBinaryLoginMessage(socket, userName, password);
@@ -44,7 +46,7 @@ public class BinaryDataEndpoint extends DataEndpoint {
             if (e instanceof DataEndpointAuthenticationException) {
                 throw (DataEndpointAuthenticationException) e;
             } else {
-                throw new DataEndpointAuthenticationException("Error while trying to login to data receiver :"
+                throw new DataEndpointLoginException("Error while trying to login to data receiver :"
                         + socket.getRemoteSocketAddress().toString(), e);
             }
         }

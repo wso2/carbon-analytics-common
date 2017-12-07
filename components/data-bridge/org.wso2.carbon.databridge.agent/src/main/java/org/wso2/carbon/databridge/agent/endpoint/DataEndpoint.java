@@ -23,6 +23,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointLoginException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
@@ -181,7 +182,7 @@ public abstract class DataEndpoint {
      * @throws DataEndpointAuthenticationException
      */
     protected abstract String login(Object client, String userName, String password)
-            throws DataEndpointAuthenticationException;
+            throws DataEndpointAuthenticationException, DataEndpointLoginException;
 
     /**
      * Logout from the endpoint.
