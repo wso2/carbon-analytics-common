@@ -53,7 +53,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
             return true;
         } else {
             for (String url : DataHolder.getInstance().getExcludeURLList()) {
-                if (request.getUri().contains(url)) {
+                if (request.getUri().matches(url)) {
                     return true;
                 }
             }
