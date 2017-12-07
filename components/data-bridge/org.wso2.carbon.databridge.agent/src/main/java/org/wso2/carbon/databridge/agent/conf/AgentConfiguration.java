@@ -72,6 +72,8 @@ public class AgentConfiguration {
 
     private String ciphers;
 
+    private int loggingControlIntervalInSeconds;
+
     @XmlElement(name = "Name")
     public String getDataEndpointName() {
         return dataEndpointName;
@@ -285,6 +287,15 @@ public class AgentConfiguration {
 
     public void setCiphers(String ciphers) {
         this.ciphers = ciphers;
+    }
+
+    @XmlElement(name = "LoggingControlIntervalInSeconds")
+    public int getLoggingControlIntervalInSeconds() {
+        return loggingControlIntervalInSeconds;
+    }
+
+    public void setLoggingControlIntervalInSeconds(int loggingControlIntervalInSeconds) {
+        this.loggingControlIntervalInSeconds = loggingControlIntervalInSeconds;
     }
 
     /**
