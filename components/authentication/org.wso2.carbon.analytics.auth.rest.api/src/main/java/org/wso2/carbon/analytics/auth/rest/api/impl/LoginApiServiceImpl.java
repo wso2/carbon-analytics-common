@@ -76,7 +76,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String refToken;
             if (IdPClientConstants.REFRESH_GRANT_TYPE.equals(grantType)) {
                 refToken = AuthUtil
-                        .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2);
+                        .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_REFRESH_TOKEN);
                 if (refToken == null) {
                     LOG.error("Unable to extract refresh token from the header for the request '" + appName);
                     ErrorDTO errorDTO = new ErrorDTO();
@@ -126,32 +126,32 @@ public class LoginApiServiceImpl extends LoginApiService {
                     // is a http only cookie. Hence we need to split the access token
                     String part1 = accessToken.substring(0, accessToken.length() / 2);
                     String part2 = accessToken.substring(accessToken.length() / 2);
-                    NewCookie accessTokenHttpAccessbile = AuthUtil
-                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_1, part1, appContext, true, false,
-                                    validityPeriod);
                     userDTO.setPartialAccessToken(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
-                                    validityPeriod);
+                                    -1);
+                    NewCookie logoutContextAccessToken = AuthUtil
+                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, part2, IdPClientConstants.LOGOUT_CONTEXT
+                                    + appContext, true, true, -1);
 
                     if (refreshToken != null && rememberMe) {
-                        NewCookie refreshTokenCookie, refreshTokenHttpOnlyCookie;
+                        NewCookie refreshTokenCookie, refreshTokenHttpOnlyCookie, loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
-                        refreshTokenCookie = AuthUtil
-                                .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_1, refTokenPart1, appContext,
-                                        true, false, validityPeriod);
                         userDTO.setPartialRefreshToken(refTokenPart1);
                         refreshTokenHttpOnlyCookie = AuthUtil
                                 .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, refTokenPart2, appContext,
-                                        true, true, validityPeriod);
+                                        true, true, -1);
+                        loginContextRefreshTokenCookie = AuthUtil
+                                .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
+                                        IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, -1);
                         return Response.ok(userDTO, MediaType.APPLICATION_JSON)
-                                .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie,
-                                        refreshTokenCookie, refreshTokenHttpOnlyCookie)
+                                .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
+                                        refreshTokenHttpOnlyCookie, loginContextRefreshTokenCookie)
                                 .build();
                     }
                     return Response.ok(userDTO, MediaType.APPLICATION_JSON)
-                            .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie)
+                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
                             .build();
                 case IdPClientConstants.LoginStatus.LOGIN_FAILURE:
                     LOG.error("Authentication failure for user '" + username + "' when accessing uri '" + appName);
@@ -232,36 +232,36 @@ public class LoginApiServiceImpl extends LoginApiService {
 
                     String part1 = accessToken.substring(0, accessToken.length() / 2);
                     String part2 = accessToken.substring(accessToken.length() / 2);
-                    NewCookie accessTokenHttpAccessbile = AuthUtil
-                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_1, part1, appContext, true, false,
-                                    validityPeriod);
                     userDTO.setPartialAccessToken(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
-                                    validityPeriod);
+                                    -1);
+                    NewCookie logoutContextAccessToken = AuthUtil
+                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, part2,
+                                    IdPClientConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
 
                     if (refreshToken != null) {
-                        NewCookie refreshTokenCookie, refreshTokenHttpOnlyCookie;
+                        NewCookie refreshTokenCookie, refreshTokenHttpOnlyCookie, loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
-                        refreshTokenCookie = AuthUtil
-                                .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_1, refTokenPart1, appContext,
-                                        true, false, validityPeriod);
                         userDTO.setPartialRefreshToken(refTokenPart1);
                         refreshTokenHttpOnlyCookie = AuthUtil
                                 .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, refTokenPart2, appContext,
-                                        true, true, validityPeriod);
+                                        true, true, -1);
+                        loginContextRefreshTokenCookie = AuthUtil
+                                .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
+                                        IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, -1);
                         return Response.status(Response.Status.FOUND)
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
-                                .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie, refreshTokenCookie,
-                                        refreshTokenHttpOnlyCookie)
+                                .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
+                                        refreshTokenHttpOnlyCookie, loginContextRefreshTokenCookie)
                                 .build();
                     }
                     return Response.status(Response.Status.FOUND)
                             .header(HttpHeaders.LOCATION, targetURIForRedirection)
                             .entity(userDTO)
-                            .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie)
+                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
                             .build();
                 } else {
                     LOG.error("Unable to get the token from the returned code '" + requestCode + "', for callback " +

@@ -35,6 +35,9 @@ public class IdPClientConfiguration {
     @Element(description = "Client properties")
     private Map<String, String> properties = new HashMap<>();
 
+    @Element(description = "REST API configuration")
+    private RESTAPIConfigurationElement restAPIAuthConfigs = new RESTAPIConfigurationElement();
+
     @Element(description = "User Manager")
     private UserManagerElement userManager = new UserManagerElement();
 
@@ -44,6 +47,10 @@ public class IdPClientConfiguration {
 
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    public RESTAPIConfigurationElement getRestAPIAuthConfigs() {
+        return restAPIAuthConfigs;
     }
 
     public UserManagerElement getUserManager() {

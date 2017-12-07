@@ -21,19 +21,19 @@ package org.wso2.carbon.analytics.idp.client.core.utils;
  * IdP Client constants.
  */
 public class IdPClientConstants {
-    public static final String WSO2_SP_TOKEN_1 = "WSO2_SP_TOKEN_1";
     public static final String WSO2_SP_TOKEN_2 = "WSO2_SP_TOKEN_2";
-    public static final String WSO2_SP_REFRESH_TOKEN_1 = "WSO2_SP_REFRESH_TOKEN_1";
+    public static final String WSO2_SP_TOKEN = "WSO2_SP_TOKEN";
     public static final String WSO2_SP_REFRESH_TOKEN_2 = "WSO2_SP_REFRESH_TOKEN_2";
+    public static final String WSO2_SP_REFRESH_TOKEN = "WSO2_SP_REFRESH_TOKEN";
+
+    public static final String LOGIN_CONTEXT = "/login";
+    public static final String LOGOUT_CONTEXT = "/login";
 
     public static final String PASSWORD_GRANT_TYPE = "password";
     public static final String AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code";
     public static final String REFRESH_GRANT_TYPE = "refresh_token";
-    public static final String CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
 
     public static final String SP_AUTH_NAMESPACE = "auth.configs";
-    public static final String ENABLE_INTERCEPTOR = "rest.api.enable.auth";
-    public static final String EXCLUDE_INTERCEPTOR = "rest.api.exclude";
 
     public static final String LOGIN_STATUS = "Status";
     public static final String REDIRECTION_URL = "Redirect_Url";
@@ -43,11 +43,9 @@ public class IdPClientConstants {
     public static final String ACCESS_TOKEN = "Access_Token";
     public static final String REFRESH_TOKEN = "Refresh_Token";
     public static final String AUTH_USER = "UserName";
-    public static final String CREATED_AT = "Created_At";
     public static final String VALIDITY_PERIOD = "Validity_Period";
     public static final String REFRESH_VALIDITY_PERIOD = "Refresh_Validity_Period";
     public static final String REMEMBER_ME = "Remember_Me";
-
 
     public static final String USERNAME = "Username";
     public static final String PASSWORD = "Password";
@@ -63,8 +61,6 @@ public class IdPClientConstants {
 
     public static final String ERROR = "Error";
     public static final String ERROR_DESCRIPTION = "Error_Description";
-
-    public static final String SYSTEM_LOGIN = "system";
 
     private IdPClientConstants() {
     }

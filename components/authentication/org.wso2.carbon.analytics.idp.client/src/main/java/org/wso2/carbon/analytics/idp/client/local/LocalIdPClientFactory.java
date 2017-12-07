@@ -71,16 +71,22 @@ public class LocalIdPClientFactory implements IdPClientFactory {
         try {
             sessionTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_SESSION_TIMEOUT));
+        } catch (NumberFormatException e) {
+            throw new IdPClientException("Session timeout overriding property '" +
+                    properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
+        }
+
+        try {
             refreshTimeout = Integer.parseInt(properties.getOrDefault(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT,
                     LocalIdPClientConstants.DEFAULT_REFRESH_SESSION_TIMEOUT));
         } catch (NumberFormatException e) {
-            throw new IdPClientException("Session timeout overridden property '" +
-                    properties.get(LocalIdPClientConstants.SESSION_TIME_OUT) + "' is invalid.");
+            throw new IdPClientException("Refresh session timeout overriding property '" +
+                    properties.get(LocalIdPClientConstants.REFRESH_SESSION_TIME_OUT) + "' is invalid.");
         }
 
         List<Role> roles = idPClientConfiguration.getUserManager().getUserStore().getRoles().stream()
                 .map(roleElement -> new Role(roleElement.getRole().getId(), roleElement.getRole().getDisplayName())
-        ).collect(Collectors.toList());
+                ).collect(Collectors.toList());
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
         Role adminRole = roles.stream().filter(role -> role.getDisplayName().equalsIgnoreCase(adminRoleDisplayName))
@@ -97,7 +103,7 @@ public class LocalIdPClientFactory implements IdPClientFactory {
                             .collect(Collectors.toList());
                     return new LocalUser(user.getUsername(), user.getPassword().toCharArray(), user.getProperties(),
                             userRolesFromId);
-        }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
 
         return new LocalIdPClient(sessionTimeout, refreshTimeout, users, roles, adminRole);
     }
