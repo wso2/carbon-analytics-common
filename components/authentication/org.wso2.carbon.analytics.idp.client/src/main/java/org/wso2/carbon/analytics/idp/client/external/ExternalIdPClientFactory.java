@@ -170,7 +170,8 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
         String databaseName = properties.getOrDefault(ExternalIdPClientConstants.DATABASE_NAME,
                 ExternalIdPClientConstants.DEFAULT_DATABASE_NAME);
-        OAuthAppDAO oAuthAppDAO = new OAuthAppDAO(this.dataSourceService, databaseName);
+        OAuthAppDAO oAuthAppDAO = new OAuthAppDAO(this.dataSourceService, databaseName,
+                idPClientConfiguration.getQueries());
 
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
                 .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword, kmCertAlias);

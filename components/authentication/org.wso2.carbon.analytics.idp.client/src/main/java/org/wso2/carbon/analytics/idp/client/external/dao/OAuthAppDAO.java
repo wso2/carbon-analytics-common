@@ -20,14 +20,22 @@ package org.wso2.carbon.analytics.idp.client.external.dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
+import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
+import org.wso2.carbon.analytics.idp.client.external.util.ExternalIdPClientUtil;
+import org.wso2.carbon.database.query.manager.config.Queries;
+import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 
 /**
@@ -36,15 +44,17 @@ import javax.sql.DataSource;
 public class OAuthAppDAO {
     private static final Logger LOG = LoggerFactory.getLogger(OAuthAppDAO.class);
 
-    private static final String TABLE_NAME = "OAUTHAPP";
-
     private DataSourceService dataSourceService;
     private DataSource dataSource;
     private String databaseName;
+    private List<Queries> deploymentQueries;
+    private Map<String, String> queries;
 
-    public OAuthAppDAO(DataSourceService dataSourceService, String databaseName) {
+    public OAuthAppDAO(DataSourceService dataSourceService, String databaseName,
+                       List<Queries> deploymentQueries) {
         this.dataSourceService = dataSourceService;
         this.databaseName = databaseName;
+        this.deploymentQueries = deploymentQueries;
     }
 
     private static void closeConnection(Connection connection, PreparedStatement preparedStatement,
@@ -74,10 +84,46 @@ public class OAuthAppDAO {
         }
     }
 
+    public void init() throws IdPClientException {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            DatabaseMetaData databaseMetaData = conn.getMetaData();
+            queries = ExternalIdPClientUtil.getQueries(databaseMetaData.getDatabaseProductName(),
+                    databaseMetaData.getDatabaseProductVersion(), this.deploymentQueries);
+        } catch (SQLException | IOException | QueryMappingNotAvailableException e) {
+            throw new IdPClientException("Error initializing connection.", e);
+        } finally {
+            closeConnection(conn, null, null);
+        }
+    }
+
+    public void createTable() throws IdPClientException {
+        String createTableQuery = getQuery(ExternalIdPClientConstants.CREATE_TABLE_TEMPLATE);
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+            ps = conn.prepareStatement(createTableQuery);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Executing query: " + createTableQuery);
+            }
+            ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new IdPClientException("Unable to create table . [Query=" + createTableQuery + "]", e);
+        } finally {
+            closeConnection(conn, ps, null);
+        }
+    }
+
     public void addOAuthApp(OAuthApplicationInfo oAuthApplicationInfo) throws IdPClientException {
         Connection conn = null;
         PreparedStatement ps = null;
-        String query = "INSERT INTO " + TABLE_NAME + "(CLIENTNAME, CLIENTID, CLIENTSECRET) VALUES(?, ?, ?)";
+        String query = getQuery(ExternalIdPClientConstants.ADD_OAUTH_APP_TEMPLATE);
 
         try {
             conn = getConnection();
@@ -102,7 +148,7 @@ public class OAuthAppDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE CLIENTNAME = ?";
+        String query = getQuery(ExternalIdPClientConstants.RETRIEVE_OAUTH_APP_TEMPLATE);
 
         try {
             conn = getConnection();
@@ -112,7 +158,7 @@ public class OAuthAppDAO {
                 LOG.debug("Executing query: " + query);
             }
             resultSet = ps.executeQuery();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 return new OAuthApplicationInfo(name, resultSet.getString("CLIENTID"),
                         resultSet.getString("CLIENTSECRET"));
             }
@@ -127,7 +173,7 @@ public class OAuthAppDAO {
     public void updateOAuthApp(OAuthApplicationInfo oAuthApplicationInfo) throws IdPClientException {
         Connection conn = null;
         PreparedStatement ps = null;
-        String query = "UPDATE " + TABLE_NAME + " SET CLIENTID= ? , CLIENTSECRET = ? WHERE CLIENTNAME = ?;";
+        String query = getQuery(ExternalIdPClientConstants.UPDATE_OAUTH_APP_TEMPLATE);
 
         try {
             conn = getConnection();
@@ -168,6 +214,13 @@ public class OAuthAppDAO {
 
     private Connection getConnection() throws SQLException, IdPClientException {
         return getDataSource().getConnection();
+    }
+
+    private String getQuery(String key) {
+        if (!this.queries.containsKey(key)) {
+            throw new RuntimeException("Unable to find the configuration entry for the key: " + key);
+        }
+        return this.queries.get(key);
     }
 }
 

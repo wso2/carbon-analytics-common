@@ -97,6 +97,11 @@ public class ExternalIdPClientConstants {
     public static final String SCIM2_GROUPS = "groups";
     public static final String SCIM2_DISPLAY = "display";
 
+    public static final String CREATE_TABLE_TEMPLATE = "CREATE_OAUTH_APP_TABLE";
+    public static final String ADD_OAUTH_APP_TEMPLATE = "ADD_OAUTH_APP";
+    public static final String UPDATE_OAUTH_APP_TEMPLATE = "UPDATE_OAUTH_APP";
+    public static final String RETRIEVE_OAUTH_APP_TEMPLATE = "RETRIEVE_OAUTH_APP";
+
     private ExternalIdPClientConstants() {
     }
 }

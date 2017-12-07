@@ -97,7 +97,18 @@ public class ExternalIdPClient implements IdPClient {
                 .build();
     }
 
+    private static String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
+    }
+
     public void init() throws IdPClientException {
+        this.oAuthAppDAO.init();
+        this.oAuthAppDAO.createTable();
         for (Map.Entry<String, OAuthApplicationInfo> oAuthApplicationInfoEntry : this.oAuthAppInfoMap.entrySet()) {
             String clientId = oAuthApplicationInfoEntry.getValue().getClientId();
             String clientSecret = oAuthApplicationInfoEntry.getValue().getClientSecret();
@@ -550,14 +561,5 @@ public class ExternalIdPClient implements IdPClient {
             }
         }
         return errorMessage.toString();
-    }
-
-    private static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
     }
 }
