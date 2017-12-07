@@ -30,9 +30,11 @@ import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.PermissionConfig;
+import org.wso2.carbon.analytics.permissions.bean.PermissionString;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.analytics.permissions.exceptions.PermissionException;
 import org.wso2.carbon.analytics.permissions.internal.dao.PermissionsDAO;
+import org.wso2.carbon.analytics.permissions.internal.util.PermissionUtil;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
@@ -81,6 +83,13 @@ public class DefaultPermissionProvider implements PermissionProvider {
         this.getPermissionsDAO().addPermission(permission);
     }
 
+    @Override
+    public String addPermissionAPI(Permission permission) throws PermissionException {
+        String permissionID = PermissionUtil.createPermissionID(permission);
+        addPermission(permission);
+        return permissionID;
+    }
+
     /**
      * Check permission.
      *
@@ -105,6 +114,23 @@ public class DefaultPermissionProvider implements PermissionProvider {
         }
         this.getPermissionsDAO().revokePermission(permission);
         this.getPermissionsDAO().deletePermission(permission);
+    }
+
+    @Override
+    public void deletePermission(String permissionID) throws PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Delete permission " + permissionID);
+        }
+        this.getPermissionsDAO().revokePermission(permissionID);
+        this.getPermissionsDAO().deletePermission(permissionID);
+    }
+
+    @Override
+    public List<PermissionString> getPermissionStrings(String appName) {
+        if (log.isDebugEnabled()) {
+            log.debug("Getting permissions for app: " + appName);
+        }
+        return this.permissionsDAO.getPermissionStrings(appName);
     }
 
     /**
@@ -136,6 +162,14 @@ public class DefaultPermissionProvider implements PermissionProvider {
         this.getPermissionsDAO().revokePermission(permission);
     }
 
+    public void revokePermission(String permissionID) throws PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Revoke permission " + permissionID);
+        }
+        this.getPermissionsDAO().revokePermission(permissionID);
+    }
+
+
     /**
      * Revoke permission from specific role.
      *
@@ -149,6 +183,13 @@ public class DefaultPermissionProvider implements PermissionProvider {
             log.debug("Revoke permission " + permission + " from " + role);
         }
         this.getPermissionsDAO().revokePermission(permission, role);
+    }
+
+    public void revokePermission(Permission permission, String roleName) throws PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Revoke permission " + permission.toString() + " from " + roleName);
+        }
+        this.getPermissionsDAO().revokePermission(permission, roleName);
     }
 
     /**
@@ -181,6 +222,10 @@ public class DefaultPermissionProvider implements PermissionProvider {
         return this.getPermissionsDAO().hasPermission(roles, permission);
     }
 
+    public boolean hasPermission(String username, String permissionID) throws PermissionException {
+        return false;
+    }
+
     /**
      * Get granted roles for a specific permission.
      *
@@ -198,7 +243,7 @@ public class DefaultPermissionProvider implements PermissionProvider {
         Map<String, org.wso2.carbon.analytics.idp.client.core.models.Role> roleMap = new HashMap<>();
         try {
             List<org.wso2.carbon.analytics.idp.client.core.models.Role> allRoles = idPClient.getAllRoles();
-            for (org.wso2.carbon.analytics.idp.client.core.models.Role role: allRoles) {
+            for (org.wso2.carbon.analytics.idp.client.core.models.Role role : allRoles) {
                 roleMap.put(role.getId(), role);
             }
         } catch (IdPClientException e) {
@@ -206,6 +251,27 @@ public class DefaultPermissionProvider implements PermissionProvider {
         }
 
         List<Role> roles = this.getPermissionsDAO().getGrantedRoles(permission);
+        roles.forEach(role -> role.setName(roleMap.get(role.getId()).getDisplayName()));
+        return roles;
+    }
+
+    public List<Role> getGrantedRoles(String permissionID) throws PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Get roles assigned for " + permissionID);
+        }
+
+        // Create a map out of all the roles with role Id as the key. This map will be used to get the role name.
+        Map<String, org.wso2.carbon.analytics.idp.client.core.models.Role> roleMap = new HashMap<>();
+        try {
+            List<org.wso2.carbon.analytics.idp.client.core.models.Role> allRoles = idPClient.getAllRoles();
+            for (org.wso2.carbon.analytics.idp.client.core.models.Role role : allRoles) {
+                roleMap.put(role.getId(), role);
+            }
+        } catch (IdPClientException e) {
+            throw new PermissionException("Failed getting roles for the permission " + permissionID + ".");
+        }
+
+        List<Role> roles = this.getPermissionsDAO().getGrantedRoles(permissionID);
         roles.forEach(role -> role.setName(roleMap.get(role.getId()).getDisplayName()));
         return roles;
     }

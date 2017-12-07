@@ -20,6 +20,7 @@
 package org.wso2.carbon.analytics.permissions;
 
 import org.wso2.carbon.analytics.permissions.bean.Permission;
+import org.wso2.carbon.analytics.permissions.bean.PermissionString;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.analytics.permissions.exceptions.PermissionException;
 
@@ -37,6 +38,8 @@ public interface PermissionProvider {
      */
     void addPermission(Permission permission) throws PermissionException;
 
+    String addPermissionAPI(Permission permission) throws PermissionException;
+
     /**
      * Check permission.
      *
@@ -51,6 +54,11 @@ public interface PermissionProvider {
      * @throws PermissionException
      */
     void deletePermission(Permission permission) throws PermissionException;
+
+    void deletePermission(String permissionID) throws PermissionException;
+
+    List<PermissionString> getPermissionStrings(String appName);
+
 
     /**
      * Grant permission to specific role.
@@ -69,6 +77,8 @@ public interface PermissionProvider {
      */
     void revokePermission(Permission permission) throws PermissionException;
 
+    void revokePermission(String permissionID) throws PermissionException;
+
     /**
      * Revoke permission from specific role.
      *
@@ -77,6 +87,9 @@ public interface PermissionProvider {
      * @throws PermissionException
      */
     void revokePermission(Permission permission, Role role) throws PermissionException;
+
+    void revokePermission(Permission permission, String roleID) throws PermissionException;
+
 
     /**
      * Check whether a particular user has specific permission.
@@ -88,6 +101,8 @@ public interface PermissionProvider {
      */
     boolean hasPermission(String username, Permission permission) throws PermissionException;
 
+    boolean hasPermission(String username, String permissionID) throws PermissionException;
+
     /**
      * Get list of roles which has a permission granted.
      *
@@ -96,4 +111,6 @@ public interface PermissionProvider {
      * @throws PermissionException
      */
     List<Role> getGrantedRoles(Permission permission) throws PermissionException;
+
+    List<Role> getGrantedRoles(String permissionID) throws PermissionException;
 }
