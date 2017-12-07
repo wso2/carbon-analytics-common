@@ -21,10 +21,8 @@ package org.wso2.carbon.analytics.idp.client.core.utils;
  * IdP Client constants.
  */
 public class IdPClientConstants {
-    public static final String WSO2_SP_TOKEN_1 = "WSO2_SP_TOKEN_1";
     public static final String WSO2_SP_TOKEN_2 = "WSO2_SP_TOKEN_2";
     public static final String WSO2_SP_TOKEN = "WSO2_SP_TOKEN";
-    public static final String WSO2_SP_REFRESH_TOKEN_1 = "WSO2_SP_REFRESH_TOKEN_1";
     public static final String WSO2_SP_REFRESH_TOKEN_2 = "WSO2_SP_REFRESH_TOKEN_2";
     public static final String WSO2_SP_REFRESH_TOKEN = "WSO2_SP_REFRESH_TOKEN";
 
