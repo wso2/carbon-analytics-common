@@ -831,7 +831,7 @@
         <carbon.messaging.version>3.0.1</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <msf4j.version>2.4.1</msf4j.version>
+        <msf4j.version>2.5.0-beta</msf4j.version>
         <msf4j.import.version.range>[2.0.0, 3.0.0)</msf4j.import.version.range>
 
         <com.fasterxml.jackson.core.version>2.7.4</com.fasterxml.jackson.core.version>
