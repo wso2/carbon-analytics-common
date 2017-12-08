@@ -430,11 +430,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.auth.rest.api</artifactId>
-                <version>${carbon.analytics.common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
