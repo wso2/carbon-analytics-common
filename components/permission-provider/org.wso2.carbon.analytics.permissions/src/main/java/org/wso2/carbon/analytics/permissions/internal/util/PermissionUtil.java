@@ -18,7 +18,6 @@
  */
 package org.wso2.carbon.analytics.permissions.internal.util;
 
-import org.owasp.encoder.Encode;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 
 import java.nio.charset.Charset;
@@ -37,18 +36,5 @@ public class PermissionUtil {
     public static String createPermissionID(Permission permission) {
         String uuid = UUID.nameUUIDFromBytes(permission.toString().getBytes(charset)).toString();
         return uuid;
-    }
-
-    public static Permission mapPermissionModel(org.wso2.carbon.analytics.permissions.api.model.Permission model) {
-        return new Permission(model.getAppName(), model.getPermissionString());
-    }
-
-    public static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
     }
 }
