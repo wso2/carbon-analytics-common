@@ -67,22 +67,6 @@
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.data.provider.bean.DataSetMetadata"/>
-        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="org.wso2.carbon.data.provider.bean.DataModel"/>
-        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="org.wso2.carbon.data.provider.rdbms.AbstractRDBMSDataProvider"/>
-        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
-    </Match>
-    <Match>
-        <Class name="org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean"/>
-        <Bug pattern="EI_EXPOSE_REP, OBL_UNSATISFIED_OBLIGATION"/>
-    </Match>
-    <Match>
         <Class name="org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender"/>
         <Bug pattern="DM_DEFAULT_ENCODING"/>
     </Match>

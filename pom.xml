@@ -34,12 +34,10 @@
         <module>components/authentication</module>
         <module>components/data-bridge</module>
         <module>components/permission-provider</module>
-        <module>components/org.wso2.carbon.data.provider</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
         <module>features/authentication</module>
         <module>features/data-bridge</module>
         <module>features/permission-provider</module>
-        <module>features/org.wso2.carbon.data.provider.feature</module>
         <module>features/org.wso2.orbit.org.owasp.encoder.feature</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -439,12 +437,6 @@
                 <artifactId>org.wso2.carbon.analytics.idp.client.feature</artifactId>
                 <version>${carbon.analytics.common.version}</version>
                 <type>zip</type>
-            </dependency>
-            <!--dataprovider feature -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.data.provider</artifactId>
-                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.config</groupId>
