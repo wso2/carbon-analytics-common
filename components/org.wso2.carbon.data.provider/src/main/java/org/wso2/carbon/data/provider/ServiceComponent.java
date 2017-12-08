@@ -28,10 +28,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.msf4j.Microservice;
-import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -53,7 +51,6 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
         immediate = true
 )
 @Path("/portal/apis/data-provider")
-@RequestInterceptor(AuthenticationInterceptor.class)
 public class ServiceComponent implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
 
