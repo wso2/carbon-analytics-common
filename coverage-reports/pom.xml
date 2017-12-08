@@ -67,10 +67,6 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.data.provider</artifactId>
         </dependency>
         <dependency>

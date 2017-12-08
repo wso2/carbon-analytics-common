@@ -33,6 +33,5 @@
 
     <modules>
         <module>org.wso2.carbon.analytics.idp.client</module>
-        <module>org.wso2.carbon.analytics.msf4j.interceptor.common</module>
     </modules>
 </project>
