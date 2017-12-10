@@ -226,11 +226,11 @@ public class OneEndPointDPThriftTest {
 
 	@Test
 	public void testOneSecureDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, IOException {
-		startServer(7611);
+		startServer(7811);
 		AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
 		String hostName = DataPublisherTestUtil.LOCAL_HOST;
-		DataPublisher dataPublisher = new DataPublisher("Thrift", "ssl://" + hostName + ":7711",
-			"ssl://" + hostName + ":7711", "admin", "admin");
+		DataPublisher dataPublisher = new DataPublisher("Thrift", "ssl://" + hostName + ":7911",
+			"ssl://" + hostName + ":7911", "admin", "admin");
 		Event event = new Event();
 		event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
 		event.setMetaData(new Object[]{"127.0.0.1"});
