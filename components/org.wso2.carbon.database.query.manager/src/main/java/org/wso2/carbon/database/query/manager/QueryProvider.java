@@ -92,13 +92,10 @@ public class QueryProvider {
                         deploymentConfigMap.containsKey(defaultEntry)) {
                     value = deploymentConfigMap.get(defaultEntry);
                     if (LOGGER.isDebugEnabled()) {
-                        if (databaseVersion == null) {
-                            databaseVersion = "null";
-                        }
                         LOGGER.debug("Override the query : '" + removeCRLFCharacters(defaultEntry) +
                                 "' with deployment config value: '" + removeCRLFCharacters(value) +
                                 "'  for database type: '" + removeCRLFCharacters(databaseType) + "' and version '" +
-                                removeCRLFCharacters(databaseVersion) + "'.");
+                                removeCRLFCharacters(String.valueOf(databaseVersion)) + "'.");
                     }
                 } else {
                     if (componentConfigMap != null && !componentConfigMap.isEmpty()
