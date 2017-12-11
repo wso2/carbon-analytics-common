@@ -58,10 +58,6 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -85,7 +81,6 @@
                             org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
                             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
                             org.wso2.carbon.stream.processor.idp.*,
-                            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

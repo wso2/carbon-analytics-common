@@ -137,11 +137,6 @@
             <artifactId>org.wso2.carbon.databridge.feature</artifactId>
             <type>zip</type>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.orbit.org.owasp.encoder.feature</artifactId>
-            <type>zip</type>
-        </dependency>
     </dependencies>
 
     <build>
@@ -305,10 +300,6 @@
                                     <id>org.wso2.carbon.cluster.coordinator.commons.feature</id>
                                     <version>${carbon.coordination.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature</id>
-                                    <version>${carbon.analytics.common.version}</version>
-                                </feature>
 
                                 <!-- Databridge Features -->
                                 <feature>
@@ -455,10 +446,6 @@
                                     <id>org.wso2.carbon.cluster.coordinator.commons.feature.group</id>
                                     <version>${carbon.coordination.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics.common.version}</version>
-                                </feature>
 
                                 <!-- Databridge Features -->
                                 <feature>
@@ -535,10 +522,6 @@
                                 <feature>
                                     <id>org.wso2.carbon.datasource.core.feature.group</id>
                                     <version>${carbon.datasources.version}</version>
-                                </feature>
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics.common.version}</version>
                                 </feature>
 
                                 <!-- Authentication feature -->
@@ -634,10 +617,6 @@
                                 <feature>
                                     <id>org.wso2.carbon.datasource.core.feature.group</id>
                                     <version>${carbon.datasources.version}</version>
-                                </feature>
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics.common.version}</version>
                                 </feature>
 
                                 <!-- Authentication feature -->

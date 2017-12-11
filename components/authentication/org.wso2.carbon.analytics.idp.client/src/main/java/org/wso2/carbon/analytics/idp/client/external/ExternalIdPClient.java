@@ -26,7 +26,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import feign.Response;
 import feign.gson.GsonDecoder;
-import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
@@ -97,13 +96,8 @@ public class ExternalIdPClient implements IdPClient {
                 .build();
     }
 
-    private static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
+    private static String removeCRLFCharacters(String str) {
+        return str.replace('\n', '_').replace('\r', '_');
     }
 
     public void init() throws IdPClientException {
@@ -307,7 +301,7 @@ public class ExternalIdPClient implements IdPClient {
 
         if (response == null) {
             String error = "Error occurred while generating an access token for grant type '" +
-                    getEncodedString(grantType) + "'. Response is null.";
+                    removeCRLFCharacters(grantType) + "'. Response is null.";
             LOG.error(error);
             throw new IdPClientException(error);
         }
