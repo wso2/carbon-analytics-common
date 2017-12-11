@@ -19,7 +19,6 @@
 package org.wso2.carbon.database.query.manager;
 
 import org.apache.log4j.Logger;
-import org.owasp.encoder.Encode;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 
@@ -93,10 +92,13 @@ public class QueryProvider {
                         deploymentConfigMap.containsKey(defaultEntry)) {
                     value = deploymentConfigMap.get(defaultEntry);
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Override the query : '" + getEncodedString(defaultEntry) + "' with deployment " +
-                                "config value: '" + getEncodedString(value) + "'  for database type: '" +
-                                getEncodedString(databaseType) + "' and version '" + getEncodedString(databaseVersion)
-                                + "'.");
+                        if (databaseVersion == null) {
+                            databaseVersion = "null";
+                        }
+                        LOGGER.debug("Override the query : '" + removeCRLFCharacters(defaultEntry) +
+                                "' with deployment config value: '" + removeCRLFCharacters(value) +
+                                "'  for database type: '" + removeCRLFCharacters(databaseType) + "' and version '" +
+                                removeCRLFCharacters(databaseVersion) + "'.");
                     }
                 } else {
                     if (componentConfigMap != null && !componentConfigMap.isEmpty()
@@ -117,12 +119,7 @@ public class QueryProvider {
         }
     }
 
-    private static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
+    private static String removeCRLFCharacters(String str) {
+            return str.replace('\n', '_').replace('\r', '_');
     }
 }

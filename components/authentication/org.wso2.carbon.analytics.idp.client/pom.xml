@@ -73,10 +73,6 @@
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
@@ -127,7 +123,6 @@
             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
             org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
             org.wso2.carbon.kernel.*;version="${carbon.kernel.package.import.version.range}",
-            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
             *;resolution:=optional
         </import.package>
         <dynamic.import.package>*</dynamic.import.package>
