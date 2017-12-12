@@ -55,6 +55,8 @@ public final class DCRClientInfo {
     private String jwksUri;
     @SerializedName("userinfo_signed_response_alg")
     private String userinfoSignedResponseAlg;
+    @SerializedName("ext_param_owner")
+    private String extParamOwner;
 
     public String getClientId() {
         return clientId;
@@ -178,6 +180,10 @@ public final class DCRClientInfo {
             redirectURIs = new ArrayList<>();
         }
         redirectURIs.add(callback);
+    }
+
+    public void setExtParamOwner(String extParamOwner) {
+        this.extParamOwner = extParamOwner;
     }
 
     @Override

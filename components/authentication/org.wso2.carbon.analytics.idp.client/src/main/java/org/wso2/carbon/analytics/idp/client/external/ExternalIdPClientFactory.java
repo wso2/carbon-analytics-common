@@ -109,6 +109,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 ExternalIdPClientConstants.DEFAULT_KM_PASSWORD);
         String kmTokenUrl = properties.getOrDefault(ExternalIdPClientConstants.KM_TOKEN_URL,
                 ExternalIdPClientConstants.DEFAULT_KM_TOKEN_URL);
+        String dcrAppOwner = properties.getOrDefault(ExternalIdPClientConstants.DCR_APP_OWNER, kmUsername);
 
         String idPBaseUrl = properties.getOrDefault(ExternalIdPClientConstants.IDP_BASE_URL,
                 ExternalIdPClientConstants.DEFAULT_IDP_BASE_URL);
@@ -185,7 +186,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
                 adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
                 keyManagerServiceStubs, scimServiceStub);
-        externalIdPClient.init();
+        externalIdPClient.init(dcrAppOwner);
         return externalIdPClient;
     }
 
