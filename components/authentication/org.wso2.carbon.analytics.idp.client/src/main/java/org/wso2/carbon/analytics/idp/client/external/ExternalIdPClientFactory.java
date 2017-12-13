@@ -40,6 +40,7 @@ import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.secvault.SecretRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +55,7 @@ import java.util.Map;
 public class ExternalIdPClientFactory implements IdPClientFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalIdPClientFactory.class);
     private DataSourceService dataSourceService;
+    private SecretRepository secretRepository;
 
     @Activate
     protected void activate(BundleContext bundleContext) {
@@ -91,6 +93,30 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         this.dataSourceService = null;
     }
 
+    /**
+     * Register secret repository.
+     *
+     * @param secretRepository
+     */
+    @Reference(
+            name = "org.wso2.carbon.secvault.repository.DefaultSecretRepository",
+            service = SecretRepository.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterSecretRepository"
+    )
+    protected void registerSecretRepository(SecretRepository secretRepository) {
+        this.secretRepository = secretRepository;
+    }
+
+    /**
+     * Unregister secret repository.
+     *
+     * @param secretRepository
+     */
+    protected void unregisterSecretRepository(SecretRepository secretRepository) {
+        this.secretRepository = null;
+    }
 
     @Override
     public String getType() {
@@ -168,7 +194,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         String databaseName = properties.getOrDefault(ExternalIdPClientConstants.DATABASE_NAME,
                 ExternalIdPClientConstants.DEFAULT_DATABASE_NAME);
         OAuthAppDAO oAuthAppDAO = new OAuthAppDAO(this.dataSourceService, databaseName,
-                idPClientConfiguration.getQueries());
+                idPClientConfiguration.getQueries(), this.secretRepository);
 
         DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
                 .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword);
