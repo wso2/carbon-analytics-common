@@ -100,7 +100,7 @@ public class ExternalIdPClient implements IdPClient {
         return str.replace('\n', '_').replace('\r', '_');
     }
 
-    public void init() throws IdPClientException {
+    public void init(String kmUserName) throws IdPClientException {
         this.oAuthAppDAO.init();
         this.oAuthAppDAO.createTable();
         for (Map.Entry<String, OAuthApplicationInfo> oAuthApplicationInfoEntry : this.oAuthAppInfoMap.entrySet()) {
@@ -121,7 +121,7 @@ public class ExternalIdPClient implements IdPClient {
                 this.oAuthAppInfoMap.replace(oAuthApplicationInfoEntry.getKey(), persistedOAuthApp);
             } else {
                 registerApplication(oAuthApplicationInfoEntry.getKey(),
-                        oAuthApplicationInfoEntry.getValue().getClientName());
+                        oAuthApplicationInfoEntry.getValue().getClientName(), kmUserName);
             }
         }
     }
@@ -468,7 +468,8 @@ public class ExternalIdPClient implements IdPClient {
         }
     }
 
-    private void registerApplication(String appContext, String clientName) throws IdPClientException {
+    private void registerApplication(String appContext, String clientName, String kmUserName)
+            throws IdPClientException {
         List<String> grantTypes = new ArrayList<>();
         grantTypes.add(IdPClientConstants.PASSWORD_GRANT_TYPE);
         grantTypes.add(IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
@@ -493,6 +494,7 @@ public class ExternalIdPClient implements IdPClient {
         dcrClientInfo.setGrantTypes(grantTypes);
         dcrClientInfo.addCallbackUrl(callBackUrl);
         dcrClientInfo.setUserinfoSignedResponseAlg(signingAlgo);
+        dcrClientInfo.setExtParamOwner(kmUserName);
 
         Response response = dcrmServiceStub.registerApplication(dcrClientInfo);
         if (response == null) {

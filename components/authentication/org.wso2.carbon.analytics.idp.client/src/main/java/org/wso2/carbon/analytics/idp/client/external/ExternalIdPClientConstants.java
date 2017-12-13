@@ -49,6 +49,7 @@ public class ExternalIdPClientConstants {
     public static final String BR_DB_CLIENT_SECRET = "businessRulesClientSecret";
     public static final String CACHE_TIMEOUT = "cacheTimeout";
     public static final String DATABASE_NAME = "databaseName";
+    public static final String DCR_APP_OWNER = "dcrAppOwner";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
