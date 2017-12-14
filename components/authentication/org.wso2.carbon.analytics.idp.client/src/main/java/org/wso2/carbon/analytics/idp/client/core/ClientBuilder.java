@@ -18,16 +18,24 @@
 
 package org.wso2.carbon.analytics.idp.client.core;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
+import feign.Client;
 
 /**
- * Implementation of {@link HostnameVerifier} to verify hostnames.
+ * Builder class used to build feign client.
  */
-public class IDPClientHostNameVerifier implements HostnameVerifier {
+public class ClientBuilder {
 
-    @Override
-    public boolean verify(String hostname, SSLSession sslSession) {
-        return Boolean.parseBoolean(System.getProperty("org.wso2.ignoreHostnameVerification"));
+    private boolean isHostnameVerifierEnabled;
+
+    public ClientBuilder(boolean isEnabled) {
+        this.isHostnameVerifierEnabled = isEnabled;
+    }
+
+    public Client.Default createClient() {
+        if (isHostnameVerifierEnabled) {
+            return new Client.Default(null, (hostName, sslSession) -> true);
+        } else {
+            return new Client.Default(null, null);
+        }
     }
 }
