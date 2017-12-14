@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.database.query.manager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 
@@ -33,7 +34,7 @@ import java.util.Set;
  * deployment.yaml config.
  */
 public class QueryProvider {
-    private static final Logger LOGGER = Logger.getLogger(QueryProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryProvider.class);
     private static final String DEFAULT_TYPE = "default";
 
     /**

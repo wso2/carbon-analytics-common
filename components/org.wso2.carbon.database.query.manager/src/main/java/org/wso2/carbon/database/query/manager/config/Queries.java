@@ -60,4 +60,16 @@ public class Queries {
     public Map<String, String> getMappings() {
         return this.mappings;
     }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setMappings(Map<String, String> mappings) {
+        this.mappings = mappings;
+    }
 }
