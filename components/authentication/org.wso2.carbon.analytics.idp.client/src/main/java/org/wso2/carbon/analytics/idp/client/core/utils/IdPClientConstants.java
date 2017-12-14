@@ -21,13 +21,6 @@ package org.wso2.carbon.analytics.idp.client.core.utils;
  * IdP Client constants.
  */
 public class IdPClientConstants {
-    public static final String WSO2_SP_TOKEN_2 = "WSO2_SP_TOKEN_2";
-    public static final String WSO2_SP_TOKEN = "WSO2_SP_TOKEN";
-    public static final String WSO2_SP_REFRESH_TOKEN_2 = "WSO2_SP_REFRESH_TOKEN_2";
-    public static final String WSO2_SP_REFRESH_TOKEN = "WSO2_SP_REFRESH_TOKEN";
-
-    public static final String LOGIN_CONTEXT = "/login";
-    public static final String LOGOUT_CONTEXT = "/login";
 
     public static final String PASSWORD_GRANT_TYPE = "password";
     public static final String AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code";
@@ -49,14 +42,6 @@ public class IdPClientConstants {
     public static final String USERNAME = "Username";
     public static final String PASSWORD = "Password";
     public static final String GRANT_TYPE = "Grant_Type";
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String COOKIE_HEADER = "Cookie";
-    public static final String HTTP_ONLY_COOKIE = "HttpOnly";
-    public static final String SECURE_COOKIE = "Secure";
-    public static final String EXPIRES_COOKIE = "Expires=";
-
-    public static final String BEARER_PREFIX = "Bearer";
-    public static final String BASIC_PREFIX = "Basic";
 
     public static final String ERROR = "Error";
     public static final String ERROR_DESCRIPTION = "Error_Description";

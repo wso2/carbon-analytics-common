@@ -27,8 +27,11 @@ import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.secvault.SecretRepository;
+import org.wso2.carbon.secvault.exception.SecureVaultException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -44,6 +47,7 @@ import javax.sql.DataSource;
 public class OAuthAppDAO {
     private static final Logger LOG = LoggerFactory.getLogger(OAuthAppDAO.class);
 
+    private SecretRepository secretRepository;
     private DataSourceService dataSourceService;
     private DataSource dataSource;
     private String databaseName;
@@ -51,10 +55,11 @@ public class OAuthAppDAO {
     private Map<String, String> queries;
 
     public OAuthAppDAO(DataSourceService dataSourceService, String databaseName,
-                       List<Queries> deploymentQueries) {
+                       List<Queries> deploymentQueries, SecretRepository secretRepository) {
         this.dataSourceService = dataSourceService;
         this.databaseName = databaseName;
         this.deploymentQueries = deploymentQueries;
+        this.secretRepository = secretRepository;
     }
 
     private static void closeConnection(Connection connection, PreparedStatement preparedStatement,
@@ -131,12 +136,15 @@ public class OAuthAppDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, oAuthApplicationInfo.getClientName());
             ps.setString(2, oAuthApplicationInfo.getClientId());
-            ps.setString(3, oAuthApplicationInfo.getClientSecret());
+            byte[] encrypt = this.secretRepository.encrypt(oAuthApplicationInfo.getClientSecret().getBytes("UTF-8"));
+            ps.setBytes(3, encrypt);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Executing query: " + query);
             }
             ps.executeUpdate();
             conn.commit();
+        } catch (UnsupportedEncodingException | SecureVaultException e) {
+            throw new IdPClientException("Unable to add OauthApp. [Query=" + query + "]. Encryption failed.", e);
         } catch (SQLException e) {
             throw new IdPClientException("Unable to add OauthApp. [Query=" + query + "]", e);
         } finally {
@@ -159,9 +167,12 @@ public class OAuthAppDAO {
             }
             resultSet = ps.executeQuery();
             if (resultSet.next()) {
-                return new OAuthApplicationInfo(name, resultSet.getString("CLIENTID"),
-                        resultSet.getString("CLIENTSECRET"));
+                byte[] clientSecret = resultSet.getBytes("CLIENTSECRET");
+                String decrypted = new String(this.secretRepository.decrypt(clientSecret), "UTF-8");
+                return new OAuthApplicationInfo(name, resultSet.getString("CLIENTID"), decrypted);
             }
+        } catch (UnsupportedEncodingException | SecureVaultException e) {
+            throw new IdPClientException("Unable to retrieve OAuthApp. [Query=" + query + "]. Decryption failed.", e);
         } catch (SQLException e) {
             throw new IdPClientException("Unable to retrieve OAuthApp. [Query=" + query + "]", e);
         } finally {
@@ -181,12 +192,15 @@ public class OAuthAppDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, oAuthApplicationInfo.getClientId());
             ps.setString(2, oAuthApplicationInfo.getClientSecret());
-            ps.setString(3, oAuthApplicationInfo.getClientName());
+            byte[] encrypt = this.secretRepository.encrypt(oAuthApplicationInfo.getClientSecret().getBytes("UTF-8"));
+            ps.setBytes(3, encrypt);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Executing query: " + query);
             }
             ps.executeUpdate();
             conn.commit();
+        } catch (UnsupportedEncodingException | SecureVaultException e) {
+            throw new IdPClientException("Unable to update OauthApp. [Query=" + query + "]. Encryption failed", e);
         } catch (SQLException e) {
             throw new IdPClientException("Unable to update OauthApp. [Query=" + query + "]", e);
         } finally {
