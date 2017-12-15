@@ -16,26 +16,17 @@
  * under the License.
  */
 
-package org.wso2.carbon.analytics.idp.client.core;
+package org.wso2.carbon.analytics.idp.client.core.api;
 
 import feign.Client;
 
 /**
- * Builder class used to build feign client.
+ * This interface is the Feign Client Builder Service, which create a fiegn client for each Http Service, where it is
+ * necessary. The reason for having a seperate Class is to encapsulate the hostname verification logic from their
+ * HTTP service logic.
  */
-public class ClientBuilder {
-
-    private boolean isHostnameVerifierEnabled;
-
-    public ClientBuilder(boolean isEnabled) {
-        this.isHostnameVerifierEnabled = isEnabled;
-    }
-
-    public Client.Default createClient() {
-        if (isHostnameVerifierEnabled) {
-            return new Client.Default(null, (hostName, sslSession) -> true);
-        } else {
-            return new Client.Default(null, null);
-        }
-    }
+public interface AnalyticsHttpClientBuilderService {
+    public Client newDefaultClientInstance();
+    public <T> T build(String username, String password, int connectTimeoutMillis,
+                       int readTimeoutMillis, Class<T> target, String url);
 }
