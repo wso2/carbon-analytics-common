@@ -1,0 +1,57 @@
+#
+# Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# WSO2 Inc. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+queries:
+  -
+    mappings:
+      get_permission: ~
+      get_appname: ~
+      add_permission: ~
+      is_permission_exists: ~
+      delete_permission: ~
+      delete_permission_by_id: ~
+      grant_permission: ~
+      revoke_permission: ~
+      revoke_permission_by_permission_id: ~
+      revoke_permission_by_role: ~
+      revoke_permission_by_role_id: ~
+      has_permission: ~
+      has_permission_by_permission_id: ~
+      get_granted_roles: ~
+      get_granted_roles_by_permission_id: ~
+    type: default
+    version: default
+  -
+    mappings:
+      get_permission: SELECT PERMISSION_ID, PERMISSION_STRING FROM PERMISSIONS WHERE APP_NAME = ?
+      get_appname: SELECT APP_NAME FROM PERMISSIONS WHERE PERMISSION_ID = ?
+      add_permission: INSERT INTO PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING) VALUES(?, ?, ?)
+      is_permission_exists: SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?
+      delete_permission: DELETE FROM PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?
+      delete_permission_by_id: DELETE FROM PERMISSIONS WHERE PERMISSION_ID = ?
+      grant_permission: INSERT INTO ROLE_PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING, ROLE_ID) VALUES(?, ?, ?, ?)
+      revoke_permission: DELETE FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?
+      revoke_permission_by_permission_id: DELETE FROM ROLE_PERMISSIONS WHERE PERMISSION_ID = ?
+      revoke_permission_by_role: DELETE FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ? AND ROLE_ID = ?
+      revoke_permission_by_role_id: DELETE FROM ROLE_PERMISSIONS WHERE APP_NAME = ? PERMISSION_STRING = ? AND ROLE_ID = ?
+      has_permission: SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ? AND ROLE_ID IN ({ROLE_IDS})
+      has_permission_by_permission_id: SELECT * FROM ROLE_PERMISSIONS WHERE PERMISSIO_ID = ? AND ROLE_ID IN ({ROLE_IDS})
+      get_granted_roles: SELECT ROLE_ID FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?
+      get_granted_roles_by_permission_id: SELECT ROLE_ID FROM ROLE_PERMISSIONS WHERE PERMISSION_ID = ?
+    type: H2
+    version: default
