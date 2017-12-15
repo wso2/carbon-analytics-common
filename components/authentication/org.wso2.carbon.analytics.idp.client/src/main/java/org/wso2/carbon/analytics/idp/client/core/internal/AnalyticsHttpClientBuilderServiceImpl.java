@@ -42,7 +42,7 @@ public class AnalyticsHttpClientBuilderServiceImpl implements AnalyticsHttpClien
     }
 
     public Client newDefaultClientInstance() {
-        if (isHostnameVerifierEnabled) {
+        if (!isHostnameVerifierEnabled) {
             return new Client.Default(null, (hostName, sslSession) -> true);
         } else {
             return new Client.Default(null, null);
