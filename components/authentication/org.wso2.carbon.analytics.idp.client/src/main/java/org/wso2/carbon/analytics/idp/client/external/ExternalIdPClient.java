@@ -293,7 +293,7 @@ public class ExternalIdPClient implements IdPClient {
         } else if (IdPClientConstants.PASSWORD_GRANT_TYPE.equals(grantType)) {
             response = oAuth2ServiceStubs.getTokenServiceStub().generatePasswordGrantAccessToken(
                     username, properties.get(IdPClientConstants.PASSWORD),
-                    null, this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
+                    properties.get(IdPClientConstants.APP_ID), this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                     this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
         } else {
             response = oAuth2ServiceStubs.getTokenServiceStub().generateRefreshGrantAccessToken(
