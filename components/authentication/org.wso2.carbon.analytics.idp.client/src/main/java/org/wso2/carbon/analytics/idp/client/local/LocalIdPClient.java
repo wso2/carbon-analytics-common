@@ -116,8 +116,6 @@ public class LocalIdPClient implements IdPClient {
                     LocalSession oldSession = this.usersToSessionMap.get(userValue);
                     if (oldSession != null) {
                         ZonedDateTime createdAt = ZonedDateTime.now();
-                        oldSession.setSessionId(UUID.randomUUID());
-                        oldSession.setRefreshId(UUID.randomUUID());
                         oldSession.setExpiryTime(createdAt.plusSeconds(this.sessionTimeout));
                         oldSession.setRefreshExpiryTime(createdAt.plusSeconds(this.refreshTimeout));
 
