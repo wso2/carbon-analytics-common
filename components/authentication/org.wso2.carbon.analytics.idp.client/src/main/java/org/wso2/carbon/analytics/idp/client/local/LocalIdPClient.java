@@ -103,18 +103,21 @@ public class LocalIdPClient implements IdPClient {
         Map<String, String> returnProperties = new HashMap<>();
         String grantType = properties.getOrDefault(IdPClientConstants.GRANT_TYPE,
                 IdPClientConstants.PASSWORD_GRANT_TYPE);
-        String userName, password, errorMessage;
+        String userName, password, errorMessage, appId;
         switch (grantType) {
             case IdPClientConstants.PASSWORD_GRANT_TYPE:
                 userName = properties.get(IdPClientConstants.USERNAME);
                 password = properties.get(IdPClientConstants.PASSWORD);
+                appId = properties.getOrDefault(IdPClientConstants.APP_ID, "");
                 LocalSession session;
-                int userValue = (userName + ":" + password).hashCode();
+                int userValue = (userName + ":" + password + ":" + appId).hashCode();
                 if (userName != null & password != null) {
                     //Checking if session is already present and update expiry time.
                     LocalSession oldSession = this.usersToSessionMap.get(userValue);
                     if (oldSession != null) {
                         ZonedDateTime createdAt = ZonedDateTime.now();
+                        oldSession.setSessionId(UUID.randomUUID());
+                        oldSession.setRefreshId(UUID.randomUUID());
                         oldSession.setExpiryTime(createdAt.plusSeconds(this.sessionTimeout));
                         oldSession.setRefreshExpiryTime(createdAt.plusSeconds(this.refreshTimeout));
 
@@ -225,6 +228,7 @@ public class LocalIdPClient implements IdPClient {
 
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
+                        returnProperties.put(IdPClientConstants.USERNAME, refreshSession.getUsername());
                         returnProperties.put(IdPClientConstants.ACCESS_TOKEN, refreshSession.getSessionId().toString());
                         returnProperties.put(
                                 IdPClientConstants.REFRESH_TOKEN, refreshSession.getRefreshId().toString());
