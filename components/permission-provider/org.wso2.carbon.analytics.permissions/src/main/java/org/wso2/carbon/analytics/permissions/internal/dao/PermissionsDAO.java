@@ -47,10 +47,12 @@ public class PermissionsDAO {
     private DataSourceService dataSourceService;
     private DataSource dataSource;
     private PermissionConfig permissionConfig;
+    private QueryManager queryManager;
 
     public PermissionsDAO(DataSourceService dataSourceService, PermissionConfig permissionConfig) {
         this.dataSourceService = dataSourceService;
         this.permissionConfig = permissionConfig;
+        this.queryManager = new QueryManager(permissionConfig);
     }
 
     /**
@@ -61,10 +63,11 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         List<PermissionString> permissionStrings = new ArrayList<>();
-        String query = "SELECT PERMISSION_ID, PERMISSION_STRING FROM PERMISSIONS WHERE APP_NAME = ?";
+        String query = null;
         ResultSet resultSet = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.GET_PERMISSION_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, appName);
             if (log.isDebugEnabled()) {
@@ -77,7 +80,7 @@ public class PermissionsDAO {
             }
         } catch (SQLException e) {
             throw new PermissionException("Unable to retrieve the PERMISSION_STRINGS: " +
-                    permissionConfig.getDatasourceName(), e);
+                    permissionConfig.getDatasourceName() + "[Query=" + query + "]", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -87,11 +90,12 @@ public class PermissionsDAO {
     public String getAppName(String permissionID) {
         Connection conn = null;
         PreparedStatement ps = null;
-        String query = "SELECT APP_NAME FROM PERMISSIONS WHERE PERMISSION_ID = ?";
+        String query = null;
         ResultSet resultSet = null;
         String appName = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.GET_APPNAME_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
             if (log.isDebugEnabled()) {
@@ -102,8 +106,8 @@ public class PermissionsDAO {
                 appName = resultSet.getString("APP_NAME");
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to retrieve the APP_NAME: " +
-                    permissionConfig.getDatasourceName(), e);
+            throw new PermissionException("Unable to retrieve the APP_NAME: " + permissionConfig.getDatasourceName() +
+                    " [Query=" + query + "]", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -118,11 +122,11 @@ public class PermissionsDAO {
     public void addPermission(Permission permission) {
         Connection conn = null;
         PreparedStatement ps = null;
-        // TODO: Get the query from the QueryManager
-        String query = "INSERT INTO PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING) VALUES(?, ?, ?)";
+        String query = null;
         String uuid = PermissionUtil.createPermissionID(permission);
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.ADD_PERMISSION_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, uuid);
@@ -150,10 +154,10 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.CHECK_PERMISSION_EXISTS_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
@@ -165,7 +169,7 @@ public class PermissionsDAO {
                 hasPermission = true;
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to execute check permissions query.", e);
+            throw new PermissionException("Unable to execute check permissions query. [Query=" + query + "]", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -180,10 +184,10 @@ public class PermissionsDAO {
     public void deletePermission(Permission permission) {
         Connection conn = null;
         PreparedStatement ps = null;
-        // TODO: Get the query from the QueryManager
-        String query = "DELETE FROM PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.DELETE_PERMISSION_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
@@ -208,10 +212,10 @@ public class PermissionsDAO {
     public void deletePermission(String permissionID) {
         Connection conn = null;
         PreparedStatement ps = null;
-        String query = "DELETE FROM PERMISSIONS WHERE PERMISSION_ID = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.DELETE_PERMISSION_BY_ID_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
@@ -237,12 +241,10 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         String uuid = PermissionUtil.createPermissionID(permission);
-        // TODO: Get the query from the QueryManager
-        String query = "INSERT INTO ROLE_PERMISSIONS(PERMISSION_ID, APP_NAME, PERMISSION_STRING, ROLE_ID) "
-                + "VALUES(?, ?, ?, ?)";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.GRANT_PERMISSION_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, uuid);
@@ -269,11 +271,10 @@ public class PermissionsDAO {
     public void revokePermission(Permission permission) {
         Connection conn = null;
         PreparedStatement ps = null;
-        // TODO: Get the query from the QueryManager
-        String query = "DELETE FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.REVOKE_PERMISSION_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
@@ -298,11 +299,10 @@ public class PermissionsDAO {
     public void revokePermission(String permissionID) {
         Connection conn = null;
         PreparedStatement ps = null;
-        // TODO: Get the query from the QueryManager
-        String query = "DELETE FROM ROLE_PERMISSIONS WHERE PERMISSION_ID = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.REVOKE_PERMISSION_BY_PERMISSION_ID_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
@@ -327,11 +327,10 @@ public class PermissionsDAO {
     public void revokePermission(Permission permission, Role role) {
         Connection conn = null;
         PreparedStatement ps = null;
-        // TODO: Get the query from the QueryManager
-        String query = "DELETE FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ? AND ROLE_ID = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.REVOKE_PERMISSION_BY_ROLE_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
@@ -358,10 +357,10 @@ public class PermissionsDAO {
     public void revokePermission(Permission permission, String roleID) {
         Connection conn = null;
         PreparedStatement ps = null;
-        String query = "DELETE FROM ROLE_PERMISSIONS WHERE APP_NAME = ? PERMISSION_STRING = ? AND ROLE_ID = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.REVOKE_PERMISSION_BY_ROLE_ID_QUERY);
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
@@ -391,17 +390,18 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ? AND ROLE_ID IN (";
-
-        StringBuilder sb = new StringBuilder(query);
+        String query = null;
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < roles.size(); i++) {
             sb.append("?,");
         }
-        String rolesId = sb.deleteCharAt(sb.length() - 1).append(")").toString();
+        String roleIds = sb.deleteCharAt(sb.length() - 1).toString();
 
         try {
             conn = getConnection();
-            ps = conn.prepareStatement(rolesId);
+            query = queryManager.getQuery(conn, QueryManager.HAS_PERMISSION_QUERY)
+                    .replace("{ROLE_IDS}", roleIds);
+            ps = conn.prepareStatement(roleIds);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             for (int i = 0; i < roles.size(); i++) {
@@ -432,17 +432,17 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT * FROM ROLE_PERMISSIONS WHERE PERMISSIO_ID = ? AND ROLE_ID IN (";
-
-        StringBuilder sb = new StringBuilder(query);
+        String query = null;
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < roles.size(); i++) {
             sb.append("?,");
         }
-        String rolesId = sb.deleteCharAt(sb.length() - 1).append(")").toString();
-
+        String roleIds = sb.deleteCharAt(sb.length() - 1).toString();
         try {
             conn = getConnection();
-            ps = conn.prepareStatement(rolesId);
+            query = queryManager.getQuery(conn, QueryManager.HAS_PERMISSION_BY_PERMISSION_ID_QUERY)
+                    .replace("{ROLE_IDS}", roleIds);
+            ps = conn.prepareStatement(roleIds);
             ps.setString(1, permissionID);
             for (int i = 0; i < roles.size(); i++) {
                 ps.setString(i + 3, roles.get(i).getId());
@@ -473,10 +473,10 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT ROLE_ID FROM ROLE_PERMISSIONS WHERE APP_NAME = ? AND PERMISSION_STRING = ?";
-
+        String query = null;
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.GET_GRANTED_ROLES_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
@@ -505,10 +505,11 @@ public class PermissionsDAO {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        String query = "SELECT ROLE_ID FROM ROLE_PERMISSIONS WHERE PERMISSION_ID = ?";
+        String query = null;
 
         try {
             conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.GET_GRANTED_ROLES_BY_PERMISSION_ID_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
             if (log.isDebugEnabled()) {

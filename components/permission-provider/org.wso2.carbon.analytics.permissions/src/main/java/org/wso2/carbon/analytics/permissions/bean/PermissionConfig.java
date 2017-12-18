@@ -22,6 +22,10 @@ package org.wso2.carbon.analytics.permissions.bean;
 import org.wso2.carbon.analytics.permissions.internal.impl.DefaultPermissionProvider;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
+import org.wso2.carbon.database.query.manager.config.Queries;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuration bean class.
@@ -34,6 +38,9 @@ public class PermissionConfig {
 
     @Element(description = "Permission provider datasource name")
     private String datasourceName = "WSO2_PERMISSIONS_DB";
+
+    @Element(description = "Database queries template array list.")
+    List<Queries> queries = new ArrayList<>();
 
     /**
      * Get permission provider.
@@ -69,5 +76,14 @@ public class PermissionConfig {
      */
     public void setDatasourceName(String datasourceName) {
         this.datasourceName = datasourceName;
+    }
+
+    /**
+     * Get database queries.
+     *
+     * @return
+     */
+    public List<Queries> getQueries() {
+        return queries;
     }
 }
