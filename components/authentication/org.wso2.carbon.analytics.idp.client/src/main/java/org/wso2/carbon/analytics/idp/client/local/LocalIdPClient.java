@@ -141,7 +141,7 @@ public class LocalIdPClient implements IdPClient {
                     }
                 } else {
                     errorMessage = "The login credential used for login are invalid, username : '" + userName + "'.";
-                    LOG.error(errorMessage);
+                    LOG.debug(errorMessage);
                     returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
@@ -236,7 +236,7 @@ public class LocalIdPClient implements IdPClient {
                     } else {
                         errorMessage = "The refresh token used for login is expired, Refresh token : '"
                                 + refreshId + "'.";
-                        LOG.error(errorMessage);
+                        LOG.debug(errorMessage);
                         returnProperties.put(
                                 IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                         returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
@@ -245,7 +245,7 @@ public class LocalIdPClient implements IdPClient {
                     }
                 } else {
                     errorMessage = "The refresh token used for login are invalid, Refresh token : '" + refreshId + "'.";
-                    LOG.error(errorMessage);
+                    LOG.debug(errorMessage);
                     returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
@@ -254,7 +254,7 @@ public class LocalIdPClient implements IdPClient {
             default:
                 errorMessage = "The Grant Type '" + grantType + "' is not" +
                         "supported by the IdPClient '" + LocalIdPClient.class.getName();
-                LOG.error(errorMessage);
+                LOG.debug(errorMessage);
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                 returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
                 returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
