@@ -92,9 +92,7 @@ public class LocalIdPClient implements IdPClient {
         if (user != null) {
             return user.getRoles();
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("User with username '" + name + "' is not present when retrieving user roles.");
-        }
+        LOG.debug("User with username '{}' is not present when retrieving user roles.", name);
         return new ArrayList<>();
     }
 
@@ -123,10 +121,7 @@ public class LocalIdPClient implements IdPClient {
                         sessionIdSessionMap.replace(oldSession.getSessionId().toString(), oldSession);
                         refreshIdSessionMap.replace(oldSession.getRefreshId().toString(), oldSession);
 
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("User '" + userName + "' session is extended.");
-                        }
-
+                        LOG.debug("User '{}' session is extended.", userName);
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                         returnProperties.put(IdPClientConstants.USERNAME, userName);
@@ -141,7 +136,7 @@ public class LocalIdPClient implements IdPClient {
                     }
                 } else {
                     errorMessage = "The login credential used for login are invalid, username : '" + userName + "'.";
-                    LOG.error(errorMessage);
+                    LOG.debug(errorMessage);
                     returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
@@ -158,10 +153,8 @@ public class LocalIdPClient implements IdPClient {
                     Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
 
                     if (!Arrays.equals(plainUserPassword, password.getBytes(Charset.forName("UTF-8")))) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Password did not match with the configured user, userName: '" +
-                                    userName + "', Failing the authentication.");
-                        }
+                        LOG.debug("Password did not match with the configured user, userName: '{}', " +
+                                "Failing the authentication.", userName);
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                         returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
@@ -181,10 +174,7 @@ public class LocalIdPClient implements IdPClient {
                         sessionIdSessionMap.put(session.getSessionId().toString(), session);
                         refreshIdSessionMap.put(session.getRefreshId().toString(), session);
 
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("User '" + userName + "' is logged in.");
-                        }
-
+                        LOG.debug("User '{}' is logged in.", userName);
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                         returnProperties.put(IdPClientConstants.USERNAME, userName);
@@ -196,7 +186,7 @@ public class LocalIdPClient implements IdPClient {
                         return returnProperties;
                     }
                 } else {
-                    LOG.debug("User not found for userName: '" + userName + "'. Failing the authentication.");
+                    LOG.debug("User not found for userName: '{}'. Failing the authentication.", userName);
                     returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, "The login credential used for " +
@@ -220,10 +210,7 @@ public class LocalIdPClient implements IdPClient {
                         sessionIdSessionMap.put(refreshSession.getSessionId().toString(), refreshSession);
                         refreshIdSessionMap.put(refreshSession.getRefreshId().toString(), refreshSession);
 
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("User '" + refreshSession.getUsername() + "' session is refreshed.");
-                        }
-
+                        LOG.debug("User '{}' session is refreshed.", refreshSession.getUsername());
                         returnProperties.put(IdPClientConstants.LOGIN_STATUS,
                                 IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                         returnProperties.put(IdPClientConstants.USERNAME, refreshSession.getUsername());
@@ -236,7 +223,7 @@ public class LocalIdPClient implements IdPClient {
                     } else {
                         errorMessage = "The refresh token used for login is expired, Refresh token : '"
                                 + refreshId + "'.";
-                        LOG.error(errorMessage);
+                        LOG.debug(errorMessage);
                         returnProperties.put(
                                 IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                         returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
@@ -245,7 +232,7 @@ public class LocalIdPClient implements IdPClient {
                     }
                 } else {
                     errorMessage = "The refresh token used for login are invalid, Refresh token : '" + refreshId + "'.";
-                    LOG.error(errorMessage);
+                    LOG.debug(errorMessage);
                     returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                     returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.INVALID_CREDENTIALS);
                     returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
@@ -254,7 +241,7 @@ public class LocalIdPClient implements IdPClient {
             default:
                 errorMessage = "The Grant Type '" + grantType + "' is not" +
                         "supported by the IdPClient '" + LocalIdPClient.class.getName();
-                LOG.error(errorMessage);
+                LOG.debug(errorMessage);
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_FAILURE);
                 returnProperties.put(IdPClientConstants.ERROR, IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
                 returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, errorMessage);
