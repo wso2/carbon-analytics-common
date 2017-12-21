@@ -26,7 +26,12 @@ import feign.Client;
  * HTTP service logic.
  */
 public interface AnalyticsHttpClientBuilderService {
-    public Client newDefaultClientInstance();
-    public <T> T build(String username, String password, int connectTimeoutMillis,
+    Client newDefaultClientInstance();
+
+    <T> T build(String username, String password, int connectTimeoutMillis,
                        int readTimeoutMillis, Class<T> target, String url);
+
+    <T> T buildWithoutInterceptor(Class<T> target, String url);
+
+    <T> T buildWithFormEncoder(String username, String password, Class<T> target, String url);
 }
