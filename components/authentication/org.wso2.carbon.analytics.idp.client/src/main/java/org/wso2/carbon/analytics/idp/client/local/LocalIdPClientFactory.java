@@ -49,13 +49,12 @@ public class LocalIdPClientFactory implements IdPClientFactory {
 
     @Activate
     protected void activate(BundleContext bundleContext) {
-        if (LOG.isDebugEnabled()) {
-            LOG.info("Local User Store Factory registered...");
-        }
+        LOG.debug("Local IDP client factory activated.");
     }
 
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
+        LOG.debug("Local IDP client factory deactivated.");
     }
 
     @Override

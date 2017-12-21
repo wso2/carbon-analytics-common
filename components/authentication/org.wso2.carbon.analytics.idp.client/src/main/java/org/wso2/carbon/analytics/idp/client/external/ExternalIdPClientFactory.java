@@ -59,13 +59,12 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
     @Activate
     protected void activate(BundleContext bundleContext) {
-        if (LOG.isDebugEnabled()) {
-            LOG.info("External IdP Client factory registered...");
-        }
+        LOG.debug("External IDP client factory activated.");
     }
 
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
+        LOG.debug("External IDP client factory deactivated.");
     }
 
     /**
