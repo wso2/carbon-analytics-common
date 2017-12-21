@@ -63,12 +63,13 @@ public class IdPClientServiceComponent implements RequiredCapabilityListener {
 
     @Activate
     protected void start(BundleContext bundleContext) {
+        LOG.debug("IdPClient service component is activated.");
         this.bundleContext = bundleContext;
     }
 
     @Deactivate
     protected void stop() {
-        LOG.info("IdPClient Component is deactivated...");
+        LOG.debug("IdPClient service component is deactivated.");
         if (this.idpClientRegistrationService != null) {
             idpClientRegistrationService.unregister();
         }
@@ -110,7 +111,7 @@ public class IdPClientServiceComponent implements RequiredCapabilityListener {
 
     @Override
     public void onAllRequiredCapabilitiesAvailable() {
-        LOG.info("IdPClientServiceComponent is activated...");
+        LOG.debug("IdPClient service component is started.");
         try {
             IdPClient idPClient = IdPServiceUtils.getIdPClient(configProvider, idPClientFactoryHashMap);
             this.idpClientRegistrationService =
