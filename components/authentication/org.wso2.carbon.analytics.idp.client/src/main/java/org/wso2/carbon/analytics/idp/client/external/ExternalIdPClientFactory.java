@@ -26,15 +26,14 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.analytics.idp.client.external.dao.OAuthAppDAO;
-import org.wso2.carbon.analytics.idp.client.external.factories.DCRMServiceStubFactory;
 import org.wso2.carbon.analytics.idp.client.external.factories.OAuth2ServiceStubFactory;
-import org.wso2.carbon.analytics.idp.client.external.factories.SCIM2ServiceStubFactory;
 import org.wso2.carbon.analytics.idp.client.external.impl.DCRMServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
@@ -56,6 +55,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ExternalIdPClientFactory.class);
     private DataSourceService dataSourceService;
     private SecretRepository secretRepository;
+    private AnalyticsHttpClientBuilderService analyticsHttpClientBuilderService;
 
     @Activate
     protected void activate(BundleContext bundleContext) {
@@ -115,6 +115,24 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
      */
     protected void unregisterSecretRepository(SecretRepository secretRepository) {
         this.secretRepository = null;
+    }
+
+    @Reference(
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        this.analyticsHttpClientBuilderService = service;
+        LOG.debug("@Reference(bind) AnalyticsHttpClientBuilderService at '{}'",
+                AnalyticsHttpClientBuilderService.class.getName());
+    }
+
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        LOG.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at '{}'",
+                AnalyticsHttpClientBuilderService.class.getName());
+        this.analyticsHttpClientBuilderService = null;
     }
 
     @Override
@@ -195,15 +213,15 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         OAuthAppDAO oAuthAppDAO = new OAuthAppDAO(this.dataSourceService, databaseName,
                 idPClientConfiguration.getQueries(), this.secretRepository);
 
-        DCRMServiceStub dcrmServiceStub = DCRMServiceStubFactory
-                .getDCRMServiceStub(dcrEndpoint, kmUsername, kmPassword);
+        DCRMServiceStub dcrmServiceStub = this.analyticsHttpClientBuilderService
+                .buildWithFormEncoder(kmUsername, kmPassword, DCRMServiceStub.class, dcrEndpoint);
         OAuth2ServiceStubs keyManagerServiceStubs = OAuth2ServiceStubFactory.getKeyManagerServiceStubs(
-                kmTokenUrl + ExternalIdPClientConstants.TOKEN_POSTFIX,
+                this.analyticsHttpClientBuilderService, kmTokenUrl + ExternalIdPClientConstants.TOKEN_POSTFIX,
                 kmTokenUrl + ExternalIdPClientConstants.REVOKE_POSTFIX,
                 kmTokenUrl + ExternalIdPClientConstants.INTROSPECT_POSTFIX,
                 kmUsername, kmPassword);
-        SCIM2ServiceStub scimServiceStub = SCIM2ServiceStubFactory
-                .getSCIMServiceStub(idPBaseUrl, idPUserName, idPPassword);
+        SCIM2ServiceStub scimServiceStub = this.analyticsHttpClientBuilderService
+                .buildWithFormEncoder(idPUserName, idPPassword, SCIM2ServiceStub.class, idPBaseUrl);
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
 
