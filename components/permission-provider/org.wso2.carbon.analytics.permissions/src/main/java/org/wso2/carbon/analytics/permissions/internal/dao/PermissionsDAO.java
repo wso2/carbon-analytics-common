@@ -401,7 +401,7 @@ public class PermissionsDAO {
             conn = getConnection();
             query = queryManager.getQuery(conn, QueryManager.HAS_PERMISSION_QUERY)
                     .replace("{ROLE_IDS}", roleIds);
-            ps = conn.prepareStatement(roleIds);
+            ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             for (int i = 0; i < roles.size(); i++) {
@@ -442,7 +442,7 @@ public class PermissionsDAO {
             conn = getConnection();
             query = queryManager.getQuery(conn, QueryManager.HAS_PERMISSION_BY_PERMISSION_ID_QUERY)
                     .replace("{ROLE_IDS}", roleIds);
-            ps = conn.prepareStatement(roleIds);
+            ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
             for (int i = 0; i < roles.size(); i++) {
                 ps.setString(i + 3, roles.get(i).getId());
