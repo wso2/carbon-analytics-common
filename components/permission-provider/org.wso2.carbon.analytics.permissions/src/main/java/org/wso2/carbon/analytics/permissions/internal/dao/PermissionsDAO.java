@@ -70,17 +70,14 @@ public class PermissionsDAO {
             query = queryManager.getQuery(conn, QueryManager.GET_PERMISSION_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, appName);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 permissionStrings.add(new PermissionString(resultSet.getString("PERMISSION_ID"),
                         resultSet.getString("PERMISSION_STRING")));
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to retrieve the PERMISSION_STRINGS: " +
-                    permissionConfig.getDatasourceName() + "[Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to retrieve permissions.", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -98,16 +95,13 @@ public class PermissionsDAO {
             query = queryManager.getQuery(conn, QueryManager.GET_APPNAME_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 appName = resultSet.getString("APP_NAME");
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to retrieve the APP_NAME: " + permissionConfig.getDatasourceName() +
-                    " [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to retrieve the app name.", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -132,13 +126,11 @@ public class PermissionsDAO {
             ps.setString(1, uuid);
             ps.setString(2, permission.getAppName());
             ps.setString(3, permission.getPermissionString());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to add permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to add permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -161,15 +153,13 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 hasPermission = true;
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to execute check permissions query. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to execute check permissions.", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -192,13 +182,11 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to delete permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to delete permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -219,13 +207,11 @@ public class PermissionsDAO {
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to delete permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to delete permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -251,13 +237,11 @@ public class PermissionsDAO {
             ps.setString(2, permission.getAppName());
             ps.setString(3, permission.getPermissionString());
             ps.setString(4, role.getId());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to grant permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to grant permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -279,13 +263,11 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to revoke permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to revoke permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -306,13 +288,11 @@ public class PermissionsDAO {
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to revoke permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to revoke permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -336,13 +316,11 @@ public class PermissionsDAO {
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             ps.setString(3, role.getId());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to revoke permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to revoke permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -366,13 +344,11 @@ public class PermissionsDAO {
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
             ps.setString(3, roleID);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             ps.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new PermissionException("Unable to revoke permission. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to revoke permission.", e);
         } finally {
             closeConnection(conn, ps, null);
         }
@@ -407,15 +383,13 @@ public class PermissionsDAO {
             for (int i = 0; i < roles.size(); i++) {
                 ps.setString(i + 3, roles.get(i).getId());
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 hasPermission = true;
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to check permissions. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to check permissions.", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -447,15 +421,13 @@ public class PermissionsDAO {
             for (int i = 0; i < roles.size(); i++) {
                 ps.setString(i + 3, roles.get(i).getId());
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 hasPermission = true;
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to check permissions. [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to check permissions.", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -480,16 +452,13 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permission.getAppName());
             ps.setString(2, permission.getPermissionString());
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 roles.add(new Role(resultSet.getString("ROLE_ID"), ""));
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to get roles assigned for the permission " + permission +
-                    ". [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to get roles assigned for the permission " + permission + ".", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
@@ -512,16 +481,13 @@ public class PermissionsDAO {
             query = queryManager.getQuery(conn, QueryManager.GET_GRANTED_ROLES_BY_PERMISSION_ID_QUERY);
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + query);
-            }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 roles.add(new Role(resultSet.getString("ROLE_ID"), ""));
             }
         } catch (SQLException e) {
-            throw new PermissionException("Unable to get roles assigned for the permission " + permissionID +
-                    ". [Query=" + query + "]", e);
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to get roles assigned for the permission " + permissionID + ".", e);
         } finally {
             closeConnection(conn, ps, resultSet);
         }
