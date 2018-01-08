@@ -130,7 +130,7 @@ public class DefaultPermissionProvider implements PermissionProvider {
         if (log.isDebugEnabled()) {
             log.debug("Getting permissions for app: " + appName);
         }
-        return this.permissionsDAO.getPermissionStrings(appName);
+        return this.getPermissionsDAO().getPermissionStrings(appName);
     }
 
     /**
