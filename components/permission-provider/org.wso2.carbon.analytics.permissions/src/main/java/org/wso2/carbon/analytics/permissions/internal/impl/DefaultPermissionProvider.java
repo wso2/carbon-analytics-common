@@ -204,6 +204,11 @@ public class DefaultPermissionProvider implements PermissionProvider {
         if (log.isDebugEnabled()) {
             log.debug("Check permission " + permission);
         }
+
+        if (permissionConfig.isPermissionDisabled()) {
+            return true;
+        }
+
         List<Role> roles = getRoles(username);
         org.wso2.carbon.analytics.idp.client.core.models.Role adminRole;
         try {
