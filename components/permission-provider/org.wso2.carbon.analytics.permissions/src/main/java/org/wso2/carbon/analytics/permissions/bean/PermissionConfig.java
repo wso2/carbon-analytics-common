@@ -39,6 +39,9 @@ public class PermissionConfig {
     @Element(description = "Permission provider datasource name")
     private String datasourceName = "WSO2_PERMISSIONS_DB";
 
+    @Element(description = "Boolean for permission provider enable or disable")
+    private boolean isPermissionDisabled = false;
+
     @Element(description = "Database queries template array list.")
     List<Queries> queries = new ArrayList<>();
 
@@ -85,5 +88,23 @@ public class PermissionConfig {
      */
     public List<Queries> getQueries() {
         return queries;
+    }
+
+    /**
+     * set permission disabled flag.
+     *
+     * @return isPemissionDisabled
+     */
+    public boolean isPermissionDisabled() {
+        return isPermissionDisabled;
+    }
+
+    /**
+     * get permission disabled flag.
+     *
+     * @param isPermissionDisabled
+     */
+    public void setPermissionDisabled(boolean isPermissionDisabled) {
+        this.isPermissionDisabled = isPermissionDisabled;
     }
 }
