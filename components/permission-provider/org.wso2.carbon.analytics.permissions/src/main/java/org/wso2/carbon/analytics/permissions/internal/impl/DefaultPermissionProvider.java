@@ -130,7 +130,7 @@ public class DefaultPermissionProvider implements PermissionProvider {
         if (log.isDebugEnabled()) {
             log.debug("Getting permissions for app: " + appName);
         }
-        return this.permissionsDAO.getPermissionStrings(appName);
+        return this.getPermissionsDAO().getPermissionStrings(appName);
     }
 
     /**
@@ -223,7 +223,11 @@ public class DefaultPermissionProvider implements PermissionProvider {
     }
 
     public boolean hasPermission(String username, String permissionID) throws PermissionException {
-        return false;
+        if (log.isDebugEnabled()) {
+            log.debug("Checking permission with ID " + permissionID + " for the username " + username);
+        }
+        List<Role> roles = getRoles(username);
+        return this.getPermissionsDAO().hasPermission(roles, permissionID);
     }
 
     /**
