@@ -1167,6 +1167,11 @@
                 <version>5.4.0</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-sqs</artifactId>
+                <version>${aws.java.sdk.sqs.version}</version>
+            </dependency>
             <!--carbon-deployment features start-->
             <!--<dependency>-->
             <!--<groupId>org.wso2.carbon.deployment</groupId>-->
@@ -1544,6 +1549,7 @@
         <encoder.wso2.version>1.2.0.wso2v1</encoder.wso2.version>
         <xmlunit.version>1.6</xmlunit.version>
 
+        <aws.java.sdk.sqs.version>1.11.261</aws.java.sdk.sqs.version>
         <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
 
         <mockito.version>1.10.19</mockito.version>

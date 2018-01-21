@@ -45,6 +45,7 @@
         <module>org.wso2.carbon.event.input.adapter.mqtt</module>
         <module>org.wso2.carbon.event.input.adapter.email</module>
         <module>org.wso2.carbon.event.input.adapter.filetail</module>
+        <module>org.wso2.carbon.event.input.adapter.sqs</module>
     </modules>
 
 </project>
