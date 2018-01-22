@@ -65,9 +65,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     @Override
     public void onEvent(Event event) {
         try {
-            threadBarrier.lock();
-            eventQueue.put(event);
-            threadBarrier.unlock();
+            eventQueue.put(event, threadBarrier);
         } catch (InterruptedException e) {
             log.error("Interrupted while waiting to put the event to queue.", e);
         }

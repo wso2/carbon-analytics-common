@@ -53,7 +53,7 @@ public class BlockingEventQueue implements Serializable {
         this.currentEventSize = 0;
     }
 
-    public void put(Event event) throws InterruptedException {
+    public void put(Event event, ReentrantLock threadBarrier) throws InterruptedException {
         final ReentrantLock putLock = this.putLock;
         final AtomicInteger currentSize = this.currentSize;
         int c = -1;
@@ -63,9 +63,20 @@ public class BlockingEventQueue implements Serializable {
             this.currentEventSize = EventReceiverUtil.getSize(event) + 4; //for the int value for size field.
             while (currentSize.get() >= maxSizeInBytes) {
                 // waits if the queue has exceeded the max size
-                notFull.await(30, TimeUnit.SECONDS);
+                notFull.await(1, TimeUnit.SECONDS);
             }
-            this.queue.put(new WrappedEvent(this.currentEventSize, event));
+            // acquire the lock
+            threadBarrier.lock();
+            while (!this.queue.offer(new WrappedEvent(this.currentEventSize, event))) {
+                // queue is full
+                threadBarrier.unlock();
+                // wait for 1000ms
+                Thread.sleep(1000);
+                // acquire the lock and retry
+                threadBarrier.lock();
+            }
+            // release the lock
+            threadBarrier.unlock();
             c = currentSize.getAndAdd(this.currentEventSize);
 
         } finally {
@@ -91,7 +102,7 @@ public class BlockingEventQueue implements Serializable {
         try {
             while (currentSize.get() == 0) {
                 // waits if the queue is empty
-                notEmpty.await(30, TimeUnit.SECONDS);
+                notEmpty.await(1, TimeUnit.SECONDS);
             }
             wrappedEvent = this.queue.take();
             c = currentSize.getAndAdd(-wrappedEvent.getSize());
