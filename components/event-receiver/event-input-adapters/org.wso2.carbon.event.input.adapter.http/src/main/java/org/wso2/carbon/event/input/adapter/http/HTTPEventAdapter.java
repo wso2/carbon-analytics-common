@@ -15,6 +15,7 @@
 
 package org.wso2.carbon.event.input.adapter.http;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.http.HttpService;
@@ -105,7 +106,9 @@ public final class HTTPEventAdapter implements InputEventAdapter {
             };
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(jobQueueSize), rejectedExecutionHandler);
+                    new LinkedBlockingQueue<Runnable>(jobQueueSize), new ThreadFactoryBuilder().
+                    setNameFormat("Thread pool- component - HTTPEventAdapter.executorService;adapterName - " +
+                            this.eventAdapterConfiguration.getName()).build(),rejectedExecutionHandler);
 
         }
     }

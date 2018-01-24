@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.event.output.adapter.websocket.local;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
@@ -92,7 +93,9 @@ public final class WebsocketLocalEventAdapter implements OutputEventAdapter {
             }
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(jobQueSize));
+                    new LinkedBlockingQueue<Runnable>(jobQueSize),new ThreadFactoryBuilder().
+                    setNameFormat("Thread pool- component - WebsocketLocalEventAdapter.executorService;adapterName - " +
+                            this.eventAdapterConfiguration.getName()).build());
         }
     }
 
