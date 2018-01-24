@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -25,11 +25,12 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.sqs.internal.SQSEventAdapterFactory;
 
 /**
+ * Class to handle registering SQS event adapter component as an input event adapter.
  * @scr.component name="input.sqsEventAdapterService.component" immediate="true"
  */
 
 public class SQSEventAdapterServiceDS {
-    private static final Log log = LogFactory.getLog(SQSEventAdapterServiceDS.class);
+    private static final Log LOG = LogFactory.getLog(SQSEventAdapterServiceDS.class);
 
     /**
      * initialize the agent service here service here.
@@ -41,11 +42,11 @@ public class SQSEventAdapterServiceDS {
             InputEventAdapterFactory sqsEventEventAdapterFactory = new SQSEventAdapterFactory();
             context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),
                     sqsEventEventAdapterFactory, null);
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully deployed the input SQS adapter service");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully deployed the input SQS adapter service.");
             }
         } catch (RuntimeException e) {
-            log.error("Can not create the input SQS adapter service ", e);
+            LOG.error("Can not create the input SQS adapter service. ", e);
         }
     }
 }

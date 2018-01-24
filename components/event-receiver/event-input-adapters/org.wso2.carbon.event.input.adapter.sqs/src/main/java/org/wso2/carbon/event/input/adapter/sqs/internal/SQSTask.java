@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.event.input.adapter.sqs.internal;
 
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageResult;
@@ -32,12 +31,11 @@ import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 
 import java.util.List;
 
-
 /**
  * A runnable to handle the taks of polling the queue and delete messages after consuming them as requested.
  */
 public class SQSTask implements Runnable {
-    private static final Log log = LogFactory.getLog(SQSTask.class);
+    private static final Log LOG = LogFactory.getLog(SQSTask.class);
 
     private ReceiveMessageRequest receiveMessageRequest;
     private AmazonSQS sqs;
@@ -65,28 +63,37 @@ public class SQSTask implements Runnable {
 
     @Override
     public void run() {
-        int receiveRetryCount = 0;
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-        do {
-            List<Message> messages = receiveMessageFromQueue();
-            receiveRetryCount++;
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
             if (messages != null) {
                 for (Message message : messages) {
                     String eventMsg = message.getBody();
-                    eventAdapterListener.onEvent(eventMsg);
+                    sendEventToListener(eventMsg);
                     if (configs.shouldDeleteAfterConsuming()) {
                         delete(message);
                     }
                 }
-            } else {
-                try {
-                    Thread.sleep(configs.getRetryInterval());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
             }
-        } while (receiveRetryCount < configs.getRetryCountLimit());
+        } catch (Exception e) {
+            LOG.error("Error occured while trying to receive messages from the queue. Hence waiting for the next " +
+                    "polling cycle.");
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    private void sendEventToListener(String eventMsg) {
+        try {
+            eventAdapterListener.onEvent(eventMsg);
+        } catch (Exception e) {
+            /*
+                Catching unexpected exceptions occurring after onEvent(), in order to avoid
+                thread getting killed.
+            */
+            LOG.error("Error while transforming the event : " + eventMsg, e);
+        }
     }
 
     private void delete(Message message) {
@@ -109,21 +116,10 @@ public class SQSTask implements Runnable {
             DeleteMessageResult deleteMessageResult =
                     sqs.deleteMessage(new DeleteMessageRequest(configs.getQueueURL(), messageReceiptHandle));
             return deleteMessageResult.getSdkHttpMetadata().getHttpStatusCode() == 200;
-        } catch (SdkClientException e) {
-            log.error(String.format("Failed to delete message '%s' from the queue '%s'. Hence retrying.",
+        } catch (Exception e) {
+            LOG.error(String.format("Failed to delete message '%s' from the queue '%s'. Hence retrying.",
                     message.getBody(), configs.getQueueURL()), e);
             return false;
         }
-    }
-
-    private List<Message> receiveMessageFromQueue() {
-        List<Message> messages = null;
-        try {
-            messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
-        } catch (SdkClientException e) {
-            log.error(String.format("Failed to receive message from the queue '%s'. Hence retrying.",
-                    configs.getQueueURL()), e);
-        }
-        return messages;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.input.adapter.sqs.internal;
 
 import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterException;
+import org.wso2.carbon.event.input.adapter.sqs.internal.util.SQSEventAdapterConstants;
 
 /**
  * Class to keep configuration related properties for SQS Event Adapter.
@@ -28,12 +29,12 @@ public class SQSConfig {
     private String secretKey = null;
     private String queueURL = null;
     private Integer waitTime = null;
-    private Integer maxNumberOfMessages = null;
     private String region = null;
     private Integer visibilityTimeout = null;
-    private boolean shouldDeleteAfterConsuming;
-    private int retryCountLimit;
-    private int retryInterval;
+    private Integer maxNumberOfMessages = SQSEventAdapterConstants.DEFAULT_MAX_NUMBER_OF_MSGS;
+    private boolean shouldDeleteAfterConsuming = SQSEventAdapterConstants.DEFAULT_DELETE_AFTER_CONSUMING;
+    private int retryCountLimit = SQSEventAdapterConstants.DEFAULT_RETRY_ATTEMPT_LIMIT;
+    private int retryInterval = SQSEventAdapterConstants.DEFAULT_RETRY_INTERVAL;
 
     String getAccessKey() {
         return accessKey;
