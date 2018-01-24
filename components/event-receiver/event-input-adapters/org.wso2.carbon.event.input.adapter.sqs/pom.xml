@@ -86,10 +86,8 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Import-Package>
-                            org.wso2.carbon.event.input.adapter.core,
-                            org.wso2.carbon.event.input.adapter.core.*,
-                            !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
+                            org.wso2.carbon.event.input.adapter.core;version="${input.adater.sqs.input.range}",
+                            org.wso2.carbon.event.input.adapter.core.*;version="${input.adater.sqs.input.range}",
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
@@ -97,7 +95,6 @@
                             !org.wso2.carbon.event.input.adapter.sqs.internal.*,
                             org.wso2.carbon.event.input.adapter.sqs.*,
                         </Export-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
