@@ -98,18 +98,14 @@ public class SQSTask implements Runnable {
 
     private void delete(Message message) {
         int deleteRetryCount = 0;
-        do {
+        while (!deleteMessageFromQueue(message) && (deleteRetryCount < configs.getRetryCountLimit())) {
             deleteRetryCount++;
-            if (!deleteMessageFromQueue(message)) {
-                try {
-                    Thread.sleep(configs.getRetryInterval());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            } else {
-                break;
+            try {
+                Thread.sleep(configs.getRetryInterval());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } while (deleteRetryCount < configs.getRetryCountLimit());
+        }
     }
 
     private boolean deleteMessageFromQueue(Message message) {
