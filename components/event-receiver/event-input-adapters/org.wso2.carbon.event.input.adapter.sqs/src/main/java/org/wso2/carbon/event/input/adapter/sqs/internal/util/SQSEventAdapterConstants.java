@@ -42,6 +42,7 @@ public final class SQSEventAdapterConstants {
 
     // Global properties
     public static final String ADAPTER_LISTENER_WAITING_TIME = "listenerWaitingTimeInMillis";
+    public static final String NUMBER_OF_THREADS = "numberOfThreads";
 
     // Default values for properties
     public static final int DEFAULT_POLLING_INTERVAL = 5000; //milliseconds
@@ -52,6 +53,7 @@ public final class SQSEventAdapterConstants {
 
     // Default values for global properties
     public static final int DEFAULT_ADAPTER_LISTENER_WAITING_TIME = 0;
+    public static final int DEFAULT_NUMBER_OF_THREADS = 1;
 
     // Hint texts to be displayed in the UI
     public static final String ACCESS_KEY_HINT = "Access key for the amazon web services";

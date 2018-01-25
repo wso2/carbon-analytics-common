@@ -26,7 +26,6 @@ import org.wso2.carbon.event.input.adapter.core.exception.InputEventAdapterExcep
 import org.wso2.carbon.event.input.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.input.adapter.sqs.internal.SQSConfig;
 import org.wso2.carbon.event.input.adapter.sqs.internal.SQSProvider;
-import org.wso2.carbon.event.input.adapter.sqs.internal.SQSTask;
 import org.wso2.carbon.event.input.adapter.sqs.internal.util.SQSEventAdapterConstants;
 
 import java.util.Map;
@@ -38,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * SQS Input Event Adapter is an adapter for consuming messages from a queue provided by Amazon Simple Queue Service.
  */
-public final class SQSEventAdapter implements InputEventAdapter {
+public class SQSEventAdapter implements InputEventAdapter {
 
     private final InputEventAdapterConfiguration eventAdapterConfiguration;
     private final Map<String, String> globalProperties;
@@ -47,6 +46,7 @@ public final class SQSEventAdapter implements InputEventAdapter {
 
     private int pollingInterval = SQSEventAdapterConstants.DEFAULT_POLLING_INTERVAL;
     private int listenerWaitingTime = SQSEventAdapterConstants.DEFAULT_ADAPTER_LISTENER_WAITING_TIME;
+    private int numberOfThreads = SQSEventAdapterConstants.DEFAULT_NUMBER_OF_THREADS;
 
     private SQSProvider sqsProvider;
 
@@ -106,7 +106,12 @@ public final class SQSEventAdapter implements InputEventAdapter {
                     .get(SQSEventAdapterConstants.ADAPTER_LISTENER_WAITING_TIME));
         }
 
-        scheduler = Executors.newScheduledThreadPool(1);
+        if (globalProperties.get(SQSEventAdapterConstants.NUMBER_OF_THREADS) != null) {
+            numberOfThreads = Integer.parseInt(globalProperties
+                    .get(SQSEventAdapterConstants.NUMBER_OF_THREADS));
+        }
+
+        scheduler = Executors.newScheduledThreadPool(numberOfThreads);
 
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         sqsProvider = new SQSProvider(sqsConfig, eventAdaptorListener, tenantId);
@@ -120,8 +125,10 @@ public final class SQSEventAdapter implements InputEventAdapter {
     @Override
     public void connect() {
         if (scheduler != null && !scheduler.isShutdown()) {
-            SQSTask sqsTask = sqsProvider.getNewSQSTask();
-            scheduler.scheduleAtFixedRate(sqsTask, listenerWaitingTime, pollingInterval, TimeUnit.MILLISECONDS);
+            for (int i = 0; i < numberOfThreads; i++) {
+                scheduler.scheduleAtFixedRate(sqsProvider.getNewSQSTask(), listenerWaitingTime, pollingInterval,
+                        TimeUnit.MILLISECONDS);
+            }
         }
     }
 

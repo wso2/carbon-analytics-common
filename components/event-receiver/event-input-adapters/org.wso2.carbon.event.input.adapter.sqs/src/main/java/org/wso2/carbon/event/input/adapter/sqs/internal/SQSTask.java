@@ -106,6 +106,8 @@ public class SQSTask implements Runnable {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+            } else {
+                break;
             }
         } while (deleteRetryCount < configs.getRetryCountLimit());
     }
