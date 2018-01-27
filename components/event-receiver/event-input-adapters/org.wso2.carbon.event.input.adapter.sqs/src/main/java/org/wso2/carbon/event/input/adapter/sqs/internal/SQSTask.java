@@ -78,7 +78,7 @@ public class SQSTask implements Runnable {
             }
         } catch (Exception e) {
             LOG.error("Error occured while trying to receive messages from the queue. Hence waiting for the next " +
-                    "polling cycle.");
+                    "polling cycle.", e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -92,7 +92,7 @@ public class SQSTask implements Runnable {
                 Catching unexpected exceptions occurring after onEvent(), in order to avoid
                 thread getting killed.
             */
-            LOG.error("Error while transforming the event : " + eventMsg, e);
+            LOG.error(String.format("Error while transforming the event : %s", eventMsg), e);
         }
     }
 
