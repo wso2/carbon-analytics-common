@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.event.input.adapter.kafka;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
@@ -60,7 +61,8 @@ public class ConsumerKafkaAdaptor {
 
             // now launch all the threads
             //
-            executor = Executors.newFixedThreadPool(numThreads);
+            executor = Executors.newFixedThreadPool(numThreads,new ThreadFactoryBuilder().
+                    setNameFormat("Thread pool- component - ConsumerKafkaAdaptor.executor").build());
 
             // now create an object to consume the messages
             //
