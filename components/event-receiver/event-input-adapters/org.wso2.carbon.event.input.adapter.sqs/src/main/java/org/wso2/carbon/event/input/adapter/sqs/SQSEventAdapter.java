@@ -170,6 +170,6 @@ public class SQSEventAdapter implements InputEventAdapter {
 
     @Override
     public boolean isPolling() {
-        return false;
+        return true;
     }
 }
