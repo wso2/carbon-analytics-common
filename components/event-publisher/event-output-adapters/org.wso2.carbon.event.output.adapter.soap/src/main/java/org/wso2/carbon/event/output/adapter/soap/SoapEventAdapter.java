@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.event.output.adapter.soap;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.AxisFault;
@@ -111,7 +112,9 @@ public class SoapEventAdapter implements OutputEventAdapter {
             }
 
             executorService = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>(jobQueueSize));
+                    new LinkedBlockingQueue<Runnable>(jobQueueSize),new ThreadFactoryBuilder().
+                    setNameFormat("Thread pool- component - SoapEventAdapter.executorService;adapterName - " +
+                            this.eventAdapterConfiguration.getName()).build());
         }
 
     }

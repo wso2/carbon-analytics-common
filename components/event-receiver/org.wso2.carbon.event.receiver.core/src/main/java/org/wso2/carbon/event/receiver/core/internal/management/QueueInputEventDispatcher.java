@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.event.receiver.core.internal.management;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
@@ -46,7 +47,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
     private String syncId;
     private int tenantId;
     private ReentrantLock threadBarrier = new ReentrantLock();
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService executorService;
     private boolean isContinue = false;
     private String originalEventStreamId;
 
@@ -58,7 +59,12 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
         this.syncId = syncId;
         this.eventQueue = new BlockingEventQueue(eventQueueSizeMb, eventSyncQueueSize);
         this.originalEventStreamId = exportedStreamDefinition.getStreamId();
-        this.streamDefinition = EventManagementUtil.constructDatabridgeStreamDefinition(syncId, exportedStreamDefinition);
+        this.streamDefinition = EventManagementUtil.constructDatabridgeStreamDefinition(syncId,
+                exportedStreamDefinition);
+        this.executorService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().
+                setNameFormat("Thread pool- component - QueueInputEventDispatcher.executorService;tenant - " +
+                this.tenantId +";stream - " + exportedStreamDefinition.getStreamId() + ";receiver - " +
+                this.streamDefinition.getName()).build());
         this.executorService.submit(new QueueInputEventDispatcherWorker());
     }
 

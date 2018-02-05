@@ -20,7 +20,7 @@
     <parent>
         <artifactId>event-output-adapters</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>5.1.26-SNAPSHOT</version>
+        <version>5.1.29-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -64,6 +64,10 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
 
