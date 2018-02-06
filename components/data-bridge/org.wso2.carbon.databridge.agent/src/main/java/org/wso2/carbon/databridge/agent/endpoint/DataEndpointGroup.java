@@ -290,6 +290,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
+    private DataEndpoint getDataEndpoint(boolean isBusyWait) {
+        return getDataEndpoint(isBusyWait, null);
+    }
+
     /**
      * Find the next event processable endpoint to the
      * data endpoint based on load balancing and failover logic, and wait
@@ -299,7 +303,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      * @param isBusyWait waitUntil atleast one endpoint becomes available
      * @return DataEndpoint which can accept and send the events.
      */
-    private DataEndpoint getDataEndpoint(boolean isBusyWait) {
+    private DataEndpoint getDataEndpoint(boolean isBusyWait, DataEndpoint failedEP) {
         int startIndex;
         if (haType.equals(HAType.LOADBALANCE)) {
             startIndex = getDataPublisherIndex();
@@ -310,7 +314,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         while (true) {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
-            if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
+            if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE) && dataEndpoint != failedEP) {
                 return dataEndpoint;
             } else if (haType.equals(HAType.FAILOVER) && (dataEndpoint.getState().equals(DataEndpoint.State.BUSY) ||
                     dataEndpoint.getState().equals(DataEndpoint.State.INITIALIZING))) {
@@ -380,8 +384,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         return index;
     }
 
-    public void tryResendEvents(List<Event> events) {
-        List<Event> unsuccessfulEvents = trySendActiveEndpoints(events);
+    public void tryResendEvents(List<Event> events, DataEndpoint dataEndpoint) {
+        List<Event> unsuccessfulEvents = trySendActiveEndpoints(events, dataEndpoint);
         for (Event event : unsuccessfulEvents) {
             try {
                 if (eventQueue != null) {
@@ -395,10 +399,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
-    private List<Event> trySendActiveEndpoints(List<Event> events) {
+    private List<Event> trySendActiveEndpoints(List<Event> events, DataEndpoint failedEP) {
         ArrayList<Event> unsuccessfulEvents = new ArrayList<>();
         for (Event event : events) {
-            DataEndpoint endpoint = getDataEndpoint(false);
+            DataEndpoint endpoint = getDataEndpoint(false,failedEP);
             if (endpoint != null) {
                 endpoint.collectAndSend(event);
             } else {
