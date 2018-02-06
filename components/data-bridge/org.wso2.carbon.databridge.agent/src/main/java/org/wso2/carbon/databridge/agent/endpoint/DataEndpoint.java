@@ -280,16 +280,16 @@ public abstract class DataEndpoint {
                     log.error("Unable to process this event.", ex);
                 } catch (Exception ex) {
                     log.error("Unexpected error occurred while sending the event. ", ex);
-                    handleFailedEvents();
+                    handleFailedEvents(this.events);
                 }
             } catch (DataEndpointException e) {
                 log.error("Unable to send events to the endpoint. ", e);
-                handleFailedEvents();
+                handleFailedEvents(this.events);
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
             } catch (Exception ex) {
                 log.error("Unexpected error occurred while sending the event. ", ex);
-                handleFailedEvents();
+                handleFailedEvents(this.events);
             } catch (Throwable t) {
                 //There can be situations where runtime exceptions/class not found exceptions occur, This block help to catch those exceptions.
                 //No need to retry send events. Deactivating the state would be enough.
@@ -308,11 +308,6 @@ public abstract class DataEndpoint {
             }
         }
 
-        private void handleFailedEvents() {
-            deactivate();
-            dataEndpointFailureCallback.tryResendEvents(events);
-        }
-
         private void publish() throws DataEndpointException, SessionTimeoutException, UndefinedEventTypeException {
             Object client = getClient();
             try {
@@ -321,6 +316,11 @@ public abstract class DataEndpoint {
                 returnClient(client);
             }
         }
+    }
+
+    private void handleFailedEvents(List<Event> events) {
+        deactivate();
+        dataEndpointFailureCallback.tryResendEvents(events, this);
     }
 
     boolean isConnected() {
