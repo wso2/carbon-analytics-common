@@ -62,7 +62,7 @@ public class DataEndpointConfiguration {
     public DataEndpointConfiguration(String receiverURL, String authURL, String username, String password,
                                      GenericKeyedObjectPool transportPool,
                                      GenericKeyedObjectPool securedTransportPool,
-                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPoo,
+                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool,
                                      int loggingControlIntervalInSeconds) {
         this.receiverURL = receiverURL;
         this.authURL = authURL;

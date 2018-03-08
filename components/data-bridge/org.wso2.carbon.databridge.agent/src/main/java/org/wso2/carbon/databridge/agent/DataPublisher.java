@@ -158,12 +158,13 @@ public class DataPublisher {
             Object[] receiverGroup = receiverURLGroups.get(i);
             Object[] authGroup = authURLGroups.get(i);
             boolean failOver = (Boolean) receiverGroup[0];
-
             DataEndpointGroup endpointGroup;
-            if (failOver)
+            if (failOver) {
                 endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.FAILOVER, dataEndpointAgent);
-            else endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE,
-                    dataEndpointAgent);
+            }
+            else {
+                endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE, dataEndpointAgent);
+            }
             /**
              * Since the first element holds the failover/LB settings
              * we need to start iterating from 2nd element.
@@ -191,7 +192,6 @@ public class DataPublisher {
                             dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
                             dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds());
                 }
-
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);
                 endpointGroup.addDataEndpoint(dataEndpoint);

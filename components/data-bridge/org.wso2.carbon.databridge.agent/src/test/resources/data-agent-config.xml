@@ -40,6 +40,7 @@
         <SecureMaxIdleConnections>250</SecureMaxIdleConnections>
         <SecureEvictionTimePeriod>5500</SecureEvictionTimePeriod>
         <SecureMinIdleTimeInPool>5000</SecureMinIdleTimeInPool>
+        <LoggingControlIntervalInSeconds>500</LoggingControlIntervalInSeconds>
     </Agent>
 
     <Agent>
@@ -64,6 +65,7 @@
         <SecureMaxIdleConnections>250</SecureMaxIdleConnections>
         <SecureEvictionTimePeriod>5500</SecureEvictionTimePeriod>
         <SecureMinIdleTimeInPool>5000</SecureMinIdleTimeInPool>
+        <LoggingControlIntervalInSeconds>500</LoggingControlIntervalInSeconds>
     </Agent>
 </DataAgentsConfiguration>
 
