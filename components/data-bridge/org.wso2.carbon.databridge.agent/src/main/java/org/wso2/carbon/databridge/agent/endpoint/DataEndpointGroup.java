@@ -76,6 +76,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private boolean isShutdown = false;
 
+    private MBeanServer platformMBeanServer;
+
+    private ObjectName mbeanEventQueue;
+
     public enum HAType {
         FAILOVER, LOADBALANCE
     }
@@ -88,9 +92,9 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
         if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
             this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
-            MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+            platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
             try {
-                ObjectName mbeanEventQueue = new ObjectName("org.wso2.carbon:00=analytics," +
+                mbeanEventQueue = new ObjectName("org.wso2.carbon:00=analytics," +
                         "01=DATABRIDGE_AGENT_EVENT_QUEUE " + this.hashCode());
                 if (!platformMBeanServer.isRegistered(mbeanEventQueue)) {
                     platformMBeanServer.registerMBean(this.eventQueue, mbeanEventQueue);
@@ -506,6 +510,14 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         isShutdown = true;
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             dataEndpoint.shutdown();
+        }
+        if (platformMBeanServer != null && mbeanEventQueue != null) {
+            try {
+                platformMBeanServer.unregisterMBean(mbeanEventQueue);
+            } catch (Exception e) {
+                log.error("Unable to unregisterMBean DATABRIDGE_AGENT_EVENT_QUEUE stat MXBean: " +
+                        e.getMessage(), e);
+            }
         }
     }
 }

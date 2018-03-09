@@ -43,9 +43,10 @@ public class DataReceiver {
         this.configurations = configurations;
     }
 
-    public Object getConfiguration(String configName, Object defaultValue){
-        for (Configuration configuration: configurations){
-            if (configuration.getName().equalsIgnoreCase(configName)){
+    public Object getConfiguration(String configName, Object defaultValue) {
+        for (Configuration configuration : configurations) {
+            if (configuration.getName().equalsIgnoreCase(configName) && configuration.getValue() != null
+                    && !configuration.getValue().isEmpty()) {
                 return configuration.getValue();
             }
         }

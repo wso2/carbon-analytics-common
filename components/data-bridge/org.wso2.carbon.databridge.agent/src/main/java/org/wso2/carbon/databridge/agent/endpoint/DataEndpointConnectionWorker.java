@@ -74,8 +74,10 @@ public class DataEndpointConnectionWorker implements Runnable {
             }
         } else {
             String errorMsg = "Data endpoint connection worker is not properly initialized ";
-            if (dataEndpoint == null) errorMsg += ", data Endpoint is not provided ";
-            if (dataEndpointConfiguration == null) errorMsg += ", data Endpoint configuration is not provided";
+            if (dataEndpoint == null)
+                errorMsg += ", data Endpoint is not provided ";
+            if (dataEndpointConfiguration == null)
+                errorMsg += ", data Endpoint configuration is not provided";
             errorMsg += ".";
             log.error(errorMsg);
         }
@@ -128,11 +130,10 @@ public class DataEndpointConnectionWorker implements Runnable {
             dataEndpointConfiguration.setSessionId(sessionId);
         } catch (Throwable e) {
             if (e instanceof DataEndpointLoginException) {
-                throw new DataEndpointLoginException(
-                        "Cannot borrow client for " + dataEndpointConfiguration.getAuthURL() + ".", e);
+                throw new DataEndpointLoginException("Cannot borrow client for "
+                        + dataEndpointConfiguration.getAuthURL() + "." , e);
             } else {
-                throw new DataEndpointAuthenticationException(
-                        "Cannot borrow client for " + dataEndpointConfiguration.getAuthURL(), e);
+                throw new DataEndpointAuthenticationException("Cannot borrow client for " + dataEndpointConfiguration.getAuthURL(), e);
             }
         } finally {
             try {
