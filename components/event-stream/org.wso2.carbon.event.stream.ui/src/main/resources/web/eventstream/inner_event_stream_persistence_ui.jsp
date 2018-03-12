@@ -55,7 +55,7 @@
         </tr>
         </tbody>
     </table>
-    <fieldset id="attributeFieldSet">
+    <fieldset id="attributeFieldSet" class="stream-attributes">
         <table class="styledLeft noBorders spacer-bot" style="width:100%">
             <tbody>
             <tr>
@@ -211,7 +211,7 @@
         <table class="styledLeft noBorders spacer-bot" style="width:100%">
             <tr>
                 <td align="left">
-                    <input type="button" class="ninjaButton"
+                    <input type="button" class="button"
                            value="<fmt:message key="advanced.options"/>"
                            onclick="showHideAttribute()" style="float: left"/>
 
