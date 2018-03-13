@@ -28,12 +28,12 @@
         <config name="waitingTimeInMilliSeconds">10</config>
         <config name="sslEnabledProtocols">TLSv1</config>
         <config name="ciphers">SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,SSL_RSA_WITH_DES_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA</config>
-        <config name="tcpMaxWorkerThreads">20</config>
-        <config name="tcpMinWorkerThreads">5</config>
+        <config name="tcpMaxWorkerThreads">2000</config>
+        <config name="tcpMinWorkerThreads">20</config>
         <config name="tcpRequestTimeout">10</config>
         <config name="tcpStopTimeoutVal">50</config>
-        <config name="sslMaxWorkerThreads">20</config>
-        <config name="sslMinWorkerThreads">5</config>
+        <config name="sslMaxWorkerThreads">100</config>
+        <config name="sslMinWorkerThreads">10</config>
         <config name="sslRequestTimeout">10</config>
         <config name="sslStopTimeoutVal">50</config>
     </dataReceiver>
