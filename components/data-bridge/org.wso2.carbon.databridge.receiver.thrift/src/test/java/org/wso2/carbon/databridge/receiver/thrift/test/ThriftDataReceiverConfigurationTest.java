@@ -44,12 +44,12 @@ public class ThriftDataReceiverConfigurationTest {
         Assert.assertEquals("TLSv1", config.getSslProtocols());
         Assert.assertEquals("SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,SSL_RSA_WITH_DES_CBC_SHA," +
                 "SSL_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA", config.getCiphers());
-        Assert.assertEquals(20, config.getTcpMaxWorkerThreads());
-        Assert.assertEquals(5, config.getTcpMinWorkerThreads());
+        Assert.assertEquals(2000, config.getTcpMaxWorkerThreads());
+        Assert.assertEquals(20, config.getTcpMinWorkerThreads());
         Assert.assertEquals(10, config.getTcpRequestTimeout());
         Assert.assertEquals(50, config.getTcpStopTimeoutVal());
-        Assert.assertEquals(20, config.getSslMaxWorkerThreads());
-        Assert.assertEquals(5, config.getSslMinWorkerThreads());
+        Assert.assertEquals(100, config.getSslMaxWorkerThreads());
+        Assert.assertEquals(10, config.getSslMinWorkerThreads());
         Assert.assertEquals(10, config.getSslRequestTimeout());
         Assert.assertEquals(50, config.getSslStopTimeoutVal());
     }
