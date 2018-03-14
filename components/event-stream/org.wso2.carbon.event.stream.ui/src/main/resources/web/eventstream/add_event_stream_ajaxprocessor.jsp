@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
 
@@ -154,7 +155,7 @@
         msg = "true";
 
     } catch (Exception e) {
-        msg = e.getMessage();
+        msg = Encode.forHtmlContent(e.getMessage());
     }
 %>
 <%=msg%>
