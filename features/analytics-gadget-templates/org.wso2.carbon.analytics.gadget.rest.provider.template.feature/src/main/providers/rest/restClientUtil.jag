@@ -20,7 +20,7 @@ var restClientUtil = function () {
 
     var log = new Log();
     var constants = require("/modules/constants.js");
-    var tokenUtil = require("/modules/tokenUtil.js").tokenUtil;
+    var tokenUtil = require("/modules/oauth/token-handler-utils.js")["utils"];
     var restClientConstants = require("./constants.js");
     var module = {};
 
