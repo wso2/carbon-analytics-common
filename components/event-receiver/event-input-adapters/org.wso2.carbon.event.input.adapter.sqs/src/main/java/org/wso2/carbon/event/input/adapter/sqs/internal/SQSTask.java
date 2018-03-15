@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.event.input.adapter.sqs.internal;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageResult;
@@ -114,7 +116,7 @@ public class SQSTask implements Runnable {
             DeleteMessageResult deleteMessageResult =
                     sqs.deleteMessage(new DeleteMessageRequest(configs.getQueueURL(), messageReceiptHandle));
             return deleteMessageResult.getSdkHttpMetadata().getHttpStatusCode() == 200;
-        } catch (Exception e) {
+        } catch (AmazonServiceException e) {
             LOG.error(String.format("Failed to delete message '%s' from the queue '%s'. Hence retrying.",
                     message.getBody(), configs.getQueueURL()), e);
             return false;

@@ -91,7 +91,7 @@ public class SQSConfig {
     public void setWaitTime(Integer waitTime) throws InputEventAdapterException {
         if (waitTime != null && !(waitTime >= 0 && waitTime <= 20)) {
             throw new InputEventAdapterException("Wait time should be between 0 and 20 seconds. But provided " +
-                    waitTime + "seconds.");
+                    waitTime + " seconds.");
         }
         this.waitTime = waitTime;
     }
