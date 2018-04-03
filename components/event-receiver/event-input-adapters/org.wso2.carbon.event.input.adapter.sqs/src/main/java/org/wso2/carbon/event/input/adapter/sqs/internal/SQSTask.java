@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.event.input.adapter.sqs.internal;
 
-import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
