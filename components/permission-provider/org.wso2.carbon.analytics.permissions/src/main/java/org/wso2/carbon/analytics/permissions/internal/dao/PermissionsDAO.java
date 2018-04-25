@@ -419,7 +419,7 @@ public class PermissionsDAO {
             ps = conn.prepareStatement(query);
             ps.setString(1, permissionID);
             for (int i = 0; i < roles.size(); i++) {
-                ps.setString(i + 3, roles.get(i).getId());
+                ps.setString(i + 2, roles.get(i).getId());
             }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
