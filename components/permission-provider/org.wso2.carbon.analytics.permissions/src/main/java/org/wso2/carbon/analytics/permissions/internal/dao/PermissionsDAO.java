@@ -475,6 +475,7 @@ public class PermissionsDAO {
      */
     public boolean hasPermission(List<Role> roles, String permissionID) {
         boolean hasPermission = false;
+        int ordinal = 1;
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
@@ -489,9 +490,9 @@ public class PermissionsDAO {
             query = queryManager.getQuery(conn, QueryManager.HAS_PERMISSION_BY_PERMISSION_ID_QUERY)
                     .replace("{ROLE_IDS}", roleIds);
             ps = conn.prepareStatement(query);
-            ps.setString(1, permissionID);
+            ps.setString(ordinal, permissionID);
             for (int i = 0; i < roles.size(); i++) {
-                ps.setString(i + 3, roles.get(i).getId());
+                ps.setString(++ordinal, roles.get(i).getId());
             }
             resultSet = ps.executeQuery();
             while (resultSet.next()) {
