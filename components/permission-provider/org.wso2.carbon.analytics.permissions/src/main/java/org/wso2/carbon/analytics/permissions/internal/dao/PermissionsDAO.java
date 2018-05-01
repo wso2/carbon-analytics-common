@@ -120,7 +120,8 @@ public class PermissionsDAO {
             return true;
         } catch (SQLException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed to execute SQL query {} {}" , query, e.getMessage());
+                log.debug("Table '{}' assumed to not exist since its existence check query {} resulted "
+                        + "in exception {}.", tableName, query, e.getMessage());
             }
             return false;
         } finally {
