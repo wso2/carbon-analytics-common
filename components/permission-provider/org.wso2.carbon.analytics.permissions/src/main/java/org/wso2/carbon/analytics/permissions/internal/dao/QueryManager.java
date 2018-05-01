@@ -37,6 +37,9 @@ import java.util.Map;
  * Provides SQl queries for the common permission model.
  */
 public class QueryManager {
+    public static final String CREATE_PERMISSION_TABLE_QUERY = "create_permission_table";
+    public static final String CREATE_ROLE_PERMISSIONS_TABLE_QUERY = "create_role_permissions_table";
+    public static final String TABLE_CHECK_QUERY = "table_check";
     public static final String GET_PERMISSION_QUERY = "get_permission";
     public static final String GET_APPNAME_QUERY = "get_appname";
     public static final String ADD_PERMISSION_QUERY = "add_permission";
@@ -52,6 +55,9 @@ public class QueryManager {
     public static final String HAS_PERMISSION_BY_PERMISSION_ID_QUERY = "has_permission_by_permission_id";
     public static final String GET_GRANTED_ROLES_QUERY = "get_granted_roles";
     public static final String GET_GRANTED_ROLES_BY_PERMISSION_ID_QUERY = "get_granted_roles_by_permission_id";
+    public static final String PERMISSIONS_TABLE = "PERMISSIONS";
+    public static final String ROLE_PERMISSIONS_TABLE = "ROLE_PERMISSIONS";
+    public static final String TABLE_NAME_PLACEHOLDER = "{{TABLE_NAME}}";
 
     private static final String FILE_SQL_QUERIES = "queries.yaml";
 

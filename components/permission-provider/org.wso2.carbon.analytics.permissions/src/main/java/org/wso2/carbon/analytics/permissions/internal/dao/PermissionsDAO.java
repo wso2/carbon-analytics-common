@@ -53,6 +53,78 @@ public class PermissionsDAO {
         this.dataSourceService = dataSourceService;
         this.permissionConfig = permissionConfig;
         this.queryManager = new QueryManager(permissionConfig);
+        if (!tableExists(QueryManager.PERMISSIONS_TABLE)) {
+            this.createPermissionTableIfNotExist();
+        }
+        if (!tableExists(QueryManager.ROLE_PERMISSIONS_TABLE)) {
+            this.createRolePermissionsTableIfNotExist();
+        }
+    }
+
+    /**
+     * Create permission table.
+     */
+    private void createPermissionTableIfNotExist() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        String query = null;
+        try {
+            conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.CREATE_PERMISSION_TABLE_QUERY);
+            ps = conn.prepareStatement(query);
+            ps.execute();
+        } catch (SQLException e) {
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to create the '" + QueryManager.PERMISSIONS_TABLE + "' table.", e);
+        } finally {
+            closeConnection(conn, ps, null);
+        }
+    }
+
+    /**
+     * Create role permissions table.
+     */
+    private void createRolePermissionsTableIfNotExist() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        String query = null;
+        try {
+            conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.CREATE_ROLE_PERMISSIONS_TABLE_QUERY);
+            ps = conn.prepareStatement(query);
+            ps.execute();
+        } catch (SQLException e) {
+            log.debug("Failed to execute SQL query {}", query);
+            throw new PermissionException("Unable to create the '" + QueryManager.ROLE_PERMISSIONS_TABLE +
+                    "' table.", e);
+        } finally {
+            closeConnection(conn, ps, null);
+        }
+    }
+
+    /**
+     * Method for checking whether or not the given table (which reflects the current event table instance) exists.
+     *
+     * @return true/false based on the table existence.
+     */
+    private boolean tableExists(String tableName) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        String query = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            query = queryManager.getQuery(conn, QueryManager.TABLE_CHECK_QUERY);
+            stmt = conn.prepareStatement(query.replace(QueryManager.TABLE_NAME_PLACEHOLDER, tableName));
+            rs = stmt.executeQuery();
+            return true;
+        } catch (SQLException e) {
+            log.debug("Table '{}' assumed to not exist since its existence check query {} resulted "
+                    + "in exception {}.", tableName, query, e.getMessage());
+            return false;
+        } finally {
+            closeConnection(conn, stmt, rs);
+        }
     }
 
     /**
