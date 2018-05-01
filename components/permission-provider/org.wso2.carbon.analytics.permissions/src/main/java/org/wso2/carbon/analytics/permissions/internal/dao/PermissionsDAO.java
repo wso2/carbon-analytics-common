@@ -110,7 +110,7 @@ public class PermissionsDAO {
     private boolean tableExists(String tableName) {
         Connection conn = null;
         PreparedStatement stmt = null;
-        String query;
+        String query = null;
         ResultSet rs = null;
         try {
             conn = getConnection();
@@ -120,8 +120,7 @@ public class PermissionsDAO {
             return true;
         } catch (SQLException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Table '" + tableName + "' assumed to not exist since its existence check resulted "
-                        + "in exception " + e.getMessage());
+                log.debug("Failed to execute SQL query {} {}" , query, e.getMessage());
             }
             return false;
         } finally {
