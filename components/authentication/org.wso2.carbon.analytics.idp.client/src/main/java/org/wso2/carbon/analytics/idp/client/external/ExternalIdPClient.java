@@ -105,7 +105,9 @@ public class ExternalIdPClient implements IdPClient {
 
     public void init(String kmUserName) throws IdPClientException {
         this.oAuthAppDAO.init();
-        this.oAuthAppDAO.createTable();
+        if (!this.oAuthAppDAO.tableExists()) {
+            this.oAuthAppDAO.createTable();
+        }
         for (Map.Entry<String, OAuthApplicationInfo> oAuthApplicationInfoEntry : this.oAuthAppInfoMap.entrySet()) {
             String clientId = oAuthApplicationInfoEntry.getValue().getClientId();
             String clientSecret = oAuthApplicationInfoEntry.getValue().getClientSecret();

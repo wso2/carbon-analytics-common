@@ -70,9 +70,11 @@ public class PermissionsDAO {
         String query = null;
         try {
             conn = getConnection();
+            conn.setAutoCommit(false);
             query = queryManager.getQuery(conn, QueryManager.CREATE_PERMISSION_TABLE_QUERY);
             ps = conn.prepareStatement(query);
-            ps.execute();
+            ps.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             log.debug("Failed to execute SQL query {}", query);
             throw new PermissionException("Unable to create the '" + QueryManager.PERMISSIONS_TABLE + "' table.", e);
@@ -90,9 +92,11 @@ public class PermissionsDAO {
         String query = null;
         try {
             conn = getConnection();
+            conn.setAutoCommit(false);
             query = queryManager.getQuery(conn, QueryManager.CREATE_ROLE_PERMISSIONS_TABLE_QUERY);
             ps = conn.prepareStatement(query);
-            ps.execute();
+            ps.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             log.debug("Failed to execute SQL query {}", query);
             throw new PermissionException("Unable to create the '" + QueryManager.ROLE_PERMISSIONS_TABLE +
