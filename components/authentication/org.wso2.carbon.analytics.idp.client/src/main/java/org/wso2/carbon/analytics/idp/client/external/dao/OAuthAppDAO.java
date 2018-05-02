@@ -137,7 +137,7 @@ public class OAuthAppDAO {
         ResultSet rs = null;
         try {
             conn = getConnection();
-            query = getQuery(ExternalIdPClientConstants.IS_APP_TABLE_EXISTS);
+            query = getQuery(ExternalIdPClientConstants.OAUTH_APP_TABLE_CHECK);
             stmt = conn.prepareStatement(query);
             rs = stmt.executeQuery();
             return true;
