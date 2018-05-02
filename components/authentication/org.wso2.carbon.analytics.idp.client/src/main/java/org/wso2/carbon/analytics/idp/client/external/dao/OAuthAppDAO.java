@@ -125,6 +125,31 @@ public class OAuthAppDAO {
         }
     }
 
+    /**
+     * Method for checking whether or not the given table (which reflects the current event table instance) exists.
+     *
+     * @return true/false based on the table existence.
+     */
+    public boolean tableExists() {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        String query = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            query = getQuery(ExternalIdPClientConstants.IS_APP_TABLE_EXISTS);
+            stmt = conn.prepareStatement(query);
+            rs = stmt.executeQuery();
+            return true;
+        } catch (SQLException | IdPClientException e) {
+            LOG.debug("Table '{}' assumed to not exist since its existence check query {} resulted "
+                    + "in exception {}.", ExternalIdPClientConstants.OAUTHAPP_TABLE, query, e.getMessage());
+            return false;
+        } finally {
+            closeConnection(conn, stmt, rs);
+        }
+    }
+
     public void addOAuthApp(OAuthApplicationInfo oAuthApplicationInfo) throws IdPClientException {
         Connection conn = null;
         PreparedStatement ps = null;
