@@ -100,7 +100,8 @@ public class BinaryDataReceiver {
                 }
 
             }
-
+            System.setProperty("javax.net.ssl.keyStore", keyStore);
+            System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
             SSLServerSocketFactory sslServerSocketFactory = null;
             KeyStore ks;
             InputStream inputStream = null;
