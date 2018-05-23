@@ -44,7 +44,7 @@ import java.util.Map;
  * Datapublisher Test Case.
  */
 public class DataPublisherTestCase {
-    Logger log = Logger.getLogger(DataPublisherTestCase.class);
+    private static final Logger log = Logger.getLogger(DataPublisherTestCase.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
@@ -116,7 +116,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            log.error(e.getMessage());
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -149,6 +149,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -165,8 +166,8 @@ public class DataPublisherTestCase {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
 
-        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9651",
-                "ssl://" + hostName + ":9751", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9629",
+                "ssl://" + hostName + ":9729", "admin", "admin");
 
         String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
         Object[] metaData = new Object[]{"127.0.0.1"};
@@ -175,8 +176,6 @@ public class DataPublisherTestCase {
         Map<String, String> arbitrary = new HashMap<String, String>();
         arbitrary.put("test", "testValue");
         arbitrary.put("test1", "test123");
-
-
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
             dataPublisher.tryPublish(streamID, metaData, correlationData, payLoad, arbitrary);
@@ -184,8 +183,10 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
+        AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -211,7 +212,6 @@ public class DataPublisherTestCase {
         arbitrary.put("test", "testValue");
         arbitrary.put("test1", "test123");
 
-
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
             dataPublisher.tryPublish(streamID, timeStamp, metaData, correlationData, payLoad, arbitrary);
@@ -219,8 +219,10 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
+        AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -251,6 +253,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -285,5 +288,4 @@ public class DataPublisherTestCase {
                 "{ssl://" + hostName + ":9130}", "admin", "admin");
 
     }
-
 }

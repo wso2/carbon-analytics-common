@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
  * Binary Message Convert Util Testcase.
  */
 public class BinaryMessageConvertUtilTest {
-    Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
+    private static final Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
 
     @Test
     public void testEventBufferSize() {
@@ -79,7 +79,7 @@ public class BinaryMessageConvertUtilTest {
         try {
             BinaryMessageConverterUtil.loadData(stream, dataArray1);
         } catch (IOException e) {
-            Assert.fail();
+            Assert.fail(e.getMessage());
         }
     }
 
