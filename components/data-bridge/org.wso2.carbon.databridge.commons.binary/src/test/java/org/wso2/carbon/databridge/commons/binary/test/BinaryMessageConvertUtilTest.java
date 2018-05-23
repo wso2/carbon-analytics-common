@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
  * Binary Message Convert Util Testcase.
  */
 public class BinaryMessageConvertUtilTest {
-    private static final Logger LOG = Logger.getLogger(BinaryMessageConvertUtilTest.class);
+    private static final Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
 
     @Test
     public void testEventBufferSize() {
@@ -73,13 +73,13 @@ public class BinaryMessageConvertUtilTest {
         try {
             stream = new ByteArrayInputStream(exampleString.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         } catch (UnsupportedEncodingException e) {
-            LOG.error(e.getMessage());
+            log.error(e.getMessage());
         }
         byte[] dataArray1 = new byte[75];
         try {
             BinaryMessageConverterUtil.loadData(stream, dataArray1);
         } catch (IOException e) {
-            Assert.fail();
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -90,7 +90,7 @@ public class BinaryMessageConvertUtilTest {
         try {
             stream = new ByteArrayInputStream(exampleString.getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         } catch (UnsupportedEncodingException e) {
-            LOG.error(e.getMessage());
+            log.error(e.getMessage());
         }
         byte[] dataArray1 = new byte[100];
         BinaryMessageConverterUtil.loadData(stream, dataArray1);
