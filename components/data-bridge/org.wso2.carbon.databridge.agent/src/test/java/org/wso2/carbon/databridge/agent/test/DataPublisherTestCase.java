@@ -44,7 +44,7 @@ import java.util.Map;
  * Datapublisher Test Case.
  */
 public class DataPublisherTestCase {
-    private static final Logger LOG = Logger.getLogger(DataPublisherTestCase.class);
+    private static final Logger log = Logger.getLogger(DataPublisherTestCase.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
@@ -116,7 +116,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            LOG.error("Thread sleep interrupted.", e);
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -149,7 +149,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            LOG.error("Thread sleep interrupted.", e);
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -183,7 +183,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            LOG.error("Thread sleep interrupted.", e);
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -219,7 +219,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            LOG.error("Thread sleep interrupted.", e);
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
@@ -253,7 +253,7 @@ public class DataPublisherTestCase {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            LOG.error("Thread sleep interrupted.", e);
+            log.error("Thread sleep interrupted.", e);
         }
         dataPublisher.shutdown();
         AssertJUnit.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
