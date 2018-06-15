@@ -22,8 +22,8 @@ import feign.Client;
 import feign.Feign;
 import feign.Request;
 import feign.auth.BasicAuthRequestInterceptor;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
+import feign.codec.Decoder;
+import feign.codec.Encoder;
 
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 
@@ -52,7 +52,7 @@ public class AnalyticsHttpClientBuilderServiceImpl implements AnalyticsHttpClien
     public <T> T build(String username, String password, int connectTimeoutMillis,
                        int readTimeoutMillis, Class<T> target, String url) {
         return Feign.builder().requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .encoder(new GsonEncoder()).decoder(new GsonDecoder())
+                .encoder(new Encoder.Default()).decoder(new Decoder.Default())
                 .options(new Request.Options(connectTimeoutMillis, readTimeoutMillis))
                 .client(newDefaultClientInstance())
                 .target(target, url);
