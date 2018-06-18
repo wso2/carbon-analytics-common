@@ -27,14 +27,11 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPServiceUtils;
-import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.kernel.startupresolver.RequiredCapabilityListener;
 import org.wso2.carbon.kernel.startupresolver.StartupServiceUtils;
 
@@ -57,7 +54,6 @@ public class IdPClientServiceComponent implements RequiredCapabilityListener {
 
     private BundleContext bundleContext;
     private ServiceRegistration idpClientRegistrationService;
-    private ServiceRegistration analyticsHttpClientRegistrationService;
     private ConfigProvider configProvider;
     private Map<String, IdPClientFactory> idPClientFactoryHashMap = new HashMap<>();
 
@@ -72,9 +68,6 @@ public class IdPClientServiceComponent implements RequiredCapabilityListener {
         LOG.debug("IdPClient service component is deactivated.");
         if (this.idpClientRegistrationService != null) {
             idpClientRegistrationService.unregister();
-        }
-        if (this.analyticsHttpClientRegistrationService != null) {
-            analyticsHttpClientRegistrationService.unregister();
         }
     }
 
@@ -119,22 +112,8 @@ public class IdPClientServiceComponent implements RequiredCapabilityListener {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("IdPClient of class '" + idPClient.getClass().getName() + "' is registered as a service.");
             }
-
-            CarbonConfiguration carbonConfiguration = configProvider.getConfigurationObject(CarbonConfiguration.class);
-            boolean isHostnameVerificationEnabled = carbonConfiguration.isHostnameVerificationEnabled();
-            AnalyticsHttpClientBuilderService clientBuilderService = new AnalyticsHttpClientBuilderServiceImpl
-                    (isHostnameVerificationEnabled);
-            this.analyticsHttpClientRegistrationService = bundleContext.registerService
-                    (AnalyticsHttpClientBuilderService.class.getName(), clientBuilderService, null);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("AnalyticsHttpClient of class '" + clientBuilderService.getClass().getName() +
-                          "' is registered as a service.");
-            }
-
         } catch (IdPClientException e) {
             LOG.error("Error occurred while initializing IdP Client: " + e.getMessage(), e);
-        } catch (ConfigurationException e) {
-            LOG.error("Error occurred while initializing Idp Client: " + e.getMessage(), e);
         }
     }
 }
