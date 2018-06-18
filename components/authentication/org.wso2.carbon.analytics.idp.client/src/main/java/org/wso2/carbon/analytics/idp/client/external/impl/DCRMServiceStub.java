@@ -21,7 +21,6 @@ package org.wso2.carbon.analytics.idp.client.external.impl;
 import feign.Headers;
 import feign.RequestLine;
 import feign.Response;
-import org.wso2.carbon.analytics.idp.client.external.dto.DCRClientInfo;
 
 /**
  * This is the stub class for DCR(M) services.
@@ -30,7 +29,7 @@ public interface DCRMServiceStub {
 
     @Headers("Content-Type: application/json")
     @RequestLine("POST /")
-    Response registerApplication(DCRClientInfo dcrClientInfo);
+    Response registerApplication(String dcrClientInfo);
 
 }
 

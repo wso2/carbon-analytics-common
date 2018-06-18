@@ -50,6 +50,8 @@ public class ExternalIdPClientConstants {
     public static final String CACHE_TIMEOUT = "cacheTimeout";
     public static final String DATABASE_NAME = "databaseName";
     public static final String DCR_APP_OWNER = "dcrAppOwner";
+    public static final String CONNECTION_TIMEOUT = "connectionTimeout";
+    public static final String READ_TIMEOUT = "readTimeout";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
@@ -68,6 +70,8 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_BR_DB_APP_CONTEXT = "business-rules";
     public static final String DEFAULT_CACHE_TIMEOUT = "900";
     public static final String DEFAULT_DATABASE_NAME = "WSO2_OAUTH_APP_DB";
+    public static final String DEFAULT_CONNECTION_TIMEOUT = "10000";
+    public static final String DEFAULT_READ_TIMEOUT = "60000";
 
     public static final String SP_APP_NAME = "sp";
     public static final String PORTAL_APP_NAME = "sp_portal";

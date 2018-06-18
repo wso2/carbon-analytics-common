@@ -17,37 +17,33 @@
  */
 package org.wso2.carbon.analytics.idp.client.external.impl;
 
-import feign.Client;
-import feign.Feign;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import feign.RequestTemplate;
 import feign.Response;
-import feign.auth.BasicAuthRequestInterceptor;
-import feign.codec.EncodeException;
-import feign.codec.Encoder;
-import feign.gson.GsonDecoder;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.external.util.ExternalIdPClientUtil;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * OAuth2 service stubs.
  */
 public class OAuth2ServiceStubs {
+    private AnalyticsHttpClientBuilderService analyticsHttpClientBuilderService;
     private String tokenEndpoint;
     private String revokeEndpoint;
     private String introspectEndpoint;
     private String username;
     private String password;
+    private int connectionTimeout;
+    private int readTimeout;
 
     /**
      * Constructor.
@@ -58,13 +54,17 @@ public class OAuth2ServiceStubs {
      * @param username           Username of Key Manager
      * @param password           Password of Key Manager
      */
-    public OAuth2ServiceStubs(String tokenEndpoint, String revokeEndpoint, String introspectEndpoint,
-                              String username, String password) {
+    public OAuth2ServiceStubs(AnalyticsHttpClientBuilderService service, String tokenEndpoint, String revokeEndpoint,
+                              String introspectEndpoint, String username, String password, int connectionTimeout,
+                              int readTimeout) {
+        this.analyticsHttpClientBuilderService = service;
         this.tokenEndpoint = tokenEndpoint;
         this.revokeEndpoint = revokeEndpoint;
         this.introspectEndpoint = introspectEndpoint;
         this.username = username;
         this.password = password;
+        this.connectionTimeout = connectionTimeout;
+        this.readTimeout = readTimeout;
     }
 
     /**
@@ -74,11 +74,9 @@ public class OAuth2ServiceStubs {
      * @throws IdPClientException if error occurs while crating OAuth2 token service stub
      */
     public OAuth2ServiceStubs.TokenServiceStub getTokenServiceStub() throws IdPClientException {
-        return Feign.builder()
-                .encoder(new FormEncoder())
-                .decoder(new GsonDecoder())
-                .client(new Client.Default(null, null))
-                .target(OAuth2ServiceStubs.TokenServiceStub.class, tokenEndpoint);
+        return this.analyticsHttpClientBuilderService
+                .buildWithoutInterceptor(this.connectionTimeout, this.readTimeout,
+                        OAuth2ServiceStubs.TokenServiceStub.class, tokenEndpoint);
     }
 
     /**
@@ -88,10 +86,9 @@ public class OAuth2ServiceStubs {
      * @throws IdPClientException if error occurs while crating OAuth2 revoke service stub
      */
     public OAuth2ServiceStubs.RevokeServiceStub getRevokeServiceStub() throws IdPClientException {
-        return Feign.builder()
-                .encoder(new FormEncoder())
-                .client(new Client.Default(null, null))
-                .target(OAuth2ServiceStubs.RevokeServiceStub.class, revokeEndpoint);
+        return this.analyticsHttpClientBuilderService
+                .buildWithoutInterceptor(this.connectionTimeout, this.readTimeout,
+                        OAuth2ServiceStubs.RevokeServiceStub.class, revokeEndpoint);
     }
 
     /**
@@ -101,12 +98,9 @@ public class OAuth2ServiceStubs {
      * @throws IdPClientException if error occurs while crating OAuth2 introspection service stub
      */
     public OAuth2ServiceStubs.IntrospectionServiceStub getIntrospectionServiceStub() throws IdPClientException {
-        return Feign.builder()
-                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .encoder(new FormEncoder())
-                .decoder(new GsonDecoder())
-                .client(new Client.Default(null, null))
-                .target(OAuth2ServiceStubs.IntrospectionServiceStub.class, introspectEndpoint);
+        return this.analyticsHttpClientBuilderService
+                .build(username, password, this.connectionTimeout, this.readTimeout,
+                        OAuth2ServiceStubs.IntrospectionServiceStub.class, introspectEndpoint);
     }
 
     /**
@@ -117,14 +111,7 @@ public class OAuth2ServiceStubs {
 
         @Headers("Authorization: Basic {auth_token}")
         @RequestLine("POST /")
-        Response generateAccessToken(@Param("auth_token") String authToken,
-                                     @Param("grant_type") String grantType,
-                                     @Param("code") String code,
-                                     @Param("redirect_uri") String redirectUri,
-                                     @Param("refresh_token") String refreshToken,
-                                     @Param("username") String username,
-                                     @Param("password") String password,
-                                     @Param("scope") String scopes);
+        Response generateAccessToken(@Param("auth_token") String authToken, String body);
 
         /**
          * Get a access token by Password grant type.
@@ -140,8 +127,11 @@ public class OAuth2ServiceStubs {
                                                           String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-            return generateAccessToken(authToken, IdPClientConstants.PASSWORD_GRANT_TYPE, null, null, null,
-                    username, password, scopes);
+            Map<String, String> requestParam = new HashMap<>();
+            requestParam.put("grant_type", IdPClientConstants.PASSWORD_GRANT_TYPE);
+            requestParam.put("username", username);
+            requestParam.put("password", password);
+            return generateAccessToken(authToken, ExternalIdPClientUtil.getRequestBody(requestParam));
         }
 
         /**
@@ -158,8 +148,12 @@ public class OAuth2ServiceStubs {
                                                           String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-            return generateAccessToken(authToken, IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE, code, redirectUri,
-                    null, null, null, scopes);
+
+            Map<String, String> requestParam = new HashMap<>();
+            requestParam.put("grant_type", IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
+            requestParam.put("code", code);
+            requestParam.put("redirect_uri", redirectUri);
+            return generateAccessToken(authToken, ExternalIdPClientUtil.getRequestBody(requestParam));
         }
 
         /**
@@ -175,8 +169,10 @@ public class OAuth2ServiceStubs {
                                                          String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-            return generateAccessToken(authToken, IdPClientConstants.REFRESH_GRANT_TYPE, null,
-                    null, refreshToken, null, null, scopes);
+            Map<String, String> requestParam = new HashMap<>();
+            requestParam.put("grant_type", IdPClientConstants.REFRESH_GRANT_TYPE);
+            requestParam.put("refresh_token", refreshToken);
+            return generateAccessToken(authToken, ExternalIdPClientUtil.getRequestBody(requestParam));
         }
     }
 
@@ -188,7 +184,7 @@ public class OAuth2ServiceStubs {
 
         @RequestLine("POST /")
         @Headers("Authorization: Basic {auth_token}")
-        Response revokeToken(@Param("auth_token") String authToken, @Param("token") String token);
+        Response revokeToken(@Param("auth_token") String authToken, String token);
 
         /**
          * Revoke access token.
@@ -201,7 +197,8 @@ public class OAuth2ServiceStubs {
         default Response revokeAccessToken(String token, String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-            return revokeToken(authToken, token);
+            Map<String, String> requestParam = Collections.singletonMap("token", token);
+            return revokeToken(authToken, ExternalIdPClientUtil.getRequestBody(requestParam));
         }
     }
 
@@ -211,26 +208,11 @@ public class OAuth2ServiceStubs {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     public interface IntrospectionServiceStub {
         @RequestLine("POST /")
-        Response introspectToken(@Param("token") String token);
-    }
+        Response introspectToken(String token);
 
-    private static class FormEncoder implements Encoder {
-        @Override
-        public void encode(Object o, Type type, RequestTemplate requestTemplate) throws EncodeException {
-            Map<String, Object> params = (Map<String, Object>) o;
-            String paramString = params.entrySet().stream()
-                    .map(this::urlEncodeKeyValuePair)
-                    .collect(Collectors.joining("&"));
-            requestTemplate.body(paramString);
-        }
-
-        private String urlEncodeKeyValuePair(Map.Entry<String, Object> entry) {
-            try {
-                return URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString()) + '='
-                        + URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.toString());
-            } catch (UnsupportedEncodingException ex) {
-                throw new EncodeException("Error occurred while URL encoding message", ex);
-            }
+        default Response introspectAccessToken(String token) {
+            Map<String, String> requestParam = Collections.singletonMap("token", token);
+            return introspectToken(ExternalIdPClientUtil.getRequestBody(requestParam));
         }
     }
 }

@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.analytics.idp.client.external.util;
 
+import feign.codec.EncodeException;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
@@ -27,9 +28,13 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Query Manager.
@@ -61,6 +66,21 @@ public class ExternalIdPClientUtil {
                 IdPClientConfiguration.class.getClassLoader()));
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml.loadAs(yamlContent, IdPClientConfiguration.class);
+    }
+
+    public static String getRequestBody(Map<String, String> params) {
+        return params.entrySet().stream()
+                .map(ExternalIdPClientUtil::urlEncodeKeyValuePair)
+                .collect(Collectors.joining("&"));
+    }
+
+    private static String urlEncodeKeyValuePair(Map.Entry<String, String> entry) {
+        try {
+            return URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString()) + '='
+                    + URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException ex) {
+            throw new EncodeException("Error occurred while URL encoding message", ex);
+        }
     }
 
 }
