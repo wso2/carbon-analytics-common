@@ -26,20 +26,69 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * IdPClient interface.
+ * This interface can be used to access common functionality of the IdpClient. This can be used by the dependent
+ * component without the need to know about the underlying IdPClient implementation.
  */
 public interface IdPClient {
+
+    /**
+     * This returns all roles available in the user store.
+     *
+     * @return List of {Role} objects
+     * @throws IdPClientException thrown when an error occurred when retrieving roles
+     */
     List<Role> getAllRoles() throws IdPClientException;
 
+    /**
+     * This returns the admin role of the user store.
+     *
+     * @return {Role}
+     * @throws IdPClientException thrown when an error occurred when retrieving admin role
+     */
     Role getAdminRole() throws IdPClientException;
 
+    /**
+     * This returns the {User} object with the name passed in the parameter.
+     *
+     * @param name Username
+     * @return {User}
+     * @throws IdPClientException thrown when an error occurred when retrieving user
+     */
     User getUser(String name) throws IdPClientException;
 
+    /**
+     * This returns a list of the roles assigned to the user.
+     *
+     * @param name username
+     * @return List of {Role}
+     * @throws IdPClientException thrown when an error occurred when retrieving user role
+     */
     List<Role> getUserRoles(String name) throws IdPClientException;
 
+    /**
+     * This returns the login parameters of a login request.
+     *
+     * @param properties Map of properties that is needed for login
+     * @return Map of login properties such as Status, Access Token, Refresh Token, Expiry time
+     * @throws IdPClientException thrown when an error occurred when login
+     */
     Map<String, String> login(Map<String, String> properties) throws IdPClientException;
 
+    /**
+     * This invalidates the user session.
+     *
+     * @param properties Map of logout properties.
+     * @throws IdPClientException thrown when an error occurred when logout
+     */
     void logout(Map<String, String> properties) throws IdPClientException;
 
+    /**
+     * This will authenticate user based on the token.
+     *
+     * @param token token used to identify user session.
+     * @return username if authentication is success
+     * @throws AuthenticationException thrown when authentication fails
+     * @throws IdPClientException thrown when an error occurred when authenticating
+     */
     String authenticate(String token) throws AuthenticationException, IdPClientException;
 }
