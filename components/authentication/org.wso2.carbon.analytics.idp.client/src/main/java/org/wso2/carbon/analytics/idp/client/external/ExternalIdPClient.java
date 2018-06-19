@@ -379,7 +379,7 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + appContext);
 
                 Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
-                        .introspectToken(oAuth2TokenInfo.getAccessToken());
+                        .introspectAccessToken(oAuth2TokenInfo.getAccessToken());
                 String authUser = null;
                 if (introspectTokenResponse.status() == 200) {   //200 - Success
                     OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
@@ -439,7 +439,8 @@ public class ExternalIdPClient implements IdPClient {
         if (ifPresent != null) {
             return ifPresent.getUserName();
         }
-        Response response = oAuth2ServiceStubs.getIntrospectionServiceStub().introspectToken(token);
+        Response response = oAuth2ServiceStubs.getIntrospectionServiceStub()
+                .introspectAccessToken(token);
 
         if (response == null) {
             String error = "Error occurred while authenticating token '" + token + "'. Response is null.";
@@ -501,7 +502,7 @@ public class ExternalIdPClient implements IdPClient {
         dcrClientInfo.setUserinfoSignedResponseAlg(signingAlgo);
         dcrClientInfo.setExtParamOwner(kmUserName);
 
-        Response response = dcrmServiceStub.registerApplication(dcrClientInfo);
+        Response response = dcrmServiceStub.registerApplication(new Gson().toJson(dcrClientInfo));
         if (response == null) {
             String error = "Error occurred while DCR application '" + dcrClientInfo + "' creation. " +
                     "Response is null.";

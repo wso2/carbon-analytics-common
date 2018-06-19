@@ -26,7 +26,37 @@ import feign.Client;
  * HTTP service logic.
  */
 public interface AnalyticsHttpClientBuilderService {
-    public Client newDefaultClientInstance();
-    public <T> T build(String username, String password, int connectTimeoutMillis,
-                       int readTimeoutMillis, Class<T> target, String url);
+
+    /**
+     * Function to create new Feign client instance.
+     *
+     * @return Feign Client instance
+     */
+    Client newDefaultClientInstance();
+
+    /**
+     * Function to build Feign client factory.
+     *
+     * @param username User name to be used in auth header
+     * @param password Password to be used in auth header
+     * @param connectTimeoutMillis Connection timeout of the request
+     * @param readTimeoutMillis Read timeout of the request
+     * @param target target service stubs to be used by the factory
+     * @param url Base url of the API to be created
+     * @return Feign client factory
+     */
+    <T> T build(String username, String password, int connectTimeoutMillis,
+                int readTimeoutMillis, Class<T> target, String url);
+
+    /**
+     * Function to build Feign client factory.
+     *
+     * @param connectTimeoutMillis Connection timeout of the request
+     * @param readTimeoutMillis Read timeout of the request
+     * @param target target service stubs to be used by the factory
+     * @param url Base url of the API to be created
+     * @return Feign client factory
+     */
+    <T> T buildWithoutInterceptor(int connectTimeoutMillis, int readTimeoutMillis, Class<T> target, String url);
+
 }
