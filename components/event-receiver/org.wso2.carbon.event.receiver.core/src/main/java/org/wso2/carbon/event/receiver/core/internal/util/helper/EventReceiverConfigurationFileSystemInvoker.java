@@ -88,9 +88,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
         EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(EventAdapterUtil.getAxisConfiguration());
         EventReceiverUtil.validateFilePath(fileName);
         String filePath = getFilePathFromFilename(fileName);
-        try {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(filePath))) {
             /* save contents to .xml file */
-            BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
             String xmlContent = XmlFormatter.format(eventReceiverConfigXml);
             eventReceiverDeployer.getDeployedEventReceiverFilePaths().add(filePath);
             out.write(xmlContent);
