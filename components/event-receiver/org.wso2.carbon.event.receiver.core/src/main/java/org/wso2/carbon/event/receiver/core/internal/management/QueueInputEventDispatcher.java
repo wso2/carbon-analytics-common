@@ -104,7 +104,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
 
     @Override
     public void process(Event event) {
-        if(isContinueProcess()){
+        if (isContinueProcess()) {
             readLock.lock();
             readLock.unlock();
             callBack.sendEvent(event);
@@ -190,7 +190,7 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         Event event = eventQueue.take();
                         readLock.lock();
                         readLock.unlock();
-                        if(isContinueProcess()){
+                        if (isContinueProcess()) {
                             callBack.sendEvent(event);
                         }
                         if (isSendToOther()) {
@@ -198,6 +198,9 @@ public class QueueInputEventDispatcher extends AbstractInputEventDispatcher impl
                         }
                     } catch (InterruptedException e) {
                         log.error("Interrupted while waiting to get an event from queue.", e);
+                    } catch (Throwable t) {
+                        log.error("Error has occured while waiting to get an event from the queue which is " +
+                                "belonging to tenentId:" + tenantId + " and Stream Definition: " + streamDefinition, t);
                     }
                 }
             } catch (Exception e) {
