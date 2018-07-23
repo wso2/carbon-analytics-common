@@ -168,8 +168,8 @@ public class TCPEventPublisher {
         int arbitraryMapSize = 0;
         if (hasArbitraryAttributes) {
             for (Map.Entry<String, String> entry : arbitraryMap.entrySet()) {
-                arbitraryMapSize += 4 + entry.getKey().length();
-                arbitraryMapSize += 4 + entry.getValue().length();
+                arbitraryMapSize += 4 + entry.getKey().getBytes(defaultCharset).length;
+                arbitraryMapSize += 4 + entry.getValue().getBytes(defaultCharset).length;
             }
         }
         ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 16);
