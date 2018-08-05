@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.databridge.receiver.binary.internal;
 
 import org.apache.log4j.Logger;
@@ -23,12 +23,10 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
-import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 import org.wso2.carbon.kernel.CarbonRuntime;
-
-import java.io.IOException;
 
 /**
  * Binary Data Receiver ServiceComponent.
@@ -42,7 +40,6 @@ public class BinaryDataReceiverServiceComponent {
     private static final Logger log = Logger.getLogger(BinaryDataReceiverServiceComponent.class);
     private DataBridgeReceiverService dataBridgeReceiverService;
     private static CarbonRuntime carbonRuntime;
-    private static final String DISABLE_RECEIVER = "disable.receiver";
     private BinaryDataReceiver binaryDataReceiver;
 
     /**
@@ -51,20 +48,11 @@ public class BinaryDataReceiverServiceComponent {
      * @param context
      */
     protected void activate(ComponentContext context) {
-        String disableReceiver = System.getProperty(DISABLE_RECEIVER);
-        if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
-            log.info("Receiver disabled.");
-            return;
-        }
+        log.info("org.wso2.carbon.databridge.receiver.binary.internal.Service Component is activated");
         binaryDataReceiver = new BinaryDataReceiver(new BinaryDataReceiverConfiguration(dataBridgeReceiverService.
                 getInitialConfig()), dataBridgeReceiverService);
-        try {
-            binaryDataReceiver.start();
-        } catch (IOException e) {
-            log.error("Error while starting binary data receiver ", e);
-        } catch (DataBridgeException e) {
-            log.error("Error while starting binary data receiver ", e);
-        }
+        context.getBundleContext().registerService(ServerEventListener.class.getName(),
+                binaryDataReceiver, null);
     }
 
     protected void deactivate(ComponentContext context) {
@@ -106,4 +94,6 @@ public class BinaryDataReceiverServiceComponent {
     public static CarbonRuntime getCarbonRuntime() {
         return carbonRuntime;
     }
+
 }
+
