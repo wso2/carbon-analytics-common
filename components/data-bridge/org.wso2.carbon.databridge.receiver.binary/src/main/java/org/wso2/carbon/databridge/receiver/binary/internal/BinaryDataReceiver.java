@@ -60,6 +60,7 @@ public class BinaryDataReceiver implements ServerEventListener {
     private ExecutorService sslReceiverExecutorService;
     private ExecutorService tcpReceiverExecutorService;
     private static final String DISABLE_RECEIVER = "disable.receiver";
+    private boolean isStarted = false;
 
     public BinaryDataReceiver(BinaryDataReceiverConfiguration binaryDataReceiverConfiguration,
                               DataBridgeReceiverService dataBridgeReceiverService) {
@@ -74,13 +75,14 @@ public class BinaryDataReceiver implements ServerEventListener {
     @Override
     public void start() {
         String disableReceiver = System.getProperty(DISABLE_RECEIVER);
-        if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
+        if (Boolean.parseBoolean(disableReceiver)) {
             log.info("Receiver disabled.");
             return;
         }
         try {
             startSecureTransmission();
             startEventTransmission();
+            isStarted = true;
         } catch (IOException e) {
             log.error("Error while starting binary data receiver ", e);
         } catch (DataBridgeException e) {
@@ -90,9 +92,14 @@ public class BinaryDataReceiver implements ServerEventListener {
 
     @Override
     public void stop() {
-        log.info("Stopping Binary Server..");
-        sslReceiverExecutorService.shutdown();
-        tcpReceiverExecutorService.shutdown();
+        if (isStarted) {
+            log.info("Stopping Binary Server..");
+            sslReceiverExecutorService.shutdown();
+            tcpReceiverExecutorService.shutdown();
+        } else {
+            log.info("Binary server not started in order to stop");
+        }
+
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {

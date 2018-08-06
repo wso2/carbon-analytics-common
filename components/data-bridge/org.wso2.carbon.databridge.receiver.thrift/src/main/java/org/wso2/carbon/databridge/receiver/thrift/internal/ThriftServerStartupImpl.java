@@ -32,11 +32,12 @@ public class ThriftServerStartupImpl implements ServerEventListener {
 
     private static final Logger log = Logger.getLogger(ThriftServerStartupImpl.class);
     private static final String DISABLE_RECEIVER = "disable.receiver";
+    private boolean isStarted = false;
 
     @Override
     public void start() {
         String disableReceiver = System.getProperty(DISABLE_RECEIVER);
-        if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
+        if (Boolean.parseBoolean(disableReceiver)) {
             log.info("Receiver disabled.");
             return;
         }
@@ -65,6 +66,7 @@ public class ThriftServerStartupImpl implements ServerEventListener {
                     }*/
                 }
                 ServiceHolder.getDataReceiver().start(hostName);
+                isStarted = true;
             }
         } catch (DataBridgeException e) {
             log.error("Can not create and start Agent Server ", e);
@@ -77,11 +79,16 @@ public class ThriftServerStartupImpl implements ServerEventListener {
 
     @Override
     public void stop() {
-        log.info("Thrift server shutting down...");
+        if (isStarted) {
+            log.info("Thrift server shutting down...");
 
-        ServiceHolder.getDataReceiver().stop();
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully stopped thrift agent server");
+            ServiceHolder.getDataReceiver().stop();
+            isStarted = false;
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully stopped thrift agent server");
+            }
+        } else {
+            log.info("Thrift server not started in order to stop");
         }
     }
 }
