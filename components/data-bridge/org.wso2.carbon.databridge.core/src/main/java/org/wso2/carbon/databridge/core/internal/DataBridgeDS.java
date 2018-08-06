@@ -82,8 +82,6 @@ public class DataBridgeDS {
                 dataBridgeEventStreamServiceRegistration = bundleContext.
                         registerService(DataBridgeStreamStore.class.getName(),
                                 new DataBridgeStreamStore(), null);
-
-                log.info("Successfully deployed Agent Server ");
             }
         } catch (RuntimeException e) {
             log.error("Error in starting Agent Server ", e);
@@ -162,3 +160,4 @@ public class DataBridgeDS {
     }
 
 }
+

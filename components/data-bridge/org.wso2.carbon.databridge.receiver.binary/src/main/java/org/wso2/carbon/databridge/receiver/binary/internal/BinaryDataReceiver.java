@@ -1,24 +1,25 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.databridge.receiver.binary.internal;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
@@ -52,12 +53,14 @@ import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUt
 /**
  * Binary Transport Receiver implementation.
  */
-public class BinaryDataReceiver {
+public class BinaryDataReceiver implements ServerEventListener {
     private static final Logger log = Logger.getLogger(BinaryDataReceiver.class);
     private DataBridgeReceiverService dataBridgeReceiverService;
     private BinaryDataReceiverConfiguration binaryDataReceiverConfiguration;
     private ExecutorService sslReceiverExecutorService;
     private ExecutorService tcpReceiverExecutorService;
+    private static final String DISABLE_RECEIVER = "disable.receiver";
+    private boolean isStarted = false;
 
     public BinaryDataReceiver(BinaryDataReceiverConfiguration binaryDataReceiverConfiguration,
                               DataBridgeReceiverService dataBridgeReceiverService) {
@@ -69,15 +72,34 @@ public class BinaryDataReceiver {
                 getSizeOfTCPThreadPool(), "Receiver-Binary-TCP");
     }
 
-    public void start() throws IOException, DataBridgeException {
-        startSecureTransmission();
-        startEventTransmission();
+    @Override
+    public void start() {
+        String disableReceiver = System.getProperty(DISABLE_RECEIVER);
+        if (Boolean.parseBoolean(disableReceiver)) {
+            log.info("Receiver disabled.");
+            return;
+        }
+        try {
+            startSecureTransmission();
+            startEventTransmission();
+            isStarted = true;
+        } catch (IOException e) {
+            log.error("Error while starting binary data receiver ", e);
+        } catch (DataBridgeException e) {
+            log.error("Error while starting binary data receiver ", e);
+        }
     }
 
+    @Override
     public void stop() {
-        log.info("Stopping Binary Server..");
-        sslReceiverExecutorService.shutdown();
-        tcpReceiverExecutorService.shutdown();
+        if (isStarted) {
+            log.info("Stopping Binary Server..");
+            sslReceiverExecutorService.shutdown();
+            tcpReceiverExecutorService.shutdown();
+        } else {
+            log.info("Binary server not started in order to stop");
+        }
+
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
@@ -322,3 +344,4 @@ public class BinaryDataReceiver {
         }
     }
 }
+

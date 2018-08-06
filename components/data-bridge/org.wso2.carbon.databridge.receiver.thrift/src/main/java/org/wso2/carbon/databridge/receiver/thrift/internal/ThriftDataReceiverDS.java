@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 
@@ -40,8 +41,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ThriftDataReceiverDS {
     private static final Logger log = Logger.getLogger(ThriftDataReceiverDS.class);
-
-    private static final String DISABLE_RECEIVER = "disable.receiver";
+    private ThriftServerStartupImpl thriftServerStartup;
 
     /**
      * This is the activation method of ThriftDataReceiverDS. This will be called when its references are
@@ -52,13 +52,9 @@ public class ThriftDataReceiverDS {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        String disableReceiver = System.getProperty(DISABLE_RECEIVER);
-        if (disableReceiver != null && Boolean.parseBoolean(disableReceiver)) {
-            log.info("Receiver disabled.");
-            return;
-        }
-        // Register ThriftServerStartupImpl instance as an OSGi service.
-        new ThriftServerStartupImpl().completingServerStartup();
+        log.info("Service Component is activated");
+        bundleContext.registerService(ServerEventListener.class.getName(),
+                new ThriftServerStartupImpl(), null);
     }
 
     /**
@@ -69,12 +65,7 @@ public class ThriftDataReceiverDS {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Thrift server shutting down...");
-
-        ServiceHolder.getDataReceiver().stop();
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully stopped thrift agent server");
-        }
+        thriftServerStartup.stop();
     }
 
     /**
