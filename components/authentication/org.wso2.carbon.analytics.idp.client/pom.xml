@@ -127,7 +127,7 @@
             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
             org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
             org.wso2.carbon.kernel.*;version="${carbon.kernel.package.import.version.range}",
-            org.wso2.carbon.secvault.*;version="${carbon.securevault.version}",
+            org.wso2.carbon.secvault.*;version="${carbon.secvault.version}",
             *;resolution:=optional
         </import.package>
         <dynamic.import.package>*</dynamic.import.package>

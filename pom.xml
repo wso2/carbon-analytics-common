@@ -571,7 +571,7 @@
             <dependency>
                 <groupId>org.wso2.carbon.secvault</groupId>
                 <artifactId>org.wso2.carbon.secvault.feature</artifactId>
-                <version>${carbon.securevault.version}</version>
+                <version>${carbon.secvault.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
@@ -784,7 +784,7 @@
         <!-- Latest Dependencies -->
         <carbon.config.version>2.1.4</carbon.config.version>
         <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
-        <carbon.secvault.version>5.0.10</carbon.secvault.version>
+        <carbon.secvault.version>5.0.11</carbon.secvault.version>
         <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
@@ -805,10 +805,10 @@
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <msf4j.version>2.6.2</msf4j.version>
+        <msf4j.version>2.6.3</msf4j.version>
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
 
-        <com.fasterxml.jackson.core.version>2.8.9</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.core.version>2.9.6</com.fasterxml.jackson.core.version>
         <io.swagger.version>1.5.16</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
@@ -819,7 +819,6 @@
         <commons-lang3.version>3.3.2</commons-lang3.version>
 
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
-        <carbon.securevault.version>5.0.10</carbon.securevault.version>
         <carbon.utils.version>2.0.4</carbon.utils.version>
         <org.wso2.carbon.transport.http.netty.version>5.0.1</org.wso2.carbon.transport.http.netty.version>
         <org.wso2.carbon.transport.version>5.0.1</org.wso2.carbon.transport.version>
