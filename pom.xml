@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>org.wso2.carbon.analytics-common.parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.67</version>
+    <version>6.0.68-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics Common - Parent</name>
 
     <modules>
@@ -226,7 +226,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>v6.0.67</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
@@ -710,7 +710,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.common.version>6.0.67</carbon.analytics.common.version>
+        <carbon.analytics.common.version>6.0.68-SNAPSHOT</carbon.analytics.common.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
