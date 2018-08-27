@@ -235,7 +235,7 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.secvault.feature</id>
-                                    <version>${carbon.securevault.version}</version>
+                                    <version>${carbon.secvault.version}</version>
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.osgi.feature</id>
@@ -393,7 +393,7 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.secvault.feature.group</id>
-                                    <version>${carbon.securevault.version}</version>
+                                    <version>${carbon.secvault.version}</version>
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.utils.feature.group</id>
@@ -485,7 +485,7 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.secvault.feature.group</id>
-                                    <version>${carbon.securevault.version}</version>
+                                    <version>${carbon.secvault.version}</version>
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.utils.feature.group</id>
@@ -576,7 +576,7 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.secvault.feature.group</id>
-                                    <version>${carbon.securevault.version}</version>
+                                    <version>${carbon.secvault.version}</version>
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.utils.feature.group</id>
