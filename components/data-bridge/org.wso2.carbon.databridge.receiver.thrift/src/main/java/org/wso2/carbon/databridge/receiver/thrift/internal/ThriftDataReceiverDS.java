@@ -41,7 +41,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ThriftDataReceiverDS {
     private static final Logger log = Logger.getLogger(ThriftDataReceiverDS.class);
-    private ThriftServerStartupImpl thriftServerStartup;
+    private ThriftServerStartupImpl thriftDataReceiver;
 
     /**
      * This is the activation method of ThriftDataReceiverDS. This will be called when its references are
@@ -53,8 +53,9 @@ public class ThriftDataReceiverDS {
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
         log.info("Service Component is activated");
+        thriftDataReceiver = new ThriftServerStartupImpl();
         bundleContext.registerService(ServerEventListener.class.getName(),
-                new ThriftServerStartupImpl(), null);
+                thriftDataReceiver, null);
     }
 
     /**
@@ -65,7 +66,7 @@ public class ThriftDataReceiverDS {
      */
     @Deactivate
     protected void stop() throws Exception {
-        thriftServerStartup.stop();
+        thriftDataReceiver.stop();
     }
 
     /**
