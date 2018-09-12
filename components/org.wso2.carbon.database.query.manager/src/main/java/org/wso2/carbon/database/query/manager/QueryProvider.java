@@ -56,31 +56,30 @@ public class QueryProvider {
         Map<String, String> componentConfigMap = new HashMap<>();
         Map<String, String> result = new HashMap<>();
         if (deploymentQueries != null) {
-            //populate the deployment query map for given database type and version.
+            //populate the deployment.yaml RDBMS queries map for given database type and version.
             for (Queries queries : deploymentQueries) {
-                if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
-                        databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
+                String queriesType = queries.getType();
+                String queriesVersion = queries.getVersion();
+                if ((queriesType.equalsIgnoreCase(databaseType) || queriesType.equalsIgnoreCase(DEFAULT_TYPE)) &&
+                        (queriesVersion.equalsIgnoreCase(databaseVersion) ||
+                                queriesVersion.equalsIgnoreCase(DEFAULT_TYPE))) {
                     deploymentConfigMap = queries.getMappings();
+                    break;
                 }
             }
         }
         if (componentQueries != null) {
-            //populate the default and component query map for given type and version.
+            //populate the default and component RDBMS queries map for given type and version.
             for (Queries queries : componentQueries) {
-                if (queries.getType().equals(DEFAULT_TYPE)) {
+                String queriesType = queries.getType();
+                String queriesVersion = queries.getVersion();
+                if (queriesType.equalsIgnoreCase(DEFAULT_TYPE)) {
                     defaultConfigSet = queries.getMappings().keySet();
-                } else if (queries.getType().equals(databaseType) && (queries.getVersion() == null ?
-                        databaseVersion == null : queries.getVersion().equals(databaseVersion))) {
+                } else if (queriesType.equalsIgnoreCase(databaseType)
+                        && (queriesVersion.equalsIgnoreCase(databaseVersion) ||
+                        queriesVersion.equalsIgnoreCase(DEFAULT_TYPE))) {
                     componentConfigMap = queries.getMappings();
-                }
-            }
-            //if matching database type and version not found check whether default version available.
-            if (componentConfigMap == null || componentConfigMap.isEmpty()) {
-                for (Queries queries : componentQueries) {
-                    if (queries.getType().equals(databaseType) && queries.getVersion() != null &&
-                            queries.getVersion().equals(DEFAULT_TYPE)) {
-                        componentConfigMap = queries.getMappings();
-                    }
+                    break;
                 }
             }
         } else {
