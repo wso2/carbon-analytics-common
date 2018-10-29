@@ -48,8 +48,8 @@ public final class ThriftDataReceiverConstants {
     public static final String THRIFT_SSL_REQUEST_TIMEOUT = "sslRequestTimeout";
     public static final String THRIFT_SSL_STOP_TIMEOUT_VAL = "sslStopTimeoutVal";
 
-    public static final int THRIFT_TCP_DEFAULT_MAX_WORKER_THREADS = 1000;
-    public static final int THRIFT_SSL_DEFAULT_MAX_WORKER_THREADS = 1000;
+    public static final int THRIFT_TCP_DEFAULT_MAX_WORKER_THREADS = 2500;
+    public static final int THRIFT_SSL_DEFAULT_MAX_WORKER_THREADS = 2500;
 
     public static final int UNDEFINED = -1;
 }
