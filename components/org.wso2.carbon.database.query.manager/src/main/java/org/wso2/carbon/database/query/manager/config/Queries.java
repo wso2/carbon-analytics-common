@@ -21,6 +21,7 @@ package org.wso2.carbon.database.query.manager.config;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Map;
 @Configuration(
         description = "Queries configuration parent."
 )
-public class Queries {
+public class Queries implements Serializable {
     @Element(
             description = "Queries type",
             required = true
