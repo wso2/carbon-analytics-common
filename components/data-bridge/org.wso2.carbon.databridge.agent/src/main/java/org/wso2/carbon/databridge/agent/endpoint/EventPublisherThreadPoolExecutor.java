@@ -52,17 +52,13 @@ public class EventPublisherThreadPoolExecutor extends ThreadPoolExecutor {
         super.execute(task);
     }
 
-    public void submitJobAndSetState(Thread thread, DataEndpoint dataEndpoint) {
+    public void submitJobAndSetState(DataEndpoint.EventPublisher publisher, DataEndpoint dataEndpoint) {
         int permits = semaphore.availablePermits();
         if (permits <= 1) {
             dataEndpoint.setState(DataEndpoint.State.BUSY);
         }
-        submit(thread);
+        publisher.setPoolSemaphore(semaphore);
+        submit(new Thread(publisher));
     }
 
-    @Override
-    protected void afterExecute(final Runnable r, final Throwable t) {
-        super.afterExecute(r, t);
-        semaphore.release();
-    }
 }
