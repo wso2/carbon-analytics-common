@@ -26,6 +26,8 @@ import org.wso2.carbon.databridge.core.utils.EventComposite;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Will removes the events from queues and send then to the endpoints.
@@ -36,13 +38,16 @@ public class QueueWorker implements Runnable {
     private BlockingQueue<EventComposite> eventQueue;
     private List<AgentCallback> subscribers;
     private List<RawDataAgentCallback> rawDataSubscribers;
+    private ExecutorService executorService;
 
     public QueueWorker(BlockingQueue<EventComposite> queue,
                        List<AgentCallback> subscribers,
-                       List<RawDataAgentCallback> rawDataSubscribers) {
+                       List<RawDataAgentCallback> rawDataSubscribers,
+                       ExecutorService executorService) {
         this.eventQueue = queue;
         this.subscribers = subscribers;
         this.rawDataSubscribers = rawDataSubscribers;
+        this.executorService = executorService;
     }
 
     public void run() {
@@ -55,42 +60,49 @@ public class QueueWorker implements Runnable {
                 log.debug(eventQueue.size() + " messages in queue before " +
                           Thread.currentThread().getName() + " worker has polled queue");
             }
-            EventComposite eventComposite = eventQueue.poll();
+            ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor) executorService);
+            if (eventQueue.size() != 0) {
+                do {
+                    EventComposite eventComposite = eventQueue.poll();
+                    if (eventComposite != null) {
+                        if (rawDataSubscribers.size() > 0) {
+                            for (RawDataAgentCallback agentCallback : rawDataSubscribers) {
+                                try {
+                                    agentCallback.receive(eventComposite);
+                                } catch (Throwable e) {
+                                    log.error("Error in passing event composite " + eventComposite + " to " +
+                                            "subscriber " + agentCallback, e);
+                                }
+                            }
+                        }
+                        if (subscribers.size() > 0) {
+                            try {
+                                eventList = eventComposite.getEventConverter().toEventList(
+                                        eventComposite.getEventBundle(), eventComposite.getStreamTypeHolder());
 
-            if (rawDataSubscribers.size() > 0) {
-                for (RawDataAgentCallback agentCallback : rawDataSubscribers) {
-                    try {
-                        agentCallback.receive(eventComposite);
-                    } catch (Throwable e) {
-                        log.error("Error in passing event composite " + eventComposite + " to subscriber " +
-                                agentCallback, e);
-                    }
-                }
-            }
-            if (subscribers.size() > 0) {
-                try {
-                    eventList = eventComposite.getEventConverter().toEventList(eventComposite.getEventBundle(),
-                                                                               eventComposite.getStreamTypeHolder());
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Dispatching event to " + subscribers.size() + " subscriber(s)");
+                                }
+                                for (AgentCallback agentCallback : subscribers) {
+                                    try {
+                                        agentCallback.receive(eventList,
+                                                eventComposite.getAgentSession().getCredentials());
+                                    } catch (Throwable e) {
+                                        log.error("Error in passing event eventList " + eventList + " to " +
+                                                "subscriber " + agentCallback, e);
+                                    }
+                                }
+                                if (log.isDebugEnabled()) {
+                                    log.debug(eventQueue.size() + " messages in queue after " +
+                                            Thread.currentThread().getName() + " worker has finished work");
+                                }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("Dispatching event to " + subscribers.size() + " subscriber(s)");
-                    }
-                    for (AgentCallback agentCallback : subscribers) {
-                        try {
-                            agentCallback.receive(eventList, eventComposite.getAgentSession().getCredentials());
-                        } catch (Throwable e) {
-                            log.error("Error in passing event eventList " + eventList + " to subscriber " +
-                                    agentCallback, e);
+                            } catch (EventConversionException re) {
+                                log.error("Dropping wrongly formatted event sent ", re);
+                            }
                         }
                     }
-                    if (log.isDebugEnabled()) {
-                        log.debug(eventQueue.size() + " messages in queue after " +
-                                  Thread.currentThread().getName() + " worker has finished work");
-                    }
-
-                } catch (EventConversionException re) {
-                    log.error("Dropping wrongly formatted event sent ", re);
-                }
+                } while (threadPoolExecutor.getActiveCount() <= 3 && eventQueue.size() != 0);
             }
         } catch (Throwable e) {
             log.error("Error in passing events " + eventList + " to subscribers " + subscribers + " " +

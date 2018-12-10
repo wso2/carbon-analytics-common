@@ -61,7 +61,7 @@ public class EventQueue {
             String logMessage = "Failure to insert event into queue";
             log.warn(logMessage);
         }
-        executorService.submit(new QueueWorker(eventQueue, subscribers, rawDataSubscribers));
+        executorService.submit(new QueueWorker(eventQueue, subscribers, rawDataSubscribers, executorService));
     }
 
     @Override
