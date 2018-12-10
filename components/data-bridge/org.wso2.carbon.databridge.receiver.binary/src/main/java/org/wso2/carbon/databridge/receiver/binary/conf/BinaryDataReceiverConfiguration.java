@@ -30,6 +30,7 @@ public class BinaryDataReceiverConfiguration {
     private int tcpPort;
     private int sizeOfSSLThreadPool;
     private int sizeOfTCPThreadPool;
+    private int waitingTimeInMilliSeconds;
     private String sslProtocols;
     private String ciphers;
 
@@ -53,6 +54,8 @@ public class BinaryDataReceiverConfiguration {
         this.sizeOfTCPThreadPool = Integer.parseInt(dataReceiver.getConfiguration(
                 BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE,
                 BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE).toString());
+        this.waitingTimeInMilliSeconds = Integer.parseInt(dataReceiver.getConfiguration(
+                BinaryDataReceiverConstants.WAITING_TIME_IN_MILISECONDS, 0).toString());
 
         Object sslProtocolObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME, null);
         sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
@@ -86,5 +89,9 @@ public class BinaryDataReceiverConfiguration {
 
     public String getCiphers() {
         return ciphers;
+    }
+
+    public int getWaitingTimeInMilliSeconds() {
+        return waitingTimeInMilliSeconds;
     }
 }
