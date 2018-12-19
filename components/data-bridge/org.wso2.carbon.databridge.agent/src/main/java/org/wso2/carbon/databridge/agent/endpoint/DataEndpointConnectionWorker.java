@@ -65,7 +65,12 @@ public class DataEndpointConnectionWorker implements Runnable {
                         loggingControlFlag.set(false);
                     }
                 } else {
-                    log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                    if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                        log.info("Attempt to connect to the endpoint " +
+                                dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
+                    } else {
+                        log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                    }
                 }
                 dataEndpoint.deactivate();
             } catch (DataEndpointLoginException e) {

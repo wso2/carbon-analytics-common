@@ -181,7 +181,8 @@ public class DataPublisher {
                             dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
                             dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
                             dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
-                            dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds());
+                            dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
+                            failOver);
                 } else {
                     endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
                             (String) authGroup[j], username, password, dataEndpointAgent.getSecuredTransportPool(),
@@ -190,7 +191,8 @@ public class DataPublisher {
                             dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
                             dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
                             dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
-                            dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds());
+                            dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
+                            failOver);
                 }
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);
