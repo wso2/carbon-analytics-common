@@ -65,7 +65,8 @@ public class DataBrigdeWorkerTestCase {
                         dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
                         dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
                         dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
-                        dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds());
+                        dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
+                        true);
         DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
         dataEndpoint.initialize(endpointConfiguration);
         dataEndpointConnectionWorker.initialize(dataEndpoint, endpointConfiguration);
