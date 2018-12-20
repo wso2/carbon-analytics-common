@@ -57,20 +57,24 @@ public class DataEndpointConnectionWorker implements Runnable {
         if (isInitialized()) {
             try {
                 connect();
+                if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                    loggingControlFlag.set(true);
+                }
                 dataEndpoint.activate();
             } catch (DataEndpointAuthenticationException e) {
                 if (isLoggingControl) {
                     if (loggingControlFlag.get()) {
-                        log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                            log.info("Attempt to connect to the endpoint " +
+                                    dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
+                            log.debug("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        } else {
+                            log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        }
                         loggingControlFlag.set(false);
                     }
                 } else {
-                    if (dataEndpointConfiguration.isFailOverEndpoint()) {
-                        log.info("Attempt to connect to the endpoint " +
-                                dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
-                    } else {
-                        log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
-                    }
+                    log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
                 }
                 dataEndpoint.deactivate();
             } catch (DataEndpointLoginException e) {
@@ -120,6 +124,8 @@ public class DataEndpointConnectionWorker implements Runnable {
         if (dataEndpointConfiguration.getLoggingControlIntervalInSeconds() != 0) {
             isLoggingControl = true;
             scheduledLoggingTask();
+        } else if (dataEndpointConfiguration.isFailOverEndpoint()) {
+            isLoggingControl = true;
         }
     }
 
