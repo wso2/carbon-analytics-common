@@ -42,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -285,7 +286,17 @@ public class BinaryDataReceiver implements ServerEventListener {
             while (true) {
                 try {
                     Socket socket = this.serverSocket.accept();
-                    sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                    Future<?> submit = sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                    while (true) {
+                        if (!(submit.isDone() || submit.isCancelled())) {
+                            continue;
+                        }
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            log.error("Unable to close the binary SSL receiver socket. ", e);
+                        }
+                    }
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
                 }
@@ -308,7 +319,17 @@ public class BinaryDataReceiver implements ServerEventListener {
             while (true) {
                 try {
                     Socket socket = this.serverSocket.accept();
-                    tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                    Future<?> submit = tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                    while (true) {
+                        if (!(submit.isDone() || submit.isCancelled())) {
+                            continue;
+                        }
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            log.error("Unable to close the binary TCP receiver socket. ", e);
+                        }
+                    }
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
                 }
