@@ -88,5 +88,10 @@
         <Class name="org.wso2.carbon.databridge.core.internal.EventDispatcher"/>
         <Bug pattern="IS2_INCONSISTENT_SYNC"/>
     </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.core.internal.queue.EventBlockingQueue"/>
+        <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+    </Match>
+
 
 </FindBugsFilter>
