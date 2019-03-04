@@ -34,6 +34,9 @@ public class IdPClientConfiguration {
     @Element(description = "Client Type", required = true)
     private String type = "local";
 
+    @Element(description = "SSO enabled")
+    private boolean ssoEnabled = false;
+
     @Element(description = "Client properties")
     private Map<String, String> properties = new HashMap<>();
 
@@ -64,5 +67,9 @@ public class IdPClientConfiguration {
 
     public ArrayList<Queries> getQueries() {
         return queries;
+    }
+
+    public boolean isSsoEnabled() {
+        return ssoEnabled;
     }
 }
