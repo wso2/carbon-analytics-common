@@ -1172,6 +1172,11 @@
                 <artifactId>aws-java-sdk-sqs</artifactId>
                 <version>${aws.java.sdk.sqs.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${version.org.wso2.orbit.javax.activation}</version>
+            </dependency>
 
             <!--carbon-deployment features start-->
             <!--<dependency>-->
@@ -1591,6 +1596,7 @@
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.4</powermock.version>
         <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
+        <version.org.wso2.orbit.javax.activation>1.1.1.wso2v2</version.org.wso2.orbit.javax.activation>
 
     </properties>
 
