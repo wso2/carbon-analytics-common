@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -42,7 +43,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -62,6 +62,8 @@ public class BinaryDataReceiver implements ServerEventListener {
     private ExecutorService tcpReceiverExecutorService;
     private static final String DISABLE_RECEIVER = "disable.receiver";
     private boolean isStarted = false;
+    private SSLServerSocket sslserversocket;
+    private ServerSocket serversocket;
 
     public BinaryDataReceiver(BinaryDataReceiverConfiguration binaryDataReceiverConfiguration,
                               DataBridgeReceiverService dataBridgeReceiverService) {
@@ -97,6 +99,20 @@ public class BinaryDataReceiver implements ServerEventListener {
             log.info("Stopping Binary Server..");
             sslReceiverExecutorService.shutdown();
             tcpReceiverExecutorService.shutdown();
+                if (sslserversocket != null) {
+                    try {
+                        sslserversocket.close();
+                    } catch (IOException e) {
+                        log.error("Error occurs when closing the SSL server socket ", e);
+                    }
+                }
+                if (serversocket != null) {
+                    try {
+                        serversocket.close();
+                    } catch (IOException e) {
+                        log.error("Error occurs when closing the server socket ", e);
+                    }
+                }
         } else {
             log.info("Binary server not started in order to stop");
         }
@@ -150,7 +166,7 @@ public class BinaryDataReceiver implements ServerEventListener {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(kmf.getKeyManagers(), null, null);
             sslServerSocketFactory = sslContext.getServerSocketFactory();
-            SSLServerSocket sslserversocket =
+            sslserversocket =
                     (SSLServerSocket) sslServerSocketFactory.
                             createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
             String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
@@ -179,7 +195,7 @@ public class BinaryDataReceiver implements ServerEventListener {
 
     private void startEventTransmission() throws IOException {
         ServerSocketFactory serversocketfactory = ServerSocketFactory.getDefault();
-        ServerSocket serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.
+        serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.
                 getTCPPort());
         Thread thread = new Thread(new BinaryEventServerAcceptor(serversocket));
         thread.start();
@@ -283,19 +299,16 @@ public class BinaryDataReceiver implements ServerEventListener {
 
         @Override
         public void run() {
-            while (true) {
+            while (!this.serverSocket.isClosed()) {
                 try {
                     Socket socket = this.serverSocket.accept();
-                    Future<?> submit = sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                    while (true) {
-                        if (!(submit.isDone() || submit.isCancelled())) {
-                            continue;
-                        }
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            log.error("Unable to close the binary SSL receiver socket. ", e);
-                        }
+                    sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (SocketException e) {
+                    log.warn("Error while accepting TCP connection from " + serverSocket +
+                            " for binary transport receiver.");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error while accepting TCP connection from " + serverSocket +
+                                " for binary transport receiver.", e);
                     }
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
@@ -316,19 +329,16 @@ public class BinaryDataReceiver implements ServerEventListener {
 
         @Override
         public void run() {
-            while (true) {
+            while (!this.serverSocket.isClosed()) {
                 try {
-                    Socket socket = this.serverSocket.accept();
-                    Future<?> submit = tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                    while (true) {
-                        if (!(submit.isDone() || submit.isCancelled())) {
-                            continue;
-                        }
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            log.error("Unable to close the binary TCP receiver socket. ", e);
-                        }
+                        Socket socket = this.serverSocket.accept();
+                        tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (SocketException e) {
+                    log.warn("Error while accepting TCP connection from " + serverSocket +
+                            " for binary transport receiver.");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error while accepting TCP connection from " + serverSocket +
+                                " for binary transport receiver. ", e);
                     }
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
