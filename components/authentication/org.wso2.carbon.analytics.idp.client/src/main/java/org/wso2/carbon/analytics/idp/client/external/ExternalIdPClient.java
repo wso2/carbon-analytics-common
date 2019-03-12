@@ -376,8 +376,11 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
-                returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + appContext);
-
+                if (this.baseUrl.endsWith("/")) {
+                    returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + appContext);
+                } else {
+                    returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + "/" + appContext);
+                }
                 Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
                         .introspectAccessToken(oAuth2TokenInfo.getAccessToken());
                 String authUser = null;
@@ -385,7 +388,11 @@ public class ExternalIdPClient implements IdPClient {
                     OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                             .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
                     String username = introspectResponse.getUsername();
-                    authUser = username.substring(0, username.indexOf("@carbon.super"));
+                    if (username.contains("@carbon.super")) {
+                        authUser = username.substring(0, username.indexOf("@carbon.super"));
+                    } else {
+                        authUser = username;
+                    }
                     returnProperties.put(IdPClientConstants.USERNAME, authUser);
                 } else {
                     if (LOG.isDebugEnabled()) {
