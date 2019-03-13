@@ -99,20 +99,29 @@ public class BinaryDataReceiver implements ServerEventListener {
             log.info("Stopping Binary Server..");
             sslReceiverExecutorService.shutdown();
             tcpReceiverExecutorService.shutdown();
-                if (sslserversocket != null) {
-                    try {
-                        sslserversocket.close();
-                    } catch (IOException e) {
-                        log.error("Error occurs when closing the SSL server socket ", e);
-                    }
+            if (sslserversocket != null) {
+                try {
+                    sslserversocket.close();
+                } catch (IOException e) {
+                    log.error("Error occurs when closing the SSL server socket ", e);
                 }
-                if (serversocket != null) {
-                    try {
-                        serversocket.close();
-                    } catch (IOException e) {
-                        log.error("Error occurs when closing the server socket ", e);
-                    }
+            }
+            if (serversocket != null) {
+                try {
+                    serversocket.close();
+                } catch (IOException e) {
+                    log.error("Error occurs when closing the server socket ", e);
                 }
+            }
+            while (!dataBridgeReceiverService.isQueueEmpty()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    log.warn("Error in waiting for queue to become empty " + e.getMessage());
+                }
+            }
+            log.info("Successfully stopped Binary server");
+
         } else {
             log.info("Binary server not started in order to stop");
         }
@@ -166,8 +175,7 @@ public class BinaryDataReceiver implements ServerEventListener {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(kmf.getKeyManagers(), null, null);
             sslServerSocketFactory = sslContext.getServerSocketFactory();
-            sslserversocket =
-                    (SSLServerSocket) sslServerSocketFactory.
+            sslserversocket = (SSLServerSocket) sslServerSocketFactory.
                             createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
             String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
             if (sslProtocols != null && sslProtocols.length() != 0) {
@@ -331,8 +339,8 @@ public class BinaryDataReceiver implements ServerEventListener {
         public void run() {
             while (!this.serverSocket.isClosed()) {
                 try {
-                        Socket socket = this.serverSocket.accept();
-                        tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                    Socket socket = this.serverSocket.accept();
+                    tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
                 } catch (SocketException e) {
                     log.warn("Error while accepting TCP connection from " + serverSocket +
                             " for binary transport receiver.");

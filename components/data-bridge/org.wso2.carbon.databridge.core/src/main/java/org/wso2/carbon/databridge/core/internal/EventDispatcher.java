@@ -211,6 +211,10 @@ public class EventDispatcher {
         eventQueue.publish(new EventComposite(eventBundle, getStreamDefinitionHolder(), agentSession, eventConverter));
     }
 
+    public Boolean isQueueEmpty() {
+        return eventQueue.isQueueEmpty();
+    }
+
     private StreamTypeHolder getStreamDefinitionHolder() {
         if (streamTypeHolder != null) {
             if (log.isDebugEnabled()) {

@@ -78,6 +78,8 @@ public interface DataBridgeReceiverService {
     public void subscribe(StreamAddRemoveListener streamAddRemoveListener);
 
     public void unsubscribe(StreamAddRemoveListener streamAddRemoveListener);
+
+    public Boolean isQueueEmpty();
 }
 
 
