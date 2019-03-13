@@ -273,6 +273,10 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         }
     }
 
+    public Boolean isQueueEmpty() {
+        return eventDispatcher.isQueueEmpty();
+    }
+
     private void endTimeMeasurement(int eventsNum) {
         if (isProfileReceiver) {
             eventsReceived.addAndGet(eventsNum);

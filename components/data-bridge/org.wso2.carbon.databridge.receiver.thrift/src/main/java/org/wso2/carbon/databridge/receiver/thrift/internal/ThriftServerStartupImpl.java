@@ -46,7 +46,7 @@ public class ThriftServerStartupImpl implements ServerEventListener {
                     ServiceHolder.getDataBridgeReceiverService().getInitialConfig(),
                     ServiceHolder.getCarbonRuntime().getConfiguration().getPortsConfig().getOffset());
 
-            if (ServiceHolder.getDataReceiver() == null) {
+            if (!isStarted) {
                 ServiceHolder.setDataReceiver(new ThriftDataReceiverFactory().createAgentServer(
                         thriftDataReceiverConfiguration, ServiceHolder.getDataBridgeReceiverService()));
                 // TODO: 1/27/17 Hack to get host name. Change later
@@ -84,9 +84,14 @@ public class ThriftServerStartupImpl implements ServerEventListener {
 
             ServiceHolder.getDataReceiver().stop();
             isStarted = false;
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully stopped thrift agent server");
+            while (!ServiceHolder.getDataBridgeReceiverService().isQueueEmpty()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    log.warn("Error in waiting for queue to become empty " + e.getMessage());
+                }
             }
+            log.info("Successfully stopped thrift server");
         } else {
             log.info("Thrift server not started in order to stop");
         }

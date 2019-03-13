@@ -64,6 +64,10 @@ public class EventQueue {
         executorService.submit(new QueueWorker(eventQueue, subscribers, rawDataSubscribers, executorService));
     }
 
+    public boolean isQueueEmpty() {
+        return eventQueue.peek() == null;
+    }
+
     @Override
     protected void finalize() throws Throwable {
         executorService.shutdown();
