@@ -52,6 +52,7 @@ public class ExternalIdPClientConstants {
     public static final String DCR_APP_OWNER = "dcrAppOwner";
     public static final String CONNECTION_TIMEOUT = "connectionTimeout";
     public static final String READ_TIMEOUT = "readTimeout";
+    public static final String EXTERNAL_SSO_LOGOUT_URL = "externalLogoutUrl";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
@@ -72,6 +73,7 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_DATABASE_NAME = "WSO2_OAUTH_APP_DB";
     public static final String DEFAULT_CONNECTION_TIMEOUT = "10000";
     public static final String DEFAULT_READ_TIMEOUT = "60000";
+    public static final String DEFAULT_EXTERNAL_SSO_LOGOUT_URL = "https://localhost:9443/samlsso";
 
     public static final String SP_APP_NAME = "sp";
     public static final String PORTAL_APP_NAME = "sp_portal";
@@ -97,6 +99,7 @@ public class ExternalIdPClientConstants {
     public static final String TOKEN_POSTFIX = "/token";
     public static final String INTROSPECT_POSTFIX = "/introspect";
     public static final String AUTHORIZE_POSTFIX = "/authorize";
+    public static final String PRIMARY_USER_STORE_PREFIX = "PRIMARY/";
 
     public static final String SCIM2_USERNAME = "userName";
     public static final String SCIM2_GROUPS = "groups";
