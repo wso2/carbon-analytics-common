@@ -233,7 +233,13 @@ public class ExternalIdPClient implements IdPClient {
                             scimGroups.forEach(scimGroup -> {
                                         JsonElement displayName = ((JsonObject) scimGroup)
                                                 .get(ExternalIdPClientConstants.SCIM2_DISPLAY);
-                                        userGroupsDisplayNameList.add(displayName.getAsString());
+                                        if (displayName.getAsString().contains("/")) {
+                                            userGroupsDisplayNameList.add(displayName.getAsString());
+                                        } else {
+                                            userGroupsDisplayNameList.
+                                                    add(ExternalIdPClientConstants.PRIMARY_USER_STORE_PREFIX +
+                                                            displayName.getAsString());
+                                        }
                                     }
                             );
                             userRoles = allRolesInUserStore.stream()
@@ -356,7 +362,7 @@ public class ExternalIdPClient implements IdPClient {
         }
         OAuthApplicationInfo oAuthApplicationInfo = this.oAuthAppInfoMap.get(oAuthAppContext);
         Response response = oAuth2ServiceStubs.getTokenServiceStub().generateAuthCodeGrantAccessToken(code,
-                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + oAuthAppContext, null,
+                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + appContext, null,
                 oAuthApplicationInfo.getClientId(), oAuthApplicationInfo.getClientSecret());
         if (response == null) {
             String error = "Error occurred while generating an access token from code '" + code + "'. " +
