@@ -1378,7 +1378,7 @@
         <apache.servicemix.version>4.0-m1</apache.servicemix.version>
         <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
         <jsonpath.version>0.9.1</jsonpath.version>
-        <jsonsmart.version>1.2</jsonsmart.version>
+        <jsonsmart.version>2.3</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
 
