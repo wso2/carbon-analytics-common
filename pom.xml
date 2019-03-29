@@ -831,7 +831,7 @@
         <!--pax-exam dependencies-->
         <javax.inject.version>1</javax.inject.version>
         <pax.exam.version>4.6.0</pax.exam.version>
-        <pax.exam.testng.version>4.6.0</pax.exam.testng.version>
+        <pax.exam.testng.version>4.13.1</pax.exam.testng.version>
         <pax.exam.link.mvn.version>4.6.0</pax.exam.link.mvn.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
 
