@@ -798,7 +798,7 @@
         <carbon.datasources.version>1.1.4</carbon.datasources.version>
         <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
 
-        <feign.version>9.5.0</feign.version>
+        <feign.version>10.2.0</feign.version>
         <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
         <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
 
