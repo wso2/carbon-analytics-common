@@ -233,13 +233,7 @@ public class ExternalIdPClient implements IdPClient {
                             scimGroups.forEach(scimGroup -> {
                                         JsonElement displayName = ((JsonObject) scimGroup)
                                                 .get(ExternalIdPClientConstants.SCIM2_DISPLAY);
-                                        if (displayName.getAsString().contains("/")) {
-                                            userGroupsDisplayNameList.add(displayName.getAsString());
-                                        } else {
-                                            userGroupsDisplayNameList.
-                                                    add(ExternalIdPClientConstants.PRIMARY_USER_STORE_PREFIX +
-                                                            displayName.getAsString());
-                                        }
+                                        userGroupsDisplayNameList.add(displayName.getAsString());
                                     }
                             );
                             userRoles = allRolesInUserStore.stream()
@@ -362,7 +356,7 @@ public class ExternalIdPClient implements IdPClient {
         }
         OAuthApplicationInfo oAuthApplicationInfo = this.oAuthAppInfoMap.get(oAuthAppContext);
         Response response = oAuth2ServiceStubs.getTokenServiceStub().generateAuthCodeGrantAccessToken(code,
-                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + appContext, null,
+                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + oAuthAppContext, null,
                 oAuthApplicationInfo.getClientId(), oAuthApplicationInfo.getClientSecret());
         if (response == null) {
             String error = "Error occurred while generating an access token from code '" + code + "'. " +
@@ -382,11 +376,8 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
-                if (this.baseUrl.endsWith("/")) {
-                    returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + appContext);
-                } else {
-                    returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + "/" + appContext);
-                }
+                returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL,
+                        this.baseUrl + (this.baseUrl.endsWith("/") ? appContext : "/" + appContext));
                 Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
                         .introspectAccessToken(oAuth2TokenInfo.getAccessToken());
                 String authUser = null;
@@ -394,11 +385,7 @@ public class ExternalIdPClient implements IdPClient {
                     OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                             .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
                     String username = introspectResponse.getUsername();
-                    if (username.contains("@carbon.super")) {
-                        authUser = username.substring(0, username.indexOf("@carbon.super"));
-                    } else {
-                        authUser = username;
-                    }
+                    authUser = username.substring(0, username.indexOf("@carbon.super"));
                     returnProperties.put(IdPClientConstants.USERNAME, authUser);
                 } else {
                     if (LOG.isDebugEnabled()) {

@@ -99,7 +99,6 @@ public class ExternalIdPClientConstants {
     public static final String TOKEN_POSTFIX = "/token";
     public static final String INTROSPECT_POSTFIX = "/introspect";
     public static final String AUTHORIZE_POSTFIX = "/authorize";
-    public static final String PRIMARY_USER_STORE_PREFIX = "PRIMARY/";
 
     public static final String SCIM2_USERNAME = "userName";
     public static final String SCIM2_GROUPS = "groups";
