@@ -490,6 +490,12 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${com.fasterxml.jackson.core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -782,9 +788,9 @@
         <org.wso2.json.version>3.0.0.wso2v1</org.wso2.json.version>
 
         <!-- Latest Dependencies -->
-        <carbon.config.version>2.1.5</carbon.config.version>
+        <carbon.config.version>2.1.10</carbon.config.version>
         <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
-        <carbon.secvault.version>5.0.11</carbon.secvault.version>
+        <carbon.secvault.version>5.0.13</carbon.secvault.version>
         <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
@@ -805,10 +811,10 @@
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <msf4j.version>2.6.3</msf4j.version>
+        <msf4j.version>2.7.1</msf4j.version>
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
 
-        <com.fasterxml.jackson.core.version>2.9.6</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
         <io.swagger.version>1.5.16</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
