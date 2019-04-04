@@ -26,6 +26,7 @@ public final class ThriftDataReceiverConstants {
 
     private ThriftDataReceiverConstants() {
     }
+    public static final String ENABLE_THRIFT_RECEIVER = "enable";
     public static final String SECURE_PORT_ELEMENT = "sslPort";
     public static final String PORT_ELEMENT = "tcpPort";
     public static final String PROTOCOLS_ELEMENT = "sslEnabledProtocols";
