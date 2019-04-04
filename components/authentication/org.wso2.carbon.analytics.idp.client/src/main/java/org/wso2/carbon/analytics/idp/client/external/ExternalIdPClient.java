@@ -376,8 +376,8 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
-                returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL, this.baseUrl + appContext);
-
+                returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL,
+                        this.baseUrl + (this.baseUrl.endsWith("/") ? appContext : "/" + appContext));
                 Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
                         .introspectAccessToken(oAuth2TokenInfo.getAccessToken());
                 String authUser = null;
