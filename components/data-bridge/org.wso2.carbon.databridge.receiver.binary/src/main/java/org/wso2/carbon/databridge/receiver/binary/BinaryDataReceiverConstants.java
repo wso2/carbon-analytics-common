@@ -27,6 +27,7 @@ public class BinaryDataReceiverConstants {
     private BinaryDataReceiverConstants(){
 
     }
+    public static final String ENABLE_BINARY_DATA_RECEIVER = "enable";
     public static final int DEFAULT_SSL_RECEIVER_THREAD_POOL_SIZE = 100;
     public static final int DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE = 100;
     public static final int DEFAULT_SSL_RECEIVER_PORT = 9611;
