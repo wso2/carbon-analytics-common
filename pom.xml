@@ -111,11 +111,23 @@
                 <groupId>org.apache.rampart.wso2</groupId>
                 <artifactId>rampart-core</artifactId>
                 <version>${rampart.wso2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>log4j-over-slf4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.rampart.wso2</groupId>
                 <artifactId>rampart-policy</artifactId>
                 <version>${rampart.wso2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>log4j-over-slf4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.tyrus.bundles.wso2</groupId>
@@ -361,7 +373,7 @@
             <dependency>
                 <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
-                <version>${jsonpath.version}</version>
+                <version>${jayway.jsonpath.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.minidev</groupId>
@@ -1500,6 +1512,7 @@
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
         <jsonpath.version>2.4.0.wso2v2</jsonpath.version>
+        <jayway.jsonpath.orbit.version>2.4.0.wso2v2</jayway.jsonpath.orbit.version>
         <jsonsmart.version>1.2</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
