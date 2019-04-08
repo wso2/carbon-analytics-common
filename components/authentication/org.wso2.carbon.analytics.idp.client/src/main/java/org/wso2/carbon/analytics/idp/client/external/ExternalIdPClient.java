@@ -124,6 +124,11 @@ public class ExternalIdPClient implements IdPClient {
                     this.oAuthAppDAO.updateOAuthApp(persistedOAuthApp);
                 }
                 this.oAuthAppInfoMap.replace(oAuthApplicationInfoEntry.getKey(), persistedOAuthApp);
+            } else if (clientId != null && clientSecret != null) {
+                OAuthApplicationInfo oAuthApplicationInfo =
+                        new OAuthApplicationInfo(oAuthApplicationInfoEntry.getKey(), clientId, clientSecret);
+                this.oAuthAppDAO.addOAuthApp(oAuthApplicationInfo);
+                this.oAuthAppInfoMap.replace(oAuthApplicationInfoEntry.getKey(), oAuthApplicationInfo);
             } else {
                 registerApplication(oAuthApplicationInfoEntry.getKey(),
                         oAuthApplicationInfoEntry.getValue().getClientName(), kmUserName);
