@@ -773,7 +773,7 @@
         <carbon.kernel.pax.version>5.2.8</carbon.kernel.pax.version>
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
-        <disruptor.version>3.3.2.wso2v2</disruptor.version>
+        <disruptor.version>3.4.2.wso2v1</disruptor.version>
         <guava.version>20.0</guava.version>
         <guava.bundle.version>20.0.0</guava.bundle.version>
         <gson.version>2.5</gson.version>
