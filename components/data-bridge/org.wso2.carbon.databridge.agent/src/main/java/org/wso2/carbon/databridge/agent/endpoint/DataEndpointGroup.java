@@ -402,7 +402,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     private List<Event> trySendActiveEndpoints(List<Event> events, DataEndpoint failedEP) {
         ArrayList<Event> unsuccessfulEvents = new ArrayList<>();
         for (Event event : events) {
-            DataEndpoint endpoint = getDataEndpoint(false,failedEP);
+            DataEndpoint endpoint = getDataEndpoint(false, failedEP);
             if (endpoint != null) {
                 endpoint.collectAndSend(event);
             } else {
