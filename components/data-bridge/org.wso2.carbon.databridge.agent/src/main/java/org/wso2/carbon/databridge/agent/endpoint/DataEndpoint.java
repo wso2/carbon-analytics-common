@@ -286,24 +286,17 @@ public abstract class DataEndpoint {
                     semaphoreRelease();
                 } catch (Exception ex) {
                     log.error("Unexpected error occurred while sending the event. ", ex);
-                    handleFailedEvents();
-                } catch (Throwable t) {
-                    //There can be situations where runtime exceptions/class not found exceptions occur,
-                    //This block help to catch those exceptions.
-                    //No need to retry send events. Deactivating the state would be enough.
-                    log.error("Unexpected error occurred while sending events. ", t);
-                    semaphoreRelease();
-                    deactivate();
+                    handleFailedEvents(this.events);
                 }
             } catch (DataEndpointException e) {
                 log.error("Unable to send events to the endpoint. ", e);
-                handleFailedEvents();
+                handleFailedEvents(this.events);
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
                 semaphoreRelease();
             } catch (Exception ex) {
                 log.error("Unexpected error occurred while sending the event. ", ex);
-                handleFailedEvents();
+                handleFailedEvents(this.events);
             } catch (Throwable t) {
                 //There can be situations where runtime exceptions/class not found exceptions occur,
                 // This block help to catch those exceptions.
@@ -330,12 +323,6 @@ public abstract class DataEndpoint {
             this.semaphore = semaphore;
         }
 
-        private void handleFailedEvents() {
-            deactivate();
-            semaphoreRelease();
-            dataEndpointFailureCallback.tryResendEvents(events);
-        }
-
         private void publish() throws DataEndpointException, SessionTimeoutException, UndefinedEventTypeException {
             Object client = getClient();
             try {
@@ -351,6 +338,11 @@ public abstract class DataEndpoint {
                 this.semaphore.release();
             }
         }
+    }
+
+    private void handleFailedEvents(List<Event> events) {
+        deactivate();
+        dataEndpointFailureCallback.tryResendEvents(events, this);
     }
 
     boolean isConnected() {
