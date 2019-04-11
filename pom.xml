@@ -799,7 +799,7 @@
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <msf4j.version>2.7.1</msf4j.version>
+        <msf4j.version>2.7.2</msf4j.version>
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
 
         <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
