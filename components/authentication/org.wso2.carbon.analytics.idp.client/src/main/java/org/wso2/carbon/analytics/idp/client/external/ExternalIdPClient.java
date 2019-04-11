@@ -484,12 +484,11 @@ public class ExternalIdPClient implements IdPClient {
         String callBackUrl;
         if (clientName.equals(ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT)) {
             callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH +
-                    ExternalIdPClientConstants.REGEX_BASE_END;
+                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.REGEX_BASE_END;
         } else {
             callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH
-                    + appContext + ExternalIdPClientConstants.REGEX_BASE_END;
+                    ExternalIdPClientConstants.CALLBACK_URL + appContext +
+                    ExternalIdPClientConstants.REGEX_BASE_END;
         }
 
         if (LOG.isDebugEnabled()) {
