@@ -713,7 +713,7 @@
         <httpclient.version>4.3.6.wso2v2</httpclient.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
-        <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
+        <equinox.osgi.services.version>3.5.100.v20160504-1419</equinox.osgi.services.version>
 
         <pax.logging.log4j2.version>1.10.0</pax.logging.log4j2.version>
         <apache.felix.gogo.command.version>0.10.0.v201209301215</apache.felix.gogo.command.version>
