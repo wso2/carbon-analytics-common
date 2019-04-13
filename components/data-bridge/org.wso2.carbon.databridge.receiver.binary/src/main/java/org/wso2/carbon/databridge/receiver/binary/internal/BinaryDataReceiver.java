@@ -62,14 +62,20 @@ public class BinaryDataReceiver {
     }
 
     public void start() throws IOException, DataBridgeException {
-        startSecureTransmission();
-        startEventTransmission();
+
+        if (binaryDataReceiverConfiguration.isEnable()) {
+            startSecureTransmission();
+            startEventTransmission();
+        }
     }
 
     public void stop() {
-        log.info("Stopping Binary Server..");
-        sslReceiverExecutorService.shutdown();
-        tcpReceiverExecutorService.shutdown();
+
+        if (binaryDataReceiverConfiguration.isEnable()) {
+            log.info("Stopping Binary Server..");
+            sslReceiverExecutorService.shutdown();
+            tcpReceiverExecutorService.shutdown();
+        }
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {

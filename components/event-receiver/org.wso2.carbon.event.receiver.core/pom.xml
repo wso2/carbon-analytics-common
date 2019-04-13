@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-receiver</artifactId>
-        <version>5.1.51-SNAPSHOT</version>
+        <version>5.1.57-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -114,13 +114,13 @@
                             org.wso2.carbon.event.receiver.core.internal,
                             org.wso2.carbon.event.receiver.core.internal.*,
                             <!--org.slf4j.*,-->
-                            com.jayway.jsonpath.*
+                            org.wso2.orbit.com.jayway.jsonpath.*
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.event.receiver.core.internal,
                             !org.wso2.carbon.event.receiver.core.internal.*,
                             <!--!org.slf4j.*,-->
-                            !com.jayway.jsonpath.*,
+                            !org.wso2.orbit.com.jayway.jsonpath.*,
                             org.wso2.carbon.event.receiver.*
                         </Export-Package>
                         <Import-Package>

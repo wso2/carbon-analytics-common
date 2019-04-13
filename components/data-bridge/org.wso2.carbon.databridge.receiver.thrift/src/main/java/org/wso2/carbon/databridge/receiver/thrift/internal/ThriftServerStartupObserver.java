@@ -46,7 +46,7 @@ public class ThriftServerStartupObserver implements ServerStartupObserver {
             ThriftDataReceiverConfiguration thriftDataReceiverConfiguration = new
                     ThriftDataReceiverConfiguration(ServiceHolder.getDataBridgeReceiverService().getInitialConfig());
 
-            if (ServiceHolder.getDataReceiver() == null) {
+            if (thriftDataReceiverConfiguration.isEnable() && ServiceHolder.getDataReceiver() == null) {
                 ServiceHolder.setDataReceiver(new ThriftDataReceiverFactory().createAgentServer(thriftDataReceiverConfiguration, ServiceHolder.getDataBridgeReceiverService()));
                 String serverUrl = CarbonUtils.getServerURL(ServiceHolder.getServerConfiguration(), ServiceHolder.getConfigurationContext().getServerConfigContext());
                 String hostName = thriftDataReceiverConfiguration.getReceiverHostName();
@@ -81,6 +81,8 @@ public class ThriftServerStartupObserver implements ServerStartupObserver {
                         new Hashtable(),
                         ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());
 
+            } else {
+                log.info(" Thrift Data Receiver is disabled.");
             }
         } catch (DataBridgeException e) {
             log.error("Can not create and start Agent Server ", e);
