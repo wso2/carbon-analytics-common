@@ -28,6 +28,8 @@ import org.wso2.carbon.utils.CarbonUtils;
  * configuration details related to DataReceiver
  */
 public class ThriftDataReceiverConfiguration {
+
+    private boolean enable = true;
     private int secureDataReceiverPort;
     private int dataReceiverPort;
     private String sslProtocols;
@@ -83,6 +85,7 @@ public class ThriftDataReceiverConfiguration {
                 ThriftDataReceiverConstants.THRIFT_SSL_REQUEST_TIMEOUT, sslRequestTimeout).toString());
         sslStopTimeoutVal = Integer.parseInt(dataReceiver.getConfiguration(
                 ThriftDataReceiverConstants.THRIFT_SSL_STOP_TIMEOUT_VAL, sslStopTimeoutVal).toString());
+        enable = Boolean.valueOf(dataReceiver.getConfiguration(ThriftDataReceiverConstants.ENABLE_THRIFT_RECEIVER, enable).toString());
     }
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort,
@@ -204,5 +207,10 @@ public class ThriftDataReceiverConfiguration {
 
     public void setSslStopTimeoutVal(int sslStopTimeoutVal) {
         this.sslStopTimeoutVal = sslStopTimeoutVal;
+    }
+
+    public boolean isEnable() {
+
+        return enable;
     }
 }
