@@ -152,6 +152,8 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         String kmTokenUrl = properties.getOrDefault(ExternalIdPClientConstants.KM_TOKEN_URL,
                 ExternalIdPClientConstants.DEFAULT_KM_TOKEN_URL);
         String dcrAppOwner = properties.getOrDefault(ExternalIdPClientConstants.DCR_APP_OWNER, kmUsername);
+        String introspectUrl = properties.getOrDefault(ExternalIdPClientConstants.INTROSPECTION_URL,
+                kmTokenUrl + ExternalIdPClientConstants.INTROSPECT_POSTFIX);
 
         String idPBaseUrl = properties.getOrDefault(ExternalIdPClientConstants.IDP_BASE_URL,
                 ExternalIdPClientConstants.DEFAULT_IDP_BASE_URL);
@@ -174,6 +176,9 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 ExternalIdPClientConstants.DEFAULT_STATUS_DB_APP_CONTEXT);
         String businessAppContext = properties.getOrDefault(ExternalIdPClientConstants.BR_DB_APP_CONTEXT,
                 ExternalIdPClientConstants.DEFAULT_BR_DB_APP_CONTEXT);
+
+        String defaultUserStore = properties.getOrDefault(ExternalIdPClientConstants.USER_STORE,
+                ExternalIdPClientConstants.DEFAULT_USER_STORE);
 
         OAuthApplicationInfo spOAuthApp = new OAuthApplicationInfo(
                 ExternalIdPClientConstants.SP_APP_NAME,
@@ -220,8 +225,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 .build(kmUsername, kmPassword, connectionTimeout, readTimeout, DCRMServiceStub.class, dcrEndpoint);
         OAuth2ServiceStubs keyManagerServiceStubs = new OAuth2ServiceStubs(
                 this.analyticsHttpClientBuilderService, kmTokenUrl + ExternalIdPClientConstants.TOKEN_POSTFIX,
-                kmTokenUrl + ExternalIdPClientConstants.REVOKE_POSTFIX,
-                kmTokenUrl + ExternalIdPClientConstants.INTROSPECT_POSTFIX,
+                kmTokenUrl + ExternalIdPClientConstants.REVOKE_POSTFIX, introspectUrl,
                 kmUsername, kmPassword, connectionTimeout, readTimeout);
         SCIM2ServiceStub scimServiceStub = this.analyticsHttpClientBuilderService
                 .build(idPUserName, idPPassword, connectionTimeout, readTimeout, SCIM2ServiceStub.class, idPBaseUrl);
@@ -231,7 +235,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
                 kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
                 adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
-                keyManagerServiceStubs, scimServiceStub);
+                keyManagerServiceStubs, scimServiceStub, defaultUserStore);
         externalIdPClient.init(dcrAppOwner);
         return externalIdPClient;
     }
