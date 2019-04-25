@@ -405,9 +405,7 @@ public class ExternalIdPClient implements IdPClient {
                 if (introspectTokenResponse.status() == 200) {   //200 - Success
                     OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                             .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
-                    String username = introspectResponse.getUsername();
-                    authUser = username.substring(0, username.indexOf("@carbon.super"));
-                    returnProperties.put(IdPClientConstants.USERNAME, authUser);
+                    returnProperties.put(IdPClientConstants.USERNAME, introspectResponse.getUsername());
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Unable to get the username from introspection of the token '" +
