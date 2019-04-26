@@ -47,7 +47,7 @@ public class OAuth2IntrospectionResponse {
     @SerializedName("nbf")
     private long nbf;
     @SerializedName("token_type")
-    private String token_type;
+    private String tokenType;
 
     public boolean isActive() {
         return active;
@@ -129,11 +129,11 @@ public class OAuth2IntrospectionResponse {
         this.nbf = nbf;
     }
 
-    public String getToken_type() {
-        return token_type;
+    public String getTokenType() {
+        return tokenType;
     }
 
-    public void setToken_type(String token_type) {
-        this.token_type = token_type;
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
     }
 }
