@@ -110,7 +110,7 @@ public class OAuth2ServiceStubs {
     public interface TokenServiceStub {
 
         @Headers("Authorization: Basic {auth_token}")
-        @RequestLine("POST /")
+        @RequestLine("POST")
         Response generateAccessToken(@Param("auth_token") String authToken, String body);
 
         /**
@@ -182,7 +182,7 @@ public class OAuth2ServiceStubs {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     public interface RevokeServiceStub {
 
-        @RequestLine("POST /")
+        @RequestLine("POST")
         @Headers("Authorization: Basic {auth_token}")
         Response revokeToken(@Param("auth_token") String authToken, String token);
 
@@ -207,7 +207,7 @@ public class OAuth2ServiceStubs {
      */
     @Headers("Content-Type: application/x-www-form-urlencoded")
     public interface IntrospectionServiceStub {
-        @RequestLine("POST /")
+        @RequestLine("POST")
         Response introspectToken(String token);
 
         default Response introspectAccessToken(String token) {
