@@ -28,7 +28,7 @@ import feign.Response;
 public interface DCRMServiceStub {
 
     @Headers("Content-Type: application/json")
-    @RequestLine("POST /")
+    @RequestLine("POST")
     Response registerApplication(String dcrClientInfo);
 
 }
