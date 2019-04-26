@@ -405,7 +405,8 @@ public class ExternalIdPClient implements IdPClient {
                 if (introspectTokenResponse.status() == 200) {   //200 - Success
                     OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                             .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
-                    returnProperties.put(IdPClientConstants.USERNAME, introspectResponse.getUsername());
+                    authUser = introspectResponse.getUsername();
+                    returnProperties.put(IdPClientConstants.USERNAME, authUser);
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Unable to get the username from introspection of the token '" +
@@ -413,8 +414,10 @@ public class ExternalIdPClient implements IdPClient {
                                 introspectTokenResponse.toString());
                     }
                 }
-                tokenCache.put(oAuth2TokenInfo.getAccessToken(),
-                        new ExternalSession(authUser, oAuth2TokenInfo.getAccessToken()));
+                if (authUser != null) {
+                    tokenCache.put(oAuth2TokenInfo.getAccessToken(),
+                            new ExternalSession(authUser, oAuth2TokenInfo.getAccessToken()));
+                }
                 return returnProperties;
             } catch (IOException e) {
                 String error = "Error occurred while parsing token response. Response : '" +
