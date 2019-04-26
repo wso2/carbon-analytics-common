@@ -44,6 +44,10 @@ public class OAuth2IntrospectionResponse {
     private long exp;
     @SerializedName("iat")
     private long iat;
+    @SerializedName("nbf")
+    private long nbf;
+    @SerializedName("token_type")
+    private String token_type;
 
     public boolean isActive() {
         return active;
@@ -115,5 +119,21 @@ public class OAuth2IntrospectionResponse {
 
     public void setIat(long iat) {
         this.iat = iat;
+    }
+
+    public long getNbf() {
+        return nbf;
+    }
+
+    public void setNbf(long nbf) {
+        this.nbf = nbf;
+    }
+
+    public String getToken_type() {
+        return token_type;
+    }
+
+    public void setToken_type(String token_type) {
+        this.token_type = token_type;
     }
 }
