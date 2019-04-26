@@ -395,6 +395,7 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                 returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oAuth2TokenInfo.getAccessToken());
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
+                returnProperties.put(IdPClientConstants.ID_TOKEN, oAuth2TokenInfo.getIdToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
                 returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL,

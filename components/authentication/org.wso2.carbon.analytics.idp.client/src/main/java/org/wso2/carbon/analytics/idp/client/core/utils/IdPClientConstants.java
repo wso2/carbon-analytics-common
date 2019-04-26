@@ -35,6 +35,7 @@ public class IdPClientConstants {
     public static final String APP_NAME = "App_Name";
     public static final String ACCESS_TOKEN = "Access_Token";
     public static final String REFRESH_TOKEN = "Refresh_Token";
+    public static final String ID_TOKEN = "ID_Token";
     public static final String VALIDITY_PERIOD = "Validity_Period";
     public static final String REFRESH_VALIDITY_PERIOD = "Refresh_Validity_Period";
     public static final String REMEMBER_ME = "Remember_Me";
