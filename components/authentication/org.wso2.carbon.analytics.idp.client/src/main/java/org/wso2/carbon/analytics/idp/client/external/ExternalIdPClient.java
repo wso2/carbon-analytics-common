@@ -463,12 +463,8 @@ public class ExternalIdPClient implements IdPClient {
         if (!isSSOEnabled) {
             returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "false");
         } else {
-            String idToken = properties.get(IdPClientConstants.ID_TOKEN_KEY);
-            if (idToken == null) {
-                LOG.error("Unable to extract ID token form the request.");
-                throw new IdPClientException("Invalid Request");
-            }
             returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "true");
+            String idToken = properties.get(IdPClientConstants.ID_TOKEN_KEY);
             String targetURIForRedirection = ssoLogoutURL
                     .concat(ExternalIdPClientConstants.SSO_LOGING_ID_TOKEN_TAIL).concat(idToken);
             returnProperties.put(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL, targetURIForRedirection);
