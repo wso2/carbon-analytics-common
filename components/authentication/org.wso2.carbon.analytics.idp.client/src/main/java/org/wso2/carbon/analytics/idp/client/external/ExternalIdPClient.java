@@ -72,6 +72,8 @@ public class ExternalIdPClient implements IdPClient {
     private OAuthAppDAO oAuthAppDAO;
     private String defaultUserStore;
     private Cache<String, ExternalSession> tokenCache;
+    private boolean isSSOEnabled;
+    private String ssoLogoutURL;
 
     //Here the user given context are mapped to the OAuthApp Info.
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
@@ -80,7 +82,7 @@ public class ExternalIdPClient implements IdPClient {
                              String adminRoleDisplayName, Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
                              int cacheTimeout, OAuthAppDAO oAuthAppDAO, DCRMServiceStub dcrmServiceStub,
                              OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub,
-                             String defaultUserStore) {
+                             String defaultUserStore, boolean isSSOEnabled, String ssoLogoutURL) {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
         this.grantType = grantType;
@@ -97,6 +99,8 @@ public class ExternalIdPClient implements IdPClient {
                 .expireAfterWrite(cacheTimeout, TimeUnit.SECONDS)
                 .build();
         this.defaultUserStore = defaultUserStore;
+        this.isSSOEnabled = isSSOEnabled;
+        this.ssoLogoutURL = ssoLogoutURL;
     }
 
     private static String removeCRLFCharacters(String str) {
@@ -395,7 +399,7 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.LOGIN_STATUS, IdPClientConstants.LoginStatus.LOGIN_SUCCESS);
                 returnProperties.put(IdPClientConstants.ACCESS_TOKEN, oAuth2TokenInfo.getAccessToken());
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
-                returnProperties.put(IdPClientConstants.ID_TOKEN, oAuth2TokenInfo.getIdToken());
+                returnProperties.put(IdPClientConstants.ID_TOKEN_KEY, oAuth2TokenInfo.getIdToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
                 returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL,
@@ -442,7 +446,7 @@ public class ExternalIdPClient implements IdPClient {
     }
 
     @Override
-    public void logout(Map<String, String> properties) throws IdPClientException {
+    public Map<String, String> logout(Map<String, String> properties) throws IdPClientException {
         String token = properties.get(IdPClientConstants.ACCESS_TOKEN);
         String oAuthAppContext = properties.getOrDefault(IdPClientConstants.APP_NAME,
                 ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT);
@@ -454,6 +458,22 @@ public class ExternalIdPClient implements IdPClient {
                 token,
                 this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                 this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
+
+        Map<String, String> returnProperties = new HashMap<>();
+        if (!isSSOEnabled) {
+            returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "false");
+        } else {
+            String idToken = properties.get(IdPClientConstants.ID_TOKEN_KEY);
+            if (idToken == null) {
+                LOG.error("Unable to extract ID token form the request.");
+                throw new IdPClientException("Invalid Request");
+            }
+            returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "true");
+            String targetURIForRedirection = ssoLogoutURL
+                    .concat(ExternalIdPClientConstants.SSO_LOGING_ID_TOKEN_TAIL).concat(idToken);
+            returnProperties.put(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL, targetURIForRedirection);
+        }
+        return returnProperties;
     }
 
     @Override
