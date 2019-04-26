@@ -216,9 +216,9 @@ public class OAuthAppDAO {
             conn.setAutoCommit(false);
             ps = conn.prepareStatement(query);
             ps.setString(1, oAuthApplicationInfo.getClientId());
-            ps.setString(2, oAuthApplicationInfo.getClientSecret());
             byte[] encrypt = this.secretRepository.encrypt(oAuthApplicationInfo.getClientSecret().getBytes("UTF-8"));
-            ps.setBytes(3, encrypt);
+            ps.setBytes(2, encrypt);
+            ps.setString(3, oAuthApplicationInfo.getClientName());
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Executing query: " + query);
             }
