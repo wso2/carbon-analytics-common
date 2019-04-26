@@ -70,23 +70,25 @@ public class ExternalIdPClient implements IdPClient {
     private String signingAlgo;
     private String adminRoleDisplayName;
     private OAuthAppDAO oAuthAppDAO;
-
+    private String defaultUserStore;
     private Cache<String, ExternalSession> tokenCache;
 
     //Here the user given context are mapped to the OAuthApp Info.
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
 
-    public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String singingAlgo,
+    public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String signinAlgo,
                              String adminRoleDisplayName, Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
                              int cacheTimeout, OAuthAppDAO oAuthAppDAO, DCRMServiceStub dcrmServiceStub,
-                             OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub)
-            throws IdPClientException {
+                             OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub,
+                             String defaultUserStore) {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
         this.grantType = grantType;
-        this.signingAlgo = singingAlgo;
+        this.signingAlgo = signinAlgo;
         this.oAuthAppInfoMap = oAuthAppInfoMap;
-        this.adminRoleDisplayName = adminRoleDisplayName;
+        // If the admin role doesn't contain the user store, prepend the default user store.
+        this.adminRoleDisplayName = adminRoleDisplayName.contains("/") ?
+                adminRoleDisplayName  : defaultUserStore + "/" +  adminRoleDisplayName;
         this.oAuthAppDAO = oAuthAppDAO;
         this.dcrmServiceStub = dcrmServiceStub;
         this.oAuth2ServiceStubs = oAuth2ServiceStubs;
@@ -94,6 +96,7 @@ public class ExternalIdPClient implements IdPClient {
         this.tokenCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(cacheTimeout, TimeUnit.SECONDS)
                 .build();
+        this.defaultUserStore = defaultUserStore;
     }
 
     private static String removeCRLFCharacters(String str) {
@@ -108,11 +111,16 @@ public class ExternalIdPClient implements IdPClient {
         if (!this.oAuthAppDAO.tableExists()) {
             this.oAuthAppDAO.createTable();
         }
-        for (Map.Entry<String, OAuthApplicationInfo> oAuthApplicationInfoEntry : this.oAuthAppInfoMap.entrySet()) {
-            String clientId = oAuthApplicationInfoEntry.getValue().getClientId();
-            String clientSecret = oAuthApplicationInfoEntry.getValue().getClientSecret();
-            OAuthApplicationInfo persistedOAuthApp =
-                    this.oAuthAppDAO.getOAuthApp(oAuthApplicationInfoEntry.getValue().getClientName());
+
+        for (Map.Entry<String, OAuthApplicationInfo> entry : this.oAuthAppInfoMap.entrySet()) {
+            String appContext = entry.getKey();
+            OAuthApplicationInfo oAuthApp = entry.getValue();
+
+            String clientId = oAuthApp.getClientId();
+            String clientSecret = oAuthApp.getClientSecret();
+            String clientName = oAuthApp.getClientName();
+
+            OAuthApplicationInfo persistedOAuthApp = this.oAuthAppDAO.getOAuthApp(clientName);
             if (persistedOAuthApp != null) {
                 if (clientId != null || clientSecret != null) {
                     if (clientId != null) {
@@ -123,15 +131,13 @@ public class ExternalIdPClient implements IdPClient {
                     }
                     this.oAuthAppDAO.updateOAuthApp(persistedOAuthApp);
                 }
-                this.oAuthAppInfoMap.replace(oAuthApplicationInfoEntry.getKey(), persistedOAuthApp);
+                this.oAuthAppInfoMap.replace(appContext, persistedOAuthApp);
             } else if (clientId != null && clientSecret != null) {
-                OAuthApplicationInfo oAuthApplicationInfo =
-                        new OAuthApplicationInfo(oAuthApplicationInfoEntry.getKey(), clientId, clientSecret);
-                this.oAuthAppDAO.addOAuthApp(oAuthApplicationInfo);
-                this.oAuthAppInfoMap.replace(oAuthApplicationInfoEntry.getKey(), oAuthApplicationInfo);
+                OAuthApplicationInfo newOAuthApp = new OAuthApplicationInfo(clientName, clientId, clientSecret);
+                this.oAuthAppDAO.addOAuthApp(newOAuthApp);
+                this.oAuthAppInfoMap.replace(appContext, newOAuthApp);
             } else {
-                registerApplication(oAuthApplicationInfoEntry.getKey(),
-                        oAuthApplicationInfoEntry.getValue().getClientName(), kmUserName);
+                registerApplication(appContext, clientName, kmUserName);
             }
         }
     }
@@ -149,9 +155,9 @@ public class ExternalIdPClient implements IdPClient {
                 SCIMGroupList scimGroups = (SCIMGroupList) new GsonDecoder().decode(response, SCIMGroupList.class);
                 List<SCIMGroupList.SCIMGroupResources> resources = scimGroups.getResources();
                 if (resources != null) {
-                    return resources.stream().map(
-                            (resource) -> new Role(resource.getId(), resource.getDisplayName())
-                    ).collect(Collectors.toList());
+                    return resources.stream()
+                            .map((resource) -> new Role(resource.getId(), resource.getDisplayName()))
+                            .collect(Collectors.toList());
                 }
                 return new ArrayList<>();
             } catch (IOException e) {
@@ -170,8 +176,7 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public Role getAdminRole() throws IdPClientException {
-        Response response = scimServiceStub
-                .getFilteredGroups(ExternalIdPClientConstants.FILTER_PREFIX_GROUP + this.adminRoleDisplayName);
+        Response response = scimServiceStub.getAllGroups();
         if (response == null) {
             String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName +
                     "'. Error : Response is null.";
@@ -183,7 +188,11 @@ public class ExternalIdPClient implements IdPClient {
                 SCIMGroupList scimGroups = (SCIMGroupList) new GsonDecoder().decode(response, SCIMGroupList.class);
                 List<SCIMGroupList.SCIMGroupResources> resources = scimGroups.getResources();
                 if (resources != null) {
-                    return new Role(resources.get(0).getId(), resources.get(0).getDisplayName());
+                    for (SCIMGroupList.SCIMGroupResources resource : resources) {
+                        if (resource.getDisplayName().equalsIgnoreCase(this.adminRoleDisplayName)) {
+                            return new Role(resource.getId(), resource.getDisplayName());
+                        }
+                    }
                 }
                 String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName +
                         "'. Admin role not found in the user store.";
@@ -207,55 +216,63 @@ public class ExternalIdPClient implements IdPClient {
     public User getUser(String name) throws IdPClientException {
         Response response = scimServiceStub.searchUser(ExternalIdPClientConstants.FILTER_PREFIX_USER + name);
         if (response == null) {
-            String errorMessage =
-                    "Error occurred while retrieving user, '" + name + "'. Error : Response is null.";
+            String errorMessage = "Error occurred while retrieving user, '" + name + "'. Error : Response is null.";
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
+
+        JsonParser parser = new JsonParser();
         if (response.status() == 200) {
-            String responseBody = response.body().toString();
-            JsonParser parser = new JsonParser();
-            JsonObject parsedResponseBody = (JsonObject) parser.parse(responseBody);
-            JsonArray users = (JsonArray) parsedResponseBody.get(ExternalIdPClientConstants.RESOURCES);
-            if (users != null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Retrieving all roles for getting role id of the roles of the user '" + name + "'.");
-                }
-                List<Role> allRolesInUserStore = getAllRoles();
+            JsonObject userObject = parser.parse(response.body().toString()).getAsJsonObject();
+            JsonArray users = userObject.get(ExternalIdPClientConstants.RESOURCES).getAsJsonArray();
 
-                Map<String, String> userProperties = new HashMap<>();
-                List<Role> userRoles = new ArrayList<>();
-
-                JsonObject scimUser = (JsonObject) users.get(0);
-                for (Map.Entry<String, JsonElement> entry : scimUser.entrySet()) {
-                    switch (entry.getKey()) {
-                        case ExternalIdPClientConstants.SCIM2_USERNAME:
-                            break;
-                        case ExternalIdPClientConstants.SCIM2_GROUPS:
-                            JsonArray scimGroups = scimUser.get(ExternalIdPClientConstants.SCIM2_GROUPS)
-                                    .getAsJsonArray();
-                            List<String> userGroupsDisplayNameList = new ArrayList<>();
-                            scimGroups.forEach(scimGroup -> {
-                                        JsonElement displayName = ((JsonObject) scimGroup)
-                                                .get(ExternalIdPClientConstants.SCIM2_DISPLAY);
-                                        userGroupsDisplayNameList.add(displayName.getAsString());
-                                    }
-                            );
-                            userRoles = allRolesInUserStore.stream()
-                                    .filter(role -> userGroupsDisplayNameList.contains(role.getDisplayName()))
-                                    .collect(Collectors.toList());
-                            break;
-                        default:
-                            userProperties.put(entry.getKey(), entry.getValue().toString());
-                    }
-                }
-                return new User(name, userProperties, userRoles);
-            } else {
+            if (users == null) {
                 return null;
             }
+
+            JsonObject user = users.get(0).getAsJsonObject();
+            // Check if the user groups are there in the user object. If not do a separate call and get the user with
+            // roles.
+            JsonElement groupsElement = user.get(ExternalIdPClientConstants.SCIM2_GROUPS);
+            JsonArray groups;
+            if (groupsElement != null) {
+                groups = groupsElement.getAsJsonArray();
+            } else {
+                String id = user.get(ExternalIdPClientConstants.SCIM2_ID).getAsString();
+                Response userResponse = scimServiceStub.getUserByID(id);
+                user = parser.parse(userResponse.body().toString()).getAsJsonObject();
+                groups = user.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
+            }
+
+            // Get user roles
+            List<Role> allRolesInUserStore = getAllRoles();
+            List<String> groupNameList = new ArrayList<>();
+            groups.forEach(group -> {
+                // In SCIM1 (IS 5.2.0) groupName doesn't contain the user store, but 5.7.0 it is. Hence prepending the
+                // user store if it is not available as a workaround. Need a proper fix for this though.
+                String groupName = group.getAsJsonObject().get(ExternalIdPClientConstants.SCIM2_DISPLAY).getAsString();
+                if (!groupName.contains("/")) {
+                    groupName = this.defaultUserStore + "/" + groupName;
+                }
+                groupNameList.add(groupName);
+            });
+
+            List<Role> roles = allRolesInUserStore.stream()
+                    .filter(role -> groupNameList.contains(role.getDisplayName()))
+                    .collect(Collectors.toList());
+
+            // Add user properties
+            Map<String, String> properties = new HashMap<>();
+            for (Map.Entry<String, JsonElement> entry : user.entrySet()) {
+                if (!entry.getKey().equals(ExternalIdPClientConstants.SCIM2_USERNAME) ||
+                    !entry.getKey().equals(ExternalIdPClientConstants.SCIM2_GROUPS)) {
+                    properties.put(entry.getKey(), entry.getValue().toString());
+                }
+            }
+            return new User(name, properties, roles);
         } else {
-            String errorMessage = "Error occurred while retrieving user, '" + name + "'. HTTP error code: "
-                    + response.status() + " Error Response: " + getErrorMessage(response);
+            String errorMessage = "Error occurred while retrieving user, '" + name + "'. " +
+                    "HTTP error code: " + response.status() + " Error Response: " + getErrorMessage(response);
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
@@ -263,15 +280,14 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public List<Role> getUserRoles(String name) throws IdPClientException {
-        List<Role> userGroups = new ArrayList<>();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Retrieving user roles by retrieving user '" + name + "'.");
         }
         User user = getUser(name);
         if (user != null) {
-            userGroups = user.getRoles();
+            return user.getRoles();
         }
-        return userGroups;
+        return new ArrayList<>();
     }
 
     @Override
@@ -441,10 +457,11 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public String authenticate(String token) throws AuthenticationException, IdPClientException {
-        ExternalSession ifPresent = tokenCache.getIfPresent(token);
-        if (ifPresent != null) {
-            return ifPresent.getUserName();
+        ExternalSession session = tokenCache.getIfPresent(token);
+        if (session != null) {
+            return session.getUserName();
         }
+
         Response response = oAuth2ServiceStubs.getIntrospectionServiceStub()
                 .introspectAccessToken(token);
 
@@ -490,12 +507,11 @@ public class ExternalIdPClient implements IdPClient {
         String callBackUrl;
         if (clientName.equals(ExternalIdPClientConstants.DEFAULT_SP_APP_CONTEXT)) {
             callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH +
-                    ExternalIdPClientConstants.REGEX_BASE_END;
+                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.REGEX_BASE_END;
         } else {
             callBackUrl = ExternalIdPClientConstants.REGEX_BASE_START + this.baseUrl +
-                    ExternalIdPClientConstants.CALLBACK_URL + ExternalIdPClientConstants.FORWARD_SLASH
-                    + appContext + ExternalIdPClientConstants.REGEX_BASE_END;
+                    ExternalIdPClientConstants.CALLBACK_URL + appContext +
+                    ExternalIdPClientConstants.REGEX_BASE_END;
         }
 
         if (LOG.isDebugEnabled()) {

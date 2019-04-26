@@ -84,6 +84,9 @@ public class ExternalIdPClientConstants {
     public static final String REDIRECT_URL = "Redirect_Url";
     public static final String CALLBACK_URL_NAME = "Callback_Url";
     public static final String REQUEST_URL = "REQUEST_URL";
+    public static final String USER_STORE = "defaultUserStore";
+    public static final String DEFAULT_USER_STORE = "PRIMARY";
+    public static final String INTROSPECTION_URL = "introspectionUrl";
 
     public static final String CALLBACK_URL = "/login/callback/";
     public static final String REGEX_BASE_START = "regexp=(";
@@ -103,6 +106,7 @@ public class ExternalIdPClientConstants {
     public static final String SCIM2_USERNAME = "userName";
     public static final String SCIM2_GROUPS = "groups";
     public static final String SCIM2_DISPLAY = "display";
+    public static final String SCIM2_ID = "id";
 
     public static final String OAUTHAPP_TABLE = "OAUTHAPP";
     public static final String OAUTH_APP_TABLE_CHECK = "OAUTH_APP_TABLE_CHECK";

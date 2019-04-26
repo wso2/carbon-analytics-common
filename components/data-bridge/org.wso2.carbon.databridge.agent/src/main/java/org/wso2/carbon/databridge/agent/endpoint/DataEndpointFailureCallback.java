@@ -33,6 +33,6 @@ public interface DataEndpointFailureCallback {
      * @param events List failed events
      *
      */
-    public void tryResendEvents(List<Event> events);
+    public void tryResendEvents(List<Event> events, DataEndpoint failedEP);
 
 }

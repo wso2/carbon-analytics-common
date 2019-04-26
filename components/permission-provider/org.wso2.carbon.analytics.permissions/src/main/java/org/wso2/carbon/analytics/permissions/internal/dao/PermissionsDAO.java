@@ -300,6 +300,12 @@ public class PermissionsDAO {
      * @param role
      */
     public void grantPermission(Permission permission, Role role) {
+        List<Role> roles = new ArrayList<>();
+        roles.add(role);
+        if (hasPermission(roles, permission)) {
+            return;
+        }
+
         Connection conn = null;
         PreparedStatement ps = null;
         String uuid = PermissionUtil.createPermissionID(permission);
