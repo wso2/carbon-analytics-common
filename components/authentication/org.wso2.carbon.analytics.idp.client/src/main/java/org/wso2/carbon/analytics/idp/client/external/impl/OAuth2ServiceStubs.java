@@ -148,11 +148,12 @@ public class OAuth2ServiceStubs {
                                                           String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-
+            code = code.split("&")[0];
             Map<String, String> requestParam = new HashMap<>();
             requestParam.put("grant_type", IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
             requestParam.put("code", code);
             requestParam.put("redirect_uri", redirectUri);
+            requestParam.put("scope", "openid");
             return generateAccessToken(authToken, ExternalIdPClientUtil.getRequestBody(requestParam));
         }
 
