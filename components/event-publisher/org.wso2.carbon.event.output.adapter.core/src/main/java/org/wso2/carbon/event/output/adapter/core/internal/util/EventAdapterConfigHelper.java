@@ -18,11 +18,14 @@
 
 package org.wso2.carbon.event.output.adapter.core.internal.util;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.*;
 import org.wso2.carbon.core.util.CryptoException;
+import org.wso2.carbon.core.util.CryptoUtil;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.internal.EventAdapterConstants;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
@@ -33,14 +36,17 @@ import org.wso2.securevault.SecretResolverFactory;
 
 import org.apache.xerces.impl.Constants;
 import org.apache.xerces.util.SecurityManager;
-
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Iterator;
 
 public class EventAdapterConfigHelper {
 
@@ -61,11 +67,57 @@ public class EventAdapterConfigHelper {
         }
     }
 
+    public static void secureResolveOmElement(OMElement doc) throws OutputEventAdapterException {
+
+        if (doc != null) {
+            try {
+                secretResolver = SecretResolverFactory.create(doc, true);
+                secureLoadOMElement(doc);
+            } catch (CryptoException e) {
+                throw new OutputEventAdapterException("Error in secure load of global output event adapter properties: " +
+                        e.getMessage(), e);
+            }
+        }
+    }
+
+    private static void secureLoadOMElement(OMElement element) throws CryptoException {
+
+        String alias = MiscellaneousUtil.getProtectedToken(element.getText());
+        if (alias != null && !alias.isEmpty()) {
+            element.setText(loadFromSecureVault(alias));
+        } else {
+            OMAttribute secureAttr = element.getAttribute(new QName(EventAdapterConstants.SECURE_VAULT_NS,
+                    EventAdapterConstants.SECRET_ALIAS_ATTR_NAME));
+            if (secureAttr != null) {
+                element.setText(loadFromSecureVault(secureAttr.getAttributeValue()));
+                element.removeAttribute(secureAttr);
+            }
+        }
+        Iterator<OMElement> childNodes = element.getChildElements();
+        while (childNodes.hasNext()) {
+            OMElement tmpNode = childNodes.next();
+            secureLoadOMElement(tmpNode);
+        }
+    }
+
+
+
     public static Document convertToDocument(File file) throws OutputEventAdapterException {
         DocumentBuilderFactory fac = getSecuredDocumentBuilder();
         fac.setNamespaceAware(true);
         try {
             return fac.newDocumentBuilder().parse(file);
+        } catch (Exception e) {
+            throw new OutputEventAdapterException("Error in creating an XML document from file: " +
+                    e.getMessage(), e);
+        }
+    }
+
+    public static OMElement convertToOmElement(File file) throws OutputEventAdapterException {
+
+        try {
+            StAXOMBuilder builder = new StAXOMBuilder(new FileInputStream(file));
+            return builder.getDocumentElement();
         } catch (Exception e) {
             throw new OutputEventAdapterException("Error in creating an XML document from file: " +
                     e.getMessage(), e);
@@ -136,9 +188,9 @@ public class EventAdapterConfigHelper {
                 log.warn(EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " can not found in " + path + "," +
                         " hence Output Event Adapters will be running with default global configs.");
             }
-            Document globalConfigDoc = convertToDocument(configFile);
-            secureResolveDocument(globalConfigDoc);
-            return (AdapterConfigs) unmarshaller.unmarshal(globalConfigDoc);
+            OMElement globalConfigDoc = convertToOmElement(configFile);
+            secureResolveOmElement(globalConfigDoc);
+            return (AdapterConfigs) unmarshaller.unmarshal(globalConfigDoc.getXMLStreamReader());
         } catch (JAXBException e) {
             log.error("Error in loading " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " from " + path + "," +
                     " hence Output Event Adapters will be running with default global configs.");
