@@ -250,13 +250,16 @@ public class LocalIdPClient implements IdPClient {
     }
 
     @Override
-    public void logout(Map<String, String> properties) {
+    public Map<String, String> logout(Map<String, String> properties) {
         String token = properties.get(IdPClientConstants.ACCESS_TOKEN);
         LocalSession session = sessionIdSessionMap.get(token);
         if (session != null) {
             usersToSessionMap.remove(session.getUserHash());
             sessionIdSessionMap.remove(token);
         }
+        Map<String, String> returnProperties = new HashMap<>();
+        returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "false");
+        return returnProperties;
     }
 
     @Override

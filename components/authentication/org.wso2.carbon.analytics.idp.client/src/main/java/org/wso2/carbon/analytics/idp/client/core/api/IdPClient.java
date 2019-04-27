@@ -78,9 +78,10 @@ public interface IdPClient {
      * This invalidates the user session.
      *
      * @param properties Map of logout properties.
+     * @return properties Map of logout properties such as Redirect_URI
      * @throws IdPClientException thrown when an error occurred when logout
      */
-    void logout(Map<String, String> properties) throws IdPClientException;
+    Map<String, String> logout(Map<String, String> properties) throws IdPClientException;
 
     /**
      * This will authenticate user based on the token.

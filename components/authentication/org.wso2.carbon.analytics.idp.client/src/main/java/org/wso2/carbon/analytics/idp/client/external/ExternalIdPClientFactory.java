@@ -232,10 +232,14 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
 
+        String targetURIForRedirection = properties.getOrDefault(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL,
+                            ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
+
         ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
                 kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
                 adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
-                keyManagerServiceStubs, scimServiceStub, defaultUserStore);
+                keyManagerServiceStubs, scimServiceStub, defaultUserStore, idPClientConfiguration.isSsoEnabled(),
+                targetURIForRedirection);
         externalIdPClient.init(dcrAppOwner);
         return externalIdPClient;
     }

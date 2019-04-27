@@ -74,6 +74,7 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_CONNECTION_TIMEOUT = "10000";
     public static final String DEFAULT_READ_TIMEOUT = "60000";
     public static final String DEFAULT_EXTERNAL_SSO_LOGOUT_URL = "https://localhost:9443/oidc/logout";
+    public static final String SSO_LOGING_ID_TOKEN_TAIL = "?id_token_hint=";
 
     public static final String SP_APP_NAME = "sp";
     public static final String PORTAL_APP_NAME = "sp_portal";
