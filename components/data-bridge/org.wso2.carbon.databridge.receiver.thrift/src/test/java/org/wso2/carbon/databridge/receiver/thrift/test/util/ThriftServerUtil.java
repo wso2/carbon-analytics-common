@@ -20,6 +20,7 @@ package org.wso2.carbon.databridge.receiver.thrift.test.util;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -28,6 +29,7 @@ import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +39,7 @@ import java.nio.file.Paths;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 public class ThriftServerUtil {
@@ -54,17 +57,18 @@ public class ThriftServerUtil {
         DataBridgeConfiguration dataBridgeConfiguration;
 
         if (configFile.exists()) {
-            try(FileInputStream fileInputStream = new FileInputStream(configFile)) {
+            try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
                 JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                 dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);
                 StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
                 OMElement configElement = builder.getDocumentElement();
                 SecretResolver secretResolver = SecretResolverFactory.create(configElement, true);
-                if (secretResolver != null && secretResolver.isInitialized()) {
-                    String resolvedPassword = getResolvedPassword(secretResolver,
-                            DataBridgeConstants.DATA_BRIDGE_CONF_PASSWORD_ALIAS);
-                    if (resolvedPassword != null) {
+                OMElement keyStorePasswordElement = configElement
+                        .getFirstChildWithName(new QName("keyStorePassword"));
+                if (keyStorePasswordElement != null) {
+                    String resolvedPassword = MiscellaneousUtil.resolve(keyStorePasswordElement, secretResolver);
+                    if (StringUtils.isNotEmpty(resolvedPassword)) {
                         dataBridgeConfiguration.setKeyStorePassword(resolvedPassword);
                     }
                 }
@@ -73,16 +77,6 @@ public class ThriftServerUtil {
         } else {
             return null;
         }
-    }
-
-    private static String getResolvedPassword(SecretResolver secretResolver, String alias) {
-        if (secretResolver.isTokenProtected(alias)) {
-            String resolvedPassword = secretResolver.resolve(alias);
-            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
-                return resolvedPassword;
-            }
-        }
-        return null;
     }
 
     public static void setupCarbonConfig(String tenantName) {

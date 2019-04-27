@@ -45,10 +45,12 @@ import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.text.DateFormat;
@@ -501,10 +503,11 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
                 StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
                 OMElement configElement = builder.getDocumentElement();
                 SecretResolver secretResolver = SecretResolverFactory.create(configElement, true);
-                if (secretResolver != null && secretResolver.isInitialized()) {
-                    String resolvedPassword = getResolvedPassword(secretResolver,
-                            DataBridgeConstants.DATA_BRIDGE_CONF_PASSWORD_ALIAS);
-                    if (resolvedPassword != null) {
+                OMElement keyStorePasswordElement = configElement
+                        .getFirstChildWithName(new QName("keyStorePassword"));
+                if (keyStorePasswordElement != null){
+                    String resolvedPassword = MiscellaneousUtil.resolve(keyStorePasswordElement, secretResolver);
+                    if (StringUtils.isNotEmpty(resolvedPassword)) {
                         dataBridgeConfiguration.setKeyStorePassword(resolvedPassword);
                     }
                 }
@@ -514,16 +517,6 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             log.error("Cannot find data bridge configuration file : " + configPath);
             return null;
         }
-    }
-
-    private String getResolvedPassword(SecretResolver secretResolver, String alias) {
-        if (secretResolver.isTokenProtected(alias)) {
-            String resolvedPassword = secretResolver.resolve(alias);
-            if (resolvedPassword != null && !resolvedPassword.isEmpty()) {
-                return resolvedPassword;
-            }
-        }
-        return null;
     }
 
 }
