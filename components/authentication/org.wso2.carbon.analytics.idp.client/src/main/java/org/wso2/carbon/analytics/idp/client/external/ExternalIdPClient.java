@@ -460,11 +460,12 @@ public class ExternalIdPClient implements IdPClient {
                 this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
 
         Map<String, String> returnProperties = new HashMap<>();
-        if (!isSSOEnabled) {
+        String idToken = properties.getOrDefault(IdPClientConstants.ID_TOKEN_KEY, null);
+        // TODO: 30/04/19 Id token null check needs to be removed after all apps support sso
+        if (!isSSOEnabled || idToken == null) {
             returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "false");
         } else {
             returnProperties.put(IdPClientConstants.RETURN_LOGOUT_PROPERTIES, "true");
-            String idToken = properties.get(IdPClientConstants.ID_TOKEN_KEY);
             String targetURIForRedirection = ssoLogoutURL
                     .concat(ExternalIdPClientConstants.SSO_LOGING_ID_TOKEN_TAIL).concat(idToken);
             returnProperties.put(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL, targetURIForRedirection);
