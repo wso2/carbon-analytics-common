@@ -348,8 +348,10 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
-                tokenCache.put(oAuth2TokenInfo.getAccessToken(),
-                        new ExternalSession(username, oAuth2TokenInfo.getAccessToken()));
+                if (IdPClientConstants.PASSWORD_GRANT_TYPE.equals(grantType)) {
+                    tokenCache.put(oAuth2TokenInfo.getAccessToken(),
+                            new ExternalSession(username, oAuth2TokenInfo.getAccessToken()));
+                }
                 return returnProperties;
             } catch (IOException e) {
                 String error = "Error occurred while parsing token response for user. Response: '" +
@@ -493,7 +495,9 @@ public class ExternalIdPClient implements IdPClient {
                 OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                         .decode(response, OAuth2IntrospectionResponse.class);
                 if (introspectResponse.isActive()) {
-                    return introspectResponse.getUsername();
+                    String username = introspectResponse.getUsername();
+                    tokenCache.put(username, new ExternalSession(username, token));
+                    return username;
                 } else {
                     throw new AuthenticationException("The token is not active");
                 }
