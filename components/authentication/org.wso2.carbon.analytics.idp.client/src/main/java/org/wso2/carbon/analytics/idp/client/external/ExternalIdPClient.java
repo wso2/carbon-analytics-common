@@ -171,8 +171,8 @@ public class ExternalIdPClient implements IdPClient {
                 throw new IdPClientException(errorMessage, e);
             }
         } else {
-            String errorMessage = "Error occurred while retrieving groups. HTTP error code: " + response.status() +
-                    " Error Response: " + getErrorMessage(response);
+            String errorMessage = "Error occurred while retrieving groups. HTTP error code: '" + response.status() +
+                    "'. Error Response: '" + response.body().toString() + "'.";
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
@@ -210,7 +210,7 @@ public class ExternalIdPClient implements IdPClient {
             }
         } else {
             String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName + "'. " +
-                    "HTTP error code: " + response.status() + " Error Response: " + getErrorMessage(response);
+                    "HTTP error code: " + response.status() + " Error Response: " + response.body().toString();
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
@@ -276,7 +276,7 @@ public class ExternalIdPClient implements IdPClient {
             return new User(name, properties, roles);
         } else {
             String errorMessage = "Error occurred while retrieving user, '" + name + "'. " +
-                    "HTTP error code: " + response.status() + " Error Response: " + getErrorMessage(response);
+                    "HTTP error code: " + response.status() + " Error Response: " + response.body().toString();
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
@@ -348,8 +348,10 @@ public class ExternalIdPClient implements IdPClient {
                 returnProperties.put(IdPClientConstants.REFRESH_TOKEN, oAuth2TokenInfo.getRefreshToken());
                 returnProperties.put(IdPClientConstants.VALIDITY_PERIOD,
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
-                tokenCache.put(oAuth2TokenInfo.getAccessToken(),
-                        new ExternalSession(username, oAuth2TokenInfo.getAccessToken()));
+                if (IdPClientConstants.PASSWORD_GRANT_TYPE.equals(grantType)) {
+                    tokenCache.put(oAuth2TokenInfo.getAccessToken(),
+                            new ExternalSession(username, oAuth2TokenInfo.getAccessToken()));
+                }
                 return returnProperties;
             } catch (IOException e) {
                 String error = "Error occurred while parsing token response for user. Response: '" +
@@ -366,8 +368,8 @@ public class ExternalIdPClient implements IdPClient {
             returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, invalidResponse);
             return returnProperties;
         } else {  //Error case
-            String errorMessage = "Token generation request failed. HTTP error code: " + response.status() +
-                    " Error Response: " + getErrorMessage(response);
+            String errorMessage = "Token generation request failed. HTTP error code: '" + response.status() +
+                    "'. Error Response: '" + response.body().toString() + "'.";
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }
@@ -438,8 +440,8 @@ public class ExternalIdPClient implements IdPClient {
             returnProperties.put(IdPClientConstants.ERROR_DESCRIPTION, invalidResponse);
             return returnProperties;
         } else {  //Error case
-            String error = "Token generation request failed. HTTP error code: " + response.status() +
-                    " Error Response Body: " + getErrorMessage(response);
+            String error = "Token generation request failed. HTTP error code: '" + response.status() +
+                    "'. Error Response Body: '" + response.body().toString() + "'.";
             LOG.error(error);
             throw new IdPClientException(error);
         }
@@ -493,7 +495,9 @@ public class ExternalIdPClient implements IdPClient {
                 OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
                         .decode(response, OAuth2IntrospectionResponse.class);
                 if (introspectResponse.isActive()) {
-                    return introspectResponse.getUsername();
+                    String username = introspectResponse.getUsername();
+                    tokenCache.put(username, new ExternalSession(username, token));
+                    return username;
                 } else {
                     throw new AuthenticationException("The token is not active");
                 }
@@ -507,8 +511,8 @@ public class ExternalIdPClient implements IdPClient {
                     throw new IdPClientException("Error occurred while parsing the Introspection error message.", e);
                 }
             } else {  //Unknown Error
-                throw new IdPClientException("Error occurred while authenticating. Error: " +
-                        response.body().toString() + " Status Code: " + response.status());
+                throw new IdPClientException("Error occurred while authenticating. Error: '" +
+                        response.body().toString() + "'. Status Code: '" + response.status() + "'.");
             }
         } catch (IOException e) {
             throw new IdPClientException("Error occurred while parsing the authentication response.", e);
@@ -578,30 +582,15 @@ public class ExternalIdPClient implements IdPClient {
                 throw new IdPClientException(errorMessage);
             } catch (IOException e) {
                 String error = "Error occurred while parsing the DCR error message. Error: " +
-                        "'" + getErrorMessage(response) + "'.";
+                        "'" + response.body().toString() + "'.";
                 LOG.error(error, e);
                 throw new IdPClientException(error, e);
             }
         } else {  //Unknown Error
-            String error = "Error occurred while DCR application creation. Error: " +
-                    response.body().toString() + " Status Code: '" + response.status() + "'.";
+            String error = "Error occurred while DCR application creation. Error: '" +
+                    response.body().toString() + "'. Status Code: '" + response.status() + "'.";
             LOG.error(error);
             throw new IdPClientException(error);
         }
-    }
-
-    private String getErrorMessage(Response response) {
-        StringBuilder errorMessage = new StringBuilder(ExternalIdPClientConstants.EMPTY_STRING);
-        if (response != null && response.body() != null) {
-            try {
-                String errorDescription = new Gson().fromJson(response.body().toString(), JsonElement.class)
-                        .getAsJsonObject().getAsString();
-                errorMessage.append(errorDescription);
-            } catch (Exception ex) {
-                LOG.error("Error occurred while parsing error response. Response: '" + response.body().toString() +
-                        "'", ex);
-            }
-        }
-        return errorMessage.toString();
     }
 }
