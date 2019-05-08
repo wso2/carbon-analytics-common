@@ -46,7 +46,10 @@ import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.models.ExternalSession;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -227,7 +230,18 @@ public class ExternalIdPClient implements IdPClient {
 
         JsonParser parser = new JsonParser();
         if (response.status() == 200) {
-            JsonObject userObject = parser.parse(response.body().toString()).getAsJsonObject();
+            InputStream inputStream;
+            BufferedReader bufferedReader;
+            String responseBody;
+            try {
+                inputStream = response.body().asInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                responseBody = bufferedReader.readLine();
+            } catch (IOException e) {
+                throw new IdPClientException("Error occurred while converting response from the scim2 endpoint for " +
+                        "user " + name + ".", e);
+            }
+            JsonObject userObject = parser.parse(responseBody).getAsJsonObject();
             JsonArray users = userObject.get(ExternalIdPClientConstants.RESOURCES).getAsJsonArray();
 
             if (users == null) {
