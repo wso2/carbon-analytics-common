@@ -42,9 +42,7 @@ public class IdPServiceUtils {
             IdPClientConfiguration idPClientConfiguration;
             if (configProvider.getConfigurationObject(IdPClientConstants.SP_AUTH_NAMESPACE) == null) {
                 idPClientConfiguration = new IdPClientConfiguration();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Enabling default IdPClient Local User Store.");
-                }
+                LOG.info("Enabling default IdPClient Local User Store as configuration is not overridden.");
             } else {
                 idPClientConfiguration = configProvider.
                         getConfigurationObject(IdPClientConfiguration.class);
@@ -54,6 +52,7 @@ public class IdPServiceUtils {
                 throw new IdPClientException("No idPClientFactory found for type: " + idPClientConfiguration.getType());
             }
             idPClient = idPClientFactory.getIdPClient(idPClientConfiguration);
+            LOG.info("IdP client of type '" + idPClientConfiguration.getType() + "' is started.");
         } catch (ConfigurationException e) {
             throw new IdPClientException("Error in reading '" + IdPClientConstants.SP_AUTH_NAMESPACE + "' from file.",
                     e);
