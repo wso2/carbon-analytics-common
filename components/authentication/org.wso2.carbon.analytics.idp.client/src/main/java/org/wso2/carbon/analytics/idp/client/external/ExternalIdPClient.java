@@ -230,12 +230,9 @@ public class ExternalIdPClient implements IdPClient {
 
         JsonParser parser = new JsonParser();
         if (response.status() == 200) {
-            InputStream inputStream;
-            BufferedReader bufferedReader;
             String responseBody;
-            try {
-                inputStream = response.body().asInputStream();
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            try (InputStream inputStream = response.body().asInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
                 responseBody = bufferedReader.readLine();
             } catch (IOException e) {
                 throw new IdPClientException("Error occurred while converting response from the scim2 endpoint for " +
