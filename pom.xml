@@ -28,7 +28,7 @@
     <groupId>org.wso2.carbon.analytics-common</groupId>
     <artifactId>carbon-analytics-common</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.57-SNAPSHOT</version>
+    <version>5.1.58-SNAPSHOT</version>
     <name>WSO2 Carbon - Carbon Analytics Common Aggregator Module</name>
     <url>http://wso2.org</url>
 
@@ -1451,7 +1451,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.1.57-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.1.58-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.26</carbon.kernel.version>
@@ -1505,7 +1505,7 @@
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
-        <google.guava.version>19.0</google.guava.version>
+        <google.guava.version>27.0-jre</google.guava.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
         <xerces.xercesImpl.version>2.11.0</xerces.xercesImpl.version>

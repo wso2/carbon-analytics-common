@@ -1,0 +1,5 @@
+{
+  "time": {
+    "output_adapter.jms.keep_alive_time": "ms"
+  }
+}

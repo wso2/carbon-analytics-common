@@ -1,0 +1,12 @@
+{
+  "transport.receiver.worker_threads" : "10",
+  "transport.receiver.session_timeout" : "30",
+  "transport.receiver.keystore.file_name" : "$ref{keystore.tls.file_name}",
+  "transport.receiver.keystore.password" : "$ref{keystore.tls.password}",
+
+  "transport.binary.receiver.tcpPort" : "9611",
+  "transport.binary.receiver.sslPort" : "9711",
+  "transport.binary.receiver.ssl_receiver_thread_pool_size" : "100",
+  "transport.binary.receiver.tcp_receiver_thread_pool_size" : "100",
+  "transport.binary.receiver.enable": true
+}

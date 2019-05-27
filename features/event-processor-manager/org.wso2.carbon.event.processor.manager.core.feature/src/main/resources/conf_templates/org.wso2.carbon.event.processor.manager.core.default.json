@@ -1,0 +1,9 @@
+{
+  "event_processor.enable_persistence": false,
+  "event_processor.event_sync.hostname": "0.0.0.0",
+  "event_processor.event_sync.port": "11224",
+  "event_processor.event_management.hostname": "0.0.0.0",
+  "event_processor.event_management.port": "10005",
+  "event_processor.enable_single_mode": true,
+  "event_processor.enable_ha_mode": false
+}
