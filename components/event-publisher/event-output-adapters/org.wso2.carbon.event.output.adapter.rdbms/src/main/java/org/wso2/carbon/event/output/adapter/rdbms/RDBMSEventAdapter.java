@@ -701,6 +701,9 @@ public class RDBMSEventAdapter implements OutputEventAdapter {
                 DatabaseMetaData databaseMetaData = con.getMetaData();
                 dbName = databaseMetaData.getDatabaseProductName();
                 dbName = dbName.toLowerCase();
+                if(dbName.equals("microsoft sql server")){
+                    dbName = "mssql";
+                }
             } else {
                 throw new OutputEventAdapterException("There is no data-source called " + eventAdapterConfiguration
                         .getStaticProperties().get(RDBMSEventAdapterConstants.ADAPTER_GENERIC_RDBMS_DATASOURCE_NAME));
