@@ -21,59 +21,74 @@ import com.hazelcast.core.HazelcastInstance;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.processor.manager.core.internal.CarbonEventManagementService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-/**
- * @scr.component name="eventProcessorManagementService.component" immediate="true"
- * @scr.reference name="hazelcast.instance.service"
- * interface="com.hazelcast.core.HazelcastInstance" cardinality="0..1"
- * policy="dynamic" bind="setHazelcastInstance" unbind="unsetHazelcastInstance"
- * @scr.reference name="configuration.contextService.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
-
+@Component(
+        name = "eventProcessorManagementService.component",
+        immediate = true)
 public class EventManagementServiceDS {
+
     private static final Log log = LogFactory.getLog(EventManagementServiceDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             CarbonEventManagementService carbonEventManagementService = new CarbonEventManagementService();
             EventManagementServiceValueHolder.setCarbonEventManagementService(carbonEventManagementService);
-
-            context.getBundleContext().registerService(EventManagementService.class.getName(), carbonEventManagementService, null);
-
+            context.getBundleContext().registerService(EventManagementService.class.getName(),
+                    carbonEventManagementService, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventProcessorManagementService");
             }
-
         } catch (Throwable e) {
             log.error("Could not create EventProcessorManagementService: " + e.getMessage(), e);
         }
-
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext context) {
+
         EventManagementServiceValueHolder.getCarbonEventManagementService().shutdown();
     }
 
+    @Reference(
+            name = "hazelcast.instance.service",
+            service = com.hazelcast.core.HazelcastInstance.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetHazelcastInstance")
     protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+
         EventManagementServiceValueHolder.registerHazelcastInstance(hazelcastInstance);
         EventManagementServiceValueHolder.getCarbonEventManagementService().init(hazelcastInstance);
     }
 
     protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance) {
+
         EventManagementServiceValueHolder.registerHazelcastInstance(null);
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    @Reference(
+            name = "configuration.contextService.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         EventManagementServiceValueHolder.getCarbonEventManagementService().init(configurationContextService);
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
+
     }
 }

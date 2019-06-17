@@ -18,12 +18,14 @@ package org.wso2.carbon.event.output.adapter.soap.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.soap.SoapEventAdapterFactory;
 
-/**
- * @scr.component component.name="output.Soap.AdapterService.component" immediate="true"
- */
+@Component(
+        name = "output.Soap.AdapterService.component",
+        immediate = true)
 public class SoapEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(SoapEventAdapterServiceDS.class);
@@ -33,12 +35,13 @@ public class SoapEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             OutputEventAdapterFactory wsEventAdaptorFactory = new SoapEventAdapterFactory();
-            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), wsEventAdaptorFactory,
-                    null);
+            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
+                    wsEventAdaptorFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output Soap adaptor service");
             }

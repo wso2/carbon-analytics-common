@@ -17,21 +17,23 @@
  *  under the License.
  * /
  */
-
 package org.wso2.carbon.event.output.adapter.rdbms.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.rdbms.RDBMSEventAdapterFactory;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 
-/**
- * @scr.component name="output.RDBMSEventAdapterService.component" immediate="true"
- * @scr.reference name="org.wso2.carbon.ndatasource" interface="org.wso2.carbon.ndatasource.core.DataSourceService"
- * cardinality="1..1" policy="dynamic" bind="setDataSourceService" unbind="unsetDataSourceService"
- */
+@Component(
+        name = "output.RDBMSEventAdapterService.component",
+        immediate = true)
 public class RDBMSEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(RDBMSEventAdapterServiceDS.class);
@@ -41,11 +43,13 @@ public class RDBMSEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             OutputEventAdapterFactory rdbmsEventAdapterFactory = new RDBMSEventAdapterFactory();
-            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), rdbmsEventAdapterFactory, null);
+            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
+                    rdbmsEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output rdbms event adapter service");
             }
@@ -54,11 +58,19 @@ public class RDBMSEventAdapterServiceDS {
         }
     }
 
+    @Reference(
+            name = "org.wso2.carbon.ndatasource",
+            service = org.wso2.carbon.ndatasource.core.DataSourceService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetDataSourceService")
     protected void setDataSourceService(DataSourceService dataSourceService) {
+
         RDBMSEventAdapterServiceValueHolder.setDataSourceService(dataSourceService);
     }
 
     protected void unsetDataSourceService(DataSourceService dataSourceService) {
+
         RDBMSEventAdapterServiceValueHolder.setDataSourceService(null);
     }
 }

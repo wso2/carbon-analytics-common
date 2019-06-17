@@ -20,14 +20,16 @@ package org.wso2.carbon.event.output.adapter.websocket.local.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.websocket.local.WebsocketLocalEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.websocket.local.WebsocketLocalOutputCallbackRegisterService;
 import org.wso2.carbon.event.output.adapter.websocket.local.internal.WebsocketLocalOutputCallbackRegisterServiceImpl;
 
-/**
- * @scr.component component.name="output.Websocket.AdapterService.component" immediate="true"
- */
+@Component(
+        name = "output.Websocket.AdapterService.component",
+        immediate = true)
 public class WebsocketLocalEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(WebsocketLocalEventAdapterServiceDS.class);
@@ -37,17 +39,20 @@ public class WebsocketLocalEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             OutputEventAdapterFactory websocketLocalEventAdapterFactory = new WebsocketLocalEventAdapterFactory();
-            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), websocketLocalEventAdapterFactory, null);
-
-            WebsocketLocalOutputCallbackRegisterServiceImpl websocketLocalOutputCallbackRegisterServiceImpl = new WebsocketLocalOutputCallbackRegisterServiceImpl();
-            context.getBundleContext().registerService(WebsocketLocalOutputCallbackRegisterService.class.getName(), websocketLocalOutputCallbackRegisterServiceImpl, null);
-
-            WebsocketLocalEventAdaptorServiceInternalValueHolder.registerWebsocketOutputCallbackRegisterServiceInternal(websocketLocalOutputCallbackRegisterServiceImpl);
-
+            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
+                    websocketLocalEventAdapterFactory, null);
+            WebsocketLocalOutputCallbackRegisterServiceImpl websocketLocalOutputCallbackRegisterServiceImpl = new
+                    WebsocketLocalOutputCallbackRegisterServiceImpl();
+            context.getBundleContext().registerService(WebsocketLocalOutputCallbackRegisterService.class.getName(),
+                    websocketLocalOutputCallbackRegisterServiceImpl, null);
+            WebsocketLocalEventAdaptorServiceInternalValueHolder
+                    .registerWebsocketOutputCallbackRegisterServiceInternal
+                            (websocketLocalOutputCallbackRegisterServiceImpl);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output websocket-local adapter service");
             }
@@ -55,5 +60,4 @@ public class WebsocketLocalEventAdapterServiceDS {
             log.error("Can not create the output websocket-local adapter service ", e);
         }
     }
-
 }

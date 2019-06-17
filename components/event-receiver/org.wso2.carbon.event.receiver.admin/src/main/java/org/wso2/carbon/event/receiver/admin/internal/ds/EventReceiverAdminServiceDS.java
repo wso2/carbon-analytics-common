@@ -15,42 +15,56 @@
 package org.wso2.carbon.event.receiver.admin.internal.ds;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterService;
 import org.wso2.carbon.event.receiver.core.EventReceiverService;
 
 /**
  * This class is used to get the EventReceiver service.
- *
- * @scr.component name="eventReceiverAdmin.component" immediate="true"
- * @scr.reference name="event.adapter.service"
- * interface="org.wso2.carbon.event.input.adapter.core.InputEventAdapterService" cardinality="1..1"
- * policy="dynamic" bind="setEventAdapterService" unbind="unSetEventAdapterService"
- * @scr.reference name="eventReceiverService.service"
- * interface="org.wso2.carbon.event.receiver.core.EventReceiverService" cardinality="1..1"
- * policy="dynamic" bind="setEventReceiverService" unbind="unSetEventReceiverService"
  */
+@Component(
+        name = "eventReceiverAdmin.component",
+        immediate = true)
 public class EventReceiverAdminServiceDS {
+
+    @Activate
     protected void activate(ComponentContext context) {
 
     }
 
-    protected void setEventAdapterService(
-            InputEventAdapterService eventAdapterService) {
+    @Reference(
+            name = "event.adapter.service",
+            service = org.wso2.carbon.event.input.adapter.core.InputEventAdapterService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unSetEventAdapterService")
+    protected void setEventAdapterService(InputEventAdapterService eventAdapterService) {
+
         EventReceiverAdminServiceValueHolder.registerEventAdapterService(eventAdapterService);
     }
 
-    protected void unSetEventAdapterService(
-            InputEventAdapterService eventAdapterService) {
+    protected void unSetEventAdapterService(InputEventAdapterService eventAdapterService) {
+
         EventReceiverAdminServiceValueHolder.registerEventAdapterService(null);
     }
 
+    @Reference(
+            name = "eventReceiverService.service",
+            service = org.wso2.carbon.event.receiver.core.EventReceiverService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unSetEventReceiverService")
     protected void setEventReceiverService(EventReceiverService eventReceiverService) {
+
         EventReceiverAdminServiceValueHolder.registerEventReceiverService(eventReceiverService);
     }
 
     protected void unSetEventReceiverService(EventReceiverService eventReceiverService) {
+
         EventReceiverAdminServiceValueHolder.registerEventReceiverService(null);
     }
-
-
 }

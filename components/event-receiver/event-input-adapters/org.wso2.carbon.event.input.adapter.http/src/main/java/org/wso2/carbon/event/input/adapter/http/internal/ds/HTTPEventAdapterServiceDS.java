@@ -12,27 +12,24 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-
 package org.wso2.carbon.event.input.adapter.http.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.http.HttpService;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.http.HTTPEventAdapterFactory;
 import org.wso2.carbon.user.core.service.RealmService;
 
-/**
- * @scr.component name="input.httpEventAdapterService.component" immediate="true"
- * @scr.reference name="user.realmservice.default"
- * interface="org.wso2.carbon.user.core.service.RealmService" cardinality="1..1"
- * policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
- * @scr.reference name="http.service" interface="org.osgi.service.http.HttpService"
- * cardinality="1..1" policy="dynamic" bind="setHttpService" unbind="unsetHttpService"
- */
-
-
+@Component(
+        name = "input.httpEventAdapterService.component",
+        immediate = true)
 public class HTTPEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(HTTPEventAdapterServiceDS.class);
@@ -42,34 +39,50 @@ public class HTTPEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             InputEventAdapterFactory httpEventEventAdapterFactory = new HTTPEventAdapterFactory();
-            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(), httpEventEventAdapterFactory, null);
+            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),
+                    httpEventEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the input HTTP adapter service");
             }
-
         } catch (RuntimeException e) {
             log.error("Can not create the input HTTP adapter service ", e);
         }
     }
 
+    @Reference(
+            name = "user.realmservice.default",
+            service = org.wso2.carbon.user.core.service.RealmService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRealmService")
     protected void setRealmService(RealmService realmService) {
+
         HTTPEventAdapterServiceValueHolder.registerRealmService(realmService);
     }
 
     protected void unsetRealmService(RealmService realmService) {
+
         HTTPEventAdapterServiceValueHolder.registerRealmService(null);
     }
 
+    @Reference(
+            name = "http.service",
+            service = org.osgi.service.http.HttpService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetHttpService")
     protected void setHttpService(HttpService httpService) {
+
         HTTPEventAdapterServiceValueHolder.registerHTTPService(httpService);
     }
 
     protected void unsetHttpService(HttpService httpService) {
+
         HTTPEventAdapterServiceValueHolder.registerHTTPService(null);
     }
-
 }

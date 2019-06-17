@@ -18,17 +18,18 @@ package org.wso2.carbon.event.input.adapter.filetail.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.filetail.FileTailEventAdapterFactory;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-/**
- * @scr.component component.name="input.File.AdapterService.component" immediate="true"
- * @scr.reference name="configurationcontext.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
-
+@Component(
+        name = "input.File.AdapterService.component",
+        immediate = true)
 public class FileTailEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(FileTailEventAdapterServiceDS.class);
@@ -38,7 +39,9 @@ public class FileTailEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             InputEventAdapterFactory testInEventAdapterFactory = new FileTailEventAdapterFactory();
             context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),
@@ -51,14 +54,19 @@ public class FileTailEventAdapterServiceDS {
         }
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    @Reference(
+            name = "configurationcontext.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         FileTailEventAdapterServiceHolder.registerConfigurationContextService(configurationContextService);
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         FileTailEventAdapterServiceHolder.unregisterConfigurationContextService(configurationContextService);
     }
-
 }

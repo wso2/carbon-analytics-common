@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.gadget.template.deployer.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.gadget.template.deployer.GadgetTemplateDeployer;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
+import org.wso2.carbon.gadget.template.deployer.GadgetTemplateDeployer;
 
-/**
- * @scr.component name="TemplateDeployer.gadget.component" immediate="true"
- */
+@Component(
+        name = "TemplateDeployer.gadget.component",
+        immediate = true)
 public class GadgetTemplateDeployerDS {
+
     private static Log log = LogFactory.getLog(GadgetTemplateDeployerDS.class);
 
-
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             GadgetTemplateDeployer templateDeployer = new GadgetTemplateDeployer();
             context.getBundleContext().registerService(TemplateDeployer.class.getName(), templateDeployer, null);
-
         } catch (RuntimeException e) {
             log.error("Couldn't register GadgetTemplateDeployer service", e);
         }

@@ -18,53 +18,65 @@ package org.wso2.carbon.event.stream.template.deployer.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.template.deployer.EventStreamTemplateDeployer;
 import org.wso2.carbon.event.stream.template.deployer.internal.EventStreamTemplateDeployerValueHolder;
+import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
-
-/**
- * @scr.component name="TemplateDeployer.eventStream.component" immediate="true"
- * @scr.reference name="eventStreamService.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- */
+@Component(
+        name = "TemplateDeployer.eventStream.component",
+        immediate = true)
 public class EventStreamTemplateDeployerDS {
 
     private static final Log log = LogFactory.getLog(EventStreamTemplateDeployerDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             EventStreamTemplateDeployer templateDeployer = new EventStreamTemplateDeployer();
             context.getBundleContext().registerService(TemplateDeployer.class.getName(), templateDeployer, null);
-
         } catch (RuntimeException e) {
             log.error("Couldn't register EventStreamTemplateDeployer service", e);
         }
     }
 
+    @Reference(
+            name = "eventStreamService.service",
+            service = org.wso2.carbon.event.stream.core.EventStreamService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
+
         EventStreamTemplateDeployerValueHolder.setEventStreamService(eventStreamService);
     }
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
+
         EventStreamTemplateDeployerValueHolder.setEventStreamService(null);
     }
 
-    protected void setRegistryService(RegistryService registryService) throws
-                                                                       RegistryException {
-        EventStreamTemplateDeployerValueHolder.setRegistryService(registryService);
+    @Reference(
+            name = "registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRegistryService")
+    protected void setRegistryService(RegistryService registryService) throws RegistryException {
 
+        EventStreamTemplateDeployerValueHolder.setRegistryService(registryService);
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
+
         EventStreamTemplateDeployerValueHolder.setRegistryService(null);
     }
 }

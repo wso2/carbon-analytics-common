@@ -15,20 +15,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.event.input.adapter.websocket.local.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.websocket.local.WebsocketLocalEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.websocket.local.WebsocketLocalInputCallbackRegisterService;
 import org.wso2.carbon.event.input.adapter.websocket.local.internal.WebsocketLocalInputCallbackRegisterServiceImpl;
 
-/**
- * @scr.component name="input.websocketLocalEventAdapterService.component" immediate="true"
- */
+@Component(
+        name = "input.websocketLocalEventAdapterService.component",
+        immediate = true)
 public class WebsocketLocalEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(WebsocketLocalEventAdapterServiceDS.class);
@@ -38,18 +39,20 @@ public class WebsocketLocalEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             InputEventAdapterFactory websocketLocalEventAdapterFactory = new WebsocketLocalEventAdapterFactory();
-            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(), websocketLocalEventAdapterFactory, null);
-
-            WebsocketLocalInputCallbackRegisterServiceImpl websocketLocalInputCallbackRegisterServiceImpl = new WebsocketLocalInputCallbackRegisterServiceImpl();
-            context.getBundleContext().registerService(WebsocketLocalInputCallbackRegisterService.class.getName(), websocketLocalInputCallbackRegisterServiceImpl, null);
-
-            WebsocketLocalEventAdapterServiceInternalValueHolder.registerWebsocketInputCallbackRegisterServiceInternal(
-                    websocketLocalInputCallbackRegisterServiceImpl);
-
+            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),
+                    websocketLocalEventAdapterFactory, null);
+            WebsocketLocalInputCallbackRegisterServiceImpl websocketLocalInputCallbackRegisterServiceImpl = new
+                    WebsocketLocalInputCallbackRegisterServiceImpl();
+            context.getBundleContext().registerService(WebsocketLocalInputCallbackRegisterService.class.getName(),
+                    websocketLocalInputCallbackRegisterServiceImpl, null);
+            WebsocketLocalEventAdapterServiceInternalValueHolder
+                    .registerWebsocketInputCallbackRegisterServiceInternal
+                            (websocketLocalInputCallbackRegisterServiceImpl);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the input websocket-local adapter service");
             }

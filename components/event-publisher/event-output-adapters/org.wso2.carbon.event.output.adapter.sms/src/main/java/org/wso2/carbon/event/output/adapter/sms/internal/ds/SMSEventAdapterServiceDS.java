@@ -20,17 +20,18 @@ package org.wso2.carbon.event.output.adapter.sms.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.sms.SMSEventAdapterFactory;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-
-/**
- * @scr.component name="output.sms.EventAdapterService.component" immediate="true"
- * @scr.reference name="configurationcontext.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
+@Component(
+        name = "output.sms.EventAdapterService.component",
+        immediate = true)
 public class SMSEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(SMSEventAdapterServiceDS.class);
@@ -40,11 +41,13 @@ public class SMSEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             OutputEventAdapterFactory smsEventAdapterFactory = new SMSEventAdapterFactory();
-            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), smsEventAdapterFactory, null);
+            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
+                    smsEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output SMS event adapter service");
             }
@@ -53,15 +56,18 @@ public class SMSEventAdapterServiceDS {
         }
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    @Reference(
+            name = "configurationcontext.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         SMSEventAdapterServiceValueHolder.registerConfigurationContextService(configurationContextService);
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
 
     }
-
-
 }

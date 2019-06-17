@@ -17,13 +17,14 @@ package org.wso2.carbon.event.output.adapter.wso2event.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.wso2event.WSO2EventAdapterFactory;
 
-
-/**
- * @scr.component name="output.wso2EventAdapterService.component" immediate="true"
- */
+@Component(
+        name = "output.wso2EventAdapterService.component",
+        immediate = true)
 public class WSO2EventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(WSO2EventAdapterServiceDS.class);
@@ -33,11 +34,13 @@ public class WSO2EventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             OutputEventAdapterFactory wso2EventAdapterFactory = new WSO2EventAdapterFactory();
-            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), wso2EventAdapterFactory, null);
+            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
+                    wso2EventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output WSO2Event adapter service");
             }
@@ -45,5 +48,4 @@ public class WSO2EventAdapterServiceDS {
             log.error("Can not create the output WSO2Event adapter service ", e);
         }
     }
-
 }

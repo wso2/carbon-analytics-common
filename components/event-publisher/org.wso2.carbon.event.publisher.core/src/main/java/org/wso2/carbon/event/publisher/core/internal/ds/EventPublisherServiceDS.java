@@ -17,6 +17,11 @@ package org.wso2.carbon.event.publisher.core.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
@@ -34,56 +39,40 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.Set;
 
-
-/**
- * @scr.component name="eventPublisherService.component" immediate="true"
- * @scr.reference name="eventAdapter.service"
- * interface="org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService" cardinality="1..1"
- * policy="dynamic" bind="setEventAdapterService" unbind="unsetEventAdapterService"
- * @scr.reference name="output.event.adapter.tracker.service"
- * interface="org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory" cardinality="0..n"
- * policy="dynamic" bind="setEventAdapterType" unbind="unSetEventAdapterType"
- * @scr.reference name="eventManagement.service"
- * interface="org.wso2.carbon.event.processor.manager.core.EventManagementService" cardinality="1..1"
- * policy="dynamic" bind="setEventManagementService" unbind="unsetEventManagementService"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="0..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- * @scr.reference name="eventStreamManager.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1" policy="dynamic"
- * bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
+@Component(
+        name = "eventPublisherService.component",
+        immediate = true)
 public class EventPublisherServiceDS {
+
     private static final Log log = LogFactory.getLog(EventPublisherServiceDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             checkIsStatsEnabled();
             CarbonEventPublisherService carbonEventPublisherService = new CarbonEventPublisherService();
             EventPublisherServiceValueHolder.registerPublisherService(carbonEventPublisherService);
-
-            CarbonEventPublisherManagementService carbonEventPublisherManagementService = new CarbonEventPublisherManagementService();
-            EventPublisherServiceValueHolder.getEventManagementService().subscribe(carbonEventPublisherManagementService);
+            CarbonEventPublisherManagementService carbonEventPublisherManagementService = new
+                    CarbonEventPublisherManagementService();
+            EventPublisherServiceValueHolder.getEventManagementService().subscribe
+                    (carbonEventPublisherManagementService);
             EventPublisherServiceValueHolder.registerPublisherManagementService(carbonEventPublisherManagementService);
-
-            context.getBundleContext().registerService(EventPublisherService.class.getName(), carbonEventPublisherService, null);
+            context.getBundleContext().registerService(EventPublisherService.class.getName(),
+                    carbonEventPublisherService, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventPublisherService");
             }
-
             activateInactiveEventPublisherConfigurations(carbonEventPublisherService);
-
-            context.getBundleContext().registerService(EventStreamListener.class.getName(), new EventStreamListenerImpl(), null);
-
+            context.getBundleContext().registerService(EventStreamListener.class.getName(), new
+                    EventStreamListenerImpl(), null);
         } catch (RuntimeException e) {
             log.error("Could not create EventPublisherService : " + e.getMessage(), e);
         }
     }
 
     private void checkIsStatsEnabled() {
+
         ServerConfiguration config = ServerConfiguration.getInstance();
         String confStatisticsReporterDisabled = config.getFirstProperty("StatisticsReporterDisabled");
         if (!"".equals(confStatisticsReporterDisabled)) {
@@ -96,8 +85,10 @@ public class EventPublisherServiceDS {
     }
 
     private void activateInactiveEventPublisherConfigurations(CarbonEventPublisherService carbonEventPublisherService) {
+
         Set<String> outputEventAdapterTypes = EventPublisherServiceValueHolder.getOutputEventAdapterTypes();
-        outputEventAdapterTypes.addAll(EventPublisherServiceValueHolder.getOutputEventAdapterService().getOutputEventAdapterTypes());
+        outputEventAdapterTypes.addAll(EventPublisherServiceValueHolder.getOutputEventAdapterService()
+                .getOutputEventAdapterTypes());
         for (String type : outputEventAdapterTypes) {
             try {
                 carbonEventPublisherService.activateInactiveEventPublisherConfigurationsForAdapter(type);
@@ -107,38 +98,68 @@ public class EventPublisherServiceDS {
         }
     }
 
-    protected void setEventAdapterService(
-            OutputEventAdapterService outputEventAdapterService) {
+    @Reference(
+            name = "eventAdapter.service",
+            service = org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventAdapterService")
+    protected void setEventAdapterService(OutputEventAdapterService outputEventAdapterService) {
+
         EventPublisherServiceValueHolder.registerEventAdapterService(outputEventAdapterService);
     }
 
-    protected void unsetEventAdapterService(
-            OutputEventAdapterService outputEventAdapterService) {
+    protected void unsetEventAdapterService(OutputEventAdapterService outputEventAdapterService) {
+
         EventPublisherServiceValueHolder.getOutputEventAdapterTypes().clear();
         EventPublisherServiceValueHolder.registerEventAdapterService(null);
     }
 
+    @Reference(
+            name = "registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService registryService) throws RegistryException {
+
         EventPublisherServiceValueHolder.setRegistryService(registryService);
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
+
         EventPublisherServiceValueHolder.unSetRegistryService();
     }
 
+    @Reference(
+            name = "eventStreamManager.service",
+            service = org.wso2.carbon.event.stream.core.EventStreamService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventStreamService")
     public void setEventStreamService(EventStreamService eventStreamService) {
+
         EventPublisherServiceValueHolder.registerEventStreamService(eventStreamService);
     }
 
     public void unsetEventStreamService(EventStreamService eventStreamService) {
+
         EventPublisherServiceValueHolder.registerEventStreamService(null);
     }
 
+    @Reference(
+            name = "output.event.adapter.tracker.service",
+            service = org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unSetEventAdapterType")
     protected void setEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
+
         EventPublisherServiceValueHolder.addOutputEventAdapterType(outputEventAdapterFactory.getType());
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherService() != null) {
             try {
-                EventPublisherServiceValueHolder.getCarbonEventPublisherService().activateInactiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
+                EventPublisherServiceValueHolder.getCarbonEventPublisherService()
+                        .activateInactiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
             }
@@ -146,38 +167,48 @@ public class EventPublisherServiceDS {
     }
 
     protected void unSetEventAdapterType(OutputEventAdapterFactory outputEventAdapterFactory) {
+
         EventPublisherServiceValueHolder.removeOutputEventAdapterType(outputEventAdapterFactory.getType());
         if (EventPublisherServiceValueHolder.getCarbonEventPublisherService() != null) {
             try {
-                EventPublisherServiceValueHolder.getCarbonEventPublisherService().deactivateActiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
+                EventPublisherServiceValueHolder.getCarbonEventPublisherService()
+                        .deactivateActiveEventPublisherConfigurationsForAdapter(outputEventAdapterFactory.getType());
             } catch (EventPublisherConfigurationException e) {
                 log.error(e.getMessage(), e);
             }
         }
-
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         EventPublisherServiceValueHolder.setConfigurationContextService(configurationContextService);
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
-        EventPublisherServiceValueHolder.setConfigurationContextService(null);
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
 
+        EventPublisherServiceValueHolder.setConfigurationContextService(null);
     }
 
+    @Reference(
+            name = "eventManagement.service",
+            service = org.wso2.carbon.event.processor.manager.core.EventManagementService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventManagementService")
     protected void setEventManagementService(EventManagementService eventManagementService) {
-        EventPublisherServiceValueHolder.registerEventManagementService(eventManagementService);
 
+        EventPublisherServiceValueHolder.registerEventManagementService(eventManagementService);
     }
 
     protected void unsetEventManagementService(EventManagementService eventManagementService) {
+
         EventPublisherServiceValueHolder.registerEventManagementService(null);
         eventManagementService.unsubscribe(EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService());
-
     }
-
-
 }

@@ -17,30 +17,33 @@ package org.wso2.carbon.event.stream.core.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-/**
- * @scr.component name="eventStreamService.component" immediate="true"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="0..1" policy="dynamic"
- * bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- * @scr.reference name="eventStreamListener.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamListener" cardinality="0..n" policy="dynamic"
- * bind="setEventStreamListener" unbind="unsetEventStreamListener"
- */
+@Component(
+        name = "eventStreamService.component",
+        immediate = true)
 public class EventStreamServiceDS {
+
     private static final Log log = LogFactory.getLog(EventStreamServiceDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             EventStreamServiceValueHolder.registerEventStreamRuntime(new EventStreamRuntime());
             CarbonEventStreamService carbonEventStreamService = new CarbonEventStreamService();
             EventStreamServiceValueHolder.setCarbonEventStreamService(carbonEventStreamService);
-            context.getBundleContext().registerService(EventStreamService.class.getName(), carbonEventStreamService, null);
+            context.getBundleContext().registerService(EventStreamService.class.getName(), carbonEventStreamService,
+                    null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed EventStreamService");
             }
@@ -49,23 +52,38 @@ public class EventStreamServiceDS {
         }
     }
 
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
-        EventStreamServiceValueHolder.registerConfigurationContextService(configurationContextService);
 
+        EventStreamServiceValueHolder.registerConfigurationContextService(configurationContextService);
         if (EventStreamServiceValueHolder.getCarbonEventStreamService() != null) {
             EventStreamServiceValueHolder.getCarbonEventStreamService().addPendingStreams();
         }
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         EventStreamServiceValueHolder.registerConfigurationContextService(null);
     }
 
+    @Reference(
+            name = "eventStreamListener.service",
+            service = org.wso2.carbon.event.stream.core.EventStreamListener.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventStreamListener")
     protected void setEventStreamListener(EventStreamListener eventStreamListener) {
+
         EventStreamServiceValueHolder.registerEventStreamListener(eventStreamListener);
     }
 
     protected void unsetEventStreamListener(EventStreamListener eventStreamListener) {
+
         EventStreamServiceValueHolder.unregisterEventStreamListener(eventStreamListener);
     }
 }

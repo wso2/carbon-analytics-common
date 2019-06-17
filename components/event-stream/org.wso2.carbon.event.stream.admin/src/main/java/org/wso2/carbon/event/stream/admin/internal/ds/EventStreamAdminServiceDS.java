@@ -15,30 +15,38 @@
 package org.wso2.carbon.event.stream.admin.internal.ds;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
 /**
  * This class is used to get the EventFormatter service.
- *
- * @scr.component name="eventStreamAdmin.component" immediate="true"
- * @scr.reference name="eventStreamService.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
  */
+@Component(
+        name = "eventStreamAdmin.component",
+        immediate = true)
 public class EventStreamAdminServiceDS {
+
+    @Activate
     protected void activate(ComponentContext context) {
 
     }
 
-    protected void setEventStreamService(
-            EventStreamService eventStreamService) {
+    @Reference(
+            name = "eventStreamService.service",
+            service = org.wso2.carbon.event.stream.core.EventStreamService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventStreamService")
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+
         EventStreamAdminServiceValueHolder.registerEventStreamService(eventStreamService);
     }
 
-    protected void unsetEventStreamService(
-            EventStreamService eventStreamService) {
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
 
     }
-
-
 }
