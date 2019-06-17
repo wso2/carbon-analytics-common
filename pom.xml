@@ -1459,7 +1459,7 @@
         <carbon.analytics.common.version>5.1.58-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.4.26</carbon.kernel.version>
+        <carbon.kernel.version>4.5.0-m1</carbon.kernel.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
         <securevault.wso2.version>1.0.0-wso2v2</securevault.wso2.version>
 
