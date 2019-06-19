@@ -1,0 +1,13 @@
+{
+  "output_adapter.jms.min_thread": "8",
+  "output_adapter.jms.max_thread": "100",
+  "output_adapter.jms.keep_alive_time": "20000ms",
+  "output_adapter.jms.job_queue_size": "10000",
+  "output_adapter.email.from_address": "abcd@gmail.com",
+  "output_adapter.email.username": "abcd",
+  "output_adapter.email.password": "xxxx",
+  "output_adapter.email.hostname": "smtp.gmail.com",
+  "output_adapter.email.port": "587",
+  "output_adapter.email.enable_start_tls": true,
+  "output_adapter.email.enable_authentication": true
+}
