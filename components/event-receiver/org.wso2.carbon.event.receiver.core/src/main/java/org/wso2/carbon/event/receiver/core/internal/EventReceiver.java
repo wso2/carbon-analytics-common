@@ -43,9 +43,7 @@ import org.wso2.carbon.event.receiver.core.internal.util.EventReceiverUtil;
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
 import org.wso2.carbon.event.stream.core.EventProducer;
 import org.wso2.carbon.event.stream.core.EventProducerCallback;
-import org.wso2.carbon.metrics.manager.Counter;
-import org.wso2.carbon.metrics.manager.Level;
-import org.wso2.carbon.metrics.manager.MetricManager;
+
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -57,7 +55,6 @@ public class EventReceiver implements EventProducer {
     private boolean isEventDuplicatedInCluster;
     private boolean traceEnabled = false;
     private boolean statisticsEnabled = false;
-    private Counter eventCounter;
     private boolean customMappingEnabled = false;
     private boolean isWorkerNode = false;
     private boolean sufficientToSend = false;
@@ -109,7 +106,6 @@ public class EventReceiver implements EventProducer {
 
             // Initialize tracer and statistics.
             if (statisticsEnabled) {
-                this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
             }
             if (traceEnabled) {
                 this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventReceiverConstants.EVENT_RECEIVER +
@@ -271,7 +267,6 @@ public class EventReceiver implements EventProducer {
             trace.info(afterTracerPrefix + event);
         }
         if (statisticsEnabled) {
-            eventCounter.inc();
         }
 //
 //        long timestamp = event.getTimeStamp();
