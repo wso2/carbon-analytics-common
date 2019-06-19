@@ -16,17 +16,19 @@
 package org.wso2.carbon.event.template.manager.admin.internal.ds;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.template.manager.core.TemplateManagerService;
 
 /**
  * This class is used to get the EventProcessor service.
- *
- * @scr.component name="org.wso2.carbon.event.template.manager.admin.TemplateManagerAdminService" immediate="true"
- * @scr.reference name="templateManagerService.service"
- * interface="org.wso2.carbon.event.template.manager.core.TemplateManagerService" cardinality="1..1"
- * policy="dynamic" bind="setTemplateManagerService" unbind="unsetTemplateManagerService"
  */
-
+@Component(
+        name = "org.wso2.carbon.event.template.manager.admin.TemplateManagerAdminService",
+        immediate = true)
 public class TemplateManagerAdminServiceDS {
 
     /**
@@ -34,16 +36,24 @@ public class TemplateManagerAdminServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
     }
 
+    @Reference(
+            name = "templateManagerService.service",
+            service = org.wso2.carbon.event.template.manager.core.TemplateManagerService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetTemplateManagerService")
     protected void setTemplateManagerService(TemplateManagerService templateManagerService) {
+
         TemplateManagerAdminServiceValueHolder.setTemplateManagerService(templateManagerService);
     }
 
     protected void unsetTemplateManagerService(TemplateManagerService templateManagerService) {
+
         TemplateManagerAdminServiceValueHolder.setTemplateManagerService(null);
     }
-
 }

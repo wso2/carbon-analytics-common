@@ -18,6 +18,11 @@ package org.wso2.carbon.event.publisher.template.deployer.internal.ds;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.template.deployer.EventPublisherTemplateDeployer;
 import org.wso2.carbon.event.publisher.template.deployer.internal.EventPublisherTemplateDeployerValueHolder;
@@ -25,21 +30,16 @@ import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
-
-/**
- * @scr.component name="TemplateDeployer.eventPublisher.component" immediate="true"
- * @scr.reference name="eventPublisherService.service"
- * interface="org.wso2.carbon.event.publisher.core.EventPublisherService" cardinality="1..1"
- * policy="dynamic" bind="setEventPublisherService" unbind="unsetEventPublisherService"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- */
+@Component(
+        name = "TemplateDeployer.eventPublisher.component",
+        immediate = true)
 public class EventPublisherTemplateDeployerDS {
 
     private static final Log log = LogFactory.getLog(EventPublisherTemplateDeployerDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             EventPublisherTemplateDeployer templateDeployer = new EventPublisherTemplateDeployer();
             context.getBundleContext().registerService(TemplateDeployer.class.getName(), templateDeployer, null);
@@ -48,20 +48,35 @@ public class EventPublisherTemplateDeployerDS {
         }
     }
 
+    @Reference(
+            name = "eventPublisherService.service",
+            service = org.wso2.carbon.event.publisher.core.EventPublisherService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventPublisherService")
     protected void setEventPublisherService(EventPublisherService eventPublisherService) {
+
         EventPublisherTemplateDeployerValueHolder.setEventPublisherService(eventPublisherService);
     }
 
     protected void unsetEventPublisherService(EventPublisherService eventPublisherService) {
+
         EventPublisherTemplateDeployerValueHolder.setEventPublisherService(null);
     }
 
-    protected void setRegistryService(RegistryService registryService) throws
-                                                                       RegistryException {
+    @Reference(
+            name = "registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRegistryService")
+    protected void setRegistryService(RegistryService registryService) throws RegistryException {
+
         EventPublisherTemplateDeployerValueHolder.setRegistryService(registryService);
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
+
         EventPublisherTemplateDeployerValueHolder.setRegistryService(null);
     }
 }

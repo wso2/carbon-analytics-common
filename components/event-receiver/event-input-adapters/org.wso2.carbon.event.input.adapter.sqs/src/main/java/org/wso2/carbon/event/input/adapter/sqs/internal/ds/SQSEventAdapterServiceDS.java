@@ -15,21 +15,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.event.input.adapter.sqs.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.sqs.internal.SQSEventAdapterFactory;
 
 /**
  * Class to handle registering SQS event adapter component as an input event adapter.
- * @scr.component name="input.sqsEventAdapterService.component" immediate="true"
  */
-
+@Component(
+        name = "input.sqsEventAdapterService.component",
+        immediate = true)
 public class SQSEventAdapterServiceDS {
+
     private static final Log LOG = LogFactory.getLog(SQSEventAdapterServiceDS.class);
 
     /**
@@ -37,7 +40,9 @@ public class SQSEventAdapterServiceDS {
      *
      * @param context context of the SQS Event Adapter component
      */
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             InputEventAdapterFactory sqsEventEventAdapterFactory = new SQSEventAdapterFactory();
             context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),

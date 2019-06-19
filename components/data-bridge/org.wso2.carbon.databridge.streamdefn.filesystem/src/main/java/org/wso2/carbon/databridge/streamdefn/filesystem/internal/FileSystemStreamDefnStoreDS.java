@@ -18,32 +18,45 @@
 package org.wso2.carbon.databridge.streamdefn.filesystem.internal;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
 import org.wso2.carbon.databridge.streamdefn.filesystem.FileSystemStreamDefinitionStore;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 
-/**
- * @scr.component name="filesystem.streamdefn.store.comp" immediate="true"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1" policy="dynamic"
- * bind="setEventStreamService" unbind="unsetEventStreamService"
- */
+@Component(
+        name = "filesystem.streamdefn.store.comp",
+        immediate = true)
 public class FileSystemStreamDefnStoreDS {
+
+    @Activate
     protected void activate(ComponentContext componentContext) {
+
         AbstractStreamDefinitionStore abstractStreamDefinitionStore = new FileSystemStreamDefinitionStore();
         componentContext.getBundleContext().registerService(AbstractStreamDefinitionStore.class.getName(),
                 abstractStreamDefinitionStore, null);
         ServiceHolder.setStreamDefinitionStore(abstractStreamDefinitionStore);
-        componentContext.getBundleContext().registerService(EventStreamListener.class.getName(),
-                new EventStreamListenerImpl(), null);
+        componentContext.getBundleContext().registerService(EventStreamListener.class.getName(), new
+                EventStreamListenerImpl(), null);
     }
 
-    protected void setEventStreamService(EventStreamService eventStreamService){
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.event.stream.core.EventStreamService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetEventStreamService")
+    protected void setEventStreamService(EventStreamService eventStreamService) {
+
         ServiceHolder.setEventStreamService(eventStreamService);
     }
 
-    protected void unsetEventStreamService(EventStreamService eventStreamService){
+    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+
         ServiceHolder.setEventStreamService(null);
     }
 }

@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.dashboard.template.deployer.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.dashboard.template.deployer.DashboardTemplateDeployer;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 
-/**
- * @scr.component name="TemplateDeployer.dashboard.component" immediate="true"
- */
+@Component(
+        name = "TemplateDeployer.dashboard.component",
+        immediate = true)
 public class DashboardTemplateDeployerDS {
+
     private static final Log log = LogFactory.getLog(DashboardTemplateDeployerDS.class);
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             DashboardTemplateDeployer templateDeployer = new DashboardTemplateDeployer();
             context.getBundleContext().registerService(TemplateDeployer.class.getName(), templateDeployer, null);

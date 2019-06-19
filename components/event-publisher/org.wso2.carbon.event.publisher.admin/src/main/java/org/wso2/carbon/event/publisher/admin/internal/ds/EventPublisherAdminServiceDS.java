@@ -15,42 +15,56 @@
 package org.wso2.carbon.event.publisher.admin.internal.ds;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 
 /**
  * This class is used to get the EventPublisher service.
- *
- * @scr.component name="eventPublisherAdmin.component" immediate="true"
- * @scr.reference name="event.adapter.service"
- * interface="org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService" cardinality="1..1"
- * policy="dynamic" bind="setEventAdapterService" unbind="unSetEventAdapterService"
- * @scr.reference name="eventPublisherService.service"
- * interface="org.wso2.carbon.event.publisher.core.EventPublisherService" cardinality="1..1"
- * policy="dynamic" bind="setEventPublisherService" unbind="unSetEventPublisherService"
  */
+@Component(
+        name = "eventPublisherAdmin.component",
+        immediate = true)
 public class EventPublisherAdminServiceDS {
+
+    @Activate
     protected void activate(ComponentContext context) {
 
     }
 
-    protected void setEventAdapterService(
-            OutputEventAdapterService eventAdapterService) {
+    @Reference(
+            name = "event.adapter.service",
+            service = org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unSetEventAdapterService")
+    protected void setEventAdapterService(OutputEventAdapterService eventAdapterService) {
+
         EventPublisherAdminServiceValueHolder.registerEventAdapterService(eventAdapterService);
     }
 
-    protected void unSetEventAdapterService(
-            OutputEventAdapterService eventAdapterService) {
+    protected void unSetEventAdapterService(OutputEventAdapterService eventAdapterService) {
+
         EventPublisherAdminServiceValueHolder.registerEventAdapterService(null);
     }
 
+    @Reference(
+            name = "eventPublisherService.service",
+            service = org.wso2.carbon.event.publisher.core.EventPublisherService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unSetEventPublisherService")
     protected void setEventPublisherService(EventPublisherService eventPublisherService) {
+
         EventPublisherAdminServiceValueHolder.registerEventPublisherService(eventPublisherService);
     }
 
     protected void unSetEventPublisherService(EventPublisherService eventPublisherService) {
+
         EventPublisherAdminServiceValueHolder.registerEventPublisherService(null);
     }
-
-
 }

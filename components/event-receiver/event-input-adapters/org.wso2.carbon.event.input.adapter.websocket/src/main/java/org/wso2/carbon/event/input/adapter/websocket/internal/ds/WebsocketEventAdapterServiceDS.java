@@ -15,18 +15,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.event.input.adapter.websocket.internal.ds;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory;
 import org.wso2.carbon.event.input.adapter.websocket.WebsocketEventAdapterFactory;
 
-/**
- * @scr.component name="input.websocketEventAdapterService.component" immediate="true"
- */
+@Component(
+        name = "input.websocketEventAdapterService.component",
+        immediate = true)
 public class WebsocketEventAdapterServiceDS {
 
     private static final Log log = LogFactory.getLog(WebsocketEventAdapterServiceDS.class);
@@ -36,11 +37,13 @@ public class WebsocketEventAdapterServiceDS {
      *
      * @param context
      */
+    @Activate
     protected void activate(ComponentContext context) {
 
         try {
             InputEventAdapterFactory websocketEventAdapterFactory = new WebsocketEventAdapterFactory();
-            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(), websocketEventAdapterFactory, null);
+            context.getBundleContext().registerService(InputEventAdapterFactory.class.getName(),
+                    websocketEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the input websocket adapter service");
             }
