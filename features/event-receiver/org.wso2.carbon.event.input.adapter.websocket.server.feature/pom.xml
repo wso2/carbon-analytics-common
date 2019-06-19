@@ -35,8 +35,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.jaxb-api-2.0</artifactId>
+            <groupId>org.wso2.orbit.javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.tyrus.bundles.wso2</groupId>
@@ -76,9 +76,8 @@
                                     org.glassfish.tyrus.bundles.wso2:tyrus-standalone-client:${org.glassfish.tyrus.wso2.version}
                                 </bundleDef>
                                 <bundleDef>
-                                    <!--javax.xml.bind:jaxb-api:2.1-->
-                                    org.apache.servicemix.bundles:org.apache.servicemix.bundles.jaxb-api-2.0:${apache.servicemix.version}
-                                </bundleDef>
+                                    <!--javax.xml.bind:jaxb-api:2.3.1-->
+                                    org.wso2.orbit.javax.xml.bind:jaxb-api:${version.org.wso2.orbit.javax.xml.bind}                                </bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}

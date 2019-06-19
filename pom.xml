@@ -354,9 +354,9 @@
                 <version>${cxf.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.servicemix.bundles</groupId>
-                <artifactId>org.apache.servicemix.bundles.jaxb-api-2.0</artifactId>
-                <version>${apache.servicemix.version}</version>
+                <groupId>org.wso2.orbit.javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${version.org.wso2.orbit.javax.xml.bind}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
@@ -1493,7 +1493,7 @@
         <org.eclipse.paho.version>0.4.0</org.eclipse.paho.version>
         <org.glassfish.tyrus.wso2.version>1.7-wso2v1</org.glassfish.tyrus.wso2.version>
         <google.jsmpp.version>2.0.1</google.jsmpp.version>
-        <apache.servicemix.version>4.0-m1</apache.servicemix.version>
+        <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
         <jsonpath.version>2.4.0.wso2v2</jsonpath.version>
         <jsonsmart.version>1.2</jsonsmart.version>
