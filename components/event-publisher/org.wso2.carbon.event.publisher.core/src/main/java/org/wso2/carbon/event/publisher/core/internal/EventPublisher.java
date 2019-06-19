@@ -40,9 +40,7 @@ import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceVal
 import org.wso2.carbon.event.publisher.core.internal.util.EventPublisherUtil;
 import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
-import org.wso2.carbon.metrics.manager.Counter;
-import org.wso2.carbon.metrics.manager.Level;
-import org.wso2.carbon.metrics.manager.MetricManager;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +57,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private final boolean statisticsEnabled;
     private final boolean processingEnabled;
     private List<String> dynamicMessagePropertyList = new ArrayList<String>();
-    private Counter eventCounter;
     private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
@@ -147,7 +144,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         this.processingEnabled = eventPublisherConfiguration.isProcessingEnabled();
 
         if (statisticsEnabled) {
-            this.eventCounter = MetricManager.counter(metricId, Level.INFO, Level.INFO);
         }
         if (traceEnabled) {
             this.beforeTracerPrefix = "TenantId : " + tenantId + ", " + EventPublisherConstants.EVENT_PUBLISHER +
@@ -381,7 +377,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             trace.info(beforeTracerPrefix + event);
         }
         if (statisticsEnabled) {
-            eventCounter.inc();
         }
 
         if (!processingEnabled) {
