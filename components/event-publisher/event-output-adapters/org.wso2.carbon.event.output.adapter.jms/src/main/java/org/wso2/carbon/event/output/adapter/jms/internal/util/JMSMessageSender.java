@@ -115,6 +115,12 @@ public class JMSMessageSender {
                 } catch (JMSException e) {
                     handleConnectionException("Error setting JMS Producer TTL to : " + timeToLive, e);
                 }
+            } else if (jmsMessage.getJMSExpiration() > 0) {
+                try {
+                    producer.setTimeToLive(jmsMessage.getJMSExpiration());
+                } catch (JMSException e) {
+                    handleConnectionException("Error setting JMS Producer TTL to : " + jmsMessage.getJMSExpiration(), e);
+                }
             }
 
             // perform actual message sending
