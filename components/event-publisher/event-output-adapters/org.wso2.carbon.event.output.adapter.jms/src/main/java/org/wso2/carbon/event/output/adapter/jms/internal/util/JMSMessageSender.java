@@ -72,9 +72,6 @@ public class JMSMessageSender {
 
         Boolean jtaCommit = getBooleanProperty(messageProperties, BaseConstants.JTA_COMMIT_AFTER_SEND);
         Boolean rollbackOnly = getBooleanProperty(messageProperties, BaseConstants.SET_ROLLBACK_ONLY);
-        Boolean persistent = getBooleanProperty(messageProperties, JMSConstants.JMS_DELIVERY_MODE);
-        Integer priority = getIntegerProperty(messageProperties, JMSConstants.JMS_PRIORITY);
-        Integer timeToLive = getIntegerProperty(messageProperties, JMSConstants.JMS_TIME_TO_LIVE);
 
         MessageProducer producer = null;
         Destination destination = null;
@@ -95,33 +92,9 @@ public class JMSMessageSender {
                 jtaCommit = Boolean.FALSE;
             }
 
-            if (persistent != null) {
-                try {
-                    producer.setDeliveryMode(DeliveryMode.PERSISTENT);
-                } catch (JMSException e) {
-                    handleConnectionException("Error setting JMS Producer for PERSISTENT delivery", e);
-                }
-            }
-            if (priority != null) {
-                try {
-                    producer.setPriority(priority);
-                } catch (JMSException e) {
-                    handleConnectionException("Error setting JMS Producer priority to : " + priority, e);
-                }
-            }
-            if (timeToLive != null) {
-                try {
-                    producer.setTimeToLive(timeToLive);
-                } catch (JMSException e) {
-                    handleConnectionException("Error setting JMS Producer TTL to : " + timeToLive, e);
-                }
-            } else if (jmsMessage.getJMSExpiration() > 0) {
-                try {
-                    producer.setTimeToLive(jmsMessage.getJMSExpiration());
-                } catch (JMSException e) {
-                    handleConnectionException("Error setting JMS Producer TTL to : " + jmsMessage.getJMSExpiration(), e);
-                }
-            }
+            producer.setDeliveryMode(jmsMessage.getJMSDeliveryMode());
+            producer.setPriority(jmsMessage.getJMSPriority());
+            producer.setTimeToLive(jmsMessage.getJMSExpiration());
 
             // perform actual message sending
 //        try {
