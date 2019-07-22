@@ -88,17 +88,6 @@ public class ThriftDataReceiverTest {
         thriftDataReceiver.stop();
     }
 
-    @Test(expectedExceptions = DataBridgeException.class)
-    public void testReceiverWithNoKeyPassword() throws DataBridgeException, InterruptedException {
-
-        System.clearProperty("Security.KeyStore.Password");
-        System.setProperty("Security.KeyStore.Location", ThriftServerUtil.TEST_DIR + File.separator + "wso2carbon.jks");
-        ThriftDataReceiver thriftDataReceiver = new ThriftDataReceiver(7611, dataBridge);
-        thriftDataReceiver.start("localhost");
-        Thread.sleep(1000);
-        thriftDataReceiver.stop();
-    }
-
     @Test
     public void testReceiver() {
 

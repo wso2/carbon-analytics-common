@@ -35,7 +35,9 @@ import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfigu
 import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
 import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
+import org.wso2.carbon.utils.Utils;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -112,8 +114,8 @@ public class ThriftDataReceiver {
             if (keyStore == null) {
                 keyStore = System.getProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    throw new DataBridgeException("Cannot start thrift agent server, not valid " +
-                            "Security.KeyStore.Location is null");
+                    keyStore = Utils.getCarbonHome() + File.separator + "resources" + File.separator +
+                            "security" + File.separator + "wso2carbon.jks";
                 }
             }
 

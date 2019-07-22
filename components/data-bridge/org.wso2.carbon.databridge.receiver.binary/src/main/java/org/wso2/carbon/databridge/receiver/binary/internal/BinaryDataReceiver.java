@@ -25,9 +25,11 @@ import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
+import org.wso2.carbon.utils.Utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -134,8 +136,8 @@ public class BinaryDataReceiver implements ServerEventListener {
             if (keyStore == null) {
                 keyStore = System.getProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    throw new DataBridgeException("Cannot start binary agent server, " +
-                            "not valid Security.KeyStore.Location is null");
+                    keyStore = Utils.getCarbonHome() + File.separator + "resources" + File.separator +
+                            "security" + File.separator + "wso2carbon.jks";
                 }
             }
 
