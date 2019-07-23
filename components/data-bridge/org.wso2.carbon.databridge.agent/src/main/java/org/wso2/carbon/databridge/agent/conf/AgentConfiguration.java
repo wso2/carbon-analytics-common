@@ -41,7 +41,7 @@ public class AgentConfiguration {
     private String trustStorePath = "";
 
     @Element(description = "Trust store password", required = false)
-    private String trustStorePassword = "";
+    private String trustStorePassword = "wso2carbon";
 
     @Element(description = "Queue Size", required = false)
     private int queueSize = 32768;
@@ -92,9 +92,11 @@ public class AgentConfiguration {
     private String sslEnabledProtocols = "TLSv1,TLSv1.1,TLSv1.2";
 
     @Element(description = "Ciphers", required = false)
-    private String ciphers = "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA," +
-            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA," +
-            "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
+    private String ciphers = "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256," +
+            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA," +
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA," +
+            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256," +
+            "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256";
 
     public String getName() {
         return name;

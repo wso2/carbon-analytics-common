@@ -38,6 +38,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -136,8 +139,15 @@ public class BinaryDataReceiver implements ServerEventListener {
             if (keyStore == null) {
                 keyStore = System.getProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    keyStore = Utils.getCarbonHome() + File.separator + "resources" + File.separator +
+                    String defaultKeyStore = Utils.getCarbonHome() + File.separator + "resources" + File.separator +
                             "security" + File.separator + "wso2carbon.jks";
+                    Path defaultKeyStoreFilePath = Paths.get(defaultKeyStore);
+                    if (Files.exists(defaultKeyStoreFilePath)) {
+                        keyStore = defaultKeyStore;
+                    } else {
+                        throw new DataBridgeException("Cannot start binary agent server, " +
+                                " Security.KeyStore.Location is null");
+                    }
                 }
             }
 
