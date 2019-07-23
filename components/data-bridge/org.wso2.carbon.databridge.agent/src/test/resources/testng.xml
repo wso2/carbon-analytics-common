@@ -33,6 +33,7 @@
             <class name="org.wso2.carbon.databridge.agent.test.DataBrigdeWorkerTestCase"/>
             <class name="org.wso2.carbon.databridge.agent.test.DataPublisherTestCase"/>
             <class name="org.wso2.carbon.databridge.agent.test.LegacyDataPublisherTestCase"/>
+            <class name="org.wso2.carbon.databridge.agent.test.DataPublisherWithDefaultsTestCase"/>
         </classes>
     </test>
 </suite>
