@@ -45,8 +45,7 @@ public class DataBridgeConfiguration {
     private String keyStoreLocation = null;
 
     @Element(description = "Keystore password", required = true)
-    private String keyStorePassword = null;
-
+    private String keyStorePassword = "wso2carbon";
 
     @Element(description = "Data receiver configurations", required = true)
     public List<DataReceiver> dataReceivers = new ArrayList<>();
@@ -143,7 +142,6 @@ public class DataBridgeConfiguration {
         thriftPropertiesMap.put("ciphers", "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_" +
                 "CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_" +
                 "SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA");
-
 
         dataReceivers.add(new DataReceiver("Thrift", thriftPropertiesMap));
         dataReceivers.add(new DataReceiver("Binary", binaryPropertiesMap));
