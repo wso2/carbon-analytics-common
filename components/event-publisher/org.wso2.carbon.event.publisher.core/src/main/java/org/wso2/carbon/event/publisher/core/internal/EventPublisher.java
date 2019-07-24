@@ -19,7 +19,8 @@ package org.wso2.carbon.event.publisher.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.Event;
@@ -57,7 +58,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     private final boolean statisticsEnabled;
     private final boolean processingEnabled;
     private List<String> dynamicMessagePropertyList = new ArrayList<String>();
-    private Logger trace = Logger.getLogger(EventPublisherConstants.EVENT_TRACE_LOGGER);
+    private Log trace = LogFactory.getLog(EventPublisherConstants.EVENT_TRACE_LOGGER);
     private EventPublisherConfiguration eventPublisherConfiguration = null;
     private int tenantId;
     private Map<String, Integer> propertyPositionMap = new TreeMap<String, Integer>();

@@ -22,7 +22,8 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
 import org.wso2.carbon.event.processor.manager.core.EventProcessorManagementService;
@@ -51,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CarbonEventManagementService implements EventManagementService {
 
-    private static Logger log = Logger.getLogger(CarbonEventManagementService.class);
+    private static Log log = LogFactory.getLog(CarbonEventManagementService.class);
 
     private Mode mode = Mode.SingleNode;
     private ManagementModeInfo managementModeInfo;

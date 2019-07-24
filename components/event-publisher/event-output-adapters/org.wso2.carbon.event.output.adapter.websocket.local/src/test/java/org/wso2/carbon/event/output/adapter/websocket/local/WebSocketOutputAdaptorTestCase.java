@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.output.adapter.websocket.local;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,7 +10,7 @@ import java.nio.file.Paths;
  * .
  */
 public class WebSocketOutputAdaptorTestCase {
-    private static final Logger logger = Logger.getLogger(WebSocketOutputAdaptorTestCase.class);
+    private static final Log logger = LogFactory.getLog(WebSocketOutputAdaptorTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     private void setupCarbonConfig() {

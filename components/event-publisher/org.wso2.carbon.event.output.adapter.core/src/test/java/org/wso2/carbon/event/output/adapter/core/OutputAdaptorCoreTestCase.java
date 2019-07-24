@@ -4,7 +4,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -37,7 +38,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(CarbonContext.class)
 public class OutputAdaptorCoreTestCase {
-    private static final Logger logger = Logger.getLogger(OutputAdaptorCoreTestCase.class);
+    private static final Log logger = LogFactory.getLog(OutputAdaptorCoreTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     @Test

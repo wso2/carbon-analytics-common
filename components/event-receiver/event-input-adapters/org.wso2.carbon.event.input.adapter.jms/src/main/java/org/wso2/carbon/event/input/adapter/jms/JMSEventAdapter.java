@@ -18,7 +18,8 @@
 package org.wso2.carbon.event.input.adapter.jms;
 
 import org.apache.axis2.transport.base.threads.NativeWorkerPool;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -39,7 +40,7 @@ public class JMSEventAdapter implements InputEventAdapter {
     private InputEventAdapterListener eventAdapterListener;
     private JMSConnectionFactory jmsConnectionFactory;
     private JMSListener jmsListener;
-    private Logger log = Logger.getLogger(JMSEventAdapter.class);
+    private Log log = LogFactory.getLog(JMSEventAdapter.class);
     private String destination;
     private int minThreadPoolSize;
     private int maxThreadPoolSize;

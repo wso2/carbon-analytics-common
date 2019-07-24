@@ -24,7 +24,8 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.TimeoutBlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
 import org.wso2.carbon.event.processor.manager.commons.transport.server.ConnectionCallback;
@@ -46,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 public class TCPEventPublisher {
     public static final int PING_HEADER_VALUE = -99;
 
-    private static Logger log = Logger.getLogger(TCPEventPublisher.class);
+    private static Log log = LogFactory.getLog(TCPEventPublisher.class);
     private final String hostUrl;
     private Disruptor<ByteArrayHolder> disruptor;
     private RingBuffer<ByteArrayHolder> ringBuffer;

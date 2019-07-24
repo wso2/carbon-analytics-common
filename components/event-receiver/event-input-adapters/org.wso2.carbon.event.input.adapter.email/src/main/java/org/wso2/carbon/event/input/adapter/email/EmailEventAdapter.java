@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.event.input.adapter.email;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
@@ -39,7 +40,7 @@ public class EmailEventAdapter implements InputEventAdapter {
     private final Map<String, String> globalProperties;
     private InputEventAdapterListener eventAdaptorListener;
     private final String id = UUID.randomUUID().toString();
-    private static final Logger log = Logger.getLogger(EmailEventAdapter.class);
+    private static final Log log = LogFactory.getLog(EmailEventAdapter.class);
     private long pollIntervalInSeconds = EmailEventAdapterConstants.DEFAULT_EMAIL_POLL_INTERVAL_IN_MINS;
     private String moveToFolderName;
     private Timer timer;

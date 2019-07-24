@@ -21,7 +21,8 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
@@ -43,7 +44,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventHandler {
-    private static Logger log = Logger.getLogger(EventHandler.class);
+    private static Log log = LogFactory.getLog(EventHandler.class);
 
     private TCPEventServer tcpEventServer = null;
 

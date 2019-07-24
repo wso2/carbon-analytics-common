@@ -19,7 +19,8 @@
 
 package org.wso2.carbon.analytics.common.jmx.agent;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.common.jmx.agent.exceptions.JmxConnectionException;
 import org.wso2.carbon.analytics.common.jmx.agent.exceptions.JmxMBeanException;
 import org.wso2.carbon.analytics.common.jmx.agent.profiles.Profile;
@@ -40,7 +41,7 @@ import java.util.Map;
 
 public class JmxAgent {
 
-    private static Logger log = Logger.getLogger(JmxAgent.class);
+    private static Log log = LogFactory.getLog(JmxAgent.class);
 
     private Profile profile;
 

@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.output.adapter.jms;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class JmsPublisherTestCase {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
-    private static final Logger LOGGER = Logger.getLogger(JmsPublisherTestCase.class);
+    private static final Log LOGGER = LogFactory.getLog(JmsPublisherTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     private void setupCarbonConfig(String tenantName) {

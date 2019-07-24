@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.output.adapter.core;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -34,7 +35,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * .
  */
 public class OutputAdaptorServiceTestCase {
-    private static final Logger logger = Logger.getLogger(OutputAdaptorServiceTestCase.class);
+    private static final Log logger = LogFactory.getLog(OutputAdaptorServiceTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     private void setupCarbonConfig() {
@@ -114,7 +115,7 @@ public class OutputAdaptorServiceTestCase {
             TestConnectionNotSupportedException {
         logger.info("Test case for testing the publishing while Runtime exception happen in message sending.");
         final TestLogAppender appender = new TestLogAppender();
-        final Logger testLogger = Logger.getLogger(OutputAdapterRuntime.class);
+        final Log testLogger = LogFactory.getLog(OutputAdapterRuntime.class);
         testLogger.addAppender(appender);
         setupCarbonConfig();
         CarbonOutputEventAdapterService adapterService = new CarbonOutputEventAdapterService();
@@ -177,7 +178,7 @@ public class OutputAdaptorServiceTestCase {
             TestConnectionNotSupportedException {
         logger.info("Test case for testing the publishing while connection is not available");
         final TestLogAppender appender = new TestLogAppender();
-        final Logger testLogger = Logger.getLogger(OutputAdapterRuntime.class);
+        final Log testLogger = LogFactory.getLog(OutputAdapterRuntime.class);
         testLogger.addAppender(appender);
         setupCarbonConfig();
         CarbonOutputEventAdapterService adapterService = new CarbonOutputEventAdapterService();

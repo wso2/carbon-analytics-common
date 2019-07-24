@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.output.adapter.sms;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -29,7 +30,7 @@ import java.util.Map;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SMSEventAdapterServiceValueHolder.class)
 public class SmsOutputAdaptorTestCase {
-    private static final Logger logger = Logger.getLogger(SmsOutputAdaptorTestCase.class);
+    private static final Log logger = LogFactory.getLog(SmsOutputAdaptorTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     private void setupCarbonConfig() {

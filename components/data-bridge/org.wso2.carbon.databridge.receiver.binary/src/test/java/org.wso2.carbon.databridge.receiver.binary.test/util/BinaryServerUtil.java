@@ -21,7 +21,8 @@ package org.wso2.carbon.databridge.receiver.binary.test.util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -52,7 +53,7 @@ public class BinaryServerUtil {
 
     public static final Path testDir = Paths.get("src", "test", "resources");
 
-    private static Logger log = Logger.getLogger(BinaryServerUtil.class);
+    private static Log log = LogFactory.getLog(BinaryServerUtil.class);
 
     public static byte[] convertEventToByteArray(Event event, String sessionId) throws IOException {
 

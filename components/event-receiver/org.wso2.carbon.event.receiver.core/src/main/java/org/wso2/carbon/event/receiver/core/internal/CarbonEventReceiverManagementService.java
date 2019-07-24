@@ -19,7 +19,8 @@
 package org.wso2.carbon.event.receiver.core.internal;
 
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.core.EventReceiverManagementService;
 import org.wso2.carbon.event.processor.manager.core.exception.EventManagementException;
 import org.wso2.carbon.event.receiver.core.internal.ds.EventReceiverServiceValueHolder;
@@ -32,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CarbonEventReceiverManagementService extends EventReceiverManagementService {
 
-    private Logger log = Logger.getLogger(CarbonEventReceiverManagementService.class);
+    private Log log = LogFactory.getLog(CarbonEventReceiverManagementService.class);
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private boolean isReceiverCoordinator = false;
 
