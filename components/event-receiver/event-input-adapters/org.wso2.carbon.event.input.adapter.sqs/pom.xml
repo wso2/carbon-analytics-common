@@ -82,7 +82,7 @@
                             org.wso2.carbon.event.input.adapter.core;version="${input.adapter.sqs.input.range}",
                             org.wso2.carbon.event.input.adapter.core.*;version="${input.adapter.sqs.input.range}",
                             com.amazonaws.*;version="0.0.0",
-                            org.apache.commons.logging.*;version="${carbon.version.range}",
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.osgi.framework.*;version="${org.eclipse.osgi.version.range}",
                             org.osgi.service.component.*;version="${org.eclipse.osgi.version.range}",
                             org.wso2.carbon.context.*;version="${carbon.kernel.version.range}"
