@@ -28,6 +28,9 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 
 import java.util.Map;
 
+import static org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants.SP_AUTH_NAMESPACE;
+import static org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants.STREAMLINED_AUTH_NAMESPACE;
+
 /**
  * IdP Client Utils.
  */
@@ -40,12 +43,17 @@ public class IdPServiceUtils {
         IdPClient idPClient;
         try {
             IdPClientConfiguration idPClientConfiguration;
-            if (configProvider.getConfigurationObject(IdPClientConstants.SP_AUTH_NAMESPACE) == null) {
-                idPClientConfiguration = new IdPClientConfiguration();
-                LOG.info("Enabling default IdPClient Local User Store as configuration is not overridden.");
+
+            if (configProvider.getConfigurationObject(STREAMLINED_AUTH_NAMESPACE) != null) {
+                LOG.debug("Extract IdP Client configs from under 'authentication' namespace.");
+                idPClientConfiguration = configProvider.getConfigurationObject(
+                        STREAMLINED_AUTH_NAMESPACE, IdPClientConfiguration.class);
+            } else if (configProvider.getConfigurationObject(SP_AUTH_NAMESPACE) != null) {
+                LOG.debug("Extract IdP Client configs from under 'auth.configs' namespace.");
+                idPClientConfiguration = configProvider.getConfigurationObject(IdPClientConfiguration.class);
             } else {
-                idPClientConfiguration = configProvider.
-                        getConfigurationObject(IdPClientConfiguration.class);
+                LOG.info("Enabling default IdPClient Local User Store as configuration is not overridden.");
+                idPClientConfiguration = new IdPClientConfiguration();
             }
             idPClientFactory = idPClientFactoryMap.get(idPClientConfiguration.getType());
             if (idPClientFactory == null) {
@@ -54,8 +62,7 @@ public class IdPServiceUtils {
             idPClient = idPClientFactory.getIdPClient(idPClientConfiguration);
             LOG.info("IdP client of type '" + idPClientConfiguration.getType() + "' is started.");
         } catch (ConfigurationException e) {
-            throw new IdPClientException("Error in reading '" + IdPClientConstants.SP_AUTH_NAMESPACE + "' from file.",
-                    e);
+            throw new IdPClientException("Error in reading '" + SP_AUTH_NAMESPACE + "' from file.", e);
         }
         return idPClient;
     }
