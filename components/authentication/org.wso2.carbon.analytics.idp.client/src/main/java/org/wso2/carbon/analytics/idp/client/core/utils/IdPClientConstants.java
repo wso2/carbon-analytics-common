@@ -27,6 +27,7 @@ public class IdPClientConstants {
     public static final String REFRESH_GRANT_TYPE = "refresh_token";
 
     public static final String SP_AUTH_NAMESPACE = "auth.configs";
+    public static final String STREAMLINED_AUTH_NAMESPACE = "authentication";
 
     public static final String LOGIN_STATUS = "Status";
     public static final String REDIRECTION_URL = "Redirect_Url";
