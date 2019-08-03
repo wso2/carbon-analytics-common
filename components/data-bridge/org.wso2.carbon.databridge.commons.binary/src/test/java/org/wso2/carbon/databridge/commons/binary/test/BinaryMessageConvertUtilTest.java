@@ -18,7 +18,8 @@
 package org.wso2.carbon.databridge.commons.binary.test;
 
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil;
@@ -32,7 +33,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class BinaryMessageConvertUtilTest {
-    Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
+    Log log = LogFactory.getLog(BinaryMessageConvertUtilTest.class);
 
     @Test
     public void testEventBufferSize() {

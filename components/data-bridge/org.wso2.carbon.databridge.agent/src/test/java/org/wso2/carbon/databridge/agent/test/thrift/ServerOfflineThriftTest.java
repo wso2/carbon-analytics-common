@@ -1,27 +1,31 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.databridge.agent.test.thrift;
 
 import junit.framework.Assert;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,11 +44,13 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
+import java.io.Serializable;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServerOfflineThriftTest {
+
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private String agentConfigFileName = "data-agent-config.xml";
@@ -71,12 +77,15 @@ public class ServerOfflineThriftTest {
 
     @BeforeClass
     public static void init() {
+
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointException, DataEndpointConfigurationException {
+
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
                 "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -86,6 +95,7 @@ public class ServerOfflineThriftTest {
     public void testSendingEventsWhileServerOffline()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
             DataEndpointException, DataEndpointConfigurationException, SocketException {
+
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":8613",
@@ -116,9 +126,10 @@ public class ServerOfflineThriftTest {
             MalformedStreamDefinitionException, DataBridgeException, DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
             DataEndpointConfigurationException, InterruptedException {
+
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
-        final TestAppender appender = new TestAppender();
-        final Logger logger = Logger.getRootLogger();
+        final TestAppender appender = new TestAppender("TestAppender", null, null);
+        final Logger logger = (Logger) LogManager.getRootLogger();
         logger.addAppender(appender);
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
 
@@ -142,13 +153,14 @@ public class ServerOfflineThriftTest {
         Thread.sleep(5000);
 
         try {
-            final List<LoggingEvent> log = appender.getLog();
-            for (LoggingEvent loggingEvent : log) {
+            final List<LogEvent> log = appender.getLog();
+            for (LogEvent loggingEvent : log) {
                 if (loggingEvent.getLevel() == Level.ERROR) {
-                    Throwable exception = loggingEvent.getThrowableInformation().getThrowable();
+                    Throwable exception = loggingEvent.getThrownProxy().getThrowable();
                     if (exception instanceof DataEndpointException && exception.getMessage().contains("knownUserName")) {
                         String errorMessage = exception.getMessage();
-                        Assert.assertTrue("Format of log entry does not match", errorMessage.contains(DataEndpointConstants.SEPARATOR));
+                        Assert.assertTrue("Format of log entry does not match",
+                                errorMessage.contains(DataEndpointConstants.SEPARATOR));
                         Assert.assertFalse("Log output not sanitized", errorMessage.contains("knownPass"));
                         break;
                     }
@@ -166,7 +178,10 @@ public class ServerOfflineThriftTest {
 
     @Test
     public void testBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+            DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+            DataBridgeException, StreamDefinitionStoreException, SocketException {
+
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
@@ -208,7 +223,10 @@ public class ServerOfflineThriftTest {
 
     @Test
     public void testNonBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+            DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+            DataBridgeException, StreamDefinitionStoreException, SocketException {
+
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7651",
@@ -285,25 +303,24 @@ public class ServerOfflineThriftTest {
 //        thriftTestServer.stop();
 //    }
 
-    private class TestAppender extends AppenderSkeleton {
-        private final List<LoggingEvent> log = new ArrayList<>();
+    private class TestAppender extends AbstractAppender {
 
-        @Override
-        public boolean requiresLayout() {
-            return false;
+        private final List<LogEvent> log = new ArrayList<>();
+
+        protected TestAppender(String name, Filter filter, Layout<? extends Serializable> layout) {
+
+            super(name, filter, layout);
         }
 
-        @Override
-        protected void append(final LoggingEvent loggingEvent) {
-            log.add(loggingEvent);
-        }
+        public List<LogEvent> getLog() {
 
-        @Override
-        public void close() {
-        }
-
-        public List<LoggingEvent> getLog() {
             return new ArrayList<>(log);
+        }
+
+        @Override
+        public void append(LogEvent logEvent) {
+
+            log.add(logEvent);
         }
     }
 

@@ -3,7 +3,8 @@ package org.wso2.carbon.event.output.adapter.sms;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -33,7 +34,7 @@ import java.util.Map;
 @PrepareForTest(SMSEventAdapterServiceValueHolder.class)
 public class SmsOutputAdaptorTestCase2 {
     PrivilegedCarbonContext privilegedCarbonContext;
-    private static final Logger logger = Logger.getLogger(SmsOutputAdaptorTestCase2.class);
+    private static final Log logger = LogFactory.getLog(SmsOutputAdaptorTestCase2.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     private void setupCarbonConfig() {

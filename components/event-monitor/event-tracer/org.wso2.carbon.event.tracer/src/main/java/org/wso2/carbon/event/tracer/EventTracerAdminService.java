@@ -20,16 +20,20 @@ package org.wso2.carbon.event.tracer;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Appender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-// MemoryAppender should not be used here,
-// this should be handled using a logging provider
-import org.wso2.carbon.utils.logging.appenders.MemoryAppender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.wso2.carbon.log4j2.plugins.MemoryAppender;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+// MemoryAppender should not be used here,
+// this should be handled using a logging provider
 
 public class EventTracerAdminService {
     private static final Log log = LogFactory.getLog(EventTracerAdminService.class);
@@ -39,8 +43,9 @@ public class EventTracerAdminService {
     public String[] getTraceLogs() {
         int amount;
         int DEFAULT_NO_OF_LOGS = 100;
-        Logger logger = Logger.getLogger(EVENT_TRACE_LOGGER);
-        Appender appender = logger.getAppender(EVENT_TRACE_MEMORYAPPENDER);
+        Logger logger = (Logger) LogManager.getLogger(EVENT_TRACE_LOGGER);
+        Map<String, Appender> appenders = logger.getAppenders();
+        Appender appender = appenders.get(EVENT_TRACE_MEMORYAPPENDER);
         if (appender instanceof MemoryAppender) {
             MemoryAppender memoryAppender = (MemoryAppender) appender;
             if ((memoryAppender.getCircularQueue() != null)) {
@@ -63,11 +68,11 @@ public class EventTracerAdminService {
                 objects = memoryAppender.getCircularQueue().getObjects(amount);
             }
             String[] resp = new String[objects.length];
-            Layout layout = memoryAppender.getLayout();
+            Layout<? extends Serializable> layout = memoryAppender.getLayout();
             for (int i = 0; i < objects.length; i++) {
-                LoggingEvent logEvt = (LoggingEvent) objects[i];
+                LogEvent logEvt = (LogEvent) objects[i];
                 if (logEvt != null) {
-                    resp[i] = StringEscapeUtils.escapeHtml(layout.format(logEvt));
+                    resp[i] = StringEscapeUtils.escapeHtml(String.valueOf(layout.toSerializable(logEvt)));
                 }
             }
             return resp;
@@ -78,8 +83,9 @@ public class EventTracerAdminService {
     }
 
     public boolean clearTraceLogs() {
-        Logger logger = Logger.getLogger(EVENT_TRACE_LOGGER);
-        Appender appender = logger.getAppender(EVENT_TRACE_MEMORYAPPENDER);
+        Logger logger = (Logger) LogManager.getLogger(EVENT_TRACE_LOGGER);
+        Map<String, Appender> appenders = logger.getAppenders();
+        Appender appender = appenders.get(EVENT_TRACE_MEMORYAPPENDER);
         if (appender instanceof MemoryAppender) {
             try {
                 MemoryAppender memoryAppender = (MemoryAppender) appender;
@@ -105,8 +111,9 @@ public class EventTracerAdminService {
         if ("ALL".equals(keyword) || "".equals(keyword)) {
             return getTraceLogs();
         }
-        Logger logger = Logger.getLogger(EVENT_TRACE_LOGGER);
-        Appender appender = logger.getAppender(EVENT_TRACE_MEMORYAPPENDER);
+        Logger logger = (Logger) LogManager.getLogger(EVENT_TRACE_LOGGER);
+        Map<String, Appender> appenders = logger.getAppenders();
+        Appender appender = appenders.get(EVENT_TRACE_MEMORYAPPENDER);
         if (appender instanceof MemoryAppender) {
             MemoryAppender memoryAppender
                     = (MemoryAppender) appender;
@@ -134,9 +141,9 @@ public class EventTracerAdminService {
             Layout layout = memoryAppender.getLayout();
             List<String> resultList = new ArrayList<String>();
             for (Object object : objects) {
-                LoggingEvent logEvt = (LoggingEvent) object;
+                LogEvent logEvt = (LogEvent) object;
                 if (logEvt != null) {
-                    String result = layout.format(logEvt);
+                    String result = layout.toSerializable(logEvt).toString();
                     if (result != null) {
                         if (!ignoreCase) {
                             if (result.indexOf(keyword) > -1) {
@@ -169,8 +176,10 @@ public class EventTracerAdminService {
     public String[] getLogs() {
         int DEFAULT_NO_OF_LOGS = 100;
         int definedamount;
-        Appender appender
-                = Logger.getRootLogger().getAppender("LOG_MEMORYAPPENDER");
+        Logger logger = (Logger) LogManager.getRootLogger();
+        Map<String, Appender> appenders = logger.getAppenders();
+        Appender appender = appenders.get("LOG_MEMORYAPPENDER");
+
         if (appender instanceof MemoryAppender) {
             MemoryAppender memoryAppender = (MemoryAppender) appender;
             if ((memoryAppender.getCircularQueue() != null)) {
@@ -197,9 +206,9 @@ public class EventTracerAdminService {
             String[] resp = new String[objects.length];
             Layout layout = memoryAppender.getLayout();
             for (int i = 0; i < objects.length; i++) {
-                LoggingEvent logEvt = (LoggingEvent) objects[i];
+                LogEvent logEvt = (LogEvent) objects[i];
                 if (logEvt != null) {
-                    resp[i] = StringEscapeUtils.escapeHtml(layout.format(logEvt));
+                    resp[i] = StringEscapeUtils.escapeHtml(layout.toSerializable(logEvt).toString());
                 }
             }
             return resp;

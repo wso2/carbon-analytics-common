@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.receiver.thrift.test;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -48,7 +49,7 @@ import javax.xml.stream.XMLStreamException;
 
 public class ThriftEventConverterTest {
 
-    private Logger log = Logger.getLogger(ThriftEventConverterTest.class);
+    private Log log = LogFactory.getLog(ThriftEventConverterTest.class);
     private static ThriftEventConverter thriftEventConverter;
 
     private static final int TENANT_ID = -1234;

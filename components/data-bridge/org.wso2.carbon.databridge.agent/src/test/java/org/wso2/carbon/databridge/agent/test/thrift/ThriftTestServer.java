@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.agent.test.thrift;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
 import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.Event;
@@ -40,7 +41,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThriftTestServer {
-    Logger log = Logger.getLogger(ThriftTestServer.class);
+    Log log = LogFactory.getLog(ThriftTestServer.class);
     ThriftDataReceiver thriftDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;
     AtomicInteger numberOfEventsReceived;

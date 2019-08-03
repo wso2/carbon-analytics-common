@@ -66,10 +66,7 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-scr-plugin</artifactId>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -90,7 +87,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.application.deployer.*,
-                            org.apache.commons.logging.*,
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             *;resolution:=optional
                         </Import-Package>
                         <WSO2-Application-Deployer>Event Processing cApp Deployer</WSO2-Application-Deployer>

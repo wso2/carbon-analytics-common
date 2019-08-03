@@ -16,7 +16,8 @@
 
 package org.wso2.carbon.event.application.deployer.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonException;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.CarbonApplication;
@@ -45,7 +46,7 @@ import java.util.zip.ZipFile;
  */
 public class EventProcessingAppDeployerTestUtils {
 
-    private static final Logger log = Logger.getLogger(EventProcessingAppDeployerTest.class);
+    private static final Log log = LogFactory.getLog(EventProcessingAppDeployerTest.class);
 
     /**
      * Search through the given cApp directory and get the artifacts into carbon application instance.

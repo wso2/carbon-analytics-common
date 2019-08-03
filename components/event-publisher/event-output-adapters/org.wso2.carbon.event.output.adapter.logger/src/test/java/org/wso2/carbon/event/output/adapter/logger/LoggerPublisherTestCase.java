@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.output.adapter.logger;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -20,7 +21,7 @@ import java.util.Map;
  * .
  */
 public class LoggerPublisherTestCase {
-    private static final Logger logger = Logger.getLogger(LoggerPublisherTestCase.class);
+    private static final Log logger = LogFactory.getLog(LoggerPublisherTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     private void setupCarbonConfig(String tenantName) {

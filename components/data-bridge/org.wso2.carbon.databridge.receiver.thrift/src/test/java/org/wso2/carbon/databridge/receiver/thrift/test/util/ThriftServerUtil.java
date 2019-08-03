@@ -21,7 +21,8 @@ package org.wso2.carbon.databridge.receiver.thrift.test.util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
@@ -44,7 +45,7 @@ import javax.xml.stream.XMLStreamException;
 
 public class ThriftServerUtil {
 
-    private static Logger log = Logger.getLogger(ThriftServerUtil.class);
+    private static Log log = LogFactory.getLog(ThriftServerUtil.class);
 
     public static final Path testDir = Paths.get("src", "test", "resources");
 

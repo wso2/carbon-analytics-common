@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.event.processor.manager.core.internal.thrift;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
 import org.wso2.carbon.event.processor.manager.core.internal.thrift.data.SnapshotData;
 import org.wso2.carbon.event.processor.manager.core.internal.thrift.exception.InternalServerException;
@@ -27,7 +28,7 @@ import org.wso2.carbon.event.processor.manager.core.internal.thrift.service.Mana
 
 public class ManagementServiceImpl implements ManagementService.Iface {
 
-    private static final Logger log = Logger.getLogger(ManagementServiceImpl.class);
+    private static final Log log = LogFactory.getLog(ManagementServiceImpl.class);
 
     @Override
     public SnapshotData takeSnapshot() throws InternalServerException {

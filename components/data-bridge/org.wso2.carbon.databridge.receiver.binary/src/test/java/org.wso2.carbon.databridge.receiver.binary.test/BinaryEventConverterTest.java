@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.receiver.binary.test;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

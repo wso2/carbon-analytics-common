@@ -19,7 +19,8 @@
 package org.wso2.carbon.event.receiver.core.internal.management;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -41,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class QueueInputEventDispatcher extends AbstractInputEventDispatcher implements EventSync {
 
     private final StreamDefinition streamDefinition;
-    private Logger log = Logger.getLogger(AbstractInputEventDispatcher.class);
+    private Log log = LogFactory.getLog(AbstractInputEventDispatcher.class);
     private final BlockingEventQueue eventQueue;
     private Lock readLock;
     private String syncId;

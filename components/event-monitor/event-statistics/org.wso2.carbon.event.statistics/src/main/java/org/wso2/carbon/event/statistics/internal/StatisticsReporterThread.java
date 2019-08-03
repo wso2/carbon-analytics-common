@@ -17,14 +17,15 @@
 */
 package org.wso2.carbon.event.statistics.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.statistics.internal.counter.StatsCounter;
 import org.wso2.carbon.event.statistics.internal.data.CollectionDTO;
 import org.wso2.carbon.event.statistics.internal.ds.EventStatisticsServiceHolder;
 
 public class StatisticsReporterThread extends Thread {
 
-    private static Logger log = Logger.getLogger(StatisticsReporterThread.class);
+    private static Log log = LogFactory.getLog(StatisticsReporterThread.class);
 
     private boolean shutdownRequested = false;
 

@@ -17,7 +17,8 @@ package org.wso2.carbon.event.receiver.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -58,7 +59,7 @@ public class EventReceiver implements EventProducer {
     private boolean customMappingEnabled = false;
     private boolean isWorkerNode = false;
     private boolean sufficientToSend = false;
-    private Logger trace = Logger.getLogger(EventReceiverConstants.EVENT_TRACE_LOGGER);
+    private Log trace = LogFactory.getLog(EventReceiverConstants.EVENT_TRACE_LOGGER);
     private EventReceiverConfiguration eventReceiverConfiguration = null;
     private StreamDefinition exportedStreamDefinition;
     private InputMapper inputMapper = null;

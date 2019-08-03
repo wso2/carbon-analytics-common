@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.event.processor.manager.commons.transport.server;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.commons.transport.client.TCPEventPublisher;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
@@ -41,7 +42,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TCPEventServer {
-    private static Logger log = Logger.getLogger(TCPEventServer.class);
+    private static Log log = LogFactory.getLog(TCPEventServer.class);
     private TCPEventServerConfig tcpEventServerConfig = new TCPEventServerConfig("0.0.0.0", 7211);
     private ExecutorService executorService;
     private StreamCallback streamCallback;

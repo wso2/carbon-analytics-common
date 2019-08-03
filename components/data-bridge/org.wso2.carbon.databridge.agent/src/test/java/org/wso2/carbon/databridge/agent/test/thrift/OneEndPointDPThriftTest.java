@@ -18,7 +18,8 @@
 package org.wso2.carbon.databridge.agent.test.thrift;
 
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +42,7 @@ import java.net.SocketException;
 
 
 public class OneEndPointDPThriftTest {
-    Logger log = Logger.getLogger(OneEndPointDPThriftTest.class);
+    Log log = LogFactory.getLog(OneEndPointDPThriftTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private ThriftTestServer thriftTestServer;

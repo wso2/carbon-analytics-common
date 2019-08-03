@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
 import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.Event;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BinaryTestServer {
-    Logger log = Logger.getLogger(BinaryTestServer.class);
+    Log log = LogFactory.getLog(BinaryTestServer.class);
     BinaryDataReceiver binaryDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;
     AtomicInteger numberOfEventsReceived;

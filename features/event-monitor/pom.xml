@@ -35,7 +35,7 @@
 
     <modules>
         <module>event-statistics</module>
-        <module>event-tracer</module>
+        <!--<module>event-tracer</module>-->
     </modules>
 
 
