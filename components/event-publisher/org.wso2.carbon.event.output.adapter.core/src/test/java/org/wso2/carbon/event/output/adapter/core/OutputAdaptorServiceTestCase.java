@@ -2,20 +2,18 @@ package org.wso2.carbon.event.output.adapter.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.core.internal.CarbonOutputEventAdapterService;
-import org.wso2.carbon.event.output.adapter.core.internal.DecayTimer;
-import org.wso2.carbon.event.output.adapter.core.internal.OutputAdapterRuntime;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfig;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.output.adapter.core.internal.config.Property;
@@ -28,17 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-
 /**
  * .
  */
-public class OutputAdaptorServiceTestCase {
+public class OutputAdaptorServiceTestCase  {
+
     private static final Log logger = LogFactory.getLog(OutputAdaptorServiceTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
+    TestLogAppender appender;
 
     private void setupCarbonConfig() {
+
         System.setProperty("carbon.home",
                 Paths.get(testDir.toString(), "carbon-context").toString());
         System.setProperty("tenant.name", "tenant.name");
@@ -79,7 +77,8 @@ public class OutputAdaptorServiceTestCase {
         AdapterConfig config = new AdapterConfig();
         config.setType("test");
         List<org.wso2.carbon.event.output.adapter.core.internal.config.Property> gProperties = new ArrayList<>();
-        org.wso2.carbon.event.output.adapter.core.internal.config.Property property = new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
+        org.wso2.carbon.event.output.adapter.core.internal.config.Property property =
+                new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
         property.setKey("maxThread");
         property.setValue("100");
         gProperties.add(property);
@@ -113,10 +112,12 @@ public class OutputAdaptorServiceTestCase {
     @Test
     public void OutputAdaptorTestCaseException() throws OutputEventAdapterException,
             TestConnectionNotSupportedException {
+
         logger.info("Test case for testing the publishing while Runtime exception happen in message sending.");
-        final TestLogAppender appender = new TestLogAppender();
-        final Log testLogger = LogFactory.getLog(OutputAdapterRuntime.class);
-        testLogger.addAppender(appender);
+        TestLogAppender appender = new TestLogAppender("TestLogAppender", null, null);
+        appender.start();
+        final Logger logger = (Logger) LogManager.getRootLogger();
+        logger.addAppender(appender);
         setupCarbonConfig();
         CarbonOutputEventAdapterService adapterService = new CarbonOutputEventAdapterService();
         PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
@@ -134,7 +135,8 @@ public class OutputAdaptorServiceTestCase {
         AdapterConfig config = new AdapterConfig();
         config.setType("test");
         List<org.wso2.carbon.event.output.adapter.core.internal.config.Property> gProperties = new ArrayList<>();
-        org.wso2.carbon.event.output.adapter.core.internal.config.Property property = new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
+        org.wso2.carbon.event.output.adapter.core.internal.config.Property property =
+                new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
         property.setKey("maxThread");
         property.setValue("100");
         gProperties.add(property);
@@ -157,29 +159,32 @@ public class OutputAdaptorServiceTestCase {
         adapterService.create(eventAdapterConfiguration);
         adapterService.getOutputEventAdapterTypes();
         adapterService.getOutputEventAdapterSchema("test");
-        Assert.assertEquals(adapterService.isPolled("TestAdapter"),false);
+        Assert.assertEquals(adapterService.isPolled("TestAdapter"), false);
         Map<String, String> dynamicProperties = new HashMap<>();
         dynamicProperties.put("user.address", "No 20, Plam Grove, Colombo 03");
         adapterService.publish("TestAdapter", dynamicProperties, "exception");
         adapterService.unRegisterEventAdapterFactory(outputEventAdapterFactory);
         adapterService.destroy("TestAdapter");
-        final List<LoggingEvent> logEntries = appender.getLog();
+        final List<LogEvent> logEntries = appender.getLog();
         List<Object> logMessages = new ArrayList<>();
-        for (LoggingEvent logEvent : logEntries) {
+        for (LogEvent logEvent : logEntries) {
             logMessages.add(logEvent.getMessage());
         }
         PrivilegedCarbonContext.unloadTenant(-1233);
-        Assert.assertEquals(logMessages.contains("Event dropped at Output Adapter 'TestAdapter' for tenant id '-1233', Test " +
-                "Mock exception"),true);
+        Assert.assertEquals(logMessages.contains("Event dropped at Output Adapter 'TestAdapter' for tenant id " +
+                "'-1233', Test " +
+                "Mock exception"), true);
     }
 
     @Test
     public void OutputAdaptorTestCaseException2() throws OutputEventAdapterException,
             TestConnectionNotSupportedException {
+
         logger.info("Test case for testing the publishing while connection is not available");
-        final TestLogAppender appender = new TestLogAppender();
-        final Log testLogger = LogFactory.getLog(OutputAdapterRuntime.class);
-        testLogger.addAppender(appender);
+        TestLogAppender appender = new TestLogAppender("TestLogAppender", null, null);
+        appender.start();
+        final Logger logger = (Logger) LogManager.getRootLogger();
+        logger.addAppender(appender);
         setupCarbonConfig();
         CarbonOutputEventAdapterService adapterService = new CarbonOutputEventAdapterService();
         PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
@@ -197,7 +202,8 @@ public class OutputAdaptorServiceTestCase {
         AdapterConfig config = new AdapterConfig();
         config.setType("test");
         List<org.wso2.carbon.event.output.adapter.core.internal.config.Property> gProperties = new ArrayList<>();
-        org.wso2.carbon.event.output.adapter.core.internal.config.Property property = new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
+        org.wso2.carbon.event.output.adapter.core.internal.config.Property property =
+                new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
         property.setKey("maxThread");
         property.setValue("100");
         gProperties.add(property);
@@ -226,14 +232,16 @@ public class OutputAdaptorServiceTestCase {
         adapterService.publish("TestAdapter", dynamicProperties, "exceptionC");
         adapterService.unRegisterEventAdapterFactory(outputEventAdapterFactory);
         adapterService.destroy("TestAdapter");
-        final List<LoggingEvent> logEntries = appender.getLog();
+        final List<LogEvent> logEntries = appender.getLog();
         List<Object> logMessages = new ArrayList<>();
-        for (LoggingEvent logEvent : logEntries) {
+        for (LogEvent logEvent : logEntries) {
             logMessages.add(logEvent.getMessage());
         }
         PrivilegedCarbonContext.unloadTenant(-1233);
-        Assert.assertEquals(logMessages.contains("Connection unavailable for Output Adopter 'TestAdapter' reconnecting."),true);
+        Assert.assertEquals(logMessages.contains("Connection unavailable for Output Adopter 'TestAdapter' " +
+                "reconnecting."), true);
     }
+
     @Test(expectedExceptions = {TestConnectionNotSupportedException.class})
     public void OutputAdaptorConnectionTestCase() throws OutputEventAdapterException,
             TestConnectionNotSupportedException {
@@ -254,7 +262,8 @@ public class OutputAdaptorServiceTestCase {
         AdapterConfig config = new AdapterConfig();
         config.setType("test");
         List<org.wso2.carbon.event.output.adapter.core.internal.config.Property> gProperties = new ArrayList<>();
-        org.wso2.carbon.event.output.adapter.core.internal.config.Property property = new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
+        org.wso2.carbon.event.output.adapter.core.internal.config.Property property =
+                new org.wso2.carbon.event.output.adapter.core.internal.config.Property();
         property.setKey("maxThread");
         property.setValue("100");
         gProperties.add(property);

@@ -4,14 +4,18 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -37,16 +41,17 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(CarbonContext.class)
-public class OutputAdaptorCoreTestCase {
+public class OutputAdaptorCoreTestCase  {
     private static final Log logger = LogFactory.getLog(OutputAdaptorCoreTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
 
     @Test
     public void OutputAdaptorUtilTestCase() throws OutputEventAdapterException {
         logger.info("Test case for testing the utils of Output Adapter Core.");
-        final TestLogAppender appender = new TestLogAppender();
-        final Logger testLogger = Logger.getRootLogger();
-        testLogger.addAppender(appender);
+        TestLogAppender appender = new TestLogAppender("TestLogAppender", null, null);
+        appender.start();
+        final Logger logger = (Logger) LogManager.getRootLogger();
+        logger.addAppender(appender);
         AdapterConfigs globalAdapterConfigs = new AdapterConfigs();
         List<AdapterConfig> adapterConfigs = new ArrayList<>();
         AdapterConfig config = new AdapterConfig();
@@ -84,9 +89,9 @@ public class OutputAdaptorCoreTestCase {
                 tenantId);
         Map<String, String> map = EventAdapterUtil.getGlobalProperties("Test Adaptor");
         Assert.assertEquals(map.get("test key"), "test Value");
-        final List<LoggingEvent> logEntries = appender.getLog();
+        final List<LogEvent> logEntries = appender.getLog();
         List<Object> logMessages = new ArrayList<>();
-        for (LoggingEvent logEvent : logEntries) {
+        for (LogEvent logEvent : logEntries) {
             logMessages.add(logEvent.getMessage());
         }
         PrivilegedCarbonContext.unloadTenant(-1233);
@@ -115,10 +120,11 @@ public class OutputAdaptorCoreTestCase {
 
     @Test
     public void OutputAdaptorTenantTestCase() throws OutputEventAdapterException {
-        logger.info("Test case for testing the adding tenant configuration to  TenantConfigHolder.");
-        final TestLogAppender appender = new TestLogAppender();
-        final Logger testLogger = Logger.getRootLogger();
-        testLogger.addAppender(appender);
+       logger.info("Test case for testing the adding tenant configuration to  TenantConfigHolder.");
+        TestLogAppender appender = new TestLogAppender("TestLogAppender", null, null);
+        appender.start();
+        final Logger logger = (Logger) LogManager.getRootLogger();
+        logger.addAppender(appender);
         AdapterConfigs globalAdapterConfigs = new AdapterConfigs();
         List<AdapterConfig> adapterConfigs = new ArrayList<>();
         AdapterConfig config = new AdapterConfig();
@@ -147,9 +153,9 @@ public class OutputAdaptorCoreTestCase {
         when(context1.getAxisConfiguration()).thenReturn(axisConfiguration);
         EventAdapterUtil.getAxisConfiguration();
         PrivilegedCarbonContext.unloadTenant(-1233);
-        final List<LoggingEvent> logEntries = appender.getLog();
+        final List<LogEvent> logEntries = appender.getLog();
         List<Object> logMessages = new ArrayList<>();
-        for (LoggingEvent logEvent : logEntries) {
+        for (LogEvent logEvent : logEntries) {
             logMessages.add(logEvent.getMessage());
         }
         Assert.assertEquals(logMessages.contains("Unload Tenant Task: org.wso2.carbon.context.internal." +
@@ -158,6 +164,7 @@ public class OutputAdaptorCoreTestCase {
     }
 
     private void setupCarbonConfig() {
+
         System.setProperty("carbon.home",
                 Paths.get(testDir.toString(), "carbon-context").toString());
         System.setProperty("tenant.name", "tenant.name");

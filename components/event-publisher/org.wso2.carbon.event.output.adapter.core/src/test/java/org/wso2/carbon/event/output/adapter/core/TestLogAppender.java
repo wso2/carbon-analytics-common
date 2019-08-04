@@ -1,29 +1,31 @@
 package org.wso2.carbon.event.output.adapter.core;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestLogAppender extends AppenderSkeleton {
-    private final List<LoggingEvent> log = new ArrayList<>();
+public class TestLogAppender extends AbstractAppender {
 
-    @Override
-    public boolean requiresLayout() {
-        return false;
+    private final List<LogEvent> log = new ArrayList<>();
+
+    public TestLogAppender(String name, Filter filter, Layout<? extends Serializable> layout) {
+
+        super(name, filter, layout);
+    }
+
+    List<LogEvent> getLog() {
+
+        return new ArrayList<LogEvent>(log);
     }
 
     @Override
-    protected void append(final LoggingEvent loggingEvent) {
-        log.add(loggingEvent);
-    }
+    public void append(LogEvent logEvent) {
 
-    @Override
-    public void close() {
-    }
-
-    List<LoggingEvent> getLog() {
-        return new ArrayList<LoggingEvent>(log);
+        log.add(logEvent);
     }
 }
