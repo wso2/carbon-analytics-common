@@ -78,7 +78,7 @@ public class DataPublisherTestUtil {
         return filePath.getAbsolutePath() + File.separator + fileName;
     }
 
-    public static String getDataBridgeConfigPath() {
+    public static String getDataBridgeConfigPath(String configFileName) {
         File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
         if (!filePath.exists()) {
             filePath = new File("components" + File.separator + "data-bridge" + File.separator +
@@ -91,7 +91,7 @@ public class DataPublisherTestUtil {
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
         }
-        return filePath.getAbsolutePath() + File.separator + "databridge.config.yaml";
+        return filePath.getAbsolutePath() + File.separator + configFileName;
     }
 
 }

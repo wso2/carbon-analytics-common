@@ -44,11 +44,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Binary Test Server.
  */
 public class BinaryTestServer {
+    String configFileName;
     Logger log = LoggerFactory.getLogger(BinaryTestServer.class);
     BinaryDataReceiver binaryDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;
     AtomicInteger numberOfEventsReceived;
     RestarterThread restarterThread;
+
+    public BinaryTestServer() {
+        this.configFileName = "databridge.config.yaml";
+    }
+
+    public BinaryTestServer(String configFileName) {
+        this.configFileName = configFileName;
+    }
 
     public void startTestServer() throws DataBridgeException, InterruptedException, IOException {
         BinaryTestServer testServer = new BinaryTestServer();
@@ -95,7 +104,7 @@ public class BinaryTestServer {
             public void destroyContext(AgentSession agentSession) {
 
             }
-        }, streamDefinitionStore, DataPublisherTestUtil.getDataBridgeConfigPath());
+        }, streamDefinitionStore, DataPublisherTestUtil.getDataBridgeConfigPath(configFileName));
 
         BinaryDataReceiverConfiguration dataReceiverConfiguration = new BinaryDataReceiverConfiguration(securePort,
                 tcpPort);

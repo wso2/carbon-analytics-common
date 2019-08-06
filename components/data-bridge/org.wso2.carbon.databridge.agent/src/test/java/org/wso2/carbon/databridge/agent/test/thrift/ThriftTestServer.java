@@ -95,7 +95,7 @@ public class ThriftTestServer {
             public void destroyContext(AgentSession agentSession) {
 
             }
-        }, streamDefinitionStore, DataPublisherTestUtil.getDataBridgeConfigPath());
+        }, streamDefinitionStore, DataPublisherTestUtil.getDataBridgeConfigPath("databridge.config.yaml"));
 
         thriftDataReceiver = new ThriftDataReceiver(receiverPort, databridge);
 

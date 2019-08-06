@@ -44,5 +44,8 @@ public class DataEndpointConstants {
     public static final String ASYNC_STRATEGY = "async";
 
     public static final String DATA_AGENT_CONFIG_NAMESPACE = "data.agent.config";
+    public static final String TRANSPORTS_NAMESPACE = "transports";
+    public static final String DATABRIDGE_CONFIG_NAMESPACE = "databridge";
+    public static final String DATABRIDGE_SENDER_CONFIG_NAMESPACE = "senderConfigurations";
 
 }

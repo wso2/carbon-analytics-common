@@ -500,9 +500,16 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         try {
             if (Files.exists(databridgeConfigPath)) {
                 ConfigProvider configProvider = ConfigProviderFactory.getConfigProvider(databridgeConfigPath);
-                dataBridgeConfiguration = DatabridgeConfigurationFileResolver.
-                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) configProvider.
-                                getConfigurationObject(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
+                LinkedHashMap transportsConf = (LinkedHashMap) configProvider.
+                        getConfigurationObject(DataBridgeConstants.TRANSPORTS_NAMESPACE);
+                if (transportsConf != null) {
+                    dataBridgeConfiguration = DatabridgeConfigurationFileResolver
+                            .resolveTransportsNamespaceConfiguration(transportsConf);
+                } else {
+                    dataBridgeConfiguration = DatabridgeConfigurationFileResolver.
+                            resolveAndSetDatabridgeConfiguration((LinkedHashMap) configProvider.
+                                    getConfigurationObject(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
+                }
                 return dataBridgeConfiguration;
             } else {
                 log.error("Cannot find data bridge configuration file : " + configPath);

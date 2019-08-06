@@ -194,47 +194,6 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>post-integration-test</phase>
-                                <configuration>
-                                    <target xmlns:jacoco="antlib:org.jacoco.ant">
-                                        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-                                            <classpath path="${project.build.directory}" />
-                                        </taskdef>
-                                        <!-- OSGi Test coverage only enabled for org.wso2.carbon.stream.core module-->
-                                        <jacoco:report>
-                                            <executiondata>
-                                                <file file="${project.build.directory}/jacoco.exec" />
-                                            </executiondata>
-                                            <structure name="Carbon Analytics Common OSGi Tests">
-                                                <classfiles>
-                                                    <fileset dir="../data-bridge/org.wso2.carbon.databridge.core/target/classes" />
-                                                </classfiles>
-                                                <sourcefiles encoding="UTF-8">
-                                                    <fileset dir="../data-bridge/org.wso2.carbon.databridge.core/src" />
-                                                </sourcefiles>
-                                            </structure>
-                                            <html destdir="${project.build.directory}/coverage-reports" />
-                                        </jacoco:report>
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.jacoco</groupId>
-                                <artifactId>org.jacoco.ant</artifactId>
-                                <version>${org.jacoco.ant.version}</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                    <plugin>
                         <groupId>org.ops4j.pax.exam</groupId>
                         <artifactId>maven-paxexam-plugin</artifactId>
                         <version>1.2.4</version>

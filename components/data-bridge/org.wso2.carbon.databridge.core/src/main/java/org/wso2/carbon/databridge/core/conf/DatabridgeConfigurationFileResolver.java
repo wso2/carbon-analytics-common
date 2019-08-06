@@ -23,10 +23,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants.DATABRIDGE_LISTENER_CONFIG_NAMESPACE;
+import static org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants.STREAMLINED_DATABRIDGE_CONFIG_NAMESPACE;
+
 /**
  * Resolves the databridge configuration file.
  */
 public class DatabridgeConfigurationFileResolver {
+
+    public static DataBridgeConfiguration resolveTransportsNamespaceConfiguration(LinkedHashMap transportsConf) {
+        DataBridgeConfiguration dataBridgeConfiguration = new DataBridgeConfiguration();
+
+        LinkedHashMap dataBridgeConfig = ((LinkedHashMap) transportsConf.get(STREAMLINED_DATABRIDGE_CONFIG_NAMESPACE));
+        if (dataBridgeConfig != null) {
+            LinkedHashMap listenerConf = ((LinkedHashMap) dataBridgeConfig.get(DATABRIDGE_LISTENER_CONFIG_NAMESPACE));
+            if (listenerConf != null) {
+                return resolveAndSetDatabridgeConfiguration(listenerConf);
+            }
+        }
+        return dataBridgeConfiguration;
+    }
 
     public static DataBridgeConfiguration resolveAndSetDatabridgeConfiguration(LinkedHashMap databridgeConfigHashMap) {
         DataBridgeConfiguration dataBridgeConfiguration = new DataBridgeConfiguration();
