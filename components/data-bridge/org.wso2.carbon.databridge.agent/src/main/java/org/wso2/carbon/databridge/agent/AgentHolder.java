@@ -197,7 +197,7 @@ public class AgentHolder {
         if (transportConf != null) {
             LinkedHashMap dataBridgeConfig = ((LinkedHashMap) transportConf.get(DATABRIDGE_CONFIG_NAMESPACE));
             if (dataBridgeConfig != null) {
-                LinkedHashMap senderConf = ((LinkedHashMap)dataBridgeConfig.get(DATABRIDGE_SENDER_CONFIG_NAMESPACE));
+                LinkedHashMap senderConf = ((LinkedHashMap) dataBridgeConfig.get(DATABRIDGE_SENDER_CONFIG_NAMESPACE));
                 if (senderConf != null) {
                     dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                             resolveAndSetDataAgentConfiguration(senderConf);
@@ -208,7 +208,7 @@ public class AgentHolder {
                 dataAgentsConfiguration = new DataAgentsConfiguration();
             }
 
-        } else if (configProvider. getConfigurationObject(DATA_AGENT_CONFIG_NAMESPACE) != null) {
+        } else if (configProvider.getConfigurationObject(DATA_AGENT_CONFIG_NAMESPACE) != null) {
             dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                     resolveAndSetDataAgentConfiguration
                             ((LinkedHashMap) configProvider.
