@@ -36,4 +36,7 @@ public final class DataBridgeConstants {
     public static final String STREAM_DEFINITIONS_ELEMENT = "streamDefinitions";
 
     public static final String DATABRIDGE_CONFIG_NAMESPACE = "databridge.config";
+    public static final String TRANSPORTS_NAMESPACE = "transports";
+    public static final String STREAMLINED_DATABRIDGE_CONFIG_NAMESPACE = "databridge";
+    public static final String DATABRIDGE_LISTENER_CONFIG_NAMESPACE = "listenerConfigurations";
 }

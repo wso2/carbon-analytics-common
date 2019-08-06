@@ -28,7 +28,6 @@ import org.wso2.carbon.databridge.agent.conf.DataAgentsConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.internal.DataAgentServiceValueHolder;
-import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
@@ -38,6 +37,11 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.wso2.carbon.databridge.agent.util.DataEndpointConstants.DATABRIDGE_CONFIG_NAMESPACE;
+import static org.wso2.carbon.databridge.agent.util.DataEndpointConstants.DATABRIDGE_SENDER_CONFIG_NAMESPACE;
+import static org.wso2.carbon.databridge.agent.util.DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE;
+import static org.wso2.carbon.databridge.agent.util.DataEndpointConstants.TRANSPORTS_NAMESPACE;
 
 /**
  * The holder for all Agents created and this is singleton class.
@@ -123,15 +127,7 @@ public class AgentHolder {
         if (configPath == null) {
             try {
                 ConfigProvider configProvider = DataAgentServiceValueHolder.getConfigProvider();
-                if (configProvider != null && configProvider.
-                        getConfigurationObject(DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE) != null) {
-                    dataAgentsConfiguration = DataAgentConfigurationFileResolver.
-                            resolveAndSetDataAgentConfiguration
-                                    ((LinkedHashMap) configProvider.
-                                            getConfigurationObject(DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
-                } else {
-                    dataAgentsConfiguration = new DataAgentsConfiguration();
-                }
+                dataAgentsConfiguration = getDataAgentsConfiguration(configProvider);
             } catch (ConfigurationException e) {
                 throw new DataEndpointAgentConfigurationException("Error in when loading databridge agent " +
                         "configuration", e);
@@ -141,11 +137,7 @@ public class AgentHolder {
                 Path dataAgentConfigPath = Paths.get(configPath);
                 if (Files.exists(dataAgentConfigPath)) {
                     ConfigProvider configProvider = ConfigProviderFactory.getConfigProvider(dataAgentConfigPath);
-                    dataAgentsConfiguration = DataAgentConfigurationFileResolver.
-                            resolveAndSetDataAgentConfiguration
-                                    ((LinkedHashMap) configProvider.
-                                            getConfigurationObject(DataEndpointConstants.
-                                                    DATA_AGENT_CONFIG_NAMESPACE));
+                    dataAgentsConfiguration = getDataAgentsConfiguration(configProvider);
                 } else {
                     throw new DataEndpointAgentConfigurationException("Cannot find the databridge agent " +
                             "configuration file in the specified path");
@@ -193,6 +185,36 @@ public class AgentHolder {
                 }
 
             }
+        }
+        return dataAgentsConfiguration;
+    }
+
+    private DataAgentsConfiguration getDataAgentsConfiguration(ConfigProvider configProvider)
+            throws ConfigurationException, DataEndpointAgentConfigurationException {
+        DataAgentsConfiguration dataAgentsConfiguration;
+        LinkedHashMap transportConf = ((LinkedHashMap) configProvider.getConfigurationObject(TRANSPORTS_NAMESPACE));
+
+        if (transportConf != null) {
+            LinkedHashMap dataBridgeConfig = ((LinkedHashMap) transportConf.get(DATABRIDGE_CONFIG_NAMESPACE));
+            if (dataBridgeConfig != null) {
+                LinkedHashMap senderConf = ((LinkedHashMap)dataBridgeConfig.get(DATABRIDGE_SENDER_CONFIG_NAMESPACE));
+                if (senderConf != null) {
+                    dataAgentsConfiguration = DataAgentConfigurationFileResolver.
+                            resolveAndSetDataAgentConfiguration(senderConf);
+                } else {
+                    dataAgentsConfiguration = new DataAgentsConfiguration();
+                }
+            } else {
+                dataAgentsConfiguration = new DataAgentsConfiguration();
+            }
+
+        } else if (configProvider. getConfigurationObject(DATA_AGENT_CONFIG_NAMESPACE) != null) {
+            dataAgentsConfiguration = DataAgentConfigurationFileResolver.
+                    resolveAndSetDataAgentConfiguration
+                            ((LinkedHashMap) configProvider.
+                                    getConfigurationObject(DATA_AGENT_CONFIG_NAMESPACE));
+        } else {
+            dataAgentsConfiguration = new DataAgentsConfiguration();
         }
         return dataAgentsConfiguration;
     }
