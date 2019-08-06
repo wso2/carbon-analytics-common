@@ -74,7 +74,7 @@
             <artifactId>org.apache.commons.io</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.yaml</groupId>
+            <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
         <dependency>
@@ -181,7 +181,7 @@
                                     <version>${apache.commons.io.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>snakeyaml</symbolicName>
+                                    <symbolicName>org.yaml.snakeyaml</symbolicName>
                                     <version>${org.snakeyaml.version}</version>
                                 </bundle>
                                 <bundle>
