@@ -225,7 +225,7 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     public void init(ConfigurationContextService configurationContextService) {
-        if (mode == Mode.SingleNode || isWorkerNode) {
+        if ((mode == Mode.SingleNode || isWorkerNode ) && receiverManager != null) {
             receiverManager.start();
         }
         if ((mode == Mode.Distributed || mode == Mode.HA) && isWorkerNode || mode == Mode.SingleNode) {
