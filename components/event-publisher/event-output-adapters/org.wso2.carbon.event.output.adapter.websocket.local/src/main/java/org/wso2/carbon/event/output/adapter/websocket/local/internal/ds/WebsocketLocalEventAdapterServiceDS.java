@@ -28,7 +28,7 @@ import org.wso2.carbon.event.output.adapter.websocket.local.WebsocketLocalOutput
 import org.wso2.carbon.event.output.adapter.websocket.local.internal.WebsocketLocalOutputCallbackRegisterServiceImpl;
 
 @Component(
-        name = "output.Websocket.AdapterService.component",
+        name = "output.Websocket.LocalAdapterService.component",
         immediate = true)
 public class WebsocketLocalEventAdapterServiceDS {
 
