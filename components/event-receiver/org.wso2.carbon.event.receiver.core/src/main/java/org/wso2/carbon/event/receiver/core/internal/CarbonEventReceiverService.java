@@ -437,7 +437,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
                         String eventAdapterType = eventReceiver.getEventReceiverConfiguration().getFromAdapterConfiguration().getType();
                         if (eventAdapterType.equals(dependency)) {
                             EventReceiverConfigurationFile receiverConfigurationFile = getEventReceiverConfigurationFile(eventReceiver.getEventReceiverConfiguration().getEventReceiverName(), tenantId);
-                            if (receiverConfigurationFile != null) {
+                            if (receiverConfigurationFile != null && eventAdapterService != null) {
                                 fileList.add(receiverConfigurationFile);
                                 eventAdapterService.destroy(eventReceiver.getEventReceiverConfiguration().getFromAdapterConfiguration().getName());
                             }
