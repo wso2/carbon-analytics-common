@@ -59,8 +59,10 @@ public class ThriftDataReceiverDS {
     @Deactivate
     protected void deactivate(ComponentContext context) {
 
-        log.info("Thrift server shutting down...");
-        ServiceHolder.getDataReceiver().stop();
+        if (ServiceHolder.getDataReceiver() != null) {
+            ServiceHolder.getDataReceiver().stop();
+            log.info("Thrift server shutting down...");
+        }
         if (log.isDebugEnabled()) {
             log.debug("Successfully stopped agent server");
         }
