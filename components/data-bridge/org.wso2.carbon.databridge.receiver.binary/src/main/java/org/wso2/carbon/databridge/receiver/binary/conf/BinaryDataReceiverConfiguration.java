@@ -93,8 +93,7 @@ public class BinaryDataReceiverConfiguration {
     }
 
     private static int getPortOffset() {
-        return BinaryDataReceiverServiceComponent.getCarbonRuntime().getConfiguration().getPortsConfig().
-                getOffset() + 1;
+        return BinaryDataReceiverServiceComponent.getCarbonRuntime().getConfiguration().getPortsConfig().getOffset();
     }
 
     public int getSSLPort() {
