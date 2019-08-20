@@ -83,7 +83,7 @@ public class BinaryDataReceiverConfiguration {
     }
 
     private static int getPortOffset() {
-        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE);
+        return CarbonUtils.getPortFromServerConfig(BinaryDataReceiverConstants.CARBON_CONFIG_PORT_OFFSET_NODE)+1;
     }
 
     public String getSslProtocols() {
