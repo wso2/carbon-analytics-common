@@ -57,7 +57,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
     private static final Log log = LogFactory.getLog(EmailEventAdapter.class);
     private static ThreadPoolExecutor threadPoolExecutor;
-    private Session session;
+    private static Session session;
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private int tenantId;
