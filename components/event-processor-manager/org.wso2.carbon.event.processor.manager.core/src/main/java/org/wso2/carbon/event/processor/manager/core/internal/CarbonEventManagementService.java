@@ -228,7 +228,8 @@ public class CarbonEventManagementService implements EventManagementService {
         if ((mode == Mode.SingleNode || isWorkerNode ) && receiverManager != null) {
             receiverManager.start();
         }
-        if ((mode == Mode.Distributed || mode == Mode.HA) && isWorkerNode || mode == Mode.SingleNode) {
+        if (((mode == Mode.Distributed || mode == Mode.HA) && isWorkerNode || mode == Mode.SingleNode)
+                && receiverManager != null)  {
             executorService.schedule(new Runnable() {
                 @Override
                 public void run() {
