@@ -45,7 +45,7 @@ public final class EventPublisherConstants {
     public static final String EF_ATTR_TYPE = "type";
     public static final String EF_ATTR_FACTORY_CLASS = "factoryClass";
     public static final String EF_WSO2EVENT_MAPPING_TYPE = "wso2event";
-    public static final String EF_TEXT_MAPPING_TYPE = "texttenant";
+    public static final String EF_TEXT_MAPPING_TYPE = "text";
     public static final String EF_MAP_MAPPING_TYPE = "map";
     public static final String EF_XML_MAPPING_TYPE = "xml";
     public static final String EF_JSON_MAPPING_TYPE = "json";

@@ -40,6 +40,17 @@ public class TextOutputMapper implements OutputMapper {
     private final boolean isCustomMappingEnabled;
     private String mappingText;
 
+
+    public void setMappingText(String mappingText){
+        this.mappingText = mappingText;
+
+    }
+
+    public void setMappingTextList(String mappingText){
+        this.mappingTextList = generateMappingTextList(mappingText);
+
+    }
+
     public TextOutputMapper(EventPublisherConfiguration eventPublisherConfiguration,
                             Map<String, Integer> propertyPositionMap, int tenantId,
                             StreamDefinition streamDefinition) throws

@@ -121,6 +121,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
         outputMapper = EventPublisherServiceValueHolder.getMappingFactoryMap().get(eventPublisherConfiguration.
                 getOutputMapping().getMappingType()).constructOutputMapper(eventPublisherConfiguration,
                 propertyPositionMap, tenantId, inputStreamDefinition);
+        log.info(outputMapper.getClass().getName());
 
         Map<String, String> dynamicOutputAdapterProperties = eventPublisherConfiguration.getToAdapterDynamicProperties();
         for (Map.Entry<String, String> entry : dynamicOutputAdapterProperties.entrySet()) {

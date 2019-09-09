@@ -23,8 +23,10 @@ public class TenantAwareTextOutputMapper extends TextOutputMapper {
 
 
         TextOutputMapping outputMapping = (TextOutputMapping) eventPublisherConfiguration.getOutputMapping();
-        outputMapping.setMappingText("{{body}}");
+        outputMapping.setMappingText("{{footer}}");
         eventPublisherConfiguration.setOutputMapping(outputMapping);
+        super.setMappingText("{{footer}}");
+        super.setMappingTextList("{{footer}}");
         return super.convertToMappedInputEvent(event);
 
     }
