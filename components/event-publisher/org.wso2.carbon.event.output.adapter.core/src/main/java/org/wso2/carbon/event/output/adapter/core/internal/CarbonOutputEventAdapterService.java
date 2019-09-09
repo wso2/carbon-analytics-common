@@ -131,7 +131,7 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
     @Override
     public void publish(String name, Map<String, String> dynamicProperties, Object message) {
         int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConcurrentHashMap<String, OutputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
+        ConcurrentHashMap<String, OutputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(-1234);
         if (eventAdapters == null) {
             throw new OutputEventAdapterRuntimeException("Event not published as no Output Event Adapter found with for" +
                     " tenant id " + tenantId);

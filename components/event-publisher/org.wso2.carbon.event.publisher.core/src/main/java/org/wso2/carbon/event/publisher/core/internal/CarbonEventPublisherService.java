@@ -192,6 +192,21 @@ public class CarbonEventPublisherService implements EventPublisherService {
         return eventPublisherConfigurations;
     }
 
+    public EventPublisherConfiguration getActiveEventPublisherConfiguration(String eventPublisherName, int tenantId)
+            throws EventPublisherConfigurationException {
+
+        EventPublisherConfiguration eventPublisherConfiguration = null;
+        Map<String, EventPublisher> tenantSpecificEventPublisherMap = tenantSpecificEventPublisherConfigurationMap
+                .get(tenantId);
+        if (tenantSpecificEventPublisherMap != null && tenantSpecificEventPublisherMap.size() > 0) {
+            EventPublisher eventPublisher = tenantSpecificEventPublisherMap.get(eventPublisherName);
+            if (eventPublisher != null) {
+                eventPublisherConfiguration = eventPublisher.getEventPublisherConfiguration();
+            }
+        }
+        return eventPublisherConfiguration;
+    }
+
     @Override
     public List<EventPublisherConfiguration> getAllActiveEventPublisherConfigurations(String streamId) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();

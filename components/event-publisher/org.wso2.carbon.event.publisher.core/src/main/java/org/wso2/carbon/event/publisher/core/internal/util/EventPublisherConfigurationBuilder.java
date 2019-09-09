@@ -224,7 +224,7 @@ public class EventPublisherConfigurationBuilder {
             if (!validateSupportedMapping(toEventAdapterType, MessageType.WSO2EVENT)) {
                 throw new EventPublisherConfigurationException("WSO2Event Mapping is not supported by event adapter type " + toEventAdapterType);
             }
-        } else if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_TEXT_MAPPING_TYPE)) {
+        } else if (mappingType.equalsIgnoreCase("textTenant")) {
             if (!validateSupportedMapping(toEventAdapterType, MessageType.TEXT)) {
                 throw new EventPublisherConfigurationException("Text Mapping is not supported by event adapter type " + toEventAdapterType);
             }

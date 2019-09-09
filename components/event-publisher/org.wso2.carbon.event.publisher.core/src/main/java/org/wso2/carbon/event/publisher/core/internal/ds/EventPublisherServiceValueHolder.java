@@ -23,6 +23,7 @@ import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherManagem
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherService;
 import org.wso2.carbon.event.publisher.core.internal.type.json.JSONOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.map.MapOutputMapperFactory;
+import org.wso2.carbon.event.publisher.core.internal.type.tenantText.TenantAwareTextOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.text.TextOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.wso2event.WSO2EventOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.xml.XMLOutputMapperFactory;
@@ -55,6 +56,7 @@ public class EventPublisherServiceValueHolder {
         mappingFactoryMap.put(MessageType.WSO2EVENT, new WSO2EventOutputMapperFactory());
         mappingFactoryMap.put(MessageType.XML, new XMLOutputMapperFactory());
         mappingFactoryMap.put(MessageType.JSON, new JSONOutputMapperFactory());
+        mappingFactoryMap.put("texttenant", new TenantAwareTextOutputMapperFactory());
     }
 
     private EventPublisherServiceValueHolder() {

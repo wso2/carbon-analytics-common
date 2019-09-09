@@ -305,9 +305,12 @@ public class CarbonEventStreamService implements EventStreamService {
             return SampleEventGenerator.generateXMLEvent(streamDefinition);
         } else if (eventType.equals(EventStreamConstants.JSON_EVENT)) {
             return SampleEventGenerator.generateJSONEvent(streamDefinition);
-        } else if (eventType.equals(EventStreamConstants.TEXT_EVENT)) {
+        } else if(eventType.equals("tenantText")){
             return SampleEventGenerator.generateTextEvent(streamDefinition);
         }
+//        } else if (eventType.equals(EventStreamConstants.TEXT_EVENT)) {
+//            return SampleEventGenerator.generateTextEvent(streamDefinition);
+//        }
         return null;
     }
 

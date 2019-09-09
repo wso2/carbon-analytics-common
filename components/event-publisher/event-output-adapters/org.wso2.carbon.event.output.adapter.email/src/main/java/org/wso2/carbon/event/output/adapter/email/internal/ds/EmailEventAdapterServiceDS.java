@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.email.EmailEventAdapterFactory;
+import org.wso2.carbon.event.output.adapter.email.TenantEmailEventAdapterFactory;
 
 @Component(
         name = "output.Email.AdapterService.component",
@@ -42,8 +43,11 @@ public class EmailEventAdapterServiceDS {
 
         try {
             OutputEventAdapterFactory emailEventAdaptorFactory = new EmailEventAdapterFactory();
+            OutputEventAdapterFactory tenantEmailEventAdapterFactory = new TenantEmailEventAdapterFactory();
             context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
                     emailEventAdaptorFactory, null);
+            context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(),
+                   tenantEmailEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output Email event adaptor service");
             }

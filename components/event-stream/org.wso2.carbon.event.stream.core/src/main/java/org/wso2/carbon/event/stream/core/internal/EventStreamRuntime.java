@@ -86,7 +86,7 @@ public class EventStreamRuntime {
                     getConfigurationContextService().getServerConfigContext());
         }
 
-        Map<String, EventJunction> eventJunctionMap = tenantSpecificEventJunctions.get(tenantId);
+        Map<String, EventJunction> eventJunctionMap = tenantSpecificEventJunctions.get(-1234);
         if (eventJunctionMap != null && eventJunctionMap.containsKey(streamId)) {
             EventJunction eventJunction = eventJunctionMap.get(streamId);
             eventJunction.sendEvent(event);
