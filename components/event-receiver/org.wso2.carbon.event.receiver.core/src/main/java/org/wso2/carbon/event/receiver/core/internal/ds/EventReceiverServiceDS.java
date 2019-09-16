@@ -32,13 +32,10 @@ import org.wso2.carbon.event.receiver.core.exception.EventReceiverConfigurationE
 import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverManagementService;
 import org.wso2.carbon.event.receiver.core.internal.CarbonEventReceiverService;
 import org.wso2.carbon.event.receiver.core.internal.EventStreamListenerImpl;
-import org.wso2.carbon.event.receiver.core.internal.tenantmgt.TenantLazyLoaderValve;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.tomcat.ext.valves.CarbonTomcatValve;
-import org.wso2.carbon.tomcat.ext.valves.TomcatValveContainer;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -71,9 +68,6 @@ public class EventReceiverServiceDS {
             activateInactiveEventReceiverConfigurations(carbonEventReceiverService);
             context.getBundleContext().registerService(EventStreamListener.class.getName(), new
                     EventStreamListenerImpl(), null);
-            ArrayList<CarbonTomcatValve> valves = new ArrayList<CarbonTomcatValve>();
-            valves.add(new TenantLazyLoaderValve());
-            TomcatValveContainer.addValves(valves);
         } catch (Throwable e) {
             log.error("Could not create EventReceiverService or EventReceiver : " + e.getMessage(), e);
         }
