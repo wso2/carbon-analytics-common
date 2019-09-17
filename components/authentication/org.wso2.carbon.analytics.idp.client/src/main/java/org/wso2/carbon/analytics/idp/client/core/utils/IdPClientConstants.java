@@ -33,6 +33,7 @@ public class IdPClientConstants {
     public static final String REDIRECTION_URL = "Redirect_Url";
     public static final String CLIENT_ID = "Client_Id";
     public static final String CALLBACK_URL = "Callback_Url";
+    public static final String SCOPE = "Scope";
     public static final String APP_NAME = "App_Name";
     public static final String ACCESS_TOKEN = "Access_Token";
     public static final String REFRESH_TOKEN = "Refresh_Token";
