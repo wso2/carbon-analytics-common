@@ -93,4 +93,14 @@ public interface EventStreamService {
 
     public void publish(Event event);
 
+    /**
+     * Add the Event Stream Configuration.
+     *
+     * @param eventStreamConfiguration Event Stream Configuration, as a configuration object.
+     * @throws EventStreamConfigurationException
+     */
+    public default void addEventStreamConfig(EventStreamConfiguration eventStreamConfiguration)
+            throws EventStreamConfigurationException {
+    }
+
 }
