@@ -14,6 +14,8 @@
  */
 package org.wso2.carbon.event.publisher.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfigurationFile;
@@ -24,6 +26,7 @@ import java.util.List;
 public interface EventPublisherService {
 
 
+    static final Log log = LogFactory.getLog(EventPublisherService.class);
     /**
      * Method used to add a new event publisher configuration
      *
@@ -197,5 +200,15 @@ public interface EventPublisherService {
      */
     public String getEventPublisherName(String eventPublisherConfigXml)
             throws EventPublisherConfigurationException;
+
+    /**
+     * Add the Event Publisher Configuration.
+     *
+     * @param eventPublisherConfiguration Event Publisher Configuration, as a configuration object.
+     * @throws EventPublisherConfigurationException
+     */
+    public default void addEventPublisherConfiguration(EventPublisherConfiguration eventPublisherConfiguration)
+            throws EventPublisherConfigurationException {
+    }
 
 }
