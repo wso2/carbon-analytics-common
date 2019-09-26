@@ -1,5 +1,6 @@
 {
   "time": {
-    "output_adapter.jms.keep_alive_time": "ms"
+    "output_adapter.jms.keep_alive_time": "ms",
+    "output_adapter.email.session_timeout" : "ms"
   }
 }

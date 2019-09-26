@@ -30,7 +30,6 @@ public class OutputAdapterRuntime {
     private static final Log log = LogFactory.getLog(OutputAdapterRuntime.class);
     private final OutputEventAdapter outputEventAdapter;
     private final String name;
-    private volatile boolean connected = false;
     private final DecayTimer timer = new DecayTimer();
     private volatile long nextConnectionTime;
 
@@ -58,30 +57,20 @@ public class OutputAdapterRuntime {
     public void publish(Object message, Map<String, String> dynamicProperties) {
         try {
             try {
-                if (connected) {
-                    outputEventAdapter.publish(message, dynamicProperties);
-                } else {
-                    if (nextConnectionTime <= System.currentTimeMillis()) {
-                        synchronized (this) {
-                            if (!connected) {
-                                if (nextConnectionTime <= System.currentTimeMillis()) {
-                                    outputEventAdapter.connect();
-                                    outputEventAdapter.publish(message, dynamicProperties);
-                                    connected = true;
-                                    timer.reset();
-                                } else {
-                                    logAndDrop(message);
-                                }
-                            } else {
-                                outputEventAdapter.publish(message, dynamicProperties);
-                            }
+                if (nextConnectionTime <= System.currentTimeMillis()) {
+                    synchronized (this) {
+                        if (nextConnectionTime <= System.currentTimeMillis()) {
+                            outputEventAdapter.connect();
+                            outputEventAdapter.publish(message, dynamicProperties);
+                            timer.reset();
+                        } else {
+                            logAndDrop(message);
                         }
-                    } else {
-                        logAndDrop(message);
                     }
+                } else {
+                    logAndDrop(message);
                 }
             } catch (ConnectionUnavailableException e) {
-                connected = false;
                 if (nextConnectionTime <= System.currentTimeMillis()) {
                     synchronized (this) {
                         if (nextConnectionTime <= System.currentTimeMillis()) {

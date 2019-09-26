@@ -1,4 +1,5 @@
 {
+  "output_adapter.email.type": "email",
   "output_adapter.jms.min_thread": "8",
   "output_adapter.jms.max_thread": "100",
   "output_adapter.jms.keep_alive_time": "20000ms",
@@ -9,5 +10,6 @@
   "output_adapter.email.hostname": "smtp.gmail.com",
   "output_adapter.email.port": "587",
   "output_adapter.email.enable_start_tls": true,
-  "output_adapter.email.enable_authentication": true
+  "output_adapter.email.enable_authentication": true,
+  "output_adapter.email.session_timeout": "300000ms"
 }

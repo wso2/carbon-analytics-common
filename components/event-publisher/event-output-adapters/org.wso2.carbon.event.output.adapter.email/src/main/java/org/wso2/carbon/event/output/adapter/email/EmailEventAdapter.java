@@ -142,6 +142,10 @@ public class EmailEventAdapter implements OutputEventAdapter {
     @Override
     public void connect() throws ConnectionUnavailableException {
 
+        // initialize SMTP session.
+        Properties props = new Properties();
+        props.putAll(globalProperties);
+        invalidateSession(props);
         if (session == null) {
 
             /**
@@ -159,9 +163,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
             final String smtpPassword;
 
 
-            // initialize SMTP session.
-            Properties props = new Properties();
-            props.putAll(globalProperties);
 
             //Verifying default SMTP properties of the SMTP server.
 
@@ -204,7 +205,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
             smtpUsername = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
             smtpPassword = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
 
-
+            props.put(EmailEventAdapterConstants.MAIL_SMTP_SESSION_CREATED_TIME,System.currentTimeMillis());
             //initializing SMTP server to create session object.
             if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
                 session = Session.getInstance(props, new Authenticator() {
@@ -216,6 +217,30 @@ public class EmailEventAdapter implements OutputEventAdapter {
             } else {
                 session = Session.getInstance(props);
                 log.info("Connecting adapter " + eventAdapterConfiguration.getName() + "without user authentication for tenant " + tenantId);
+            }
+        }
+    }
+
+    /**
+     * This will invalidate the session based on the timeout configured in output-event-adapters.xml.
+     *
+     * @param props properties configured in output-event-adapters.xml.
+     */
+    private void invalidateSession(Properties props) {
+
+        /**
+         *  Session TimeOut in milliseconds.
+         */
+        long sessionTimeOut = 300000;
+        if (session != null) {
+            if (props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_TIMEOUT) != null) {
+                sessionTimeOut = Long.parseLong(props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_TIMEOUT));
+            }
+
+            if (System.currentTimeMillis() - Long.parseLong(
+                    session.getProperties().get(EmailEventAdapterConstants.MAIL_SMTP_SESSION_CREATED_TIME).toString())
+                    >= sessionTimeOut) {
+                session = null;
             }
         }
     }

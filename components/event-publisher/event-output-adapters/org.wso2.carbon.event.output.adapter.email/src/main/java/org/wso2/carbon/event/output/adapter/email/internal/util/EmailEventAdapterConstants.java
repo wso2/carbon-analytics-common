@@ -45,6 +45,8 @@ public class EmailEventAdapterConstants {
 
     public static final String MAIL_SMTP_HOST = "mail.smtp.host";
     public static final String MAIL_SMTP_PORT = "mail.smtp.port";
+    public static final String MAIL_SMTP_TIMEOUT = "mail.smtp.timeout";
+    public static final String MAIL_SMTP_SESSION_CREATED_TIME = "mail.smtp.session_created_time";
 
     /**
      * Email Adapter MIME types.

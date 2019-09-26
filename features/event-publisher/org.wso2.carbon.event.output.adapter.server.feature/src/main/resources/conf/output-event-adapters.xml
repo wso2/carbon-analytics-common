@@ -98,6 +98,7 @@
         <property key="mail.smtp.port">587</property>
         <property key="mail.smtp.starttls.enable">true</property>
         <property key="mail.smtp.auth">true</property>
+        <property key="mail.smtp.timeout">300000</property>
         <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
