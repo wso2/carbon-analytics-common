@@ -211,4 +211,27 @@ public interface EventPublisherService {
             throws EventPublisherConfigurationException {
     }
 
+    /**
+     * Add the Event Publisher Configuration File.
+     *
+     * @param eventPublisherConfigurationFile Event Publisher Configuration File, as a configuration file object.
+     * @param tenantId                        Tenant ID.
+     * @throws EventPublisherConfigurationException
+     */
+    public default void addEventPublisherConfigurationFile(
+            EventPublisherConfigurationFile eventPublisherConfigurationFile, int tenantId)
+            throws EventPublisherConfigurationException {
+    }
+
+    /**
+     * Remove Event Publisher Configuration File.
+     *
+     * @param fileName EventPublisher File name.
+     * @param tenantId Tenant ID.
+     * @throws EventPublisherConfigurationException
+     */
+    public default void removeEventPublisherConfigurationFile(String fileName, int tenantId) {
+
+    }
+
 }
