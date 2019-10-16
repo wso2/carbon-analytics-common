@@ -28,6 +28,13 @@ public class EmailEventAdapterConstants {
     public static final String ADAPTER_MESSAGE_EMAIL_SUBJECT = "email.subject";
     public static final String APAPTER_MESSAGE_EMAIL_TYPE = "email.type";
     public static final String ADAPTER_MESSAGE_EMAIL_TYPE_HINT = "emailType.hint";
+    public static final String ADAPTER_EMAIL_SMTP_PORT = "mail.smtp.port";
+    public static final String ADAPTER_EMAIL_SMTP_USER  = "mail.smtp.user";
+    public static final String ADAPTER_EMAIL_SMTP_PASSWORD  = "mail.smtp.password";
+    public static final String ADAPTER_EMAIL_SMTP_FROM  = "mail.smtp.from";
+    public static final String ADAPTER_EMAIL_SMTP_HOST  = "mail.smtp.host";
+    public static final String ADAPTER_EMAIL_SMTP_AUTH  = "mail.smtp.auth";
+    public static final String ADAPTER_EMAIL_SMTP_STARTTLS_ENABLE  = "mail.smtp.starttls.enable";
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";

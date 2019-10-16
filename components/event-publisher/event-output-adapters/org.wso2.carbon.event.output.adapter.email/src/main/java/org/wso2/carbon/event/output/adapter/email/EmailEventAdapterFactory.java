@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -58,7 +59,47 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public List<Property> getStaticPropertyList() {
-        return null;
+
+        List<Property> staticpropertyList = new ArrayList<>();
+
+        Property smtplUserName = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER);
+        smtplUserName.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER));
+        smtplUserName.setRequired(false);
+
+        Property smtpPassword = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PASSWORD);
+        smtpPassword.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PASSWORD));
+        smtpPassword.setRequired(false);
+
+        Property smtpAuth = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_AUTH);
+        smtpAuth.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_AUTH));
+        smtpAuth.setRequired(false);
+
+        Property smtpFrom = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_FROM);
+        smtpFrom.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_FROM));
+        smtpFrom.setRequired(false);
+
+        Property smtpHost = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_HOST);
+        smtpHost.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_HOST));
+        smtpHost.setRequired(false);
+
+        Property smtpPort = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PORT);
+        smtpPort.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PORT));
+        smtpPort.setRequired(false);
+
+        Property startTLSEnable = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_STARTTLS_ENABLE);
+        startTLSEnable.setDisplayName(
+                resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_STARTTLS_ENABLE));
+        startTLSEnable.setRequired(false);
+
+        staticpropertyList.add(smtplUserName);
+        staticpropertyList.add(smtpPassword);
+        staticpropertyList.add(smtpAuth);
+        staticpropertyList.add(smtpFrom);
+        staticpropertyList.add(smtpHost);
+        staticpropertyList.add(smtpPort);
+        staticpropertyList.add(startTLSEnable);
+
+        return staticpropertyList;
     }
 
     @Override

@@ -118,6 +118,10 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
         }
         Map<String, String> globalProperties = OutputEventAdapterServiceValueHolder.getGlobalAdapterConfigs().
                 getAdapterConfig(outputEventAdapterConfiguration.getType()).getGlobalPropertiesAsMap();
+        if (outputEventAdapterConfiguration.getStaticProperties() != null) {
+            overrideGlobalPropertiesWithTenantProperties(globalProperties,
+                    outputEventAdapterConfiguration.getStaticProperties());
+        }
         eventAdapters.put(outputEventAdapterConfiguration.getName(), new OutputAdapterRuntime(adapterFactory.
                 createEventAdapter(outputEventAdapterConfiguration, globalProperties), outputEventAdapterConfiguration.getName()));
     }
@@ -202,6 +206,23 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
                 }
             }
             throw new OutputEventAdapterException("Adopter with name'" + outputAdapterName + "' not found");
+    }
+
+    /**
+     * This method override the global properties if tenant properties are present.
+     *
+     * @param globalProps global properties from output-event-adapters.xml.
+     * @param tenantProps tenant wise properties configured in tenant wise Publishers.
+     * @param tenantProps
+     */
+    private void overrideGlobalPropertiesWithTenantProperties(Map<String, String> globalProps,
+            Map<String, String> tenantProps) {
+
+        for (String key : tenantProps.keySet()) {
+            if (globalProps.containsKey(key) && tenantProps.get(key) != null) {
+                globalProps.put(key, tenantProps.get(key));
+            }
+        }
     }
 
 }
