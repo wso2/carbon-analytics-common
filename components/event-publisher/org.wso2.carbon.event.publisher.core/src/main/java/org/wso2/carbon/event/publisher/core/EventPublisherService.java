@@ -234,4 +234,14 @@ public interface EventPublisherService {
 
     }
 
+    /**
+     * Get Event Publisher Configuration from xml.
+     *
+     * @param eventPublisherConfigurationXml EventPublisher configuration in xml.
+     */
+    public default EventPublisherConfiguration getEventPublisherConfiguration(String eventPublisherConfigurationXml)
+            throws EventPublisherConfigurationException {
+        return null;
+    }
+
 }

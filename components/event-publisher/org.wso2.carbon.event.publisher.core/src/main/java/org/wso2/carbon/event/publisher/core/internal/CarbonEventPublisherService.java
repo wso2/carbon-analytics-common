@@ -83,6 +83,27 @@ public class CarbonEventPublisherService implements EventPublisherService {
 
     }
 
+    public EventPublisherConfiguration getEventPublisherConfiguration(String eventPublisherConfigurationXml)
+            throws EventPublisherConfigurationException {
+
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        EventPublisherConfiguration eventPublisherConfigurationObject;
+        try {
+            OMElement omElement = AXIOMUtil.stringToOM(eventPublisherConfigurationXml);
+            omElement.build();
+            EventPublisherConfigurationHelper.validateEventPublisherConfiguration(omElement);
+            String mappingType = EventPublisherConfigurationHelper.getOutputMappingType(omElement);
+            if (mappingType != null) {
+                eventPublisherConfigurationObject = EventPublisherConfigurationBuilder.getEventPublisherConfiguration(omElement, mappingType, true, tenantId);
+            } else {
+                throw new EventPublisherConfigurationException("Mapping type of the Event Publisher cannot be null");
+            }
+        } catch (XMLStreamException e) {
+            throw new EventPublisherConfigurationException("Error while building XML configuration :" + e.getMessage(), e);
+        }
+        return eventPublisherConfigurationObject;
+    }
+
     @Override
     public void deployEventPublisherConfiguration(
             String eventPublisherConfigXml)
