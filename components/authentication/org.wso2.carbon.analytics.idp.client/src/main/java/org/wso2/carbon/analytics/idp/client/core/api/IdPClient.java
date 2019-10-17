@@ -40,6 +40,15 @@ public interface IdPClient {
     List<Role> getAllRoles() throws IdPClientException;
 
     /**
+     * This returns all the roles available in the user store for the given tenant.
+     *
+     * @param username name of the user
+     * @return List of {Role} objects
+     * @throws IdPClientException thrown when an error occurred when retrieving roles
+     */
+    List<Role> getAllRolesOfTenant(String username) throws IdPClientException;
+
+    /**
      * This returns the admin role of the user store.
      *
      * @return {Role}
