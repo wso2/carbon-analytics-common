@@ -112,5 +112,15 @@ public interface PermissionProvider {
      */
     List<Role> getGrantedRoles(Permission permission) throws PermissionException;
 
+    /**
+     * Get list of roles in a tenant which has a permission granted.
+     *
+     * @param permission
+     * @param username
+     * @return
+     * @throws PermissionException
+     */
+    List<Role> getGrantedRolesOfTenant(Permission permission, String username) throws PermissionException;
+
     List<Role> getGrantedRoles(String permissionID) throws PermissionException;
 }

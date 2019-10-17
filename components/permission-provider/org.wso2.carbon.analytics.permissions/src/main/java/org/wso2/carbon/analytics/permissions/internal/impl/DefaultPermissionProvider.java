@@ -244,6 +244,11 @@ public class DefaultPermissionProvider implements PermissionProvider {
      */
     @Override
     public List<Role> getGrantedRoles(Permission permission) throws PermissionException {
+        return getGrantedRolesOfTenant(permission, null);
+    }
+
+    @Override
+    public List<Role> getGrantedRolesOfTenant(Permission permission, String username) throws PermissionException {
         if (log.isDebugEnabled()) {
             log.debug("Get roles assigned for " + permission);
         }
@@ -251,7 +256,12 @@ public class DefaultPermissionProvider implements PermissionProvider {
         // Create a map out of all the roles with role Id as the key. This map will be used to get the role name.
         Map<String, org.wso2.carbon.analytics.idp.client.core.models.Role> roleMap = new HashMap<>();
         try {
-            List<org.wso2.carbon.analytics.idp.client.core.models.Role> allRoles = idPClient.getAllRoles();
+            List<org.wso2.carbon.analytics.idp.client.core.models.Role> allRoles;
+            if (username != null) {
+                allRoles = idPClient.getAllRolesOfTenant(username);
+            } else {
+                allRoles = idPClient.getAllRoles();
+            }
             for (org.wso2.carbon.analytics.idp.client.core.models.Role role : allRoles) {
                 roleMap.put(role.getId(), role);
             }

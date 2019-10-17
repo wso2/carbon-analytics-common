@@ -182,6 +182,12 @@ public class ExternalIdPClient implements IdPClient {
     }
 
     @Override
+    public List<Role> getAllRolesOfTenant(String username) throws IdPClientException {
+        // Since there is no tenant concept in External IdP Client, all the roles are returned.
+        return getAllRoles();
+    }
+
+    @Override
     public Role getAdminRole() throws IdPClientException {
         Response response = scimServiceStub.getAllGroups();
         if (response == null) {
