@@ -329,6 +329,8 @@ public class EmailOutputAdaptorTestCase {
         globalProperties.put("jobQueueSize", "10000");
         globalProperties.put("mail.smtp.host", "smtp.gmail.com");
         globalProperties.put("minThread", "8");
+        globalProperties.put("mail.smtp.replyTo", "efgh@gmail.com");
+        globalProperties.put("mail.smtp.signature", "efgh");
         adapterFactory.createEventAdapter(eventAdapterConfiguration, globalProperties);
     }
 }

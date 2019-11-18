@@ -21,6 +21,7 @@ import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfigurationFile;
 import org.wso2.carbon.event.publisher.core.exception.EventPublisherConfigurationException;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface EventPublisherService {
@@ -209,6 +210,39 @@ public interface EventPublisherService {
      */
     public default void addEventPublisherConfiguration(EventPublisherConfiguration eventPublisherConfiguration)
             throws EventPublisherConfigurationException {
+    }
+
+    /**
+     * Get Event Publisher Configuration from xml.
+     *
+     * @param eventPublisherConfiguration EventPublisher configuration as input stream.
+     */
+    public default EventPublisherConfiguration getEventPublisherConfiguration(InputStream eventPublisherConfiguration)
+            throws EventPublisherConfigurationException {
+        return null;
+    }
+
+    /**
+     * Add the Event Publisher Configuration File.
+     *
+     * @param eventPublisherConfigurationFile Event Publisher Configuration File, as a configuration file object.
+     * @param tenantId                        Tenant ID.
+     * @throws EventPublisherConfigurationException
+     */
+    public default void addEventPublisherConfigurationFile(
+            EventPublisherConfigurationFile eventPublisherConfigurationFile, int tenantId)
+            throws EventPublisherConfigurationException {
+    }
+
+    /**
+     * Remove Event Publisher Configuration File.
+     *
+     * @param fileName EventPublisher File name.
+     * @param tenantId Tenant ID.
+     * @throws EventPublisherConfigurationException
+     */
+    public default void removeEventPublisherConfigurationFile(String fileName, int tenantId) {
+
     }
 
 }

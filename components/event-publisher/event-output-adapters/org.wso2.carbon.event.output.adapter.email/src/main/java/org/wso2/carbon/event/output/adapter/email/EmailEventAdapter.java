@@ -68,6 +68,16 @@ public class EmailEventAdapter implements OutputEventAdapter {
      */
     private InternetAddress smtpFromAddress = null;
 
+    /**
+     * Optional replyTO address for outgoing messages.
+     */
+    private InternetAddress[] smtpReplyToAddress = null;
+
+    /**
+     * Optional Signature of sender address for outgoing messages.
+     */
+    private String signature = null;
+
 
     public EmailEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                              Map<String, String> globalProperties) {
@@ -168,7 +178,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
             smtpFrom = props.getProperty(MailConstants.MAIL_SMTP_FROM);
             smtpHost = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_HOST);
             smtpPort = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_PORT);
-
+            signature = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_SIGNATURE);
             if (smtpFrom == null) {
                 String msg = "failed to connect to the mail server due to null smtpFrom value";
                 throw new ConnectionUnavailableException("The adapter " +
@@ -188,6 +198,19 @@ public class EmailEventAdapter implements OutputEventAdapter {
                         ("The adapter " + eventAdapterConfiguration.getName() + " " + msg);
             }
 
+            String replyTo = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_REPLY_TO);
+            if (replyTo != null) {
+
+                try {
+                    smtpReplyToAddress = InternetAddress.parse(replyTo);
+                } catch (AddressException e) {
+                    log.error("Error in retrieving smtp replyTo address : " + smtpFrom, e);
+                    String msg =
+                            "failed to connect to the mail server due to error in retrieving " + "smtp replyTo address";
+                    throw new ConnectionUnavailableException(
+                            "The adapter " + eventAdapterConfiguration.getName() + " " + msg, e);
+                }
+            }
 
             try {
                 smtpFromAddress = new InternetAddress(smtpFrom);
@@ -291,7 +314,25 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
             //Setting up the Email attributes and Email payload.
             try {
-                message.setFrom(smtpFromAddress);
+                if (signature != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Email Signature is configured as: " + signature);
+                    }
+                    message.setFrom(new InternetAddress(smtpFromAddress.getAddress(), signature));
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Email Signature is not configured.");
+                    }
+                    message.setFrom(smtpFromAddress);
+                }
+
+                if (smtpReplyToAddress != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Email reply to address is configured as: " + smtpReplyToAddress[0].getAddress());
+                    }
+                    message.setReplyTo(smtpReplyToAddress);
+                }
+
                 message.addRecipient(Message.RecipientType.TO,
                         new InternetAddress(to));
 

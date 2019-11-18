@@ -17,6 +17,7 @@ package org.wso2.carbon.event.publisher.core.internal;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axis2.dataretrieval.DataRetrievalUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -43,6 +44,7 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +83,29 @@ public class CarbonEventPublisherService implements EventPublisherService {
             throw new EventPublisherConfigurationException("Mapping type of the Event Publisher " + eventPublisherName + " cannot be null");
         }
 
+    }
+
+    public EventPublisherConfiguration getEventPublisherConfiguration(InputStream eventPublisherConfiguration)
+            throws EventPublisherConfigurationException {
+
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        EventPublisherConfiguration eventPublisherConfigurationObject;
+        try {
+            OMElement omElement = DataRetrievalUtil.convertToOMElement(eventPublisherConfiguration);
+            omElement.build();
+            EventPublisherConfigurationHelper.validateEventPublisherConfiguration(omElement);
+            String mappingType = EventPublisherConfigurationHelper.getOutputMappingType(omElement);
+            if (mappingType != null) {
+                eventPublisherConfigurationObject = EventPublisherConfigurationBuilder
+                        .getEventPublisherConfiguration(omElement, mappingType, true, tenantId);
+            } else {
+                throw new EventPublisherConfigurationException("Mapping type of the Event Publisher cannot be null");
+            }
+        } catch (XMLStreamException e) {
+            throw new EventPublisherConfigurationException("Error while building XML configuration :" + e.getMessage(),
+                    e);
+        }
+        return eventPublisherConfigurationObject;
     }
 
     @Override
