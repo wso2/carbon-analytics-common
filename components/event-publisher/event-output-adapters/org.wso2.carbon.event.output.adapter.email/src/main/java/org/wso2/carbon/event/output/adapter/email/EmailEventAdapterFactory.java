@@ -91,6 +91,14 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
                 resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_STARTTLS_ENABLE));
         startTLSEnable.setRequired(false);
 
+        Property senderSignature = new Property(EmailEventAdapterConstants.MAIL_SMTP_SIGNATURE);
+        startTLSEnable.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.MAIL_SMTP_SIGNATURE));
+        startTLSEnable.setRequired(false);
+
+        Property replyToAddress = new Property(EmailEventAdapterConstants.MAIL_SMTP_REPLY_TO);
+        startTLSEnable.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.MAIL_SMTP_REPLY_TO));
+        startTLSEnable.setRequired(false);
+
         staticpropertyList.add(smtplUserName);
         staticpropertyList.add(smtpPassword);
         staticpropertyList.add(smtpAuth);
@@ -98,6 +106,8 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         staticpropertyList.add(smtpHost);
         staticpropertyList.add(smtpPort);
         staticpropertyList.add(startTLSEnable);
+        staticpropertyList.add(senderSignature);
+        staticpropertyList.add(replyToAddress);
 
         return staticpropertyList;
     }

@@ -60,5 +60,11 @@ public class EmailEventAdapterConstants {
     public static final String MAIL_TEXT_PLAIN = "text/plain";
     public static final String MAIL_TEXT_HTML = "text/html";
 
+    /**
+     * SMTP optional property constants.
+     */
+    public static final String MAIL_SMTP_REPLY_TO = "mail.smtp.replyTo";
+    public static final String MAIL_SMTP_SIGNATURE = "mail.smtp.signature";
+
 
 }
