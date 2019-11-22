@@ -11,5 +11,5 @@
   "output_adapter.email.enable_start_tls": true,
   "output_adapter.email.enable_authentication": true,
   "output_adapter.email.signature": "$ref{output_adapter.email.username}",
-  "output_adapter.email.replyTo": "$ref{output_adapter.email.from_address}"
+  "output_adapter.email.reply_to": "$ref{output_adapter.email.from_address}"
 }
