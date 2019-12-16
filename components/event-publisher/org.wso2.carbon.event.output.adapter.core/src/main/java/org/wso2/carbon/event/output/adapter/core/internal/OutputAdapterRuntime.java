@@ -93,6 +93,8 @@ public class OutputAdapterRuntime {
                                 publish(message, dynamicProperties);
                             } else {
                                 log.error("Connection unavailable for Output Adopter '" + name + "' reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
+                                Thread.sleep(timer.returnTimeToWait());
+                                publish(message, dynamicProperties);
                             }
                         } else {
                             logAndDrop(message);
