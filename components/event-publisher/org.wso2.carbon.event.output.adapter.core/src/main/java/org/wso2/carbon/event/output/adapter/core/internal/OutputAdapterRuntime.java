@@ -97,18 +97,7 @@ public class OutputAdapterRuntime {
                                 publish(message, dynamicProperties);
                             } else {
                                 log.error("Connection unavailable for Output Adopter '" + name + "' reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
-                                
-                                executorService.submit(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            Thread.sleep(timer.returnTimeToWait());
-                                        } catch (InterruptedException ex) {
-                                            ex.printStackTrace();
-                                        }
-                                        publish(message, dynamicProperties);
-                                    }
-                                });
+                                executorService.submit(new RetryLogicRunnableImplementation(message, dynamicProperties));
                             }
                         } else {
                             logAndDrop(message);
@@ -135,6 +124,26 @@ public class OutputAdapterRuntime {
             outputEventAdapter.disconnect();
         } finally {
             outputEventAdapter.destroy();
+        }
+    }
+
+    class RetryLogicRunnableImplementation implements Runnable {
+        private Object message;
+        private Map<String, String> dynamicProperties;
+
+        public RetryLogicRunnableImplementation(Object message, Map<String, String> dynamicProperties) {
+            this.message = message;
+            this.dynamicProperties = dynamicProperties;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(timer.returnTimeToWait());
+            } catch (InterruptedException ex) {
+                log.error(ex.getMessage(), ex);
+            }
+            publish(message, dynamicProperties);
         }
     }
 
