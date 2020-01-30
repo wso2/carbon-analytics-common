@@ -215,8 +215,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
             try {
                 smtpFromAddress = new InternetAddress(smtpFrom);
             } catch (AddressException e) {
-                log.error("Error in retrieving smtp address : " +
-                        smtpFrom, e);
                 String msg = "failed to connect to the mail server due to error in retrieving " +
                         "smtp from address";
                 throw new ConnectionUnavailableException
