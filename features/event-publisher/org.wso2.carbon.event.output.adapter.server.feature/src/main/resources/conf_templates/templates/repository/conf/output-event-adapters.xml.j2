@@ -100,6 +100,12 @@
         <property key="mail.smtp.auth">{{output_adapter.email.enable_authentication}}</property>
         <property key="mail.smtp.signature">{{output_adapter.email.signature}}</property>
         <property key="mail.smtp.replyTo">{{output_adapter.email.reply_to}}</property>
+        {% if output_adapter.email.custom_properties is defined %}
+        <!-- Custom Properties -->
+        {% for property_name,property_value in output_adapter.email.custom_properties.items() %}
+        <property key="{{property_name}}">{{property_value}}</property>
+        {% endfor %}
+        {% endif %}
         <!-- Thread Pool Related Properties -->
         <property key="minThread">8</property>
         <property key="maxThread">100</property>
