@@ -43,6 +43,7 @@ public class IdPClientConstants {
     public static final String REMEMBER_ME = "Remember_Me";
     public static final String APP_ID = "App_Id";
     public static final String RETURN_LOGOUT_PROPERTIES = "returnLogoutProperties";
+    public static final String DOMAIN = "Domain";
 
     public static final String USERNAME = "Username";
     public static final String PASSWORD = "Password";

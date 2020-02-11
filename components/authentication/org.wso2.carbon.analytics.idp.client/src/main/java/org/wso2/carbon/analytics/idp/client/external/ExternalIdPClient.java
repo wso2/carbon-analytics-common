@@ -464,6 +464,11 @@ public class ExternalIdPClient implements IdPClient {
         }
     }
 
+    public Map<String, String> authCodeLogin(String appContext, String code, Map<String, String> properties)
+            throws IdPClientException {
+        throw new IdPClientException("Not implemented yet.");
+    }
+
     @Override
     public Map<String, String> logout(Map<String, String> properties) throws IdPClientException {
         String token = properties.get(IdPClientConstants.ACCESS_TOKEN);
