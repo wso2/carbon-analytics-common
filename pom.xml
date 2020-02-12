@@ -758,7 +758,6 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
         <carbon.kernel.version>5.2.12</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
-        <carbon.kernel.pax.version>5.2.8</carbon.kernel.pax.version>
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
         <disruptor.version>3.4.2.wso2v1</disruptor.version>
@@ -817,7 +816,7 @@
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
         <carbon.cache.version>1.1.3</carbon.cache.version>
         <carbon.deployment.version>5.2.1</carbon.deployment.version>
-        <carbon.coordination.version>2.1.5</carbon.coordination.version>
+        <carbon.coordination.version>2.1.7</carbon.coordination.version>
         <carbon.metrics.version>2.3.7</carbon.metrics.version>
 
         <!--pax-exam dependencies-->
