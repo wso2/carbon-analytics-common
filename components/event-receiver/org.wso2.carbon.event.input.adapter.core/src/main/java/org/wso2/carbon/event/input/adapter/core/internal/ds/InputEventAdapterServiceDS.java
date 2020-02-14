@@ -36,6 +36,10 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 
 @Component(
         name = "event.input.adapter.service",
@@ -137,11 +141,19 @@ public class InputEventAdapterServiceDS {
                 log.warn(EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " can not found in " + path + ", hence Input" +
                         " Event Adapters will be running with default global configs.");
             }
-            return (AdapterConfigs) unmarshaller.unmarshal(configFile);
-        } catch (JAXBException e) {
+            return (AdapterConfigs) unmarshaller.unmarshal(getXMLStreamReader(path));
+        } catch (JAXBException | XMLStreamException e) {
             log.error("Error in loading " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " from " + path + ", " +
                     "hence Input Event Adapters will be running with default global configs.");
         }
         return new AdapterConfigs();
+    }
+
+    private XMLStreamReader getXMLStreamReader(String filePath) throws XMLStreamException {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StreamSource(filePath));
+        return xmlStreamReader;
     }
 }

@@ -47,6 +47,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -133,9 +137,10 @@ public class TemplateManagerHelper {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Domain.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            domain = (Domain) jaxbUnmarshaller.unmarshal(fileEntry);
+            XMLStreamReader xmlStreamReader = getXMLInputFactory().createXMLStreamReader(new StreamSource(fileEntry));
+            domain = (Domain) jaxbUnmarshaller.unmarshal(xmlStreamReader);
 
-        } catch (JAXBException e) {
+        } catch (JAXBException | XMLStreamException e) {
             log.error("JAXB Exception when unmarshalling domain template file at "
                     + fileEntry.getPath(), e);
         }
@@ -157,8 +162,9 @@ public class TemplateManagerHelper {
             StringReader reader = new StringReader(new String((byte[]) configFileContent));
             JAXBContext jaxbContext = JAXBContext.newInstance(ScenarioConfiguration.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            scenarioConfiguration = (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(reader);
-        } catch (JAXBException e) {
+            XMLStreamReader xmlStreamReader = getXMLInputFactory().createXMLStreamReader(new StreamSource(reader));
+            scenarioConfiguration = (ScenarioConfiguration) jaxbUnmarshaller.unmarshal(xmlStreamReader);
+        } catch (JAXBException | XMLStreamException e) {
             log.error("JAXB Exception occurred when unmarshalling configuration ", e);
         }
 
@@ -641,5 +647,12 @@ public class TemplateManagerHelper {
     public static String getCommonArtifactId(String domainName, String artifactType,
                                              int sequenceNumber) {
         return domainName + TemplateManagerConstants.CONFIG_NAME_SEPARATOR + artifactType + sequenceNumber;
+    }
+
+    private static XMLInputFactory getXMLInputFactory() {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        return xmlInputFactory;
     }
 }
