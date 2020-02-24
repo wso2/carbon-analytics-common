@@ -60,5 +60,6 @@ public final class RDBMSEventAdapterConstants {
     public static final String ADAPTER_GENERIC_RDBMS_TABLE_ATTRIBUTES_HINT = "attributes.with.type.hint";
     public static final String ATTRIBUTE_SEPARATOR = ",";
     public static final String ENTRY_SEPARATOR = ":";
-
+    public static final String MS_SQL_SERVER_DB_DRIVER = "microsoft sql server";
+    public static final String MS_SQL_DB_DRIVER = "mssql";
 }
