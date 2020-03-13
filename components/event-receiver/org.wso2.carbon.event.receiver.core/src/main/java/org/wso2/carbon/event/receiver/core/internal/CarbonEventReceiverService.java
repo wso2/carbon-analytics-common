@@ -18,8 +18,10 @@ package org.wso2.carbon.event.receiver.core.internal;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
@@ -40,9 +42,13 @@ import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverCon
 import org.wso2.carbon.event.receiver.core.internal.util.helper.EventReceiverConfigurationHelper;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.core.exception.EventStreamConfigurationException;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -548,7 +554,10 @@ public class CarbonEventReceiverService implements EventReceiverService {
             throws EventReceiverConfigurationException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            OMElement omElement = AXIOMUtil.stringToOM(eventReceiverConfigurationXml);
+            DocumentBuilderFactory dbf = EventReceiverUtil.getSecuredDocumentBuilder();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(eventReceiverConfigurationXml)));
+            OMElement omElement = XMLUtils.toOM((document).getDocumentElement());
             omElement.build();
             EventReceiverConfigurationHelper.validateEventReceiverConfiguration(omElement);
             String mappingType = EventReceiverConfigurationHelper.getInputMappingType(omElement);
@@ -568,7 +577,7 @@ public class CarbonEventReceiverService implements EventReceiverService {
             } else {
                 throw new EventReceiverConfigurationException("Mapping type of the Event Receiver " + originalEventReceiverName + " cannot be null");
             }
-        } catch (XMLStreamException e) {
+        } catch (Exception e) {
             throw new EventReceiverConfigurationException("Error while building XML configuration: " + e.getMessage(), e);
         }
     }

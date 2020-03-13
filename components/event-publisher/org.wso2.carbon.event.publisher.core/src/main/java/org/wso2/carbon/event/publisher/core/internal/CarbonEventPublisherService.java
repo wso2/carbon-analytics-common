@@ -18,8 +18,10 @@ package org.wso2.carbon.event.publisher.core.internal;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.dataretrieval.DataRetrievalUtil;
+import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterSchema;
@@ -42,15 +44,19 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
+import org.xml.sax.InputSource;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamException;
 
 public class CarbonEventPublisherService implements EventPublisherService {
@@ -587,7 +593,10 @@ public class CarbonEventPublisherService implements EventPublisherService {
             throws EventPublisherConfigurationException {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            OMElement omElement = AXIOMUtil.stringToOM(eventPublisherConfigurationXml);
+            DocumentBuilderFactory dbf = EventPublisherUtil.getSecuredDocumentBuilder();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(eventPublisherConfigurationXml)));
+            OMElement omElement = XMLUtils.toOM((document).getDocumentElement());
             omElement.build();
             EventPublisherConfigurationHelper.validateEventPublisherConfiguration(omElement);
             String mappingType = EventPublisherConfigurationHelper.getOutputMappingType(omElement);
@@ -607,7 +616,7 @@ public class CarbonEventPublisherService implements EventPublisherService {
             } else {
                 throw new EventPublisherConfigurationException("Mapping type of the Event Publisher " + originalEventPublisherName + " cannot be null");
             }
-        } catch (XMLStreamException e) {
+        } catch (Exception e) {
             throw new EventPublisherConfigurationException("Error while building XML configuration :" + e.getMessage(), e);
         }
     }
