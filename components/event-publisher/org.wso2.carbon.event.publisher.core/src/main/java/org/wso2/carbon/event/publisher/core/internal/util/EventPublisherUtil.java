@@ -15,6 +15,10 @@
 package org.wso2.carbon.event.publisher.core.internal.util;
 
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.SecurityManager;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.event.publisher.core.config.EventPublisherConfiguration;
@@ -31,10 +35,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 public class EventPublisherUtil {
 
     private static final String JVM_BIT_ARCH_SYSTEM_PROPERTY = "sun.arch.data.model";
     private static int referenceSize;
+    private static final int ENTITY_EXPANSION_LIMIT = 0;
+    private static final Log log = LogFactory.getLog(EventPublisherUtil.class);
 
     static {
         String arch = System.getProperty(JVM_BIT_ARCH_SYSTEM_PROPERTY);
@@ -44,6 +53,29 @@ public class EventPublisherUtil {
         } else {
             referenceSize = 8;
         }
+    }
+
+    public static DocumentBuilderFactory getSecuredDocumentBuilder() {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setXIncludeAware(false);
+        dbf.setExpandEntityReferences(false);
+        try {
+            dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+            dbf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+            dbf.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error(
+                    "Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE + " or "
+                            + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE + " or "
+                            + Constants.LOAD_EXTERNAL_DTD_FEATURE);
+        }
+
+        SecurityManager securityManager = new SecurityManager();
+        securityManager.setEntityExpansionLimit(ENTITY_EXPANSION_LIMIT);
+        dbf.setAttribute(Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+        return dbf;
     }
 
     public static String generateFilePath(String eventPublisherName, String repositoryPath) throws EventPublisherConfigurationException {
