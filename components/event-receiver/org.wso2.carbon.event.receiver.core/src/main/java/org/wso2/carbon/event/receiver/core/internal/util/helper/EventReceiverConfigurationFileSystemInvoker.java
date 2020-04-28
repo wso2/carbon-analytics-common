@@ -19,9 +19,9 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoUtil;
 import org.wso2.carbon.event.input.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.receiver.core.EventReceiverDeployer;
@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
 import java.io.*;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class EventReceiverConfigurationFileSystemInvoker {
     private static final Log log = LogFactory.getLog(EventReceiverConfigurationFileSystemInvoker.class);
@@ -66,7 +67,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
                             propertyOMElement.setText(value);
                             propertyOMElement.addAttribute(EventReceiverConstants.ER_ATTR_ENCRYPTED, "true", null);
                         } catch (Exception e) {
-                            log.error("Unable to decrypt the encrypted field: " + name + " for adaptor type: " + adaptorType);
+                            log.error("Unable to decrypt the encrypted field: " + name + " for adaptor type: " +
+                                    adaptorType + ". Hence, setting \"\" (empty string) as the property value", e);
                             propertyOMElement.setText("");
                         }
                     }
@@ -86,9 +88,8 @@ public class EventReceiverConfigurationFileSystemInvoker {
         EventReceiverDeployer eventReceiverDeployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(EventAdapterUtil.getAxisConfiguration());
         EventReceiverUtil.validateFilePath(fileName);
         String filePath = getFilePathFromFilename(fileName);
-        try {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(filePath))) {
             /* save contents to .xml file */
-            BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
             String xmlContent = XmlFormatter.format(eventReceiverConfigXml);
             eventReceiverDeployer.getDeployedEventReceiverFilePaths().add(filePath);
             out.write(xmlContent);
@@ -162,12 +163,12 @@ public class EventReceiverConfigurationFileSystemInvoker {
         return stringBuilder.toString().trim();
     }
 
-    public static void reload(EventReceiverConfigurationFile eventReceiverConfigurationFile)
+    public static void reload(EventReceiverConfigurationFile eventReceiverConfigurationFile, Map<Integer, EventReceiverDeployer> tenantSpecificDeployerMap)
             throws EventReceiverConfigurationException {
         EventReceiverUtil.validateFilePath(eventReceiverConfigurationFile.getFileName());
         String filePath = eventReceiverConfigurationFile.getFilePath();
-        AxisConfiguration axisConfiguration = EventAdapterUtil.getAxisConfiguration();
-        EventReceiverDeployer deployer = EventReceiverConfigurationHelper.getEventReceiverDeployer(axisConfiguration);
+        EventReceiverDeployer deployer =
+	        tenantSpecificDeployerMap.get(PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true));
         try {
             deployer.processUndeployment(filePath);
             deployer.processDeployment(new DeploymentFileData(new File(filePath)));

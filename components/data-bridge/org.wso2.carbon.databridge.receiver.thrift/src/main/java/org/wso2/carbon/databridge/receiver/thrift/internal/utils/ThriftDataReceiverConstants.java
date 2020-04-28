@@ -26,6 +26,7 @@ public final class ThriftDataReceiverConstants {
 
     private ThriftDataReceiverConstants() {
     }
+    public static final String ENABLE_THRIFT_RECEIVER = "enable";
     public static final String SECURE_PORT_ELEMENT = "sslPort";
     public static final String PORT_ELEMENT = "tcpPort";
     public static final String PROTOCOLS_ELEMENT = "sslEnabledProtocols";
@@ -48,8 +49,8 @@ public final class ThriftDataReceiverConstants {
     public static final String THRIFT_SSL_REQUEST_TIMEOUT = "sslRequestTimeout";
     public static final String THRIFT_SSL_STOP_TIMEOUT_VAL = "sslStopTimeoutVal";
 
-    public static final int THRIFT_TCP_DEFAULT_MAX_WORKER_THREADS = 20;
-    public static final int THRIFT_SSL_DEFAULT_MAX_WORKER_THREADS = 20;
+    public static final int THRIFT_TCP_DEFAULT_MAX_WORKER_THREADS = 2500;
+    public static final int THRIFT_SSL_DEFAULT_MAX_WORKER_THREADS = 2500;
 
     public static final int UNDEFINED = -1;
 }

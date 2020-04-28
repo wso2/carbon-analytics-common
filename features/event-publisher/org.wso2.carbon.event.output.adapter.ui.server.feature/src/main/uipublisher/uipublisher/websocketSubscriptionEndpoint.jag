@@ -29,11 +29,10 @@ webSocket.onopen = function () {
 };
 
 webSocket.ontext = function (data) {
-    var dataObj = parse(data);
-    streamName = dataObj.streamName;
-    streamVersion = dataObj.streamVersion;
-    JaggeryWebSocketHelper.subscribeWebSocket(streamName, streamVersion, stringify(dataObj.filterProps),
-            user.username, session.getId(), user.tenantId, this);
+    streamName = data.split(':')[0];
+    streamVersion = data.split(':')[1];
+    JaggeryWebSocketHelper.subscribeWebSocket(streamName, streamVersion, "null",
+                user.username, session.getId(), user.tenantId, this);
 };
 
 webSocket.onclose = function () {

@@ -286,7 +286,7 @@
                                 selectedValue = "selected=true";
                             }
                     %>
-                    <option <%=selectedValue%> value=<%=option%>>
+                    <option <%=selectedValue%> value="<%=option%>">
                         <%=option%>
                     </option>
                     <%}%>

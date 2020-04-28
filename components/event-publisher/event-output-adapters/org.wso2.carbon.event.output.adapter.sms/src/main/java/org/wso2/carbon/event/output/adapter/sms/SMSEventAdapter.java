@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.event.output.adapter.sms;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
@@ -88,7 +89,9 @@ public final class SMSEventAdapter implements OutputEventAdapter {
             }
 
             threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1000));
+                    TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1000),new ThreadFactoryBuilder().
+                    setNameFormat("Thread pool- component - SMSEventAdapter.threadPoolExecutor;adapterName - " +
+                            this.eventAdapterConfiguration.getName()).build());
         }
     }
 

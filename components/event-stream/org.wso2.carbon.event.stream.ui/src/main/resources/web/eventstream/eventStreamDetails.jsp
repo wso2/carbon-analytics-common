@@ -27,6 +27,7 @@
            prefix="carbon" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project/Owasp.CsrfGuard.tld" prefix="csrf" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <fmt:bundle
         basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
@@ -309,7 +310,7 @@
                                                                 for (EventStreamAttributeDto metaData : streamDefinitionDto.getMetaData()) {
                                                             %>
                                                             <tr>
-                                                                <td class="property-names"><%=metaData.getAttributeName()%>
+                                                                <td class="property-names"><%=Encode.forHtmlContent(metaData.getAttributeName())%>
                                                                 </td>
                                                                 <td class="property-names"><%=metaData.getAttributeType()%>
                                                                 </td>

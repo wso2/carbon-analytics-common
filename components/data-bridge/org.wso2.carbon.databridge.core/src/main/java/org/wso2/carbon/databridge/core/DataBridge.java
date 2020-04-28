@@ -21,6 +21,7 @@ package org.wso2.carbon.databridge.core;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -72,6 +73,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     private AtomicInteger totalEventCounter;
     private long startTime;
     private boolean isProfileReceiver;
+    private int cutoff = 100000;
 
     public DataBridge(AuthenticationHandler authenticationHandler,
                       AbstractStreamDefinitionStore streamDefinitionStore,
@@ -81,11 +83,17 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
         authenticatorHandler = authenticationHandler;
         authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
         String profileReceiver = System.getProperty("profileReceiver");
+        String receiverStatsCutoff = System.getProperty("receiverStatsCutoff");
+
         if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
             isProfileReceiver = true;
             eventsReceived = new AtomicInteger();
             totalEventCounter = new AtomicInteger();
             startTime = 0;
+
+            if (receiverStatsCutoff != null && StringUtils.isNumeric(receiverStatsCutoff)) {
+                this.cutoff = Integer.parseInt(receiverStatsCutoff);
+            }
         }
     }
 
@@ -106,17 +114,22 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             authenticatorHandler = authenticationHandler;
             authenticator = new Authenticator(authenticationHandler, dataBridgeConfiguration);
             String profileReceiver = System.getProperty("profileReceiver");
+            String receiverStatsCutoff = System.getProperty("receiverStatsCutoff");
+
             if (profileReceiver != null && profileReceiver.equalsIgnoreCase("true")) {
                 isProfileReceiver = true;
                 eventsReceived = new AtomicInteger();
                 totalEventCounter = new AtomicInteger();
                 startTime = 0;
+
+                if (receiverStatsCutoff != null && StringUtils.isNumeric(receiverStatsCutoff)) {
+                    this.cutoff = Integer.parseInt(receiverStatsCutoff);
+                }
             }
     }
 
     public String defineStream(String sessionId, String streamDefinition)
             throws
-
             DifferentStreamDefinitionAlreadyDefinedException,
             MalformedStreamDefinitionException, SessionTimeoutException {
         AgentSession agentSession = authenticator.getSession(sessionId);
@@ -256,9 +269,9 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     private void endTimeMeasurement(int eventsNum) {
         if (isProfileReceiver) {
             eventsReceived.addAndGet(eventsNum);
-            if (eventsReceived.get() > 100000) {
+            if (eventsReceived.get() > cutoff) {
                 synchronized (this) {
-                    if (eventsReceived.get() > 100000) {
+                    if (eventsReceived.get() > cutoff) {
                         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                         Date date = new Date();
 
@@ -316,7 +329,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public void logout(String sessionId) throws Exception {
         AgentSession agentSession = authenticator.getSession(sessionId);
         authenticator.logout(sessionId);
-        if (agentSession != null) {
+        if (agentSession != null && agentSession.getCredentials() != null) {
             log.info("user " + agentSession.getUsername() + " disconnected");
         } else {
             log.info("session " + sessionId + " disconnected");
@@ -355,7 +368,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             throws SessionTimeoutException, StreamDefinitionNotFoundException,
             StreamDefinitionStoreException {
         AgentSession agentSession = authenticator.getSession(sessionId);
-        if (agentSession.getUsername() == null) {
+        if (agentSession.getCredentials() == null) {
             if (log.isDebugEnabled()) {
                 log.debug("session " + sessionId + " expired ");
             }
@@ -375,7 +388,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
     public List<StreamDefinition> getAllStreamDefinitions(String sessionId)
             throws SessionTimeoutException {
         AgentSession agentSession = authenticator.getSession(sessionId);
-        if (agentSession.getUsername() == null) {
+        if (agentSession.getCredentials() == null) {
             if (log.isDebugEnabled()) {
                 log.debug("session " + sessionId + " expired ");
             }
@@ -394,7 +407,7 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             throws SessionTimeoutException, StreamDefinitionStoreException,
             DifferentStreamDefinitionAlreadyDefinedException {
         AgentSession agentSession = authenticator.getSession(sessionId);
-        if (agentSession.getUsername() == null) {
+        if (agentSession.getCredentials()== null) {
             if (log.isDebugEnabled()) {
                 log.debug("session " + sessionId + " expired ");
             }

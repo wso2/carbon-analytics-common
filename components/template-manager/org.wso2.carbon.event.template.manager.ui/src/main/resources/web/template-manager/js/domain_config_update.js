@@ -163,7 +163,7 @@ function getStreamMappingObjectArray(streamMappingArrayLength) {
                     "fromStreamID": fromStreamID,
                     "metaData": metaData,
                     "correlationData": correlationData,
-                    "payloadData": payloadData
+                    "payloadData": Object.keys(payloadData).length > 0 ? payloadData : ""
                 };
             } else {
                 showErrorDialog("Invalid stream mapping");

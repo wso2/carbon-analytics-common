@@ -49,8 +49,8 @@ public class BinaryDataReceiverServiceComponent {
             log.info("Receiver disabled.");
             return;
         }
-        binaryDataReceiver = new BinaryDataReceiver(new BinaryDataReceiverConfiguration(dataBridgeReceiverService.
-                getInitialConfig()), dataBridgeReceiverService);
+        binaryDataReceiver = new BinaryDataReceiver(new BinaryDataReceiverConfiguration(dataBridgeReceiverService
+                .getInitialConfig()), dataBridgeReceiverService);
         try {
             binaryDataReceiver.start();
         } catch (IOException e) {

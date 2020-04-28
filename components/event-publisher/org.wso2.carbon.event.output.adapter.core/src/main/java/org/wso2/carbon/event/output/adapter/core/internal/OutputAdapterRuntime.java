@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.event.output.adapter.core.internal;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -33,11 +35,13 @@ public class OutputAdapterRuntime {
     private volatile boolean connected = false;
     private final DecayTimer timer = new DecayTimer();
     private volatile long nextConnectionTime;
+    private ExecutorService executorService;
 
 
     public OutputAdapterRuntime(OutputEventAdapter outputEventAdapter, String name) throws OutputEventAdapterException {
         this.outputEventAdapter = outputEventAdapter;
         this.name = name;
+        this.executorService = Executors.newFixedThreadPool(1);
         synchronized (this) {
             outputEventAdapter.init();
 //            try {
@@ -55,7 +59,7 @@ public class OutputAdapterRuntime {
         }
     }
 
-    public void publish(Object message, Map<String, String> dynamicProperties) {
+    public void publish(final Object message, final Map<String, String> dynamicProperties) {
         try {
             try {
                 if (connected) {
@@ -93,6 +97,7 @@ public class OutputAdapterRuntime {
                                 publish(message, dynamicProperties);
                             } else {
                                 log.error("Connection unavailable for Output Adopter '" + name + "' reconnection will be retried in " + (timer.returnTimeToWait()) + " milliseconds.", e);
+                                executorService.submit(new RetryLogicRunnableImplementation(message, dynamicProperties));
                             }
                         } else {
                             logAndDrop(message);
@@ -119,6 +124,26 @@ public class OutputAdapterRuntime {
             outputEventAdapter.disconnect();
         } finally {
             outputEventAdapter.destroy();
+        }
+    }
+
+    class RetryLogicRunnableImplementation implements Runnable {
+        private Object message;
+        private Map<String, String> dynamicProperties;
+
+        public RetryLogicRunnableImplementation(Object message, Map<String, String> dynamicProperties) {
+            this.message = message;
+            this.dynamicProperties = dynamicProperties;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(timer.returnTimeToWait());
+            } catch (InterruptedException ex) {
+                log.error(ex.getMessage(), ex);
+            }
+            publish(message, dynamicProperties);
         }
     }
 

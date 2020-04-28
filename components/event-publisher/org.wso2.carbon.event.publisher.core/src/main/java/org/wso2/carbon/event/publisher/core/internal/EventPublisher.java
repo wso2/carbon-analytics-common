@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 
 public class EventPublisher implements WSO2EventConsumer, EventSync {
 
@@ -344,11 +345,15 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                         // Not found in arbitrary data map as well
                         throw new EventPublisherStreamValidationException("Property " + messageProperty + " is neither in the input stream attributes nor in runtime arbitrary data map.");
                     } else {
-                        entry.setValue(entryValue.replaceAll(regexValue, arbitraryDataMap.get(messageProperty).toString()));
+                        // Backslashes (\) and dollar signs ($) in the replacement string is not treated as a literals.
+                        entry.setValue(entryValue.replaceAll(regexValue, Matcher.quoteReplacement(arbitraryDataMap
+                                .get(messageProperty).toString())));
                     }
                 } else {
                     if (eventData[position] != null) {
-                        entry.setValue(entryValue.replaceAll(regexValue, eventData[position].toString()));
+                        // Backslashes (\) and dollar signs ($) in the replacement string is not treated as a literals.
+                        entry.setValue(entryValue.replaceAll(regexValue, Matcher.quoteReplacement(eventData[position]
+                                .toString())));
                     } else {
                         entry.setValue(entryValue.replaceAll(regexValue, ""));
                     }

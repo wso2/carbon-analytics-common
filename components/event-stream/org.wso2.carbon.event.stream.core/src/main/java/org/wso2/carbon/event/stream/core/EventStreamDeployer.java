@@ -111,7 +111,10 @@ public class EventStreamDeployer extends AbstractDeployer implements EventProces
             StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(content);
             StreamDefinition existingStreamDefinition = carbonEventStreamService.getStreamDefinition(streamDefinition.getStreamId());
             if (existingStreamDefinition != null) {
-                throw new EventStreamConfigurationException("Event stream already exists for stream id: " + streamDefinition.getStreamId());
+                // If there is an existing event stream definition found, this will quietly log the message and return
+                // as it won't be an issue.
+                log.debug("Event stream already exists for stream id: " + streamDefinition.getStreamId());
+                return;
             }
             if (!carbonEventStreamService.isEventStreamFileExists(eventStreamFile.getName())) {
                 EventStreamConfiguration eventStreamConfiguration = new EventStreamConfiguration();

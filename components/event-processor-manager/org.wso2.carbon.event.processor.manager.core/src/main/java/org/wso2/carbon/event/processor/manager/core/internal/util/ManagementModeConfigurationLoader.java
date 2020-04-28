@@ -25,19 +25,27 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.commons.utils.Utils;
-import org.wso2.carbon.event.processor.manager.core.config.*;
+import org.wso2.carbon.event.processor.manager.core.config.DistributedConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.HAConfiguration;
+import org.wso2.carbon.event.processor.manager.core.config.ManagementModeInfo;
+import org.wso2.carbon.event.processor.manager.core.config.Mode;
+import org.wso2.carbon.event.processor.manager.core.config.PersistenceConfiguration;
 import org.wso2.carbon.event.processor.manager.core.exception.ManagementConfigurationException;
 import org.wso2.carbon.utils.ServerConstants;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public class ManagementModeConfigurationLoader {
 
@@ -93,7 +101,20 @@ public class ManagementModeConfigurationLoader {
                     managementModeInfo.setDistributedConfiguration(getDistributedConfiguration(processingMode));
                 } else {
                     managementModeInfo.setMode(Mode.SingleNode);
-                    log.info("CEP started in Single node mode");
+
+                    // Set Persist Configurations.
+                    OMElement nodeConfig = processingMode
+                            .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
+
+                    if (nodeConfig != null) {
+                        boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
+                        if (isPersistenceEnabled) {
+                            managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig, isPersistenceEnabled));
+                            log.info("CEP started in Persistence enabled Single Node mode");
+                        }
+                    } else {
+                        log.info("CEP started in Single node mode");
+                    }
                 }
                 return managementModeInfo;
             }

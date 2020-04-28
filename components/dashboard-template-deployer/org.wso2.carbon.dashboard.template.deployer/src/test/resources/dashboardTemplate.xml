@@ -1,0 +1,285 @@
+<config>
+    <properties>
+        <property name="dashboardId">analytics-temperature-dashboard</property>
+    </properties>
+    <content>
+        {
+        "id": "analytics-temperature-dashboard",
+        "title": "analytics-temperature-dashboard",
+        "description": "",
+        "permissions": {
+        "viewers": [
+        "Internal/analytics-temperature-dashboard-viewer"
+        ],
+        "editors": [
+        "Internal/analytics-temperature-dashboard-editor"
+        ],
+        "owners": [
+        "Internal/analytics-temperature-dashboard-owner"
+        ]
+        },
+        "pages": [
+        {
+        "id": "landing",
+        "title": "Home",
+        "layout": {
+        "content": {
+        "loggedIn": {
+        "blocks": [
+        {
+        "id": "a",
+        "x": 0,
+        "y": 0,
+        "width": 4,
+        "height": 4,
+        "banner": false
+        },
+        {
+        "id": "b",
+        "x": 4,
+        "y": 0,
+        "width": 4,
+        "height": 4,
+        "banner": false
+        },
+        {
+        "id": "c",
+        "x": 8,
+        "y": 0,
+        "width": 4,
+        "height": 4,
+        "banner": false
+        },
+        {
+        "id": "d",
+        "x": 0,
+        "y": 4,
+        "width": 4,
+        "height": 4,
+        "banner": false
+        },
+        {
+        "id": "e",
+        "x": 4,
+        "y": 4,
+        "width": 4,
+        "height": 4,
+        "banner": false
+        },
+        {
+        "id": "f",
+        "x": 8,
+        "y": 4,
+        "width": 4,
+        "height": 4,
+        "banner": false
+        }
+        ]
+        }
+        },
+        "fluidLayout": false
+        },
+        "isanon": false,
+        "content": {
+        "default": {
+        "a": [
+        {
+        "id": "temperature-count-chart-0",
+        "content": {
+        "id": "temperature-count-chart",
+        "title": "temperature-count-chart",
+        "type": "gadget",
+        "thumbnail": "fs://gadget/temperature-count-chart/thumbnail.png",
+        "data": {
+        "url": "fs://gadget/temperature-count-chart/gadget.xml"
+        },
+        "styles": {
+        "title": "temperature-count-chart",
+        "borders": true
+        },
+        "options": {
+        "windowSize": {
+        "type": "STRING",
+        "title": "Window Size",
+        "value": "10",
+        "options": [],
+        "required": false
+        }
+        },
+        "locale_titles": {}
+        }
+        }
+        ],
+        "b": [
+        {
+        "id": "temperature-sum-chart-0",
+        "content": {
+        "id": "temperature-sum-chart",
+        "title": "temperature-sum-chart",
+        "type": "gadget",
+        "thumbnail": "fs://gadget/temperature-sum-chart/thumbnail.png",
+        "data": {
+        "url": "fs://gadget/temperature-sum-chart/gadget.xml"
+        },
+        "styles": {
+        "title": "temperature-sum-chart",
+        "borders": true
+        },
+        "options": {
+        "windowSize": {
+        "type": "STRING",
+        "title": "Window Size",
+        "value": "10",
+        "options": [],
+        "required": false
+        }
+        },
+        "locale_titles": {}
+        }
+        }
+        ],
+        "c": [
+        {
+        "id": "temperature-average-chart-0",
+        "content": {
+        "id": "temperature-average-chart",
+        "title": "temperature-average-chart",
+        "type": "gadget",
+        "thumbnail": "fs://gadget/temperature-average-chart/thumbnail.png",
+        "data": {
+        "url": "fs://gadget/temperature-average-chart/gadget.xml"
+        },
+        "styles": {
+        "title": "temperature-average-chart",
+        "borders": true
+        },
+        "options": {
+        "windowSize": {
+        "type": "STRING",
+        "title": "Window Size",
+        "value": "10",
+        "options": [],
+        "required": false
+        }
+        },
+        "locale_titles": {}
+        }
+        }
+        ],
+        "d": [
+        {
+        "id": "temperature-distinctcount-chart-0",
+        "content": {
+        "id": "temperature-distinctcount-chart",
+        "title": "temperature-distinctcount-chart",
+        "type": "gadget",
+        "thumbnail": "fs://gadget/temperature-distinctcount-chart/thumbnail.png",
+        "data": {
+        "url": "fs://gadget/temperature-distinctcount-chart/gadget.xml"
+        },
+        "styles": {
+        "title": "temperature-distinctcount-chart",
+        "borders": true
+        },
+        "options": {
+        "windowSize": {
+        "type": "STRING",
+        "title": "Window Size",
+        "value": "10",
+        "options": [],
+        "required": false
+        }
+        },
+        "locale_titles": {}
+        }
+        }
+        ],
+        "e": [
+        {
+        "id": "temperature-max-chart-0",
+        "content": {
+        "id": "temperature-max-chart",
+        "title": "temperature-max-chart",
+        "type": "gadget",
+        "thumbnail": "fs://gadget/temperature-max-chart/thumbnail.png",
+        "data": {
+        "url": "fs://gadget/temperature-max-chart/gadget.xml"
+        },
+        "styles": {
+        "title": "temperature-max-chart",
+        "borders": true
+        },
+        "options": {
+        "windowSize": {
+        "type": "STRING",
+        "title": "Window Size",
+        "value": "10",
+        "options": [],
+        "required": false
+        }
+        },
+        "locale_titles": {}
+        }
+        }
+        ],
+        "f": [
+        {
+        "id": "temperature-min-chart-0",
+        "content": {
+        "id": "temperature-min-chart",
+        "title": "temperature-min-chart",
+        "type": "gadget",
+        "thumbnail": "fs://gadget/temperature-min-chart/thumbnail.png",
+        "data": {
+        "url": "fs://gadget/temperature-min-chart/gadget.xml"
+        },
+        "styles": {
+        "title": "temperature-min-chart",
+        "borders": true
+        },
+        "options": {
+        "windowSize": {
+        "type": "STRING",
+        "title": "Window Size",
+        "value": "10",
+        "options": [],
+        "required": false
+        }
+        },
+        "locale_titles": {}
+        }
+        }
+        ]
+        },
+        "anon": {}
+        }
+        }
+        ],
+        "menu": [
+        {
+        "id": "landing",
+        "isanon": false,
+        "ishidden": false,
+        "title": "Home",
+        "subordinates": []
+        }
+        ],
+        "hideAllMenuItems": false,
+        "identityServerUrl": "",
+        "accessTokenUrl": "",
+        "apiKey": "",
+        "apiSecret": "",
+        "theme": "Default Theme",
+        "shareDashboard": false,
+        "isUserCustom": false,
+        "isEditorEnable": true,
+        "banner": {
+        "globalBannerExists": false,
+        "customBannerExists": false
+        },
+        "landing": "landing",
+        "isanon": false,
+        "defaultPriority": "5"
+        }
+    </content>
+</config>

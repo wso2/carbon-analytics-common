@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
 
@@ -33,7 +34,11 @@
     try {
         EventStreamAdminServiceStub stub = EventStreamUIUtils.getEventStreamAdminService(config, session, request);
         EventStreamDefinitionDto eventStreamDefinitionDto = new EventStreamDefinitionDto();
-        eventStreamDefinitionDto.setName(request.getParameter("eventStreamName"));
+        String eventStreamName = request.getParameter("eventStreamName");
+        if (!eventStreamName.matches("^([a-z]|[A-Z]|_|\\.|-)([a-z]|[A-Z]|[0-9]|_|\\.|-)*$")) {
+            throw new Exception("Invalid event stream name.");
+        }
+        eventStreamDefinitionDto.setName(eventStreamName);
         eventStreamDefinitionDto.setVersion(request.getParameter("eventStreamVersion"));
         eventStreamDefinitionDto.setDescription(request.getParameter("eventStreamDescription"));
         eventStreamDefinitionDto.setNickName(request.getParameter("eventStreamNickName"));
@@ -154,7 +159,7 @@
         msg = "true";
 
     } catch (Exception e) {
-        msg = e.getMessage();
+        msg = Encode.forHtmlContent(e.getMessage());
     }
 %>
 <%=msg%>

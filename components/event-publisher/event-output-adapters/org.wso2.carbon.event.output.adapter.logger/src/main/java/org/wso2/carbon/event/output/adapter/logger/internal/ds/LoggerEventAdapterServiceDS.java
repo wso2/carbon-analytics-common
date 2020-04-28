@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
-import org.wso2.carbon.event.output.adapter.logger.LoggerEventAdapterFactory;
+
 
 /**
  * @scr.component component.name="output.Logger.AdapterService.component" immediate="true"
@@ -38,7 +38,7 @@ public class LoggerEventAdapterServiceDS {
     protected void activate(ComponentContext context) {
 
         try {
-            OutputEventAdapterFactory loggerEventAdapterFactory = new LoggerEventAdapterFactory();
+            OutputEventAdapterFactory loggerEventAdapterFactory = new org.wso2.carbon.event.output.adapter.logger.LoggerEventAdapterFactory();
             context.getBundleContext().registerService(OutputEventAdapterFactory.class.getName(), loggerEventAdapterFactory, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully deployed the output logger adapter service");

@@ -1,0 +1,7 @@
+
+
+            {"provider-conf" : {"streamName" : "org.wso2.event.temperature.statistics.stream:1.0.0", "provider-name" :
+            "realtime"}, "chart-conf" : {"x" : "count", "title" : "Count temperature", "gadget-name" :
+            "temperature-count-chart", "chart-name" : "number-chart"}}
+
+        

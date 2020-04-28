@@ -56,10 +56,9 @@ public final class RDBMSEventAdapterConstants {
     public static final String ADAPTER_GENERIC_RDBMS_UPDATE_TABLE = "updateTableRow";
     public static final String ADAPTER_GENERIC_RDBMS_PROPERTY_DATA_TYPE_IN_TABLE = "selectAllColumnsDataTypeInTable";
     public static final String ADAPTER_GENERIC_RDBMS_PROPERTY_SELECT_FROM_TABLE = "selectFromTable";
-
-
-
-
-
+    public static final String ADAPTER_GENERIC_RDBMS_TABLE_ATTRIBUTES = "attributes.with.type";
+    public static final String ADAPTER_GENERIC_RDBMS_TABLE_ATTRIBUTES_HINT = "attributes.with.type.hint";
+    public static final String ATTRIBUTE_SEPARATOR = ",";
+    public static final String ENTRY_SEPARATOR = ":";
 
 }

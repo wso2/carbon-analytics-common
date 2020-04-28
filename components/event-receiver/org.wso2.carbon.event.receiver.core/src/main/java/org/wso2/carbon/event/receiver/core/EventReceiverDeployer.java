@@ -167,6 +167,7 @@ public class EventReceiverDeployer extends AbstractDeployer implements EventProc
         CarbonEventReceiverService carbonEventReceiverService = EventReceiverServiceValueHolder.getCarbonEventReceiverService();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         String eventReceiverName = "";
+	    carbonEventReceiverService.getTenantSpecificDeployerMap().put(tenantId, this);
 
         String streamNameWithVersion = null;
         OMElement eventReceiverOMElement = null;

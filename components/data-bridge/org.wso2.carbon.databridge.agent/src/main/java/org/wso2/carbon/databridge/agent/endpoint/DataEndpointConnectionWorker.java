@@ -22,6 +22,13 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointLoginException;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * DataEndpoint Connection worker class implementation.
@@ -35,20 +42,51 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     private DataEndpoint dataEndpoint;
 
+    private ScheduledExecutorService loggingControlScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private ScheduledFuture<?> loggingSchedule;
+
+    private LoggingTask loggingTask = new LoggingTask();
+
+    private AtomicBoolean loggingControlFlag = new AtomicBoolean(true);
+
+    private boolean isLoggingControl = false;
+
     @Override
     public void run() {
         if (isInitialized()) {
             try {
                 connect();
+                if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                    loggingControlFlag.set(true);
+                }
                 dataEndpoint.activate();
             } catch (DataEndpointAuthenticationException e) {
+                if (isLoggingControl) {
+                    if (loggingControlFlag.get()) {
+                        if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                            log.info("Attempt to connect to the endpoint " +
+                                    dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
+                            log.debug("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        } else {
+                            log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        }
+                        loggingControlFlag.set(false);
+                    }
+                } else {
+                    log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                }
+                dataEndpoint.deactivate();
+            } catch (DataEndpointLoginException e) {
                 log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
                 dataEndpoint.deactivate();
             }
         } else {
             String errorMsg = "Data endpoint connection worker is not properly initialized ";
-            if (dataEndpoint == null) errorMsg += ", data Endpoint is not provided ";
-            if (dataEndpointConfiguration == null) errorMsg += ", data Endpoint configuration is not provided";
+            if (dataEndpoint == null)
+                errorMsg += ", data Endpoint is not provided ";
+            if (dataEndpointConfiguration == null)
+                errorMsg += ", data Endpoint configuration is not provided";
             errorMsg += ".";
             log.error(errorMsg);
         }
@@ -82,10 +120,17 @@ public class DataEndpointConnectionWorker implements Runnable {
         } else {
             throw new DataEndpointException("Already data endpoint is configured for the connection worker");
         }
+
+        if (dataEndpointConfiguration.getLoggingControlIntervalInSeconds() != 0) {
+            isLoggingControl = true;
+            scheduledLoggingTask();
+        } else if (dataEndpointConfiguration.isFailOverEndpoint()) {
+            isLoggingControl = true;
+        }
     }
 
 
-    private void connect() throws DataEndpointAuthenticationException {
+    private void connect() throws DataEndpointAuthenticationException, DataEndpointLoginException {
         Object client = null;
         try {
             client = this.dataEndpointConfiguration.getSecuredTransportPool().
@@ -95,8 +140,12 @@ public class DataEndpointConnectionWorker implements Runnable {
                             dataEndpointConfiguration.getPassword());
             dataEndpointConfiguration.setSessionId(sessionId);
         } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            throw new DataEndpointAuthenticationException("Cannot borrow client for " + dataEndpointConfiguration.getAuthURL(), e);
+            if (e instanceof DataEndpointLoginException) {
+                throw new DataEndpointLoginException("Cannot borrow client for "
+                        + dataEndpointConfiguration.getAuthURL() + "." , e);
+            } else {
+                throw new DataEndpointAuthenticationException("Cannot borrow client for " + dataEndpointConfiguration.getAuthURL(), e);
+            }
         } finally {
             try {
                 this.dataEndpointConfiguration.getSecuredTransportPool().returnObject(dataEndpointConfiguration.getAuthKey(), client);
@@ -119,6 +168,9 @@ public class DataEndpointConnectionWorker implements Runnable {
             log.warn("Cannot connect to the server at " + dataPublisherConfiguration.getAuthURL() + ", for user: " + dataPublisherConfiguration.getUsername());
         } finally {
             try {
+                if (null != loggingControlScheduledExecutorService) {
+                    loggingControlScheduledExecutorService.shutdown();
+                }
                 this.dataEndpointConfiguration.getSecuredTransportPool().returnObject(dataPublisherConfiguration.getAuthKey(), client);
             } catch (Exception e) {
                 this.dataEndpointConfiguration.getSecuredTransportPool().clear(dataPublisherConfiguration.getAuthKey());
@@ -128,6 +180,17 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     private boolean isInitialized() {
         return dataEndpoint != null && dataEndpointConfiguration != null;
+    }
+
+    private void scheduledLoggingTask() {
+        loggingSchedule = loggingControlScheduledExecutorService.scheduleAtFixedRate(loggingTask, 0,
+                dataEndpointConfiguration.getLoggingControlIntervalInSeconds(), TimeUnit.SECONDS );
+    }
+
+    private class LoggingTask implements Runnable {
+        @Override public void run() {
+            loggingControlFlag.set(true);
+        }
     }
 
 }

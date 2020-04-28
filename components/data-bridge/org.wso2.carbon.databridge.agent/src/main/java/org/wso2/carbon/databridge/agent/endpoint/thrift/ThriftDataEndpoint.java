@@ -21,6 +21,7 @@ import org.apache.thrift.TException;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointLoginException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
 import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
@@ -31,6 +32,7 @@ import org.wso2.carbon.databridge.commons.thrift.exception.ThriftUndefinedEventT
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 
+import java.net.ConnectException;
 import java.util.List;
 
 /**
@@ -40,13 +42,17 @@ public class ThriftDataEndpoint extends DataEndpoint {
 
     @Override
     protected synchronized String login(Object client, String userName, String password)
-            throws DataEndpointAuthenticationException {
+            throws DataEndpointAuthenticationException, DataEndpointLoginException {
         try {
             return ((ThriftSecureEventTransmissionService.Client) client).connect(userName, password);
         } catch (ThriftAuthenticationException e) {
-            throw new DataEndpointAuthenticationException("Thrift Authentication Exception", e);
+            throw new DataEndpointLoginException("Error while trying to login to the data receiver.", e);
         } catch (TException e) {
-            throw new DataEndpointAuthenticationException("Thrift exception", e);
+            if (e.getCause() instanceof ConnectException) {
+                throw new DataEndpointAuthenticationException("Thrift exception", e);
+            } else {
+                throw new DataEndpointLoginException("Error while trying to login to the data receiver.", e);
+            }
         }
     }
 

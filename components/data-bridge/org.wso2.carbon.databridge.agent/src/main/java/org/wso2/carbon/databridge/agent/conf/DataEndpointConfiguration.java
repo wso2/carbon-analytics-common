@@ -48,6 +48,10 @@ public class DataEndpointConfiguration {
 
     private int keepAliveTimeInPool;
 
+    private long loggingControlIntervalInSeconds;
+
+    private boolean failOverEndpoint;
+
     public enum Protocol {
         TCP, SSL;
 
@@ -60,7 +64,8 @@ public class DataEndpointConfiguration {
     public DataEndpointConfiguration(String receiverURL, String authURL, String username, String password,
                                      GenericKeyedObjectPool transportPool,
                                      GenericKeyedObjectPool securedTransportPool,
-                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool) {
+                                     int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool,
+                                     int loggingControlIntervalInSeconds, boolean failOverEndpoint) {
         this.receiverURL = receiverURL;
         this.authURL = authURL;
         this.username = username;
@@ -73,6 +78,8 @@ public class DataEndpointConfiguration {
         this.corePoolSize = corePoolSize;
         this.maxPoolSize = maxPoolSize;
         this.keepAliveTimeInPool = keepAliveTimeInPool;
+        this.loggingControlIntervalInSeconds = (long) loggingControlIntervalInSeconds;
+        this.failOverEndpoint = failOverEndpoint;
     }
 
     public String getReceiverURL() {
@@ -135,6 +142,14 @@ public class DataEndpointConfiguration {
 
     public int getBatchSize() {
         return batchSize;
+    }
+
+    public long getLoggingControlIntervalInSeconds() {
+        return loggingControlIntervalInSeconds;
+    }
+
+    public boolean isFailOverEndpoint() {
+        return failOverEndpoint;
     }
 }
 

@@ -23,6 +23,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointLoginException;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.SessionTimeoutException;
@@ -80,14 +81,14 @@ public abstract class DataEndpoint {
     void collectAndSend(Event event) {
         events.add(event);
         if (events.size() >= batchSize) {
-            threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
+            threadPoolExecutor.submitJobAndSetState(new EventPublisher(events), this);
             events = new ArrayList<>();
         }
     }
 
     void flushEvents() {
         if (events.size() != 0) {
-            threadPoolExecutor.submitJobAndSetState(new Thread(new EventPublisher(events)), this);
+            threadPoolExecutor.submitJobAndSetState(new EventPublisher(events), this);
             events = new ArrayList<>();
         }
     }
@@ -181,7 +182,7 @@ public abstract class DataEndpoint {
      * @throws DataEndpointAuthenticationException
      */
     protected abstract String login(Object client, String userName, String password)
-            throws DataEndpointAuthenticationException;
+            throws DataEndpointAuthenticationException, DataEndpointLoginException;
 
     /**
      * Logout from the endpoint.
@@ -259,6 +260,7 @@ public abstract class DataEndpoint {
      */
     class EventPublisher implements Runnable {
         List<Event> events;
+        private Semaphore semaphore;
 
         public EventPublisher(List<Event> events) {
             this.events = events;
@@ -277,22 +279,34 @@ public abstract class DataEndpoint {
                     publish();
                 } catch (UndefinedEventTypeException ex) {
                     log.error("Unable to process this event.", ex);
+                    semaphoreRelease();
                 } catch (Exception ex) {
                     log.error("Unexpected error occurred while sending the event. ", ex);
-                    handleFailedEvents();
+                    semaphoreRelease();
+                    handleFailedEvents(this.events);
+                } catch (Throwable t) {
+                    //There can be situations where runtime exceptions/class not found exceptions occur, This block help to catch those exceptions.
+                    //No need to retry send events. Deactivating the state would be enough.
+                    log.error("Unexpected error occurred while sending events. ", t);
+                    semaphoreRelease();
+                    deactivate();
                 }
             } catch (DataEndpointException e) {
                 log.error("Unable to send events to the endpoint. ", e);
-                handleFailedEvents();
+                semaphoreRelease();
+                handleFailedEvents(this.events);
             } catch (UndefinedEventTypeException e) {
                 log.error("Unable to process this event.", e);
+                semaphoreRelease();
             } catch (Exception ex) {
                 log.error("Unexpected error occurred while sending the event. ", ex);
-                handleFailedEvents();
+                semaphoreRelease();
+                handleFailedEvents(this.events);
             } catch (Throwable t) {
                 //There can be situations where runtime exceptions/class not found exceptions occur, This block help to catch those exceptions.
                 //No need to retry send events. Deactivating the state would be enough.
                 log.error("Unexpected error occurred while sending events. ", t);
+                semaphoreRelease();
                 deactivate();
             } finally {
                 //If any processing error occurred the state will be changed to unavailable,
@@ -305,21 +319,33 @@ public abstract class DataEndpoint {
                             maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
                 }
             }
+
         }
 
-        private void handleFailedEvents() {
-            deactivate();
-            dataEndpointFailureCallback.tryResendEvents(events);
+        public void setPoolSemaphore(Semaphore semaphore) {
+            this.semaphore = semaphore;
         }
 
         private void publish() throws DataEndpointException, SessionTimeoutException, UndefinedEventTypeException {
             Object client = getClient();
             try {
                 send(client, this.events);
+                semaphoreRelease();
             } finally {
                 returnClient(client);
             }
         }
+
+        private void semaphoreRelease() {
+            if (this.semaphore != null) {
+                this.semaphore.release();
+            }
+        }
+    }
+
+    private void handleFailedEvents(List<Event> events) {
+        deactivate();
+        dataEndpointFailureCallback.tryResendEvents(events, this);
     }
 
     boolean isConnected() {

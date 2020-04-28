@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.event.stream.stub.EventStreamAdminServiceStub" %>
 <%@ page import="org.wso2.carbon.event.stream.stub.types.EventStreamInfoDto" %>
 <%@ page import="org.wso2.carbon.event.stream.ui.EventStreamUIUtils" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <fmt:bundle basename="org.wso2.carbon.event.stream.ui.i18n.Resources">
 
@@ -118,7 +119,7 @@
                         <a href="eventStreamDetails.jsp?ordinal=1&eventStreamWithVersion=<%=eventStreamWithVersion%>"><%=eventStreamWithVersion%>
                         </a>
                     </td>
-                    <td><%= eventStreamInfoDto.getStreamDescription() != null ? eventStreamInfoDto.getStreamDescription() : "" %>
+                    <td><%= eventStreamInfoDto.getStreamDescription() != null ? Encode.forHtmlContent(eventStreamInfoDto.getStreamDescription()) : "" %>
                     </td>
                     <td>
 

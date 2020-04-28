@@ -124,19 +124,19 @@ public class OneEndPointDPBinaryTest {
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9601",
                 "ssl://" + hostName + ":9701", "admin", "admin");
-        Event event = new Event();
-        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-        event.setMetaData(new Object[]{"127.0.0.1"});
-        event.setCorrelationData(null);
-        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        Long timeStamp = System.currentTimeMillis();
         Map<String, String> arbitrary = new HashMap<String, String>();
         arbitrary.put("test", "testValue");
         arbitrary.put("test1", "test123");
-        event.setArbitraryDataMap(arbitrary);
 
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(event);
+            dataPublisher.publish(streamID, timeStamp, metaData, correlationData, payLoad, arbitrary);
         }
 
         try {
@@ -160,14 +160,14 @@ public class OneEndPointDPBinaryTest {
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://" + hostName + ":9621, tcp://" + hostName + ":9622",
                 "ssl://" + hostName + ":9721, ssl://" + hostName + ":9722", "admin", "admin");
-        Event event = new Event();
-        event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
-        event.setMetaData(new Object[]{"127.0.0.1"});
-        event.setCorrelationData(null);
-        event.setPayloadData(new Object[]{"WSO2", 123.4, 2, 12.4, 1.3});
+        String streamID = DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION);
+        Object[] metaData = new Object[]{"127.0.0.1"};
+        Object[] correlationData = null;
+        Object[] payLoad = new Object[]{"WSO2", 123.4, 2, 12.4, 1.3};
+        Long timeStamp= System.currentTimeMillis();
         int numberOfEventsSent = 1000;
         for (int i = 0; i < numberOfEventsSent; i++) {
-            dataPublisher.publish(event);
+            dataPublisher.publish(streamID, timeStamp,metaData, correlationData, payLoad);
         }
 
         try {

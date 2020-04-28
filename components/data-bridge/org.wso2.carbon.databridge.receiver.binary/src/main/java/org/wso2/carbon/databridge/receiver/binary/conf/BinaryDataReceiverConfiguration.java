@@ -26,10 +26,13 @@ import org.wso2.carbon.utils.CarbonUtils;
  * The receiver configuration for Binary Transport Receiver
  */
 public class BinaryDataReceiverConfiguration {
+
+    private boolean enable = true;
     private int sslPort;
     private int tcpPort;
     private int sizeOfSSLThreadPool;
     private int sizeOfTCPThreadPool;
+    private int waitingTimeInMilliSeconds;
     private String sslProtocols;
     private String ciphers;
 
@@ -53,7 +56,10 @@ public class BinaryDataReceiverConfiguration {
         this.sizeOfTCPThreadPool = Integer.parseInt(dataReceiver.getConfiguration(
                 BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE,
                 BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE).toString());
+        this.waitingTimeInMilliSeconds = Integer.parseInt(dataReceiver.getConfiguration(
+                BinaryDataReceiverConstants.WAITING_TIME_IN_MILISECONDS, 0).toString());
 
+        this.enable = Boolean.valueOf(dataReceiver.getConfiguration(BinaryDataReceiverConstants.ENABLE_BINARY_DATA_RECEIVER, enable).toString());
         Object sslProtocolObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME, null);
         sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
         Object ciphersObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME, null);
@@ -86,5 +92,14 @@ public class BinaryDataReceiverConfiguration {
 
     public String getCiphers() {
         return ciphers;
+    }
+
+    public int getWaitingTimeInMilliSeconds() {
+        return waitingTimeInMilliSeconds;
+    }
+
+    public boolean isEnable() {
+
+        return enable;
     }
 }

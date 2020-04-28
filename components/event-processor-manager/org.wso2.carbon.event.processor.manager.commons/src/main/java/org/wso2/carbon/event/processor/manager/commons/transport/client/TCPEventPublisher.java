@@ -21,7 +21,9 @@ package org.wso2.carbon.event.processor.manager.commons.transport.client;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.TimeoutBlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.EventServerUtils;
 import org.wso2.carbon.event.processor.manager.commons.transport.common.StreamRuntimeInfo;
@@ -39,6 +41,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
 public class TCPEventPublisher {
     public static final int PING_HEADER_VALUE = -99;
@@ -165,8 +168,8 @@ public class TCPEventPublisher {
         int arbitraryMapSize = 0;
         if (hasArbitraryAttributes) {
             for (Map.Entry<String, String> entry : arbitraryMap.entrySet()) {
-                arbitraryMapSize += 4 + entry.getKey().length();
-                arbitraryMapSize += 4 + entry.getValue().length();
+                arbitraryMapSize += 4 + entry.getKey().getBytes(defaultCharset).length;
+                arbitraryMapSize += 4 + entry.getValue().getBytes(defaultCharset).length;
             }
         }
         ByteBuffer buf = ByteBuffer.allocate(streamRuntimeInfo.getFixedMessageSize() + streamIdSize + 16);
@@ -312,7 +315,8 @@ public class TCPEventPublisher {
             public ByteArrayHolder newInstance() {
                 return new ByteArrayHolder();
             }
-        }, publisherConfig.getBufferSize(), Executors.newSingleThreadExecutor());
+        }, publisherConfig.getBufferSize(), Executors.newCachedThreadPool(), ProducerType.MULTI, new
+                TimeoutBlockingWaitStrategy(1, TimeUnit.SECONDS));
 
         this.ringBuffer = disruptor.getRingBuffer();
 

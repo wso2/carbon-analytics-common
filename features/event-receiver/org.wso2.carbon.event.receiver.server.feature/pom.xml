@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>event-receiver-feature</artifactId>
-        <version>5.1.21-SNAPSHOT</version>
+        <version>5.1.61-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -54,7 +54,7 @@
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
+            <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
         </dependency>
         <dependency>
@@ -98,7 +98,7 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.receiver.admin:${carbon.analytics.common.version}
                                 </bundleDef>
-                                <bundleDef>com.jayway.jsonpath:json-path:${jsonpath.version}
+                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path:${jsonpath.version}
                                 </bundleDef>
                                 <bundleDef>org.slf4j:slf4j-api:${slf4j.version}</bundleDef>
                                 <bundleDef>net.minidev:json-smart:${jsonsmart.version}</bundleDef>

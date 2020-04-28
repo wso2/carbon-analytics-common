@@ -34,7 +34,10 @@ import org.wso2.carbon.databridge.agent.util.DataPublisherUtil;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -73,6 +76,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private boolean isShutdown = false;
 
+    private MBeanServer platformMBeanServer;
+
+    private ObjectName mbeanEventQueue;
+
     public enum HAType {
         FAILOVER, LOADBALANCE
     }
@@ -85,6 +92,16 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
         if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
             this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
+            platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+            try {
+                mbeanEventQueue = new ObjectName("org.wso2.carbon:00=analytics," +
+                        "01=DATABRIDGE_AGENT_EVENT_QUEUE " + this.hashCode());
+                if (!platformMBeanServer.isRegistered(mbeanEventQueue)) {
+                    platformMBeanServer.registerMBean(this.eventQueue, mbeanEventQueue);
+                }
+            } catch (Exception e) {
+                log.error("Unable to create DATABRIDGE_AGENT_EVENT_QUEUE stat MXBean: " + e.getMessage(), e);
+            }
         }
         this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);
@@ -173,7 +190,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
-    class EventQueue {
+    class EventQueue implements EventQueueMXBean {
         private RingBuffer<WrappedEventFactory.WrappedEvent> ringBuffer = null;
         private Disruptor<WrappedEventFactory.WrappedEvent> eventQueueDisruptor = null;
         private ExecutorService eventQueuePool = null;
@@ -238,6 +255,24 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             } while (isActiveDataEndpointExists());
         }
 
+        @Override
+        public int getRingBufferSize() {
+            if (ringBuffer != null) {
+                return ringBuffer.getBufferSize();
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
+        public long getRingBufferRemainingCapacity() {
+            if (ringBuffer != null) {
+                return ringBuffer.remainingCapacity();
+            } else {
+                return 0;
+            }
+        }
+
         private void shutdown() {
             eventQueuePool.shutdown();
             eventQueueDisruptor.shutdown();
@@ -277,6 +312,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
+    private DataEndpoint getDataEndpoint(boolean isBusyWait) {
+        return getDataEndpoint(isBusyWait, null);
+    }
+
     /**
      * Find the next event processable endpoint to the
      * data endpoint based on load balancing and failover logic, and wait
@@ -286,7 +325,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
      * @param isBusyWait waitUntil atleast one endpoint becomes available
      * @return DataEndpoint which can accept and send the events.
      */
-    private DataEndpoint getDataEndpoint(boolean isBusyWait) {
+    private DataEndpoint getDataEndpoint(boolean isBusyWait, DataEndpoint failedEP) {
         int startIndex;
         if (haType.equals(HAType.LOADBALANCE)) {
             startIndex = getDataPublisherIndex();
@@ -297,7 +336,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         while (true) {
             DataEndpoint dataEndpoint = dataEndpoints.get(index);
-            if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE)) {
+            if (dataEndpoint.getState().equals(DataEndpoint.State.ACTIVE) && dataEndpoint != failedEP) {
                 return dataEndpoint;
             } else if (haType.equals(HAType.FAILOVER) && (dataEndpoint.getState().equals(DataEndpoint.State.BUSY) ||
                     dataEndpoint.getState().equals(DataEndpoint.State.INITIALIZING))) {
@@ -366,8 +405,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         return index;
     }
 
-    public void tryResendEvents(List<Event> events) {
-        List<Event> unsuccessfulEvents = trySendActiveEndpoints(events);
+    public void tryResendEvents(List<Event> events, DataEndpoint dataEndpoint) {
+        List<Event> unsuccessfulEvents = trySendActiveEndpoints(events, dataEndpoint);
         for (Event event : unsuccessfulEvents) {
             try {
                 if (eventQueue != null) {
@@ -381,10 +420,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         }
     }
 
-    private List<Event> trySendActiveEndpoints(List<Event> events) {
+    private List<Event> trySendActiveEndpoints(List<Event> events, DataEndpoint failedEP) {
         ArrayList<Event> unsuccessfulEvents = new ArrayList<>();
         for (Event event : events) {
-            DataEndpoint endpoint = getDataEndpoint(false);
+            DataEndpoint endpoint = getDataEndpoint(false,failedEP);
             if (endpoint != null) {
                 endpoint.collectAndSend(event);
             } else {
@@ -471,6 +510,14 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         isShutdown = true;
         for (DataEndpoint dataEndpoint : dataEndpoints) {
             dataEndpoint.shutdown();
+        }
+        if (platformMBeanServer != null && mbeanEventQueue != null) {
+            try {
+                platformMBeanServer.unregisterMBean(mbeanEventQueue);
+            } catch (Exception e) {
+                log.error("Unable to unregisterMBean DATABRIDGE_AGENT_EVENT_QUEUE stat MXBean: " +
+                        e.getMessage(), e);
+            }
         }
     }
 }

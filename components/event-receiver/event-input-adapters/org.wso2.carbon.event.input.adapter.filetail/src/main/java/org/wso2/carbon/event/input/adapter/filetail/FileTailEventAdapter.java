@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.event.input.adapter.filetail;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +50,9 @@ public class FileTailEventAdapter implements InputEventAdapter {
                                 Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
         this.globalProperties = globalProperties;
-        this.singleThreadedExecutor = Executors.newSingleThreadExecutor();
+        this.singleThreadedExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().
+                setNameFormat("Thread pool- component - FileTailEventAdapter.singleThreadedExecutor;adapterName - " +
+                        this.eventAdapterConfiguration.getName()).build());
     }
 
     @Override

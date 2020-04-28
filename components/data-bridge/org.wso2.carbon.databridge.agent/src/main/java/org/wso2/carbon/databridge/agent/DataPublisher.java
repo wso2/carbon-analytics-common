@@ -155,28 +155,45 @@ public class DataPublisher {
         DataPublisherUtil.validateURLs(receiverURLGroups, authURLGroups);
 
         for (int i = 0; i < receiverURLGroups.size(); i++) {
-            Object[] receiverGroup = (Object[]) receiverURLGroups.get(i);
-            Object[] authGroup = (Object[]) authURLGroups.get(i);
+            Object[] receiverGroup = receiverURLGroups.get(i);
+            Object[] authGroup = authURLGroups.get(i);
             boolean failOver = (Boolean) receiverGroup[0];
-
             DataEndpointGroup endpointGroup;
-            if (failOver)
+            if (failOver) {
                 endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.FAILOVER, dataEndpointAgent);
-            else endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE,
-                    dataEndpointAgent);
+            }
+            else {
+                endpointGroup = new DataEndpointGroup(DataEndpointGroup.HAType.LOADBALANCE, dataEndpointAgent);
+            }
             /**
              * Since the first element holds the failover/LB settings
              * we need to start iterating from 2nd element.
              */
             for (int j = 1; j < receiverGroup.length; j++) {
-                DataEndpointConfiguration endpointConfiguration =
-                        new DataEndpointConfiguration((String) receiverGroup[j],
-                                (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
-                                dataEndpointAgent.getSecuredTransportPool(), dataEndpointAgent.
-                                getAgentConfiguration().getBatchSize(),
-                                dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
-                                dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
-                                dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool());
+                DataEndpointConfiguration endpointConfiguration;
+                String[] urlParams = DataPublisherUtil.getProtocolHostPort((String) receiverGroup[j]);
+
+                if (urlParams[0].equalsIgnoreCase(DataEndpointConfiguration.Protocol.TCP.toString())) {
+                    endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
+                            (String) authGroup[j], username, password, dataEndpointAgent.getTransportPool(),
+                            dataEndpointAgent.getSecuredTransportPool(),
+                            dataEndpointAgent.getAgentConfiguration().getBatchSize(),
+                            dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
+                            dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
+                            dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
+                            dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
+                            failOver);
+                } else {
+                    endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
+                            (String) authGroup[j], username, password, dataEndpointAgent.getSecuredTransportPool(),
+                            dataEndpointAgent.getSecuredTransportPool(),
+                            dataEndpointAgent.getAgentConfiguration().getBatchSize(),
+                            dataEndpointAgent.getAgentConfiguration().getCorePoolSize(),
+                            dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
+                            dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
+                            dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
+                            failOver);
+                }
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);
                 endpointGroup.addDataEndpoint(dataEndpoint);

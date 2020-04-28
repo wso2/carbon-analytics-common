@@ -1,16 +1,15 @@
 /**
- *
  * Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +28,8 @@ import org.wso2.carbon.utils.CarbonUtils;
  * configuration details related to DataReceiver
  */
 public class ThriftDataReceiverConfiguration {
+
+    private boolean enable = true;
     private int secureDataReceiverPort;
     private int dataReceiverPort;
     private String sslProtocols;
@@ -84,6 +85,7 @@ public class ThriftDataReceiverConfiguration {
                 ThriftDataReceiverConstants.THRIFT_SSL_REQUEST_TIMEOUT, sslRequestTimeout).toString());
         sslStopTimeoutVal = Integer.parseInt(dataReceiver.getConfiguration(
                 ThriftDataReceiverConstants.THRIFT_SSL_STOP_TIMEOUT_VAL, sslStopTimeoutVal).toString());
+        enable = Boolean.valueOf(dataReceiver.getConfiguration(ThriftDataReceiverConstants.ENABLE_THRIFT_RECEIVER, enable).toString());
     }
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort,
@@ -205,5 +207,10 @@ public class ThriftDataReceiverConfiguration {
 
     public void setSslStopTimeoutVal(int sslStopTimeoutVal) {
         this.sslStopTimeoutVal = sslStopTimeoutVal;
+    }
+
+    public boolean isEnable() {
+
+        return enable;
     }
 }

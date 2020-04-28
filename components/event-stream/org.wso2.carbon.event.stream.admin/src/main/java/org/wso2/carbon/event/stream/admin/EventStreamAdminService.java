@@ -67,8 +67,10 @@ public class EventStreamAdminService extends AbstractAdmin {
                     EventStreamService eventStreamService = EventStreamAdminServiceValueHolder.getEventStreamService();
                     eventStreamService.addEventStreamDefinition(streamDefinition);
                 } catch (MalformedStreamDefinitionException e) {
+                    log.error(e.getMessage(), e);
                     throw new AxisFault("Not a valid stream definition " + e.getMessage());
                 } catch (EventStreamConfigurationException e) {
+                    log.error(e.getMessage(), e);
                     throw new AxisFault(e.getMessage(), e);
                 }
 
@@ -99,8 +101,10 @@ public class EventStreamAdminService extends AbstractAdmin {
 
 
         } catch (MalformedStreamDefinitionException e) {
+            log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage(), e);
         } catch (EventStreamConfigurationException e) {
+            log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage(), e);
         }
         return true;
@@ -123,8 +127,10 @@ public class EventStreamAdminService extends AbstractAdmin {
                 eventStreamService.addEventStreamDefinition(streamDefinition);
             }
         } catch (MalformedStreamDefinitionException e) {
+            log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage(), e);
         } catch (EventStreamConfigurationException e) {
+            log.error(e.getMessage(), e);
             throw new AxisFault(e.getMessage(), e);
         }
         return true;
@@ -165,8 +171,10 @@ public class EventStreamAdminService extends AbstractAdmin {
                     eventStreamService.addEventStreamDefinition(streamDefinition);
 
                 } catch (MalformedStreamDefinitionException e) {
+                    log.error(e.getMessage(), e);
                     throw new AxisFault("Not a valid stream definition " + e.getMessage());
                 } catch (EventStreamConfigurationException e) {
+                    log.error(e.getMessage(), e);
                     throw new AxisFault(e.getMessage() + " : " + e);
                 }
 
@@ -188,6 +196,7 @@ public class EventStreamAdminService extends AbstractAdmin {
                 try {
                     eventStreamService.removeEventStreamDefinition(eventStreamName, eventStreamVersion);
                 } catch (EventStreamConfigurationException e) {
+                    log.error(e.getMessage(), e);
                     throw new AxisFault(e.getMessage() + " : " + e.toString());
                 }
 
@@ -231,6 +240,7 @@ public class EventStreamAdminService extends AbstractAdmin {
             }
 
         } catch (EventStreamConfigurationException e) {
+            log.error(e.getMessage(), e);
             throw new AxisFault(
                     "Error while retrieving event streams from store : "
                             + e.getMessage(), e);
@@ -251,6 +261,7 @@ public class EventStreamAdminService extends AbstractAdmin {
                     return streamIdArray;
                 }
             } catch (EventStreamConfigurationException e) {
+                log.error(e.getMessage(), e);
                 throw new AxisFault("Error while retrieving stream names from store : " + e.getMessage(), e);
             }
         }
@@ -278,6 +289,7 @@ public class EventStreamAdminService extends AbstractAdmin {
             try {
                 return eventStreamService.generateSampleEvent(streamId, eventType);
             } catch (EventStreamConfigurationException e) {
+                log.error(e.getMessage(), e);
                 throw new AxisFault("Error while generating sample event");
             }
         }

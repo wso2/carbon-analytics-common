@@ -135,6 +135,19 @@ public class CarbonEventManagementService implements EventManagementService {
         if (mode == Mode.HA) {
             HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
             if (isWorkerNode) {
+
+                if(! validateHostName(haConfiguration.getEventSyncConfig().getHostName())){
+                    log.error("Hostname : "+ haConfiguration.getEventSyncConfig().getHostName() +" defined for " +
+                            "eventSync configuration is invalid. Please add proper IP address " +
+                            "of the node. This IP address is used by other nodes in the cluster to communicate.");
+                }
+
+                if(! validateHostName(haConfiguration.getManagementConfig().getHostName())){
+                    log.error("Hostname : "+ haConfiguration.getManagementConfig().getHostName() +" defined for " +
+                            "management configuration is invalid. Please add proper IP " +
+                            "address of the node. This IP address is used by other nodes in the cluster to communicate.");
+                }
+
                 receiverEventHandler.init(ConfigurationConstants.RECEIVERS, haConfiguration.getEventSyncConfig(),
                         haConfiguration.constructEventSyncPublisherConfig(), isWorkerNode);
                 haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler, presenterEventHandler);
@@ -143,6 +156,13 @@ public class CarbonEventManagementService implements EventManagementService {
                     haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance().getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
                 }
             }
+
+            if(isPresenterNode && (! validateHostName(haConfiguration.getLocalPresenterConfig().getHostName()))){
+                log.error("Hostname : "+ haConfiguration.getLocalPresenterConfig().getHostName() +" defined for " +
+                        "presentation purpose is invalid. Please add proper IP address of the " +
+                        "node. This IP address is used by other nodes in the cluster to communicate.");
+            }
+
             presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(),
                     haConfiguration.constructPresenterPublisherConfig(), isPresenterNode && !isWorkerNode);
             checkMemberUpdate();
@@ -195,6 +215,12 @@ public class CarbonEventManagementService implements EventManagementService {
 
         });
 
+    }
+
+    private boolean validateHostName(String hostname) {
+
+        return !(hostname.trim().equals("0.0.0.0") || hostname.trim().equals("localhost") ||
+                hostname.trim().equals("127.0.0.1") || hostname.trim().equals("::1"));
     }
 
     public void init(ConfigurationContextService configurationContextService) {

@@ -27,6 +27,7 @@ public class BinaryDataReceiverConstants {
     private BinaryDataReceiverConstants(){
 
     }
+    public static final String ENABLE_BINARY_DATA_RECEIVER = "enable";
     public static final int DEFAULT_SSL_RECEIVER_THREAD_POOL_SIZE = 100;
     public static final int DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE = 100;
     public static final int DEFAULT_SSL_RECEIVER_PORT = 9611;
@@ -42,4 +43,5 @@ public class BinaryDataReceiverConstants {
     public static final String META_DATA_FIELD = "Meta Data";
     public static final String PAYLOAD_DATA_FIELD = "Payload Data";
     public static final String CORRELATION_DATA_FIELD = "Correlation Data";
+    public static final String WAITING_TIME_IN_MILISECONDS = "waitingTimeInMilliSeconds";
 }

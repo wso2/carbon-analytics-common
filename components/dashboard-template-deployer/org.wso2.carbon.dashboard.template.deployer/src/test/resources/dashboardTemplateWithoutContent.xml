@@ -1,0 +1,7 @@
+<config>
+    <properties>
+        <property name="dashboardId">analytics-temperature-dashboard</property>
+    </properties>
+    <content>
+    </content>
+</config>

@@ -75,8 +75,12 @@ public class DataPublisherUtil {
             throws DataEndpointConfigurationException {
         boolean isLBURL = false, isFailOverURL = false;
         String[] urls;
-        if (aURLGroup.contains(",")) isLBURL = true;
-        if (aURLGroup.contains("|")) isFailOverURL = true;
+        if (aURLGroup.contains(",")) {
+        	isLBURL = true;
+        }
+        if (aURLGroup.contains("|")) {
+        	isFailOverURL = true;
+        }
 
         if (isLBURL && isFailOverURL) {
             throw new DataEndpointConfigurationException("Invalid data endpoints URL set provided : " + aURLGroup

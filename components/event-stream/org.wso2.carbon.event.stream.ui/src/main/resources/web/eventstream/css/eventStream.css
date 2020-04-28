@@ -160,3 +160,11 @@ a.icon-link {
 	cursor: pointer;
 	color: #2F7ABD;
 }
+
+.stream-attributes .button {
+	padding: 2px 8px;
+}
+
+.stream-attributes:disabled .button {
+	cursor: not-allowed;
+}
