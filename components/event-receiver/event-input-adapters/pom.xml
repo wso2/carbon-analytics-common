@@ -38,6 +38,7 @@
         <module>org.wso2.carbon.event.input.adapter.soap</module>
         <module>org.wso2.carbon.event.input.adapter.wso2event</module>
         <module>org.wso2.carbon.event.input.adapter.kafka</module>
+        <module>org.wso2.carbon.event.input.adapter.kafka090</module>
         <module>org.wso2.carbon.event.input.adapter.websocket</module>
         <module>org.wso2.carbon.event.input.adapter.websocket.local</module>
         <module>org.wso2.carbon.event.input.adapter.websocket.local/org.wso2.carbon.event.input.adapter.websocket.endpoint</module>
