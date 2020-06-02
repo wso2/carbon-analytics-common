@@ -3,7 +3,9 @@
   "transport.receiver.session_timeout" : "30",
   "transport.receiver.keystore.file_name" : "$ref{keystore.tls.file_name}",
   "transport.receiver.keystore.password" : "$ref{keystore.tls.password}",
-
+  "transport.receiver.keystore.type": "$ref{keystore.tls.type}",
+  "transport.receiver.keyManager.type": "SunX509",
+  "transport.receiver.trustManager.type": "PKIX",
   "transport.binary.receiver.tcpPort" : "9611",
   "transport.binary.receiver.sslPort" : "9711",
   "transport.binary.receiver.ssl_receiver_thread_pool_size" : "100",
