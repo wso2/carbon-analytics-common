@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.databridge.receiver.binary.internal;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
@@ -31,12 +32,22 @@ import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 
 import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutorService;
 
 import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
@@ -103,11 +114,51 @@ public class BinaryDataReceiver {
         }
         System.setProperty("javax.net.ssl.keyStore", keyStore);
         System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
-        SSLServerSocketFactory sslServerSocketFactory =
-                (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 
-        Thread thread = new Thread(new BinarySecureEventServer(sslServerSocketFactory));
-        thread.start();
+        String trustStore = System.getProperty("javax.net.ssl.trustStore");
+        String trustStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+        String trustStoreType = System.getProperty("javax.net.ssl.trustStoreType");
+
+        String keystoreType = dataBridgeReceiverService.getInitialConfig().getKeyStoreType();
+        if (StringUtils.isEmpty(keystoreType)) {
+            keystoreType = KeyStore.getDefaultType();
+        }
+
+        String keyManagerAlgorithm = dataBridgeReceiverService.getInitialConfig().getKeyManagerType();
+        if (StringUtils.isEmpty(keyManagerAlgorithm)) {
+            keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+        }
+
+        String trustManagerAlgorithm = dataBridgeReceiverService.getInitialConfig().getTrustManagerType();
+        if (StringUtils.isEmpty(trustManagerAlgorithm)) {
+            trustManagerAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+        }
+
+        try {
+            KeyStore ks = KeyStore.getInstance(keystoreType);
+            ks.load(new FileInputStream(keyStore), keyStorePassword.toCharArray());
+
+            KeyStore ts = KeyStore.getInstance(trustStoreType);
+            ts.load(new FileInputStream(trustStore), trustStorePassword.toCharArray());
+
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance(keyManagerAlgorithm);
+            keyManagerFactory.init(ks, keyStorePassword.toCharArray());
+
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(trustManagerAlgorithm);
+            trustManagerFactory.init(ts);
+
+            SSLContext context = SSLContext.getInstance("Default");
+            context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+
+            SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
+            Thread thread = new Thread(new BinarySecureEventServer(sslServerSocketFactory));
+            thread.start();
+
+        } catch (Exception e) {
+            throw new DataBridgeException("Error when starting binary agent server ", e);
+        }
     }
 
     private void startEventTransmission() {

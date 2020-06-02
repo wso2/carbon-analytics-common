@@ -27,6 +27,9 @@
 
     <keyStoreLocation>${carbon.home}/repository/resources/security/{{transport.receiver.keystore.file_name}}</keyStoreLocation>
     <keyStorePassword>{{transport.receiver.keystore.password}}</keyStorePassword>
+    <keyStoreType>{{transport.receiver.keystore.type}}</keyStoreType>
+    <keyManagerType>{{transport.receiver.keyManager.type}}</keyManagerType>
+    <trustManagerType>{{transport.receiver.trustManager.type}}</trustManagerType>
 
     <dataReceiver name="Thrift">
         <config name="enable">false</config>
@@ -37,7 +40,7 @@
     <dataReceiver name="Binary">
     {% for configuration_key,configuration_value in transport.binary.receiver.items() %}
       {% if configuration_key == "sslEnabledProtocols" || configuration_key == "ciphers" %}
-      <config name="configuration_key">{{configuration_value | join(',')}}</config>
+      <config name="{{configuration_key}}">{{configuration_value | join(',')}}</config>
       {%else%}
       <config name="{{configuration_key}}">{{configuration_value}}</config>
       {% endif %}
