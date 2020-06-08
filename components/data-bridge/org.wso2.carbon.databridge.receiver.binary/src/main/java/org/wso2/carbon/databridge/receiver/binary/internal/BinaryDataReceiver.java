@@ -149,7 +149,7 @@ public class BinaryDataReceiver {
                     TrustManagerFactory.getInstance(trustManagerAlgorithm);
             trustManagerFactory.init(ts);
 
-            SSLContext context = SSLContext.getInstance("Default");
+            SSLContext context = SSLContext.getInstance("TLS");
             context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
             SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
