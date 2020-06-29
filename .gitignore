@@ -19,6 +19,10 @@ hs_err_pid*
 .idea/
 *.iml
 
+#vscode files
+.classpath
+.factorypath
+
 #eclipse files
 .project
 .settings/
