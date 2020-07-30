@@ -22,21 +22,31 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
-import org.wso2.carbon.databridge.core.conf.DataReceiver;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
-import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 
 import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutorService;
 
 import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil.loadData;
@@ -79,35 +89,65 @@ public class BinaryDataReceiver {
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
-        String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
-        if (keyStore == null) {
-            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-            keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
+        try {
+            String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
             if (keyStore == null) {
-                keyStore = System.getProperty("Security.KeyStore.Location");
+                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+                keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
                 if (keyStore == null) {
-                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Location is null");
+                    keyStore = System.getProperty("Security.KeyStore.Location");
+                    if (keyStore == null) {
+                        throw new DataBridgeException("Cannot start binary agent server, " +
+                                "not valid Security.KeyStore.Location is null");
+                    }
                 }
             }
-        }
-        String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
-        if (keyStorePassword == null) {
-            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-            keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
+            String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
             if (keyStorePassword == null) {
-                keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+                keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
                 if (keyStorePassword == null) {
-                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
+                    keyStorePassword = System.getProperty("Security.KeyStore.Password");
+                    if (keyStorePassword == null) {
+                        throw new DataBridgeException("Cannot start binary agent server, " +
+                                "not valid Security.KeyStore.Password is null ");
+                    }
                 }
             }
+            System.setProperty("javax.net.ssl.keyStore", keyStore);
+            System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+            KeyStore ks;
+            InputStream inputStream = null;
+            try {
+                ks = KeyStore.getInstance("JKS");
+                inputStream = new FileInputStream(keyStore);
+                ks.load(inputStream, keyStorePassword.toCharArray());
+            } catch (CertificateException e) {
+                throw new DataBridgeException("Cannot start binary agent server, Certification error occurred", e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new DataBridgeException(
+                        "Cannot start binary agent server, Error occurred when loading keystore", e);
+            } catch (KeyStoreException e) {
+                throw new DataBridgeException("Cannot start binary agent server, " +
+                        "Error occurred when creating keystore", e);
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            }
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(ks, keyStorePassword.toCharArray());
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(kmf.getKeyManagers(), null, null);
+            Thread thread = new Thread(new BinarySecureEventServer(sslContext.getServerSocketFactory()));
+            thread.start();
+        } catch (KeyManagementException e) {
+            throw new DataBridgeException("Cannot start binary agent server, " +
+                    "Error occurred when initiating SSL context", e);
+        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException e) {
+            throw new DataBridgeException("Cannot start binary agent server, " +
+                    "Error occurred when initiating KeyManagerFactory using keystore", e);
         }
-        System.setProperty("javax.net.ssl.keyStore", keyStore);
-        System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
-        SSLServerSocketFactory sslServerSocketFactory =
-                (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-
-        Thread thread = new Thread(new BinarySecureEventServer(sslServerSocketFactory));
-        thread.start();
     }
 
     private void startEventTransmission() {
