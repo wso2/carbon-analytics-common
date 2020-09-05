@@ -440,6 +440,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 }
                 if (dataEndpoint.isConnected()) {
                     isOneReceiverConnected = true;
+                } else {
+                    noReceiverURLEndpoints.add(dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
                 }
             }
             if (!isOneReceiverConnected) {
