@@ -130,6 +130,10 @@ public class BinaryDataReceiverTest {
         System.setProperty("Security.KeyStore.Location", BinaryServerUtil.testDir + File.separator + "wso2carbon.jks");
         System.setProperty("Security.KeyStore.Password", "wso2carbon");
 
+        System.setProperty("javax.net.ssl.trustStore", BinaryServerUtil.testDir + File.separator + "client-truststore.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
+        System.setProperty("javax.net.ssl.trustStoreType", "jks");
+
         Event event = BinaryServerUtil.buildEvent(STREAM_NAME, VERSION);
 
         BinaryDataReceiver binaryDataReceiver = new BinaryDataReceiver(dataReceiverConfiguration, dataBridge);

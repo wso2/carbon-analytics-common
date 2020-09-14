@@ -27,6 +27,9 @@
 
     <keyStoreLocation>${carbon.home}/repository/resources/security/{{transport.receiver.keystore.file_name}}</keyStoreLocation>
     <keyStorePassword>{{transport.receiver.keystore.password}}</keyStorePassword>
+    <keyStoreType>{{transport.receiver.keystore.type}}</keyStoreType>
+    <keyManagerType>{{transport.receiver.keyManager.type}}</keyManagerType>
+    <trustManagerType>{{transport.receiver.trustManager.type}}</trustManagerType>
 
     <dataReceiver name="Thrift">
         <config name="enable">false</config>

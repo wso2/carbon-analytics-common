@@ -38,6 +38,9 @@ public class DataBridgeConfiguration {
     private int clientTimeoutMin;
     private String keyStoreLocation;
     private String keyStorePassword;
+    private String keyStoreType;
+    private String keyManagerType;
+    private String trustManagerType;
 
     public DataBridgeConfiguration(){
         this.workerThreads = 10;
@@ -69,6 +72,33 @@ public class DataBridgeConfiguration {
 
     public void setKeyStoreLocation(String keyStoreLocation) {
         this.keyStoreLocation = DataBridgeCommonsUtils.replaceSystemProperty(keyStoreLocation);
+    }
+
+    @XmlElement(name = "keyStoreType")
+    public String getKeyStoreType() {
+        return keyStoreType;
+    }
+
+    public void setKeyStoreType(String keyStoreType) {
+        this.keyStoreType = keyStoreType;
+    }
+
+    @XmlElement(name = "keyManagerType")
+    public String getKeyManagerType() {
+        return keyManagerType;
+    }
+
+    public void setKeyManagerType(String keyManagerType) {
+        this.keyManagerType = keyManagerType;
+    }
+
+    @XmlElement(name = "trustManagerType")
+    public String getTrustManagerType() {
+        return trustManagerType;
+    }
+
+    public void setTrustManagerType(String trustManagerType) {
+        this.trustManagerType = trustManagerType;
     }
 
     @XmlElement(name = "keyStorePassword")
