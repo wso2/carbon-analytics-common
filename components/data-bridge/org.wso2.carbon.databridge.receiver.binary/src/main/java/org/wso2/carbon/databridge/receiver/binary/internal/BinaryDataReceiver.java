@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
@@ -55,7 +56,7 @@ import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUt
 /**
  * Binary Transport Receiver implementation.
  */
-public class BinaryDataReceiver {
+public class BinaryDataReceiver implements ServerStartupObserver {
     private static final Log log = LogFactory.getLog(BinaryDataReceiver.class);
     private DataBridgeReceiverService dataBridgeReceiverService;
     private BinaryDataReceiverConfiguration binaryDataReceiverConfiguration;
@@ -153,97 +154,88 @@ public class BinaryDataReceiver {
             context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
             SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
-            Thread thread = new Thread(new BinarySecureEventServer(sslServerSocketFactory));
+            SSLServerSocket sslserversocket =
+                    (SSLServerSocket) sslServerSocketFactory.
+                            createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
+            String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
+            if (sslProtocols != null && sslProtocols.length() != 0) {
+                String[] sslProtocolsArray = sslProtocols.split(",");
+                sslserversocket.setEnabledProtocols(sslProtocolsArray);
+            }
+            String ciphers = binaryDataReceiverConfiguration.getCiphers();
+            if (ciphers != null && ciphers.length() != 0) {
+                String[] ciphersArray = ciphers.split(",");
+                sslserversocket.setEnabledCipherSuites(ciphersArray);
+            } else {
+                sslserversocket.setEnabledCipherSuites(sslserversocket.getSupportedCipherSuites());
+            }
+            Thread thread = new Thread(new BinarySecureEventServerAcceptor(sslserversocket));
             thread.start();
-
+            log.info("Started Binary SSL Transport on port : " + binaryDataReceiverConfiguration.getSSLPort());
         } catch (Exception e) {
             throw new DataBridgeException("Error when starting binary agent server ", e);
         }
     }
 
-    private void startEventTransmission() {
-        ServerSocketFactory serverSocketFactory = ServerSocketFactory.getDefault();
-        Thread thread = new Thread(new BinaryEventServer(serverSocketFactory));
+    private void startEventTransmission() throws IOException {
+        ServerSocketFactory serversocketfactory = ServerSocketFactory.getDefault();
+        ServerSocket serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getTCPPort());
+        Thread thread = new Thread(new BinaryEventServerAcceptor(serversocket));
         thread.start();
+        log.info("Started Binary TCP Transport on port : " + binaryDataReceiverConfiguration.getTCPPort());
     }
 
-    public class BinarySecureEventServer implements Runnable {
-        private SSLServerSocketFactory sslServerSocketFactory;
+    @Override
+    public void completingServerStartup() {
+        try {
+            start();
+        } catch (IOException e) {
+            log.error("Error while starting binary data receiver ", e);
+        } catch (DataBridgeException e) {
+            log.error("Error while starting binary data receiver ", e);
+        }
+    }
 
-        BinarySecureEventServer(SSLServerSocketFactory sslServerSocketFactory) {
-            this.sslServerSocketFactory = sslServerSocketFactory;
+    @Override
+    public void completedServerStartup() {
+    }
+
+    public class BinarySecureEventServerAcceptor implements Runnable {
+        private ServerSocket serverSocket;
+
+        public BinarySecureEventServerAcceptor(ServerSocket serverSocket) {
+            this.serverSocket = serverSocket;
         }
 
         @Override
         public void run() {
-            if (binaryDataReceiverConfiguration.getWaitingTimeInMilliSeconds() > 0) {
+            while (true) {
                 try {
-                    Thread.sleep(binaryDataReceiverConfiguration.getWaitingTimeInMilliSeconds());
-                } catch (InterruptedException ignore) { }
-            }
-
-            try {
-                SSLServerSocket sslServerSocket = (SSLServerSocket)
-                        sslServerSocketFactory.createServerSocket(binaryDataReceiverConfiguration.getSSLPort());
-                String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
-                if (sslProtocols != null && sslProtocols.length() != 0) {
-                    String [] sslProtocolsArray = sslProtocols.split(",");
-                    sslServerSocket.setEnabledProtocols(sslProtocolsArray);
+                    Socket socket = this.serverSocket.accept();
+                    sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (IOException e) {
+                    log.error("Error while accepting the connection. ", e);
                 }
-
-                String ciphers = binaryDataReceiverConfiguration.getCiphers();
-                if (ciphers != null && ciphers.length() != 0) {
-                    String [] ciphersArray = ciphers.split(",");
-                    sslServerSocket.setEnabledCipherSuites(ciphersArray);
-                } else {
-                    sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
-                }
-                log.info("Started Binary SSL Transport on port : " + binaryDataReceiverConfiguration.getSSLPort());
-
-                while (true) {
-                    try {
-                        Socket socket = sslServerSocket.accept();
-                        sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                    } catch (IOException e) {
-                        log.error("Error while accepting the connection. ", e);
-                    }
-                }
-            } catch (IOException e) {
-                log.error("Error while starting Binary SSL Transport.", e);
             }
         }
     }
 
-    public class BinaryEventServer implements Runnable {
-        private ServerSocketFactory serverSocketFactory;
+    public class BinaryEventServerAcceptor implements Runnable {
+        private ServerSocket serverSocket;
 
-        BinaryEventServer(ServerSocketFactory serverSocketFactory) {
-            this.serverSocketFactory = serverSocketFactory;
+        public BinaryEventServerAcceptor(ServerSocket serverSocket) {
+            this.serverSocket = serverSocket;
         }
 
         @Override
         public void run() {
-            if (binaryDataReceiverConfiguration.getWaitingTimeInMilliSeconds() > 0) {
+            while (true) {
                 try {
-                    Thread.sleep(binaryDataReceiverConfiguration.getWaitingTimeInMilliSeconds());
-                } catch (InterruptedException ignore) { }
-            }
-
-            try {
-                ServerSocket serverSocket = serverSocketFactory.createServerSocket(
-                        binaryDataReceiverConfiguration.getTCPPort());
-                log.info("Started Binary TCP Transport on port : " + binaryDataReceiverConfiguration.getTCPPort());
-
-                while (true) {
-                    try {
-                        Socket socket = serverSocket.accept();
-                        sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                    } catch (IOException e) {
-                        log.error("Error while accepting the connection. ", e);
-                    }
+                    Socket socket = this.serverSocket.accept();
+                    tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (IOException e) {
+                    log.error("Error while accepting the connection. ", e);
                 }
-            } catch (IOException e) {
-                log.error("Error while starting Binary TCP Transport.", e);
             }
         }
     }
