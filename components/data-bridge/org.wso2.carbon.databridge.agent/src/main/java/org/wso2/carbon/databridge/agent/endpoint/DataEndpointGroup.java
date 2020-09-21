@@ -466,7 +466,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             }
             if (!isOneReceiverConnected) {
                 log.warn("No receiver is reachable at URL Endpoint/Endpoints " + noReceiverURLEndpoints.toString() +
-                        "," + " will try to " + "reconnect every " + reconnectionInterval + " sec");
+                        ", will try to reconnect every " + reconnectionInterval + " sec");
             }
         }
 
