@@ -21,6 +21,7 @@ import org.apache.axiom.om.util.Base64;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
@@ -46,6 +47,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
     private Map<String, String> globalProperties;
     private static ExecutorService executorService;
     private String clientMethod;
+    private String proxyHost = null;
+    private String proxyPort = null;
     private int tenantId;
 
     private String contentType;
@@ -59,6 +62,14 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         this.globalProperties = globalProperties;
         this.clientMethod = eventAdapterConfiguration.getStaticProperties()
                 .get(HTTPEventAdapterConstants.ADAPTER_HTTP_CLIENT_METHOD);
+        // Setting the static proxy configurations for the HTTP adapter.
+        if (eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST) != null &&
+                eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT) != null) {
+            this.proxyPort =
+                    eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_PROXY_PORT);
+            this.proxyHost =
+                    eventAdapterConfiguration.getStaticProperties().get(HTTPEventAdapterConstants.ADAPTER_PROXY_HOST);
+        }
 
     }
 
@@ -297,6 +308,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                     URL hostUrl = new URL(this.getUrl());
                     hostConfiguration = new HostConfiguration();
                     hostConfiguration.setHost(hostUrl.getHost(), hostUrl.getPort(), hostUrl.getProtocol());
+                    if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
+                        hostConfiguration.setProxy(proxyHost, Integer.parseInt(proxyPort));
+                    }
                 }
 
                 method.setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
