@@ -19,6 +19,8 @@
 package org.wso2.carbon.event.output.adapter.email;
 
 import org.apache.axis2.transport.mail.MailConstants;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -30,22 +32,27 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import javax.mail.Address;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.SendFailedException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 
 /**
@@ -181,6 +188,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
             signature = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_SIGNATURE);
             if (smtpFrom == null) {
                 String msg = "failed to connect to the mail server due to null smtpFrom value";
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
                 throw new ConnectionUnavailableException("The adapter " +
                         eventAdapterConfiguration.getName() + " " + msg);
 
@@ -188,12 +198,18 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
             if (smtpHost == null) {
                 String msg = "failed to connect to the mail server due to null smtpHost value";
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
                 throw new ConnectionUnavailableException
                         ("The adapter " + eventAdapterConfiguration.getName() + " " + msg);
             }
 
             if (smtpPort == null) {
                 String msg = "failed to connect to the mail server due to null smtpPort value";
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
                 throw new ConnectionUnavailableException
                         ("The adapter " + eventAdapterConfiguration.getName() + " " + msg);
             }
@@ -217,6 +233,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
             } catch (AddressException e) {
                 String msg = "failed to connect to the mail server due to error in retrieving " +
                         "smtp from address";
+                if (log.isDebugEnabled()) {
+                    log.debug(msg + ": " + smtpFrom);
+                }
                 throw new ConnectionUnavailableException
                         ("The adapter " + eventAdapterConfiguration.getName() + " " + msg, e);
             }
@@ -260,6 +279,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
         //Send email for each emailId
         for (String email : emailIds) {
+            if (log.isDebugEnabled()) {
+                log.debug("Attempting to send an email to " + email);
+            }
             try {
                 threadPoolExecutor.submit(new EmailSender(email, subject, message.toString(), emailType));
             } catch (RejectedExecutionException e) {
@@ -345,15 +367,69 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 Transport.send(message);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Mail sent to the EmailID" + " " + to + " " + "Successfully");
+                    log.debug("Mail sent to the EmailID " + to + " Successfully");
                 }
             } catch (MessagingException e) {
+                LogMessagingException(e, to, 0);
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error in message format", e, log, tenantId);
             } catch (Exception e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error sending email to '" + to + "'", e, log, tenantId);
             }
         }
 
+    }
+
+    private void LogMessagingException(MessagingException e, String mailRecipient, int recurseCount) {
+
+        if (e instanceof SendFailedException) {
+            List<String> sentMails = new ArrayList<>();
+            List<String> invalidMails = new ArrayList<>();
+            List<String> unsentMails = new ArrayList<>();
+
+            Address[] sent = ((SendFailedException) e).getValidSentAddresses();
+            if (ArrayUtils.isNotEmpty(sent)) {
+                for (Address address : sent) {
+                    sentMails.add(address.toString());
+                }
+            }
+
+            Address[] invalid = ((SendFailedException) e).getInvalidAddresses();
+            if (ArrayUtils.isNotEmpty(invalid)) {
+                for (Address address : invalid) {
+                    invalidMails.add(address.toString());
+                }
+            }
+
+            Address[] unsent = ((SendFailedException) e).getValidUnsentAddresses();
+            if (ArrayUtils.isNotEmpty(unsent)) {
+                for (Address address : unsent) {
+                    unsentMails.add(address.toString());
+                }
+            }
+
+            log.error(String.format("Exception occurred when sending email to %s. %s. Sent email=%s, " +
+                            "Invalid emails=%s, Unsent valid emails=%s",
+                    mailRecipient,
+                    e.getMessage(),
+                    StringUtils.join(sentMails, ","),
+                    StringUtils.join(invalidMails, ","),
+                    StringUtils.join(unsentMails, ",")), e);
+
+        }
+
+        log.error("Exception occurred when sending email to " + mailRecipient + ". " + e.getMessage(), e);
+
+        // MessagingException has the capability to chain exceptions.
+        // Therefore checking for any chained exceptions.
+        Exception nextEx = e.getNextException();
+        if (nextEx instanceof MessagingException) {
+            if (recurseCount < 10) {
+                LogMessagingException((MessagingException) nextEx, mailRecipient, recurseCount + 1);
+            } else {
+                log.warn("Over " + recurseCount + " chained exceptions found when logging MessagingExceptions. " +
+                        "Stopping the exception check at this point.");
+            }
+        }
     }
 
 }

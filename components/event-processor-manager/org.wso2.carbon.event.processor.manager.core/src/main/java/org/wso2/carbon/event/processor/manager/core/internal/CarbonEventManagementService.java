@@ -386,7 +386,20 @@ public class CarbonEventManagementService implements EventManagementService {
 
     @Override
     public long getClusterTimeInMillis() {
-        return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
+
+        if (EventManagementServiceValueHolder.getHazelcastInstance() == null) {
+            throw new RuntimeException("No HazelcastInstance found.");
+        }
+
+        if (EventManagementServiceValueHolder.getHazelcastInstance().getCluster() ==  null) {
+            throw new RuntimeException("No Cluster was found in the HazelcastInstance.");
+        }
+
+        try {
+            return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public void initPersistence() {
