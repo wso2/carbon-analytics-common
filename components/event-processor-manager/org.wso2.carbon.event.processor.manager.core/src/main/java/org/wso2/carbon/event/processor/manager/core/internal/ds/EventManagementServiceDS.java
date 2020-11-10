@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.processor.manager.core.EventManagementService;
+import org.wso2.carbon.event.processor.manager.core.api.CarbonEventProcessorManagementAPI;
+import org.wso2.carbon.event.processor.manager.core.api.EventProcessorManagementAPI;
 import org.wso2.carbon.event.processor.manager.core.internal.CarbonEventManagementService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -49,13 +51,26 @@ public class EventManagementServiceDS {
                 log.debug("Successfully deployed EventProcessorManagementService");
             }
 
+            try {
+                context.getBundleContext().registerService(EventProcessorManagementAPI.class,
+                        new CarbonEventProcessorManagementAPI(carbonEventManagementService), null);
+                log.info("Successfully registered CarbonEventProcessorManagementAPI");
+            } catch (Exception e) {
+                log.error("Error while starting the Analytics API component: " + e.getMessage(), e);
+            }
+
         } catch (Throwable e) {
             log.error("Could not create EventProcessorManagementService: " + e.getMessage(), e);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Starting Analytics API component");
         }
 
     }
 
     protected void deactivate(ComponentContext context) {
+        log.info("EventManagementServiceDS shutdown triggered.");
         EventManagementServiceValueHolder.getCarbonEventManagementService().shutdown();
     }
 
