@@ -93,9 +93,16 @@ public class KafkaEventAdapterFactory extends InputEventAdapterFactory {
         isDuplicatedInCluster.setDefaultValue("false");
         propertyList.add(isDuplicatedInCluster);
 
+        Property isAsyncCommit = new Property(KafkaEventAdapterConstants.COMMIT_ASYNC);
+        isAsyncCommit.setDisplayName(resourceBundle.getString(KafkaEventAdapterConstants.COMMIT_ASYNC));
+        isAsyncCommit.setRequired(false);
+        isAsyncCommit.setOptions(new String[]{"true", "false"});
+        isAsyncCommit.setDefaultValue("true");
+        propertyList.add(isAsyncCommit);
+
         return propertyList;
 
- }
+    }
 
     @Override
     public String getUsageTips() {

@@ -1,4 +1,4 @@
-package org.wso2.carbon.analytics.restapi;
+package org.wso2.carbon.event.processor.restapi;
 
 /*
 * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.

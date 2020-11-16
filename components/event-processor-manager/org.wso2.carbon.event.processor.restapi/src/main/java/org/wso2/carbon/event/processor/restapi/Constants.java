@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.analytics.restapi;
+package org.wso2.carbon.event.processor.restapi;
 
 /**
  * The Class Constants Contains the constants used by rest apis.

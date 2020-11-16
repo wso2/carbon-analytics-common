@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.event.processor.restapi.resources;
 
-import org.wso2.carbon.analytics.restapi.Constants;
+import org.wso2.carbon.event.processor.restapi.Constants;
 import org.wso2.carbon.event.processor.restapi.beans.ResponseBean;
 
 import javax.ws.rs.core.Response;
