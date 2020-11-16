@@ -131,11 +131,11 @@ public final class KafkaEventAdapter implements InputEventAdapter {
         String threadsStr = brokerProperties.get(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_THREADS);
         String optionalConfiguration = brokerProperties.get(KafkaEventAdapterConstants.ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES);
         int threads = Integer.parseInt(threadsStr);
-
         String topic = inputEventAdapterConfiguration.getProperties().get(KafkaEventAdapterConstants.ADAPTOR_SUSCRIBER_TOPIC);
-
+        boolean enableAsyncCommit = Boolean.parseBoolean(inputEventAdapterConfiguration.getProperties().
+                get(KafkaEventAdapterConstants.COMMIT_ASYNC));
         consumerKafkaAdaptor = new ConsumerKafkaAdaptor(topic, tenantId,
-                KafkaEventAdapter.getConsumerProperties(bootstrapServers, groupID, optionalConfiguration));
+                KafkaEventAdapter.getConsumerProperties(bootstrapServers, groupID, optionalConfiguration), enableAsyncCommit);
         consumerKafkaAdaptor.run(threads, inputEventAdapterListener);
     }
 

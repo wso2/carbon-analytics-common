@@ -35,6 +35,7 @@ public final class KafkaEventAdapterConstants {
     public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES="optional.configuration";
     public final static String ADAPTOR_OPTIONAL_CONFIGURATION_PROPERTIES_HINT="optional.configuration.hint";
     public static final int AXIS_TIME_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final String COMMIT_ASYNC = "commit.async";
 
 
 }

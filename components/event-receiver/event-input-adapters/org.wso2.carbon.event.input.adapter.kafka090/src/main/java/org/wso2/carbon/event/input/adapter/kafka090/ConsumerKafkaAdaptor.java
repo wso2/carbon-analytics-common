@@ -32,12 +32,14 @@ public class ConsumerKafkaAdaptor {
     private ExecutorService executor;
     private Log log = LogFactory.getLog(ConsumerKafkaAdaptor.class);
     private int tenantId;
+    private boolean enableAsyncCommit;
 
     public ConsumerKafkaAdaptor(String inTopic, int tenantId,
-                                Properties props) {
+                                Properties props, boolean enableAsyncCommit) {
         this.props = props;
         this.topic = inTopic;
         this.tenantId = tenantId;
+        this.enableAsyncCommit = enableAsyncCommit;
     }
 
     public void shutdown() {
@@ -51,7 +53,7 @@ public class ConsumerKafkaAdaptor {
             // now launch all the threads
             executor = Executors.newFixedThreadPool(numThreads, new ThreadFactoryBuilder().
                     setNameFormat("Thread pool- component - ConsumerKafka090Adaptor.executor").build());
-            executor.submit(new KafkaConsumerThread(props, topic, brokerListener, tenantId));
+            executor.submit(new KafkaConsumerThread(props, topic, brokerListener, tenantId, enableAsyncCommit));
         } catch (Throwable t) {
             log.error("Error while creating Kafka090Consumer ", t);
         }

@@ -23,10 +23,15 @@ import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.clients.consumer.OffsetCommitCallback;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.TopicPartition;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,19 +41,18 @@ public class KafkaConsumerThread implements Runnable {
     private InputEventAdapterListener brokerListener;
     private int tenantId;
     private Log log = LogFactory.getLog(KafkaConsumerThread.class);
-
     private final Lock consumerLock = new ReentrantLock();
     private final KafkaConsumer<byte[], byte[]> consumer;
+    private boolean enableAsyncCommit;
 
     public KafkaConsumerThread(Properties props, String topic,
-                               InputEventAdapterListener inBrokerListener, int inTenantId) {
+                               InputEventAdapterListener inBrokerListener, int inTenantId, boolean enableAsyncCommit) {
         consumer = new KafkaConsumer(props);
         consumer.subscribe(Arrays.asList(topic));
-
         log.info("Subscribed for topic: " + topic);
-
         brokerListener = inBrokerListener;
         tenantId = inTenantId;
+        this.enableAsyncCommit = enableAsyncCommit;
     }
 
     public void run() {
@@ -73,14 +77,21 @@ public class KafkaConsumerThread implements Runnable {
                     consumerLock.unlock();
                 }
                 if (null != records) {
-
                     for (ConsumerRecord record : records) {
                         brokerListener.onEvent(record.value());
                     }
                     try {
                         consumerLock.lock();
                         if (!records.isEmpty()) {
-                            consumer.commitAsync();
+                            if (enableAsyncCommit) {
+                                consumer.commitAsync(new KafkaOffsetCommitCallback());
+                            } else {
+                                try {
+                                    consumer.commitSync();
+                                } catch (KafkaException e) {
+                                    log.error("Exception occurred when committing offsets Synchronously", e);
+                                }
+                            }
                         }
                     } catch (CommitFailedException e) {
                         log.error("Kafka commit failed for topic kafka_result_topic", e);
@@ -97,6 +108,29 @@ public class KafkaConsumerThread implements Runnable {
                 log.error("Error while consuming event ", t);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    private static class KafkaOffsetCommitCallback implements OffsetCommitCallback {
+        private Log log = LogFactory.getLog(KafkaConsumerThread.class);
+        @Override
+        public void onComplete(Map<TopicPartition, OffsetAndMetadata> offsets, Exception exception) {
+            if (exception == null) {
+                if (log.isDebugEnabled()) {
+                    for (Map.Entry<TopicPartition, OffsetAndMetadata> entry : offsets.entrySet()) {
+                        log.debug("Asynchronously commit offset done for " + entry.getKey().topic() +
+                                " with offset of: " + entry.getValue().offset());
+                    }
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    for (Map.Entry<TopicPartition, OffsetAndMetadata> entry : offsets.entrySet()) {
+                        log.debug("Commit offset exception for " + entry.getKey().topic() +
+                                " with offset of: " + entry.getValue().offset());
+                    }
+                }
+                log.error("Exception occurred when committing offsets asynchronously.", exception);
             }
         }
     }

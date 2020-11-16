@@ -398,4 +398,18 @@ public class CarbonEventManagementService implements EventManagementService {
             persistenceManager.shutdown();
         }
     }
+
+    public void persist() {
+        log.info("Persisting started !!!");
+        if (persistenceManager != null) {
+            persistenceManager.run();
+        } else {
+            log.error("persistenceManager is not running");
+        }
+    }
+
+    public boolean isActiveNode() {
+        log.info("Checking is active !!!");
+        return haManager.isActiveNode();
+    }
 }

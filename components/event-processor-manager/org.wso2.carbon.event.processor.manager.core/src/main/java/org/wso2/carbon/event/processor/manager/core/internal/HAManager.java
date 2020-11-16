@@ -349,6 +349,10 @@ public class HAManager {
         }
     }
 
+    public boolean isActiveNode() {
+        return haConfiguration.isActive();
+    }
+
     class PeriodicStateChanger implements Runnable {
 
         /**
