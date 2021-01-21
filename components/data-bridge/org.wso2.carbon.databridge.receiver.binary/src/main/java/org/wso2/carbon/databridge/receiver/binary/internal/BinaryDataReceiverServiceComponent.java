@@ -58,9 +58,7 @@ public class BinaryDataReceiverServiceComponent {
         }
         binaryDataReceiver = new BinaryDataReceiver(new BinaryDataReceiverConfiguration(dataBridgeReceiverService
                 .getInitialConfig()), dataBridgeReceiverService);
-                
         context.getBundleContext().registerService(ServerStartupObserver.class.getName(), binaryDataReceiver, null);
-
         log.info("Binary Data Receiver server activated");
     }
 
