@@ -190,7 +190,7 @@ public class BinaryDataReceiver implements ServerStartupObserver {
         try {
             start();
         } catch (IOException e) {
-            log.error("Error while starting binary data receiver ", e);
+            log.error("Error when creating the server socket ", e);
         } catch (DataBridgeException e) {
             log.error("Error while starting binary data receiver ", e);
         }
