@@ -59,7 +59,10 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-gson</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple.wso2</groupId>
             <artifactId>json-simple</artifactId>
@@ -111,6 +114,7 @@
             org.wso2.carbon.database.query.manager.*,
             org.wso2.carbon.database.query.manager.exception.*,
             org.wso2.carbon.analytics.idp.client.core.internal,
+            feign.*,
         </private.package>
         <export.package>
             !org.wso2.carbon.analytics.idp.client.core.internal,

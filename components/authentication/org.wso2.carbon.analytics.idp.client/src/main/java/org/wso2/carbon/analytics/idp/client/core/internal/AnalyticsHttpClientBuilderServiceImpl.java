@@ -24,6 +24,7 @@ import feign.Request;
 import feign.auth.BasicAuthRequestInterceptor;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import feign.form.FormEncoder;
 import feign.gson.GsonDecoder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -98,6 +99,16 @@ public class AnalyticsHttpClientBuilderServiceImpl implements AnalyticsHttpClien
                        int readTimeoutMillis, Class<T> target, String url) {
         return Feign.builder().requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .encoder(new Encoder.Default()).decoder(new Decoder.Default())
+                .options(new Request.Options(connectTimeoutMillis, readTimeoutMillis))
+                .client(newDefaultClientInstance())
+                .target(target, url);
+    }
+
+    public <T> T buildWithFormEncoder(String username, String password, int connectTimeoutMillis,
+                                      int readTimeoutMillis, Class<T> target, String url) {
+        return Feign.builder().requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                .encoder(new FormEncoder())
+                .decoder(new Decoder.Default())
                 .options(new Request.Options(connectTimeoutMillis, readTimeoutMillis))
                 .client(newDefaultClientInstance())
                 .target(target, url);

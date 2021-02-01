@@ -471,6 +471,11 @@
                 <version>${feign.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.github.openfeign.form</groupId>
+                <artifactId>feign-form</artifactId>
+                <version>${feign-form.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.googlecode.json-simple.wso2</groupId>
                 <artifactId>json-simple</artifactId>
                 <version>${json-simple.wso2.version}</version>
@@ -791,7 +796,8 @@
         <carbon.datasources.version>1.1.8</carbon.datasources.version>
         <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
 
-        <feign.version>9.5.0</feign.version>
+        <feign.version>11.0</feign.version>
+        <feign-form.version>3.8.0</feign-form.version>
         <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
         <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
 
