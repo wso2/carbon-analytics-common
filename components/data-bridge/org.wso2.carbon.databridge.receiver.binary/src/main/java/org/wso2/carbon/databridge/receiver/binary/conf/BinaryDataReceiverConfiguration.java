@@ -32,6 +32,7 @@ public class BinaryDataReceiverConfiguration {
     private int sizeOfTCPThreadPool;
     private String sslProtocols;
     private String ciphers;
+    private String channelEncryptionProtocol;
 
     public BinaryDataReceiverConfiguration(int sslPort, int tcpPort) {
         this.sslPort = sslPort;
@@ -56,6 +57,8 @@ public class BinaryDataReceiverConfiguration {
                 BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME);
         String ciphers = dataReceiverConfiguration.getProperties().get(
                 BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME);
+        String channelEncryptionProtocol = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.CHANNEL_ENCRYPTION_PROTOCOL);
 
 
         if (sslPortConfiguration != null && !sslPortConfiguration.trim().isEmpty()) {
@@ -90,6 +93,12 @@ public class BinaryDataReceiverConfiguration {
             this.ciphers = ciphers;
         }
 
+        if (channelEncryptionProtocol != null && !channelEncryptionProtocol.trim().isEmpty()) {
+            this.channelEncryptionProtocol = channelEncryptionProtocol;
+        } else {
+            this.channelEncryptionProtocol = "TLSv1.2";
+        }
+
     }
 
     private static int getPortOffset() {
@@ -118,5 +127,9 @@ public class BinaryDataReceiverConfiguration {
 
     public String getCiphers() {
         return ciphers;
+    }
+
+    public String getChannelEncryptionProtocol() {
+        return channelEncryptionProtocol;
     }
 }

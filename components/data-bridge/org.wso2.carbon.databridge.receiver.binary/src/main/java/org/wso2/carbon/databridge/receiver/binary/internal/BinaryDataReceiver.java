@@ -184,7 +184,8 @@ public class BinaryDataReceiver implements ServerEventListener {
             }
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(ks, keyStorePassword.toCharArray());
-            SSLContext sslContext = SSLContext.getInstance("TLS");
+            SSLContext sslContext =
+                    SSLContext.getInstance(binaryDataReceiverConfiguration.getChannelEncryptionProtocol());
             sslContext.init(kmf.getKeyManagers(), null, null);
             sslServerSocketFactory = sslContext.getServerSocketFactory();
             sslserversocket = (SSLServerSocket) sslServerSocketFactory.
