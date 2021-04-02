@@ -39,6 +39,7 @@ public class BinaryDataReceiverConfiguration {
         this.tcpPort = tcpPort;
         this.sizeOfSSLThreadPool = BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_THREAD_POOL_SIZE;
         this.sizeOfTCPThreadPool = BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE;
+        this.channelEncryptionProtocol = BinaryDataReceiverConstants.DEFAULT_CHANNEL_ENCRYPTION_PROTOCOL;
     }
 
     public BinaryDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration) {
@@ -96,7 +97,7 @@ public class BinaryDataReceiverConfiguration {
         if (channelEncryptionProtocol != null && !channelEncryptionProtocol.trim().isEmpty()) {
             this.channelEncryptionProtocol = channelEncryptionProtocol;
         } else {
-            this.channelEncryptionProtocol = "TLSv1.2";
+            this.channelEncryptionProtocol = "TLSv1.3";
         }
 
     }
