@@ -42,4 +42,5 @@ public class BinaryDataReceiverConstants {
     public static final String META_DATA_FIELD = "Meta Data";
     public static final String PAYLOAD_DATA_FIELD = "Payload Data";
     public static final String CORRELATION_DATA_FIELD = "Correlation Data";
+    public static final String DEFAULT_CHANNEL_ENCRYPTION_PROTOCOL = "TLSv1.2";
 }
