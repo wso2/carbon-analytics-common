@@ -151,4 +151,14 @@
         <property key="maxConnectionsPerHost">50</property>
     </adapterConfig>
 
+    {% for adapter in output_adapter.custom_output_adapter %}
+    {% if adapter.type is defined %}
+    <adapterConfig type="{{adapter.type}}">
+        {% for key,value in adapter.properties.items() %}
+        <property key="{{key}}">{{value}}</property>
+        {% endfor %}
+    </adapterConfig>
+    {% endif %}
+    {% endfor %}
+
 </outputEventAdaptersConfig>
