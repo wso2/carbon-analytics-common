@@ -97,7 +97,7 @@ public class BinaryDataReceiverConfiguration {
         if (channelEncryptionProtocol != null && !channelEncryptionProtocol.trim().isEmpty()) {
             this.channelEncryptionProtocol = channelEncryptionProtocol;
         } else {
-            this.channelEncryptionProtocol = "TLSv1.3";
+            this.channelEncryptionProtocol = "TLSv1.2";
         }
 
     }
