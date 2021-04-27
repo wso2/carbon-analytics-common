@@ -43,6 +43,9 @@ import org.wso2.carbon.secvault.SecretRepository;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants.DEFAULT_SCOPE;
+import static org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants.SCOPE;
+
 /**
  * Factory for External IdPClient.
  */
@@ -153,7 +156,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 ExternalIdPClientConstants.DEFAULT_KM_TOKEN_URL);
         String dcrAppOwner = properties.getOrDefault(ExternalIdPClientConstants.DCR_APP_OWNER, kmUsername);
         String introspectUrl = properties.getOrDefault(ExternalIdPClientConstants.INTROSPECTION_URL,
-                kmTokenUrl + ExternalIdPClientConstants.INTROSPECT_POSTFIX);
+                null);
 
         String idPBaseUrl = properties.getOrDefault(ExternalIdPClientConstants.IDP_BASE_URL,
                 ExternalIdPClientConstants.DEFAULT_IDP_BASE_URL);
@@ -179,6 +182,7 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
 
         String defaultUserStore = properties.getOrDefault(ExternalIdPClientConstants.USER_STORE,
                 ExternalIdPClientConstants.DEFAULT_USER_STORE);
+        String scope = properties.getOrDefault(SCOPE, DEFAULT_SCOPE);
 
         OAuthApplicationInfo spOAuthApp = new OAuthApplicationInfo(
                 ExternalIdPClientConstants.SP_APP_NAME,
@@ -230,16 +234,18 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         SCIM2ServiceStub scimServiceStub = this.analyticsHttpClientBuilderService
                 .build(idPUserName, idPPassword, connectionTimeout, readTimeout, SCIM2ServiceStub.class, idPBaseUrl);
 
+        String jwksUrl = properties.getOrDefault(ExternalIdPClientConstants.JWKS_URL,
+                ExternalIdPClientConstants.DEFULT_JWKS_URL);
         String adminRoleDisplayName = idPClientConfiguration.getUserManager().getAdminRole();
 
         String targetURIForRedirection = properties.getOrDefault(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL,
-                            ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
+                ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
 
         ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
                 kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
                 adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
                 keyManagerServiceStubs, scimServiceStub, defaultUserStore, idPClientConfiguration.isSsoEnabled(),
-                targetURIForRedirection);
+                targetURIForRedirection, scope, jwksUrl);
         externalIdPClient.init(dcrAppOwner);
         return externalIdPClient;
     }

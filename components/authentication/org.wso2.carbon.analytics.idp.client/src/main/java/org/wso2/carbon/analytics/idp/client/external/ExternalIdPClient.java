@@ -17,6 +17,13 @@
  */
 package org.wso2.carbon.analytics.idp.client.external;
 
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwk.UrlJwkProvider;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
@@ -50,12 +57,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants.JWT_PROPERTY_PREFERRED_USERNAME;
+import static org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants.JWT_PROPERTY_UNIQUE_NAME;
 
 /**
  * Implementation class for external IdP based on OAuth2 and SCIM2.
@@ -77,6 +91,8 @@ public class ExternalIdPClient implements IdPClient {
     private Cache<String, ExternalSession> tokenCache;
     private boolean isSSOEnabled;
     private String ssoLogoutURL;
+    private String scope;
+    private String jwksUrl;
 
     //Here the user given context are mapped to the OAuthApp Info.
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
@@ -85,7 +101,8 @@ public class ExternalIdPClient implements IdPClient {
                              String adminRoleDisplayName, Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
                              int cacheTimeout, OAuthAppDAO oAuthAppDAO, DCRMServiceStub dcrmServiceStub,
                              OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub,
-                             String defaultUserStore, boolean isSSOEnabled, String ssoLogoutURL) {
+                             String defaultUserStore, boolean isSSOEnabled, String ssoLogoutURL, String scope,
+                             String jwksUrl) {
         this.baseUrl = baseUrl;
         this.authorizeEndpoint = authorizeEndpoint;
         this.grantType = grantType;
@@ -93,7 +110,7 @@ public class ExternalIdPClient implements IdPClient {
         this.oAuthAppInfoMap = oAuthAppInfoMap;
         // If the admin role doesn't contain the user store, prepend the default user store.
         this.adminRoleDisplayName = adminRoleDisplayName.contains("/") ?
-                adminRoleDisplayName  : defaultUserStore + "/" +  adminRoleDisplayName;
+                adminRoleDisplayName : defaultUserStore + "/" + adminRoleDisplayName;
         this.oAuthAppDAO = oAuthAppDAO;
         this.dcrmServiceStub = dcrmServiceStub;
         this.oAuth2ServiceStubs = oAuth2ServiceStubs;
@@ -104,6 +121,8 @@ public class ExternalIdPClient implements IdPClient {
         this.defaultUserStore = defaultUserStore;
         this.isSSOEnabled = isSSOEnabled;
         this.ssoLogoutURL = ssoLogoutURL;
+        this.scope = scope;
+        this.jwksUrl = jwksUrl;
     }
 
     private static String removeCRLFCharacters(String str) {
@@ -238,7 +257,7 @@ public class ExternalIdPClient implements IdPClient {
         if (response.status() == 200) {
             String responseBody;
             try (InputStream inputStream = response.body().asInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
                 responseBody = bufferedReader.readLine();
             } catch (IOException e) {
                 throw new IdPClientException("Error occurred while converting response from the scim2 endpoint for " +
@@ -286,7 +305,7 @@ public class ExternalIdPClient implements IdPClient {
             Map<String, String> properties = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : user.entrySet()) {
                 if (!entry.getKey().equals(ExternalIdPClientConstants.SCIM2_USERNAME) ||
-                    !entry.getKey().equals(ExternalIdPClientConstants.SCIM2_GROUPS)) {
+                        !entry.getKey().equals(ExternalIdPClientConstants.SCIM2_GROUPS)) {
                     properties.put(entry.getKey(), entry.getValue().toString());
                 }
             }
@@ -337,11 +356,11 @@ public class ExternalIdPClient implements IdPClient {
         } else if (IdPClientConstants.PASSWORD_GRANT_TYPE.equals(grantType)) {
             response = oAuth2ServiceStubs.getTokenServiceStub().generatePasswordGrantAccessToken(
                     username, properties.get(IdPClientConstants.PASSWORD),
-                    properties.get(IdPClientConstants.APP_ID), this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
+                    this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                     this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
         } else {
             response = oAuth2ServiceStubs.getTokenServiceStub().generateRefreshGrantAccessToken(
-                    properties.get(IdPClientConstants.REFRESH_TOKEN), null,
+                    properties.get(IdPClientConstants.REFRESH_TOKEN),
                     this.oAuthAppInfoMap.get(oAuthAppContext).getClientId(),
                     this.oAuthAppInfoMap.get(oAuthAppContext).getClientSecret());
         }
@@ -400,7 +419,7 @@ public class ExternalIdPClient implements IdPClient {
         }
         OAuthApplicationInfo oAuthApplicationInfo = this.oAuthAppInfoMap.get(oAuthAppContext);
         Response response = oAuth2ServiceStubs.getTokenServiceStub().generateAuthCodeGrantAccessToken(code,
-                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + oAuthAppContext, null,
+                this.baseUrl + ExternalIdPClientConstants.CALLBACK_URL + oAuthAppContext, scope,
                 oAuthApplicationInfo.getClientId(), oAuthApplicationInfo.getClientSecret());
         if (response == null) {
             String error = "Error occurred while generating an access token from code '" + code + "'. " +
@@ -410,7 +429,7 @@ public class ExternalIdPClient implements IdPClient {
         }
         if (response.status() == 200) {   //200 - Success
             if (LOG.isDebugEnabled()) {
-                LOG.debug("A new access token from code is successfully generated for the code '" + code + "'.");
+                LOG.debug("A new accegiss token from code is successfully generated for the code '" + code + "'.");
             }
             try {
                 OAuth2TokenInfo oAuth2TokenInfo = (OAuth2TokenInfo) new GsonDecoder().decode(response,
@@ -423,20 +442,25 @@ public class ExternalIdPClient implements IdPClient {
                         Long.toString(oAuth2TokenInfo.getExpiresIn()));
                 returnProperties.put(ExternalIdPClientConstants.REDIRECT_URL,
                         this.baseUrl + (this.baseUrl.endsWith("/") ? appContext : "/" + appContext));
-                Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
-                        .introspectAccessToken(oAuth2TokenInfo.getAccessToken());
                 String authUser = null;
-                if (introspectTokenResponse.status() == 200) {   //200 - Success
-                    OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
-                            .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
-                    authUser = introspectResponse.getUsername();
-                    returnProperties.put(IdPClientConstants.USERNAME, authUser);
-                } else {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Unable to get the username from introspection of the token '" +
-                                oAuth2TokenInfo.getAccessToken() + "'. Response : '" +
-                                introspectTokenResponse.toString());
+                if (oAuth2ServiceStubs.isIntrospectAvailable()) {
+                    Response introspectTokenResponse = oAuth2ServiceStubs.getIntrospectionServiceStub()
+                            .introspectAccessToken(oAuth2TokenInfo.getAccessToken());
+                    if (introspectTokenResponse.status() == 200) {   //200 - Success
+                        OAuth2IntrospectionResponse introspectResponse = (OAuth2IntrospectionResponse) new GsonDecoder()
+                                .decode(introspectTokenResponse, OAuth2IntrospectionResponse.class);
+                        authUser = introspectResponse.getUsername();
+                        returnProperties.put(IdPClientConstants.USERNAME, authUser);
+                    } else {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Unable to get the username from introspection of the token '" +
+                                    oAuth2TokenInfo.getAccessToken() + "'. Response : '" +
+                                    introspectTokenResponse.toString());
+                        }
                     }
+                } else {
+                    authUser = validateAndGetUserFromJWT(oAuth2TokenInfo.getAccessToken(), jwksUrl);
+                    returnProperties.put(IdPClientConstants.USERNAME, authUser);
                 }
                 if (authUser != null) {
                     tokenCache.put(oAuth2TokenInfo.getAccessToken(),
@@ -614,5 +638,32 @@ public class ExternalIdPClient implements IdPClient {
             LOG.error(error);
             throw new IdPClientException(error);
         }
+    }
+
+    private String validateAndGetUserFromJWT(String jwtToken, String jwksUrl) {
+        try {
+            JsonParser parser = new JsonParser();
+            DecodedJWT jwt = JWT.decode(jwtToken);
+            JwkProvider provider = new UrlJwkProvider(new URL(jwksUrl));
+            Jwk jwk = provider.get(jwt.getKeyId());
+            Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
+            algorithm.verify(jwt);
+            String[] jwtTokenParts = jwtToken.split("\\.");
+            String jwtBody = new String(Base64.getDecoder().decode(jwtTokenParts[1]), StandardCharsets.UTF_8);
+            JsonObject jwtBodyJson = parser.parse(jwtBody).getAsJsonObject();
+            if (null != jwtBodyJson.get(JWT_PROPERTY_PREFERRED_USERNAME) &&
+                    !jwtBodyJson.get(JWT_PROPERTY_PREFERRED_USERNAME).getAsString().equals("")) {
+                return jwtBodyJson.get(JWT_PROPERTY_PREFERRED_USERNAME).getAsString();
+            } else if (null != jwtBodyJson.get(JWT_PROPERTY_UNIQUE_NAME) &&
+                    !jwtBodyJson.get(JWT_PROPERTY_UNIQUE_NAME).getAsString().equals("")) {
+                return jwtBodyJson.get(JWT_PROPERTY_UNIQUE_NAME).getAsString();
+            }
+            return jwt.getSubject();
+        } catch (SignatureVerificationException e) {
+            LOG.error("Signature validation failed ", e);
+        } catch (Exception e) {
+            LOG.error("Error occurred while processing ", e);
+        }
+        return null;
     }
 }
