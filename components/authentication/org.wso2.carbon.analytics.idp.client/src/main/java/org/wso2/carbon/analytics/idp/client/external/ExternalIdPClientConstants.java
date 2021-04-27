@@ -53,7 +53,6 @@ public class ExternalIdPClientConstants {
     public static final String CONNECTION_TIMEOUT = "connectionTimeout";
     public static final String READ_TIMEOUT = "readTimeout";
     public static final String EXTERNAL_SSO_LOGOUT_URL = "externalLogoutUrl";
-    public static final String SCOPE = "scope";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
