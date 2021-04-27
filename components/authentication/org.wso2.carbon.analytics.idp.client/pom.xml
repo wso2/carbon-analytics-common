@@ -91,6 +91,14 @@
             <groupId>org.wso2.carbon.secvault</groupId>
             <artifactId>org.wso2.carbon.secvault</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>jwks-rsa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -120,7 +128,9 @@
             !org.wso2.carbon.analytics.idp.client.core.internal,
             org.wso2.carbon.analytics.idp.client.*,
             feign.*,
-            org.json.simple.*
+            org.json.simple.*,
+            com.auth0.jwk.*,
+            com.auth0.jwt.*
         </export.package>
         <import.package>
             com.google.common.*,

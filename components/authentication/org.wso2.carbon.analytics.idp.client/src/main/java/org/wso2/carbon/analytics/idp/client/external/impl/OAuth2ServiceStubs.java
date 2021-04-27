@@ -103,6 +103,10 @@ public class OAuth2ServiceStubs {
                         OAuth2ServiceStubs.IntrospectionServiceStub.class, introspectEndpoint);
     }
 
+    public boolean isIntrospectAvailable() {
+        return !(introspectEndpoint == null);
+    }
+
     /**
      * This interface is for /token API stub.
      */
@@ -118,13 +122,12 @@ public class OAuth2ServiceStubs {
          *
          * @param username     Username of the user
          * @param password     Password of the user
-         * @param scopes       Required scopes (space separated) for the access token
          * @param clientId     Consumer Key of the application
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        default Response generatePasswordGrantAccessToken(String username, String password, String scopes,
-                                                          String clientId, String clientSecret) {
+        default Response generatePasswordGrantAccessToken(String username, String password, String clientId,
+                                                          String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             Map<String, String> requestParam = new HashMap<>();
@@ -153,7 +156,7 @@ public class OAuth2ServiceStubs {
             requestParam.put("grant_type", IdPClientConstants.AUTHORIZATION_CODE_GRANT_TYPE);
             requestParam.put("code", code);
             requestParam.put("redirect_uri", redirectUri);
-            requestParam.put("scope", "openid");
+            requestParam.put("scope", scopes);
             return generateAccessToken(authToken, ExternalIdPClientUtil.getRequestBody(requestParam));
         }
 
@@ -161,13 +164,11 @@ public class OAuth2ServiceStubs {
          * Get a access token by Refresh grant type.
          *
          * @param refreshToken Refresh Token
-         * @param scopes       Required scopes (space separated) for the access token
          * @param clientId     Consumer Key of the application
          * @param clientSecret Consumer Secret of the application
          * @return Feign Response Object
          */
-        default Response generateRefreshGrantAccessToken(String refreshToken, String scopes,
-                                                         String clientId, String clientSecret) {
+        default Response generateRefreshGrantAccessToken(String refreshToken, String clientId, String clientSecret) {
             String credentials = clientId + ':' + clientSecret;
             String authToken = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             Map<String, String> requestParam = new HashMap<>();

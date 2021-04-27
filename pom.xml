@@ -704,7 +704,16 @@
                 <scope>test</scope>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>jwks-rsa</artifactId>
+                <version>${jwks.rsa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>java-jwt</artifactId>
+                <version>${java.jwt.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -836,7 +845,7 @@
         <ow2.jta.spec.version>1.0.12</ow2.jta.spec.version>
         <org.jacoco.ant.version>0.8.3</org.jacoco.ant.version>
         <osgi.test.util.version>5.1.2</osgi.test.util.version>
-
+        <jwks.rsa.version>0.17.1</jwks.rsa.version>
+        <java.jwt.version>3.15.0</java.jwt.version>
     </properties>
-
 </project>

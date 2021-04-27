@@ -53,6 +53,7 @@ public class ExternalIdPClientConstants {
     public static final String CONNECTION_TIMEOUT = "connectionTimeout";
     public static final String READ_TIMEOUT = "readTimeout";
     public static final String EXTERNAL_SSO_LOGOUT_URL = "externalLogoutUrl";
+    public static final String SCOPE = "scope";
 
     public static final String DEFAULT_BASE_URL = "https://localhost:9643";
     public static final String DEFAULT_KM_TOKEN_URL = "https://localhost:9443/oauth2";
@@ -75,6 +76,11 @@ public class ExternalIdPClientConstants {
     public static final String DEFAULT_READ_TIMEOUT = "60000";
     public static final String DEFAULT_EXTERNAL_SSO_LOGOUT_URL = "https://localhost:9443/oidc/logout";
     public static final String SSO_LOGING_ID_TOKEN_TAIL = "?id_token_hint=";
+    public static final String JWKS_URL = "jwksUrl";
+    public static final String DEFULT_JWKS_URL = "https://localhost:9443/oauth2/jwks";
+
+    public static final String JWT_PROPERTY_PREFERRED_USERNAME = "preferred_username";
+    public static final String JWT_PROPERTY_UNIQUE_NAME = "unique_name";
 
     public static final String SP_APP_NAME = "sp";
     public static final String PORTAL_APP_NAME = "sp_portal";
@@ -89,6 +95,7 @@ public class ExternalIdPClientConstants {
     public static final String USER_STORE = "defaultUserStore";
     public static final String DEFAULT_USER_STORE = "PRIMARY";
     public static final String INTROSPECTION_URL = "introspectionUrl";
+    public static final String DEFAULT_SCOPE = "openid";
 
     public static final String CALLBACK_URL = "/login/callback/";
     public static final String REGEX_BASE_START = "regexp=(";
