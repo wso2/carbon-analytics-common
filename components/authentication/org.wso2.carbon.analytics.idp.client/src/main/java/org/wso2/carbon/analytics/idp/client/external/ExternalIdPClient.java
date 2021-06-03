@@ -93,6 +93,7 @@ public class ExternalIdPClient implements IdPClient {
     private String ssoLogoutURL;
     private String scope;
     private String jwksUrl;
+    private boolean isFilteredGroupsEnabled = false;
 
     //Here the user given context are mapped to the OAuthApp Info.
     private Map<String, OAuthApplicationInfo> oAuthAppInfoMap;
@@ -123,6 +124,19 @@ public class ExternalIdPClient implements IdPClient {
         this.ssoLogoutURL = ssoLogoutURL;
         this.scope = scope;
         this.jwksUrl = jwksUrl;
+    }
+
+    public ExternalIdPClient(String baseUrl, String authorizeEndpoint, String grantType, String signinAlgo,
+                             String adminRoleDisplayName, Map<String, OAuthApplicationInfo> oAuthAppInfoMap,
+                             int cacheTimeout, OAuthAppDAO oAuthAppDAO, DCRMServiceStub dcrmServiceStub,
+                             OAuth2ServiceStubs oAuth2ServiceStubs, SCIM2ServiceStub scimServiceStub,
+                             String defaultUserStore, boolean isSSOEnabled, String ssoLogoutURL, String scope,
+                             String jwksUrl, boolean isFilteredGroupsEnabled) {
+
+        this(baseUrl, authorizeEndpoint, grantType, signinAlgo, adminRoleDisplayName, oAuthAppInfoMap,
+                cacheTimeout, oAuthAppDAO, dcrmServiceStub, oAuth2ServiceStubs, scimServiceStub, defaultUserStore,
+                isSSOEnabled, ssoLogoutURL, scope, jwksUrl);
+        this.isFilteredGroupsEnabled = isFilteredGroupsEnabled;
     }
 
     private static String removeCRLFCharacters(String str) {
@@ -208,7 +222,14 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public Role getAdminRole() throws IdPClientException {
-        Response response = scimServiceStub.getAllGroups();
+
+        Response response;
+        if (isFilteredGroupsEnabled) {
+            response = scimServiceStub
+                    .getFilteredGroups(ExternalIdPClientConstants.FILTER_PREFIX_GROUP + this.adminRoleDisplayName);
+        } else {
+            response = scimServiceStub.getAllGroups();
+        }
         if (response == null) {
             String errorMessage = "Error occurred while retrieving admin group '" + this.adminRoleDisplayName +
                     "'. Error : Response is null.";

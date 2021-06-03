@@ -171,7 +171,9 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
                 IdPClientConstants.PASSWORD_GRANT_TYPE);
         String signingAlgo = properties.getOrDefault(ExternalIdPClientConstants.OIDC_USER_INFO_ALGO,
                 ExternalIdPClientConstants.DEFAULT_OIDC_USER_INFO_ALGO);
-
+        boolean isFilteredGroupsEnabled = Boolean.parseBoolean(properties.getOrDefault
+                (ExternalIdPClientConstants.IS_FILTERED_GROUPS_ENABLED,
+                        ExternalIdPClientConstants.DEFAULT_FILTERED_GROUPS_FLAG));
 
         String portalAppContext = properties.getOrDefault(ExternalIdPClientConstants.PORTAL_APP_CONTEXT,
                 ExternalIdPClientConstants.DEFAULT_PORTAL_APP_CONTEXT);
@@ -241,11 +243,21 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
         String targetURIForRedirection = properties.getOrDefault(ExternalIdPClientConstants.EXTERNAL_SSO_LOGOUT_URL,
                 ExternalIdPClientConstants.DEFAULT_EXTERNAL_SSO_LOGOUT_URL);
 
-        ExternalIdPClient externalIdPClient = new ExternalIdPClient(baseUrl,
-                kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
-                adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
-                keyManagerServiceStubs, scimServiceStub, defaultUserStore, idPClientConfiguration.isSsoEnabled(),
-                targetURIForRedirection, scope, jwksUrl);
+        ExternalIdPClient externalIdPClient;
+
+        if (!isFilteredGroupsEnabled) {
+            externalIdPClient = new ExternalIdPClient(baseUrl,
+                    kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
+                    adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
+                    keyManagerServiceStubs, scimServiceStub, defaultUserStore, idPClientConfiguration.isSsoEnabled(),
+                    targetURIForRedirection, scope, jwksUrl);
+        } else {
+            externalIdPClient = new ExternalIdPClient(baseUrl,
+                    kmTokenUrl + ExternalIdPClientConstants.AUTHORIZE_POSTFIX, grantType, signingAlgo,
+                    adminRoleDisplayName, oAuthAppInfoMap, cacheTimeout, oAuthAppDAO, dcrmServiceStub,
+                    keyManagerServiceStubs, scimServiceStub, defaultUserStore, idPClientConfiguration.isSsoEnabled(),
+                    targetURIForRedirection, scope, jwksUrl, isFilteredGroupsEnabled);
+        }
         externalIdPClient.init(dcrAppOwner);
         return externalIdPClient;
     }

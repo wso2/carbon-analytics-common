@@ -77,6 +77,7 @@ public class ExternalIdPClientConstants {
     public static final String SSO_LOGING_ID_TOKEN_TAIL = "?id_token_hint=";
     public static final String JWKS_URL = "jwksUrl";
     public static final String DEFULT_JWKS_URL = "https://localhost:9443/oauth2/jwks";
+    public static final String DEFAULT_FILTERED_GROUPS_FLAG = "false";
 
     public static final String JWT_PROPERTY_PREFERRED_USERNAME = "preferred_username";
     public static final String JWT_PROPERTY_UNIQUE_NAME = "unique_name";
@@ -90,6 +91,7 @@ public class ExternalIdPClientConstants {
     public static final String REDIRECT_URL = "Redirect_Url";
     public static final String CALLBACK_URL_NAME = "Callback_Url";
     public static final String SCOPE = "Scope";
+    public static final String IS_FILTERED_GROUPS_ENABLED = "enableFilteredGroups";
     public static final String REQUEST_URL = "REQUEST_URL";
     public static final String USER_STORE = "defaultUserStore";
     public static final String DEFAULT_USER_STORE = "PRIMARY";
