@@ -21,15 +21,22 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
+import org.wso2.carbon.analytics.idp.client.core.utils.SSLConfig;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.SSLConfiguration;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.UserChildElement;
 import org.wso2.carbon.analytics.idp.client.local.models.LocalUser;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,15 +53,48 @@ import java.util.stream.Collectors;
 public class LocalIdPClientFactory implements IdPClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalIdPClientFactory.class);
+    private SSLConfig sslConfig;
 
     @Activate
     protected void activate(BundleContext bundleContext) {
         LOG.debug("Local IDP client factory activated.");
+
+        // In case keystore/truststore configs are defined in deployment.yaml, override the jvm parameter values set
+        // through the carbon.sh files
+        if (sslConfig != null && sslConfig.isSSLConfigsExistInConfigProvider()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Overriding keystore and truststore configurations in carbon.sh with configuration values "
+                        + "included in deployment.yaml");
+            }
+            sslConfig.exportSSLConfigsExistInConfigProvider();
+        }
     }
 
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
         LOG.debug("Local IDP client factory deactivated.");
+    }
+
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) {
+
+        SSLConfiguration sslConfiguration;
+        try {
+            sslConfiguration = configProvider.getConfigurationObject(SSLConfiguration.class);
+            sslConfig = new SSLConfig(sslConfiguration);
+        } catch (ConfigurationException e) {
+            LOG.error("Error occurred while initializing Local IDP client factory : " + e.getMessage(), e);
+        }
+    }
+
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        // Nothing to do
     }
 
     @Override

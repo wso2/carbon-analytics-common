@@ -31,12 +31,16 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.spi.IdPClientFactory;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.analytics.idp.client.core.utils.SSLConfig;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.analytics.idp.client.core.utils.config.SSLConfiguration;
 import org.wso2.carbon.analytics.idp.client.external.dao.OAuthAppDAO;
 import org.wso2.carbon.analytics.idp.client.external.impl.DCRMServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.secvault.SecretRepository;
 
@@ -58,15 +62,48 @@ public class ExternalIdPClientFactory implements IdPClientFactory {
     private DataSourceService dataSourceService;
     private SecretRepository secretRepository;
     private AnalyticsHttpClientBuilderService analyticsHttpClientBuilderService;
+    private SSLConfig sslConfig;
 
     @Activate
     protected void activate(BundleContext bundleContext) {
         LOG.debug("External IDP client factory activated.");
+
+        // In case keystore/truststore configs are defined in deployment.yaml, override the jvm parameter values set
+        // through the carbon.sh files
+        if (sslConfig != null && sslConfig.isSSLConfigsExistInConfigProvider()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Overriding keystore and truststore configurations in carbon.sh with configuration values "
+                        + "included in deployment.yaml");
+            }
+            sslConfig.exportSSLConfigsExistInConfigProvider();
+        }
     }
 
     @Deactivate
     protected void deactivate(BundleContext bundleContext) {
         LOG.debug("External IDP client factory deactivated.");
+    }
+
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) {
+
+        SSLConfiguration sslConfiguration;
+        try {
+            sslConfiguration = configProvider.getConfigurationObject(SSLConfiguration.class);
+            sslConfig = new SSLConfig(sslConfiguration);
+        } catch (ConfigurationException e) {
+            LOG.error("Error occurred while initializing External IDP client factory : " + e.getMessage(), e);
+        }
+    }
+
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        // Nothing to do
     }
 
     /**
