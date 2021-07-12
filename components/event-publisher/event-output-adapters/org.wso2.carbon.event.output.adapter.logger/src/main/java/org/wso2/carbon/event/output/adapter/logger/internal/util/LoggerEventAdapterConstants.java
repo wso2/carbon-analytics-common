@@ -26,5 +26,6 @@ public final class LoggerEventAdapterConstants {
     public static final String ADAPTER_TYPE_LOGGER = "logger";
     public static final String ADAPTER_MESSAGE_UNIQUE_ID = "uniqueId";
     public static final String ADAPTER_MESSAGE_UNIQUE_ID_HINT = "uniqueIdHint";
-
+    public static final String ADAPTER_ENABLE_LINE_BREAK = "enableLineBreak";
+    public static final String ADAPTER_ENABLE_LINE_BREAK_HINT = "enableLineBreakHint";
 }

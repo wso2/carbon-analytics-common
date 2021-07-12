@@ -46,7 +46,19 @@ public class LoggerEventAdapterFactory extends OutputEventAdapterFactory {
 
     @Override
     public List<Property> getStaticPropertyList() {
-        return null;
+
+        List<Property> staticPropertyList = new ArrayList<Property>();
+
+        // line break property
+        Property enableLineBreak = new Property(LoggerEventAdapterConstants.ADAPTER_ENABLE_LINE_BREAK);
+        enableLineBreak.setDisplayName(resourceBundle.getString(LoggerEventAdapterConstants.ADAPTER_ENABLE_LINE_BREAK));
+        enableLineBreak.setOptions(new String[]{"true", "false"});
+        enableLineBreak.setDefaultValue("true");
+        enableLineBreak.setHint(resourceBundle.getString(LoggerEventAdapterConstants.ADAPTER_ENABLE_LINE_BREAK_HINT));
+
+        staticPropertyList.add(enableLineBreak);
+
+        return staticPropertyList;
     }
 
     @Override

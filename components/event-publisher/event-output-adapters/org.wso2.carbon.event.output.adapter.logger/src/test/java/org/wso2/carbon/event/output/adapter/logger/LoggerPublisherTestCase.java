@@ -149,7 +149,27 @@ public class LoggerPublisherTestCase {
         eventAdapterConfiguration.setStaticProperties(staticProperties);
         Map<String, String> globalProperties = new HashMap<>();
         adapterFactory.createEventAdapter(eventAdapterConfiguration, globalProperties);
-        Assert.assertEquals(adapterFactory.getStaticPropertyList(),null);
+
+        List<Property> staticProps = adapterFactory.getStaticPropertyList();
+        List<Property> staticPropertyList = new ArrayList<>();
+        Property lineBreakProperty = new Property("enableLineBreak");
+        lineBreakProperty.setRequired(false);
+        lineBreakProperty.setSecured(false);
+        lineBreakProperty.setEncrypted(false);
+        lineBreakProperty.setDisplayName("Enable Line Break");
+        lineBreakProperty.setDefaultValue("true");
+        lineBreakProperty.setOptions(new String[]{"true", "false"});
+        lineBreakProperty.setHint("To enable a line break between Unique Identifier and Event details in a log entry");
+        staticPropertyList.add(lineBreakProperty);
+        Assert.assertEquals(staticPropertyList.size(), staticProps.size());
+        i = 0;
+        for (Property prop : staticPropertyList) {
+            Assert.assertEquals(prop.getPropertyName(), staticProps.get(i).getPropertyName());
+            Assert.assertEquals(prop.getDefaultValue(), staticProps.get(i).getDefaultValue());
+            Assert.assertEquals(prop.getDisplayName(), staticProps.get(i).getDisplayName());
+            Assert.assertEquals(prop.getHint(), staticProps.get(i).getHint());
+            i++;
+        }
         Assert.assertEquals(adapterFactory.getUsageTips(),null);
     }
 }
