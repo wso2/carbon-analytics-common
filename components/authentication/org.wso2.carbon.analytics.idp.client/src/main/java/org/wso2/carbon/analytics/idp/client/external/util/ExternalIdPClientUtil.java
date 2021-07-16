@@ -18,7 +18,14 @@
 package org.wso2.carbon.analytics.idp.client.external.util;
 
 import feign.codec.EncodeException;
+import org.apache.log4j.Logger;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.core.utils.config.IdPClientConfiguration;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
@@ -41,9 +48,14 @@ import java.util.stream.Collectors;
  */
 public class ExternalIdPClientUtil {
 
+    private static final Logger log = Logger.getLogger(ExternalIdPClientUtil.class);
+
+    private static final IdPClientConfiguration idPClientConfiguration = getIdPClientConfiguration();
+
     public static Map<String, String> getQueries(String databaseType, String databaseVersion,
                                                  List<Queries> deploymentQueries)
             throws QueryMappingNotAvailableException, IOException {
+
         try {
             List<Queries> componentQueries;
             URL url = ExternalIdPClientUtil.class.getClassLoader().getResource("queries.yaml");
@@ -62,6 +74,7 @@ public class ExternalIdPClientUtil {
     }
 
     private static IdPClientConfiguration readYamlContent(InputStream yamlContent) {
+
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(IdPClientConfiguration.class,
                 IdPClientConfiguration.class.getClassLoader()));
         yaml.setBeanAccess(BeanAccess.FIELD);
@@ -69,12 +82,40 @@ public class ExternalIdPClientUtil {
     }
 
     public static String getRequestBody(Map<String, String> params) {
+
         return params.entrySet().stream()
                 .map(ExternalIdPClientUtil::urlEncodeKeyValuePair)
                 .collect(Collectors.joining("&"));
     }
 
+    public static String getClientConfigurationProperty(String key) {
+
+        return idPClientConfiguration.getProperties().get(key);
+    }
+
+    private static IdPClientConfiguration getIdPClientConfiguration() {
+
+        BundleContext bundleContext = FrameworkUtil.getBundle(ConfigProvider.class).getBundleContext();
+        ServiceReference serviceReference =
+                bundleContext.getServiceReference(ConfigProvider.class.getName());
+        ConfigProvider configProvider = (ConfigProvider) bundleContext.getService(serviceReference);
+        IdPClientConfiguration idPClientConfiguration;
+        try {
+            if (configProvider.getConfigurationObject(IdPClientConstants.SP_AUTH_NAMESPACE) == null) {
+                idPClientConfiguration = new IdPClientConfiguration();
+            } else {
+                idPClientConfiguration = configProvider.
+                        getConfigurationObject(IdPClientConfiguration.class);
+            }
+        } catch (ConfigurationException e) {
+            log.error("Error in reading '" + IdPClientConstants.SP_AUTH_NAMESPACE + "' from file.", e);
+            return null;
+        }
+        return idPClientConfiguration;
+    }
+
     private static String urlEncodeKeyValuePair(Map.Entry<String, String> entry) {
+
         try {
             return URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString()) + '='
                     + URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.toString());
