@@ -52,6 +52,8 @@ import org.wso2.carbon.analytics.idp.client.external.impl.OAuth2ServiceStubs;
 import org.wso2.carbon.analytics.idp.client.external.impl.SCIM2ServiceStub;
 import org.wso2.carbon.analytics.idp.client.external.models.ExternalSession;
 import org.wso2.carbon.analytics.idp.client.external.models.OAuthApplicationInfo;
+import org.wso2.carbon.analytics.idp.client.external.util.ExternalIdPClientUtil;
+import org.wso2.carbon.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,8 +65,10 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -184,9 +188,36 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public List<Role> getAllRoles() throws IdPClientException {
+
+        String selectedDomainsString =
+                ExternalIdPClientUtil.getClientConfigurationProperty(ExternalIdPClientConstants.KM_USER_STORE_DOMAINS);
+
+        if (!StringUtils.isNullOrEmpty(selectedDomainsString)) {
+            return getRolesByDomain(selectedDomainsString);
+        }
         Response response = scimServiceStub.getAllGroups();
+        return getRolesFromResponse(response);
+    }
+
+    private List<Role> getRolesByDomain(String selectedDomainsString) throws IdPClientException {
+
+        Set<Role> rolesSet = new HashSet<>();
+        String[] selectedDomains = selectedDomainsString.split("\\s*,\\s*");
+        List<Role> allRolesList = new ArrayList<>();
+
+        for (String domainName : selectedDomains) {
+            Response response = scimServiceStub.getAllDomainGroups(domainName);
+            List<Role> rolesListByDomain = getRolesFromResponse(response);
+            rolesSet.addAll(rolesListByDomain);
+        }
+        allRolesList.addAll(rolesSet);
+        return allRolesList;
+    }
+
+    private List<Role> getRolesFromResponse(Response response) throws IdPClientException {
+
         if (response == null) {
-            String errorMessage = "Error occurred while retrieving all groups. Error : Response is null.";
+            String errorMessage = "Error occurred while retrieving groups. Error : Response is null.";
             LOG.error(errorMessage);
             throw new IdPClientException(errorMessage);
         }

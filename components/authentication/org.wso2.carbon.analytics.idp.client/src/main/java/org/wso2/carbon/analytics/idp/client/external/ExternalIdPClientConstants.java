@@ -27,6 +27,7 @@ public class ExternalIdPClientConstants {
     public static final String BASE_URL = "baseUrl";
     public static final String GRANT_TYPE = "grantType";
     public static final String KM_TOKEN_URL = "kmTokenUrl";
+    public static final String KM_USER_STORE_DOMAINS = "kmUserStoreDomains";
     public static final String KM_DCR_URL = "kmDcrUrl";
     public static final String KM_CERT_ALIAS = "kmCertAlias";
     public static final String KM_USERNAME = "kmUsername";
