@@ -62,10 +62,14 @@ public final class LoggerEventAdapter implements OutputEventAdapter {
             uniqueIdentification = eventAdapterConfiguration.getName();
         }
 
+        Boolean enableLineBreak = Boolean.parseBoolean(eventAdapterConfiguration.getStaticProperties()
+                .get(LoggerEventAdapterConstants.ADAPTER_ENABLE_LINE_BREAK));
+        String newLine = (enableLineBreak) ? "\n" : "";
         if (message instanceof Object[]) {
-            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + Arrays.deepToString((Object[]) message));
+            log.info("Unique ID: " + uniqueIdentification + "," + newLine + " Event: " +
+                    Arrays.deepToString((Object[]) message));
         } else {
-            log.info("Unique ID: " + uniqueIdentification + ",\n Event: " + message);
+            log.info("Unique ID: " + uniqueIdentification + "," + newLine + " Event: " + message);
         }
     }
 
