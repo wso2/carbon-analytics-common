@@ -73,5 +73,14 @@ public class IdPClientConstants {
         public static final String INTERNAL_SERVER_ERROR = "Internal_Server_Error";
     }
 
+    /**
+     * SSL config constants.
+     */
+    public static class SSL {
+        public static final String KEY_STORE = "javax.net.ssl.keyStore";
+        public static final String KEY_STORE_PASSWORD = "javax.net.ssl.keyStorePassword";
+        public static final String TRUST_STORE = "javax.net.ssl.trustStore";
+        public static final String TRUST_STORE_PASSWORD = "javax.net.ssl.trustStorePassword";
+    }
 
 }
