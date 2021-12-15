@@ -161,4 +161,36 @@
     {% endif %}
     {% endfor %}
 
+    {% if output_adapter.azure is defined %}
+    <adapterConfig type="azure">
+        {% if output_adapter.azure.properties is defined %}
+        <!-- Custom Properties -->
+        {% for property_name,property_value in output_adapter.azure.properties.items() %}
+        <property key="{{property_name}}">{{property_value}}</property>
+        {% endfor %}
+        {% endif %}
+        <!-- Thread Pool Related Properties -->
+        {% if output_adapter.azure.minThread is defined %}
+        <property key="minThread">{{output_adapter.azure.minThread}}</property>
+        {% else %}
+        <property key="minThread">8</property>
+        {% endif %}
+        {% if output_adapter.azure.maxThread is defined %}
+        <property key="maxThread">{{output_adapter.azure.maxThread}}</property>
+        {% else %}
+        <property key="maxThread">100</property>
+        {% endif %}
+        {% if output_adapter.azure.keepAliveTimeInMillis is defined %}
+        <property key="keepAliveTimeInMillis">{{output_adapter.azure.keepAliveTimeInMillis}}</property>
+        {% else %}
+        <property key="keepAliveTimeInMillis">20000</property>
+        {% endif %}
+        {% if output_adapter.azure.jobQueueSize is defined %}
+        <property key="jobQueueSize">{{output_adapter.azure.jobQueueSize}}</property>
+        {% else %}
+        <property key="jobQueueSize">10000</property>
+        {% endif %}
+    </adapterConfig>
+    {% endif %}
+
 </outputEventAdaptersConfig>
