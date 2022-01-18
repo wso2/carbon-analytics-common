@@ -78,6 +78,10 @@
         <Class name="org.wso2.carbon.databridge.agent.endpoint.EventPublisherThreadPoolExecutor"/>
         <Bug pattern="DMI_THREAD_PASSED_WHERE_RUNNABLE_EXPECTED"/>
     </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.core.DataBridge"/>
+        <Bug pattern="NP_NULL_PARAM_DEREF"/>
+    </Match>
 
     <!-- TODO Validate below -->
     <Match>

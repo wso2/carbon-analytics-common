@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.config.ConfigProviderFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -50,7 +51,7 @@ import static org.wso2.carbon.databridge.agent.util.DataEndpointConstants.TRANSP
 
 public class AgentHolder {
 
-    private static final Logger log = Logger.getLogger(AgentHolder.class);
+    private static final Logger log = LogManager.getLogger(AgentHolder.class);
     private static String configPath;
     private static AgentHolder instance;
     private Map<String, DataEndpointAgent> dataEndpointAgents;

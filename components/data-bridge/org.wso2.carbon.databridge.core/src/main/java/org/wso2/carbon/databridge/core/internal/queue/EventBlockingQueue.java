@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.core.internal.queue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.core.utils.DataBridgeUtils;
 import org.wso2.carbon.databridge.core.utils.EventComposite;
 
@@ -30,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * the queue doesn't grow beyond the determined size.
  */
 public class EventBlockingQueue extends ArrayBlockingQueue<EventComposite> {
-    private static final Logger log = Logger.getLogger(EventBlockingQueue.class);
+    private static final Logger log = LogManager.getLogger(EventBlockingQueue.class);
     private final Object lock = new Object();
     private AtomicInteger currentSize;
     private int currentEventCompositeSize;

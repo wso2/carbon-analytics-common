@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.receiver.binary.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
@@ -60,7 +61,7 @@ import static org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUt
  * Binary Transport Receiver implementation.
  */
 public class BinaryDataReceiver implements ServerEventListener {
-    private static final Logger log = Logger.getLogger(BinaryDataReceiver.class);
+    private static final Logger log = LogManager.getLogger(BinaryDataReceiver.class);
     private DataBridgeReceiverService dataBridgeReceiverService;
     private BinaryDataReceiverConfiguration binaryDataReceiverConfiguration;
     private ExecutorService sslReceiverExecutorService;

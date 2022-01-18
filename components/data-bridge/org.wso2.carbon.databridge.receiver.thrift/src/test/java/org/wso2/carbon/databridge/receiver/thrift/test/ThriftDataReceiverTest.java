@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.receiver.thrift.test;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -44,7 +45,7 @@ import java.io.File;
  */
 public class ThriftDataReceiverTest {
 
-    private static Logger log = Logger.getLogger(ThriftDataReceiverTest.class);
+    private static final Logger log = LogManager.getLogger(ThriftDataReceiverTest.class);
 
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";

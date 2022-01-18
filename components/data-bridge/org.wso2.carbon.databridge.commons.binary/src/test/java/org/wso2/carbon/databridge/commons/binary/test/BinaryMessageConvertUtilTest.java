@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.commons.binary.test;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
@@ -37,7 +38,7 @@ import java.nio.charset.StandardCharsets;
  * Binary Message Convert Util Testcase.
  */
 public class BinaryMessageConvertUtilTest {
-    private static final Logger log = Logger.getLogger(BinaryMessageConvertUtilTest.class);
+    private static final Logger log = LogManager.getLogger(BinaryMessageConvertUtilTest.class);
 
     @Test
     public void testEventBufferSize() {

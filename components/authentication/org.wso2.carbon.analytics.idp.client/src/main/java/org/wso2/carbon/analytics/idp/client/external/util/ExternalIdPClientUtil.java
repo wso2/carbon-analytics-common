@@ -18,7 +18,8 @@
 package org.wso2.carbon.analytics.idp.client.external.util;
 
 import feign.codec.EncodeException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
  */
 public class ExternalIdPClientUtil {
 
-    private static final Logger log = Logger.getLogger(ExternalIdPClientUtil.class);
+    private static final Logger log = LogManager.getLogger(ExternalIdPClientUtil.class);
 
     private static final IdPClientConfiguration idPClientConfiguration = getIdPClientConfiguration();
 
