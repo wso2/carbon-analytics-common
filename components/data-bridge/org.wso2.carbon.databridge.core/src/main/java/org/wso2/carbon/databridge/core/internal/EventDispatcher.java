@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.databridge.core.internal;
 
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
@@ -57,7 +57,7 @@ public class EventDispatcher {
     private StreamTypeHolder streamTypeHolder;
     private EventQueue eventQueue;
 
-    private static final Logger log = Logger.getLogger(EventDispatcher.class);
+    private static final Logger log = LogManager.getLogger(EventDispatcher.class);
 
 
     public EventDispatcher(AbstractStreamDefinitionStore streamDefinitionStore,
