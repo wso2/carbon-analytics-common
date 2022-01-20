@@ -305,11 +305,6 @@
                 <version>${orbit.version.json}</version>
             </dependency>
             <dependency>
-                <groupId>slf4j.wso2</groupId>
-                <artifactId>slf4j</artifactId>
-                <version>${slf4j.wso2.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${google.guava.version}</version>
@@ -1521,7 +1516,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.2.7</siddhi.version>
+        <siddhi.version>3.2.6</siddhi.version>
 
 
         <orbit.version.json>3.0.0.wso2v1</orbit.version.json>
