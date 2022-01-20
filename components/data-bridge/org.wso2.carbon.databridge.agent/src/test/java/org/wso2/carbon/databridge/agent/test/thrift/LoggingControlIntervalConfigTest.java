@@ -22,11 +22,9 @@ import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.Layout;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.*;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
@@ -91,6 +89,7 @@ public class LoggingControlIntervalConfigTest {
 
         Logger testLogger = (Logger) LogManager.getLogger(DataEndpointConnectionWorker.class);
         UnitTestAppender testApender = new UnitTestAppender("UnitTestAppender",null,null);
+        testApender.start();
         testLogger.addAppender(testApender);
 
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
@@ -136,6 +135,8 @@ public class LoggingControlIntervalConfigTest {
     }
 
     //Inner class implement AppenderSkeleton
+    @Plugin(name = "UnitTestAppender",
+            category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE)
     public class UnitTestAppender extends AbstractAppender {
         private List<String> logMessageList = new ArrayList<>();
 
