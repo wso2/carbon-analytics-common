@@ -719,7 +719,7 @@
 
     <properties>
         <carbon.analytics.common.version>6.1.56-SNAPSHOT</carbon.analytics.common.version>
-        <log4j.version>2.17.0</log4j.version>
+        <log4j.version>2.17.1</log4j.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
@@ -730,7 +730,7 @@
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
         <equinox.osgi.services.version>3.5.100.v20160504-1419</equinox.osgi.services.version>
 
-        <pax.logging.log4j2.version>1.11.12</pax.logging.log4j2.version>
+        <pax.logging.log4j2.version>1.11.13</pax.logging.log4j2.version>
         <apache.felix.gogo.command.version>0.10.0.v201209301215</apache.felix.gogo.command.version>
         <apache.felix.gogo.runtime.version>0.10.0.v201209301036</apache.felix.gogo.runtime.version>
         <apache.felix.gogo.shell.version>0.10.0.v201212101605</apache.felix.gogo.shell.version>
@@ -771,7 +771,7 @@
 
         <osgi.framework.import.version.range>[1.8.0, 2.0.0)</osgi.framework.import.version.range>
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
-        <carbon.kernel.version>5.2.14-SNAPSHOT</carbon.kernel.version>
+        <carbon.kernel.version>5.2.15</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
@@ -780,7 +780,7 @@
         <guava.bundle.version>23.0.0</guava.bundle.version>
         <gson.version>2.8.5</gson.version>
         <gson.version.range>[2.0.0, 3.0.0)</gson.version.range>
-        <pax.logging.api.version>1.11.12</pax.logging.api.version>
+        <pax.logging.api.version>1.11.13</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
 
         <project.scm.id>my-scm-server</project.scm.id>
