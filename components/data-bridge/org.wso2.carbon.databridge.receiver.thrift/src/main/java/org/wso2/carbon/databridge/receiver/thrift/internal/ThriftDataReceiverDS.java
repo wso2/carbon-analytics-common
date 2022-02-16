@@ -17,7 +17,8 @@
 
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -40,7 +41,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 )
 
 public class ThriftDataReceiverDS {
-    private static final Logger log = Logger.getLogger(ThriftDataReceiverDS.class);
+    private static final Logger log = LogManager.getLogger(ThriftDataReceiverDS.class);
     private ThriftServerStartupImpl thriftDataReceiver;
 
     /**

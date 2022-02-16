@@ -17,14 +17,14 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint;
 
-
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.InsufficientCapacityException;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.agent.DataEndpointAgent;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.EventQueueFullException;
@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * provided the load balancing, or failover configuration.
  */
 public class DataEndpointGroup implements DataEndpointFailureCallback {
-    private static final Logger log = Logger.getLogger(DataEndpointGroup.class);
+    private static final Logger log = LogManager.getLogger(DataEndpointGroup.class);
 
     private List<DataEndpoint> dataEndpoints;
 

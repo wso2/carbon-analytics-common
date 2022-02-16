@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint.binary;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
@@ -32,7 +33,7 @@ import java.net.Socket;
  * This class implements AbstractClientPoolFactory to handle the Binary transport related connections.
  */
 public class BinaryClientPoolFactory extends AbstractClientPoolFactory {
-    private static final Logger log = Logger.getLogger(BinaryClientPoolFactory.class);
+    private static final Logger log = LogManager.getLogger(BinaryClientPoolFactory.class);
 
     @Override
     public Object createClient(String protocol, String hostName, int port) throws DataEndpointException,

@@ -17,7 +17,8 @@
  */
 package org.wso2.carbon.databridge.receiver.binary.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,7 +38,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
         immediate = true
 )
 public class BinaryDataReceiverServiceComponent {
-    private static final Logger log = Logger.getLogger(BinaryDataReceiverServiceComponent.class);
+    private static final Logger log = LogManager.getLogger(BinaryDataReceiverServiceComponent.class);
     private DataBridgeReceiverService dataBridgeReceiverService;
     private static CarbonRuntime carbonRuntime;
     private BinaryDataReceiver binaryDataReceiver;

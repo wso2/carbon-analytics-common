@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.receiver.thrift.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.databridge.commons.thrift.utils.HostAddressFinder;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
@@ -30,7 +31,7 @@ import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfigu
  */
 public class ThriftServerStartupImpl implements ServerEventListener {
 
-    private static final Logger log = Logger.getLogger(ThriftServerStartupImpl.class);
+    private static final Logger log = LogManager.getLogger(ThriftServerStartupImpl.class);
     private static final String DISABLE_RECEIVER = "disable.receiver";
     private boolean isStarted = false;
 

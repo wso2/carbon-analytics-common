@@ -46,14 +46,6 @@
             <groupId>org.wso2.orbit.com.lmax</groupId>
             <artifactId>disruptor</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -94,14 +86,6 @@
                                 <bundle>
                                     <symbolicName>disruptor</symbolicName>
                                     <version>${disruptor.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>slf4j.log4j12</symbolicName>
-                                    <version>${slf4j.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>slf4j.api</symbolicName>
-                                    <version>${slf4j.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

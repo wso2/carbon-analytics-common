@@ -19,7 +19,8 @@
 
 package org.wso2.carbon.databridge.core.internal.authentication;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
 import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
@@ -34,7 +35,7 @@ import java.util.UUID;
  */
 public final class Authenticator {
 
-    private static final Logger log = Logger.getLogger(Authenticator.class);
+    private static final Logger log = LogManager.getLogger(Authenticator.class);
     private SessionCache sessionCache;
     private AuthenticationHandler authenticationHandler;
 

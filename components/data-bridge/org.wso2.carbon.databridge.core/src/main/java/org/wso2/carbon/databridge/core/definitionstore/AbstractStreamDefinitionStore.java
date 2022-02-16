@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.core.definitionstore;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 public abstract class AbstractStreamDefinitionStore implements StreamDefinitionStore {
 
-    private static final Logger log = Logger.getLogger(AbstractStreamDefinitionStore.class);
+    private static final Logger log = LogManager.getLogger(AbstractStreamDefinitionStore.class);
     private List<StreamAddRemoveListener> streamAddRemoveListenerList = new ArrayList<StreamAddRemoveListener>();
 
     public StreamDefinition getStreamDefinition(String name,

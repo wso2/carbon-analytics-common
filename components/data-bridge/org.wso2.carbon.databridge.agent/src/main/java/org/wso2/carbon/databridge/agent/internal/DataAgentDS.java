@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.databridge.agent.internal;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -35,7 +36,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
         immediate = true
 )
 public class DataAgentDS {
-    private static final Logger log = Logger.getLogger(DataAgentDS.class);
+    private static final Logger log = LogManager.getLogger(DataAgentDS.class);
 
     /**
      * This will be called when its references are satisfied. Data Agent component is initialized here

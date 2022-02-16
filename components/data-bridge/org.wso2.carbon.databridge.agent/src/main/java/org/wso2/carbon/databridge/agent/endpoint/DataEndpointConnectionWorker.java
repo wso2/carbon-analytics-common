@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
@@ -28,7 +29,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 
 public class DataEndpointConnectionWorker implements Runnable {
 
-    private static final Logger log = Logger.getLogger(DataEndpointConnectionWorker.class);
+    private static final Logger log = LogManager.getLogger(DataEndpointConnectionWorker.class);
 
     private DataEndpointConfiguration dataEndpointConfiguration;
 

@@ -20,7 +20,8 @@ package org.wso2.carbon.databridge.core;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.config.ConfigProviderFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -70,7 +71,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiverService {
 
-    private static final Logger log = Logger.getLogger(DataBridge.class);
+    private static final Logger log = LogManager.getLogger(DataBridge.class);
     private StreamDefinitionStore streamDefinitionStore;
     private EventDispatcher eventDispatcher;
     private Authenticator authenticator;
