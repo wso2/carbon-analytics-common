@@ -100,7 +100,6 @@
                                 </bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path:${jsonpath.version}
                                 </bundleDef>
-                                <bundleDef>org.slf4j:slf4j-api:${slf4j.version}</bundleDef>
                                 <bundleDef>net.minidev:json-smart:${jsonsmart.version}</bundleDef>
                             </bundles>
                             <importFeatures>
