@@ -150,7 +150,7 @@ public class BinaryDataReceiver implements ServerStartupObserver {
                     TrustManagerFactory.getInstance(trustManagerAlgorithm);
             trustManagerFactory.init(ts);
 
-            SSLContext context = SSLContext.getInstance("TLS");
+            SSLContext context = SSLContext.getInstance("TLSv1.2");
             context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
             SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
