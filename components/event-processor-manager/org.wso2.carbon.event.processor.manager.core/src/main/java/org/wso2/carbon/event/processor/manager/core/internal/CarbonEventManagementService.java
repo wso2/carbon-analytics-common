@@ -17,11 +17,10 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
+import com.hazelcast.map.IMap;
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.MemberAttributeEvent;
-import com.hazelcast.core.MembershipEvent;
-import com.hazelcast.core.MembershipListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
@@ -195,8 +194,8 @@ public class CarbonEventManagementService implements EventManagementService {
 
             @Override
             public void memberRemoved(MembershipEvent membershipEvent) {
-                receiverEventHandler.removeMember(membershipEvent.getMember().getUuid());
-                presenterEventHandler.removeMember(membershipEvent.getMember().getUuid());
+                receiverEventHandler.removeMember(membershipEvent.getMember().getUuid().toString());
+                presenterEventHandler.removeMember(membershipEvent.getMember().getUuid().toString());
                 checkMemberUpdate();
                 if (mode == Mode.HA) {
                     if (isWorkerNode && haManager != null) {
@@ -207,11 +206,6 @@ public class CarbonEventManagementService implements EventManagementService {
                         stormReceiverCoordinator.tryBecomeCoordinator();
                     }
                 }
-            }
-
-            @Override
-            public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
-
             }
 
         });

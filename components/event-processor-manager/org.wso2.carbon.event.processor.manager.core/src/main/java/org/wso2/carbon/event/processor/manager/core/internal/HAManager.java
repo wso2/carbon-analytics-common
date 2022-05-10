@@ -18,6 +18,8 @@
 package org.wso2.carbon.event.processor.manager.core.internal;
 
 import com.hazelcast.core.*;
+import com.hazelcast.cp.lock.FencedLock;
+import com.hazelcast.map.IMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.thrift.server.TServer;
@@ -57,8 +59,8 @@ public class HAManager {
     private boolean passiveLockAcquired;
     private boolean isBackup;
     private boolean synced;
-    private ILock activeLock;
-    private ILock passiveLock;
+    private FencedLock activeLock;
+    private FencedLock passiveLock;
     private IMap<String, HAConfiguration> roleToMembershipMap;
     private Future stateChanger = null;
     private String activeId;
@@ -75,9 +77,9 @@ public class HAManager {
         this.presenterEventHandler = presenterEventHandler;
         this.activeId = ConfigurationConstants.ACTIVEID;
         this.passiveId = ConfigurationConstants.PASSIVEID;
-        this.activeLock = hazelcastInstance.getLock(activeId);
-        this.passiveLock = hazelcastInstance.getLock(passiveId);
-        this.haConfiguration.setMemberUuid(hazelcastInstance.getCluster().getLocalMember().getUuid());
+        this.activeLock = hazelcastInstance.getCPSubsystem().getLock(activeId);
+        this.passiveLock = hazelcastInstance.getCPSubsystem().getLock(passiveId);
+        this.haConfiguration.setMemberUuid(hazelcastInstance.getCluster().getLocalMember().getUuid().toString());
 
         presenterEventHandler.allowEventSync(false);
         snapshotServer = new SnapshotServer();
@@ -109,7 +111,7 @@ public class HAManager {
                     activeLockAcquired = true;
                     becomeActive();
                     passiveLockAcquired = false;
-                    passiveLock.forceUnlock();
+                    passiveLock.unlock();
                 } else {
                     becomePassive();
                     isBackup = false;
@@ -125,7 +127,7 @@ public class HAManager {
                     activeLockAcquired = true;
                     becomeActive();
                     passiveLockAcquired = false;
-                    passiveLock.forceUnlock();
+                    passiveLock.unlock();
                 } else {
                     becomePassive();
                     isBackup = false;
@@ -136,7 +138,7 @@ public class HAManager {
                 activeLockAcquired = true;
                 becomeActive();
                 passiveLockAcquired = false;
-                passiveLock.forceUnlock();
+                passiveLock.unlock();
             }
         }
         haConfiguration.setActive(activeLockAcquired);
@@ -207,11 +209,11 @@ public class HAManager {
                 .getCarbonEventManagementService();
         if (passiveLockAcquired) {
             roleToMembershipMap.remove(passiveId);
-            passiveLock.forceUnlock();
+            passiveLock.unlock();
         }
         if (activeLockAcquired) {
             roleToMembershipMap.remove(activeId);
-            activeLock.forceUnlock();
+            activeLock.unlock();
         }
         stateChanger.cancel(false);
         if (snapshotServer != null) {
