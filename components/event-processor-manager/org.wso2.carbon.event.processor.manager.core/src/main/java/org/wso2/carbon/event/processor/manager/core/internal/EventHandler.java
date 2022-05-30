@@ -18,8 +18,8 @@
 package org.wso2.carbon.event.processor.manager.core.internal;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.Member;
+import com.hazelcast.map.IMap;
+import com.hazelcast.cluster.Member;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,7 +69,7 @@ public class EventHandler {
 
     public void registerLocalMember() {
         if (isMemberNode && members != null) {
-            this.members.set(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid(), localMember);
+            this.members.set(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid().toString(), localMember);
         }
     }
 
@@ -236,7 +236,7 @@ public class EventHandler {
             Set<String> activeMemberUuidSet = new HashSet<String>();
 
             for (Member member : EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getMembers()) {
-                activeMemberUuidSet.add(member.getUuid());
+                activeMemberUuidSet.add(member.getUuid().toString());
             }
 
             List<String> currentMemberUuidList = new ArrayList<String>(members.keySet());
