@@ -74,6 +74,8 @@ public class AgentConfiguration {
 
     private int loggingControlIntervalInSeconds;
 
+    private int failedEventLogInterval;
+
     @XmlElement(name = "Name")
     public String getDataEndpointName() {
         return dataEndpointName;
@@ -312,6 +314,15 @@ public class AgentConfiguration {
             throw new DataEndpointAgentConfigurationException("Endpoint class name is not set in "
                     + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME + " for name: " + this.dataEndpointName);
         }
+    }
+
+    @XmlElement(name = "FailedEventLogInterval")
+    public int getFailedEventLogInterval() {
+        return failedEventLogInterval;
+    }
+
+    public void setFailedEventLogInterval(int failedEventLogInterval) {
+        this.failedEventLogInterval = failedEventLogInterval;
     }
 }
 
