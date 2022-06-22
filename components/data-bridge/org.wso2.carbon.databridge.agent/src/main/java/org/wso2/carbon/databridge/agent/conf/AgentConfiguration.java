@@ -98,6 +98,9 @@ public class AgentConfiguration {
             "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256," +
             "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256";
 
+    @Element(description = "Failed event log interval", required = false)
+    private int failedEventLogInterval = 10000;
+
     public String getName() {
         return name;
     }
@@ -274,6 +277,14 @@ public class AgentConfiguration {
         this.ciphers = ciphers;
     }
 
+    public int getFailedEventLogInterval() {
+        return failedEventLogInterval;
+    }
+
+    public void setFailedEventLogInterval(int failedEventLogInterval) {
+        this.failedEventLogInterval = failedEventLogInterval;
+    }
+
     @Override
     public String toString() {
         return ", Name : " + name +
@@ -297,7 +308,8 @@ public class AgentConfiguration {
                 "SecureEvictionTimePeriod" + secureEvictionTimePeriod +
                 "SecureMinIdleTimeInPool" + secureMinIdleTimeInPool +
                 "SSLEnabledProtocols" + sslEnabledProtocols +
-                "Ciphers" + ciphers;
+                "Ciphers" + ciphers +
+                "FailedEventLogInterval" + failedEventLogInterval;
     }
 
     public AgentConfiguration(String name, String dataEndpointClass) {

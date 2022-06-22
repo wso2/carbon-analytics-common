@@ -170,6 +170,11 @@ public class DataAgentConfigurationFileResolver {
                     agentConfiguration.setCiphers(agentConfigurationHashMap.get(
                             DataAgentConstants.CIPHERS).toString().trim());
                 }
+
+                if (agentConfigurationHashMap.get(DataAgentConstants.FAILED_EVENT_LOG_INTERVAL) != null) {
+                    agentConfiguration.setFailedEventLogInterval(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.FAILED_EVENT_LOG_INTERVAL).toString().trim()));
+                }
                 agents.add(agent);
             }
         } else {
