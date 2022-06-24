@@ -61,6 +61,8 @@
         <!-- HTTP Client Pool Related Properties -->
         <property key="defaultMaxConnectionsPerHost">50</property>
         <property key="maxTotalConnections">1000</property>
+        <!-- Property to enable x-www-form-urlencoded payloads -->
+        <property key="enableFormUrlEncoded">false</property>
     </adapterConfig>
 
     <adapterConfig type="jms">

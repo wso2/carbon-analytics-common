@@ -29,6 +29,7 @@ import org.apache.http.conn.params.ConnRoutePNames;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
+import org.wso2.carbon.event.output.adapter.core.MessageType;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
@@ -209,10 +210,12 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
 
             String messageFormat = eventAdapterConfiguration.getMessageFormat();
-            if (messageFormat.equalsIgnoreCase("json")) {
+            if (messageFormat.equalsIgnoreCase(MessageType.JSON)) {
                 contentType = "application/json";
-            } else if (messageFormat.equalsIgnoreCase("text")) {
+            } else if (messageFormat.equalsIgnoreCase(MessageType.TEXT)) {
                 contentType = "text/plain";
+            } else if (messageFormat.equalsIgnoreCase(MessageType.FORM)) {
+                contentType = "application/x-www-form-urlencoded";
             } else {
                 contentType = "text/xml";
             }
