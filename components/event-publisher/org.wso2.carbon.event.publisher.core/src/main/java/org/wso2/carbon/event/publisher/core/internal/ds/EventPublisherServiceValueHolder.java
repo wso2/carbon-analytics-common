@@ -21,6 +21,7 @@ import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.event.publisher.core.config.OutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherManagementService;
 import org.wso2.carbon.event.publisher.core.internal.CarbonEventPublisherService;
+import org.wso2.carbon.event.publisher.core.internal.type.form.FormOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.json.JSONOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.map.MapOutputMapperFactory;
 import org.wso2.carbon.event.publisher.core.internal.type.text.TextOutputMapperFactory;
@@ -55,6 +56,7 @@ public class EventPublisherServiceValueHolder {
         mappingFactoryMap.put(MessageType.WSO2EVENT, new WSO2EventOutputMapperFactory());
         mappingFactoryMap.put(MessageType.XML, new XMLOutputMapperFactory());
         mappingFactoryMap.put(MessageType.JSON, new JSONOutputMapperFactory());
+        mappingFactoryMap.put(MessageType.FORM, new FormOutputMapperFactory());
     }
 
     private EventPublisherServiceValueHolder() {

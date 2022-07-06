@@ -40,6 +40,9 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         supportedMessageFormats.add(MessageType.TEXT);
         supportedMessageFormats.add(MessageType.XML);
         supportedMessageFormats.add(MessageType.JSON);
+        if (isFormUrlEncodedEnabled()) {
+            supportedMessageFormats.add(MessageType.FORM);
+        }
         return supportedMessageFormats;
     }
 
@@ -116,5 +119,13 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,
                                                  Map<String, String> globalProperties) {
         return new HTTPEventAdapter(eventAdapterConfiguration, globalProperties);
+    }
+
+    private boolean isFormUrlEncodedEnabled() {
+
+        Map<String, String> globalProperties = EventAdapterUtil.
+                getGlobalProperties(HTTPEventAdapterConstants.ADAPTER_TYPE_HTTP);
+        return Boolean
+                .parseBoolean(globalProperties.get(HTTPEventAdapterConstants.ENABLE_FORM_URL_ENCODED));
     }
 }

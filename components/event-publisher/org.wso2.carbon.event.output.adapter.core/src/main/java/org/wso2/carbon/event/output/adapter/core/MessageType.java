@@ -24,5 +24,6 @@ public class MessageType {
     public static final String MAP = "map";
     public static final String TEXT = "text";
     public static final String JSON = "json";
+    public static final String FORM = "form";
 
 }

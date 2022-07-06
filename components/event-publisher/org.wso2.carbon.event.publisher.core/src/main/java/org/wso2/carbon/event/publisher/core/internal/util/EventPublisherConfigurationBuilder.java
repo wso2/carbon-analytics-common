@@ -240,6 +240,10 @@ public class EventPublisherConfigurationBuilder {
             if (!validateSupportedMapping(toEventAdapterType, MessageType.JSON)) {
                 throw new EventPublisherConfigurationException("JSON Mapping is not supported by event adapter type " + toEventAdapterType);
             }
+        } else if (mappingType.equalsIgnoreCase(EventPublisherConstants.EF_FORM_MAPPING_TYPE)) {
+            if (!validateSupportedMapping(toEventAdapterType, MessageType.FORM)) {
+                throw new EventPublisherConfigurationException("Form Mapping is not supported by event adapter type " + toEventAdapterType);
+            }
         } else {
             String factoryClassName = getMappingTypeFactoryClass(mappingElement);
             if (factoryClassName == null) {

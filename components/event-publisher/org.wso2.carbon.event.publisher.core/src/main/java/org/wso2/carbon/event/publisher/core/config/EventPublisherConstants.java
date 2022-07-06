@@ -49,6 +49,7 @@ public final class EventPublisherConstants {
     public static final String EF_MAP_MAPPING_TYPE = "map";
     public static final String EF_XML_MAPPING_TYPE = "xml";
     public static final String EF_JSON_MAPPING_TYPE = "json";
+    public static final String EF_FORM_MAPPING_TYPE = "form";
     public static final String EF_ELE_MAPPING_INLINE = "inline";
     public static final String EF_ELE_MAPPING_REGISTRY = "registry";
     public static final String EF_ELE_CACHE_TIMEOUT_DURATION = "cacheTimeoutDuration";
@@ -101,6 +102,7 @@ public final class EventPublisherConstants {
     public static final String TEMPLATE_EVENT_ATTRIBUTE_PREFIX = "{{";
     public static final String TEMPLATE_EVENT_ATTRIBUTE_POSTFIX = "}}";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
+    public static final String EVENT_FORM_ATTRIBUTE_VALUE_SEPARATOR = "=";
     public static final String EVENT_ATTRIBUTE_SEPARATOR = ",";
     public static final String DEFAULT_STREAM_VERSION = "1.0.0";
 

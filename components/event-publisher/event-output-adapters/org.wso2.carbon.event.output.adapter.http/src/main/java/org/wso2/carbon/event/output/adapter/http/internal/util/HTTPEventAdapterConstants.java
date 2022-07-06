@@ -45,6 +45,7 @@ public class HTTPEventAdapterConstants {
     public static final String ADAPTER_HTTP_CLIENT_METHOD = "http.client.method";
     public static final String CONSTANT_HTTP_POST = "HttpPost";
     public static final String CONSTANT_HTTP_PUT = "HttpPut";
+    public static final String ENABLE_FORM_URL_ENCODED = "enableFormUrlEncoded";
 
     //configurations for the httpConnectionManager
     public static final String DEFAULT_MAX_CONNECTIONS_PER_HOST = "defaultMaxConnectionsPerHost";
