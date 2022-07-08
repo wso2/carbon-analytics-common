@@ -333,7 +333,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 int responseCode = this.getHttpClient().executeMethod(hostConfiguration, method);
                 if (responseCode / 100 == 2) {
                     if (log.isDebugEnabled()) {
-                        log.info("Successfully connected to the endpoint. Received HTTP response code is : " +
+                        log.debug("Successfully connected to the endpoint. Received HTTP response code is : " +
                                 responseCode);
                     }
                 } else {
