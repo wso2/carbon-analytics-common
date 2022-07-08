@@ -125,7 +125,7 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
 
         Map<String, String> globalProperties = EventAdapterUtil.
                 getGlobalProperties(HTTPEventAdapterConstants.ADAPTER_TYPE_HTTP);
-        return Boolean
+        return globalProperties != null && Boolean
                 .parseBoolean(globalProperties.get(HTTPEventAdapterConstants.ENABLE_FORM_URL_ENCODED));
     }
 }

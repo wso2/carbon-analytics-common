@@ -330,8 +330,16 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                     }
                 }
 
-                this.getHttpClient().executeMethod(hostConfiguration, method);
-
+                int responseCode = this.getHttpClient().executeMethod(hostConfiguration, method);
+                if (responseCode / 100 == 2) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Successfully connected to the endpoint. Received HTTP response code is : " +
+                                responseCode);
+                    }
+                } else {
+                    log.error("Error while connecting the endpoint. Received HTTP response code is : " +
+                            responseCode + " Error details : " + new String(method.getResponseBody()));
+                }
             } catch (UnknownHostException e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
                         "Cannot connect to " + this.getUrl(), e, log, tenantId);
