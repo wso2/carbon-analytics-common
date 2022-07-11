@@ -62,7 +62,7 @@
         <property key="defaultMaxConnectionsPerHost">50</property>
         <property key="maxTotalConnections">1000</property>
         <!-- Property to enable x-www-form-urlencoded payloads -->
-        <property key="enableFormUrlEncoded">false</property>
+        <property key="enableFormUrlEncoded">{{output_adapter.http.enable_form_url_encoded}}</property>
     </adapterConfig>
 
     <adapterConfig type="jms">
