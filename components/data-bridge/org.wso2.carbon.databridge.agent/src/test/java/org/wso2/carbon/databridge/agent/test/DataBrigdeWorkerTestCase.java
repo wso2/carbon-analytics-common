@@ -42,8 +42,8 @@ public class DataBrigdeWorkerTestCase {
 
     @Test
     public void testDataEndpointConnectionWorkerNotInitializedTest() {
-        Thread thread = new Thread(new DataEndpointConnectionWorker());
-        thread.start();
+        DataEndpointConnectionWorker dataEndpointConnectionWorker = new DataEndpointConnectionWorker();
+        dataEndpointConnectionWorker.runConnection(false);
     }
 
     @Test
@@ -66,7 +66,9 @@ public class DataBrigdeWorkerTestCase {
                         dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
                         dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
                         dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
-                        true);
+                        true, dataEndpointAgent.getAgentConfiguration().getReconnectionInterval(),
+                        dataEndpointAgent.getAgentConfiguration().getExpFactor(),
+                        dataEndpointAgent.getAgentConfiguration().getMaxDelayInSeconds());
         DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
         dataEndpoint.initialize(endpointConfiguration);
         dataEndpointConnectionWorker.initialize(dataEndpoint, endpointConfiguration);
