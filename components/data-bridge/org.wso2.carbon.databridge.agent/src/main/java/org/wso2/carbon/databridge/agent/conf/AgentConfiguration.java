@@ -44,6 +44,18 @@ public class AgentConfiguration {
 
     private int reconnectionInterval;
 
+    public void setExpFactor(int expFactor) {
+        this.expFactor = expFactor;
+    }
+
+    public void setMaxDelayInSeconds(int maxDelayInSeconds) {
+        this.maxDelayInSeconds = maxDelayInSeconds;
+    }
+
+    private int expFactor;
+
+    private int maxDelayInSeconds;
+
     private int queueSize;
 
     private int batchSize;
@@ -133,6 +145,16 @@ public class AgentConfiguration {
     @XmlElement(name = "ReconnectionInterval")
     public int getReconnectionInterval() {
         return reconnectionInterval;
+    }
+
+    @XmlElement(name = "ExpFactor")
+    public int getExpFactor() {
+        return expFactor;
+    }
+
+    @XmlElement(name = "MaxReconnectionInterval")
+    public int getMaxDelayInSeconds() {
+        return maxDelayInSeconds;
     }
 
     public void setReconnectionInterval(int reconnectionInterval) {

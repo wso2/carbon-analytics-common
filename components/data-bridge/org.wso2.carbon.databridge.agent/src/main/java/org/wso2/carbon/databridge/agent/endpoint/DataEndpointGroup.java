@@ -58,6 +58,9 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private List<DataEndpoint> dataEndpoints;
 
+    private ExecutorService connectionService;
+    private DataEndpointConnectionWorker connectionWorker;
+
     private HAType haType;
 
     private EventQueue eventQueue = null;
@@ -70,7 +73,18 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
-    private ScheduledExecutorService reconnectionService;
+    private ExecutorService reconnectionService;
+
+
+    public static long getDelay() {
+        return delay;
+    }
+
+    public static void setDelay(long delay) {
+        DataEndpointGroup.delay = delay;
+    }
+
+    static long delay;
 
     private final String publishingStrategy;
 
@@ -87,7 +101,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     public DataEndpointGroup(HAType haType, DataEndpointAgent agent) {
         this.dataEndpoints = new ArrayList<>();
         this.haType = haType;
-        this.reconnectionService = Executors.newScheduledThreadPool(1, new DataBridgeThreadFactory("ReconnectionService"));
+        this.reconnectionService =  Executors.newSingleThreadExecutor();
+
         this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
         this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
         if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
@@ -103,9 +118,14 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 log.error("Unable to create DATABRIDGE_AGENT_EVENT_QUEUE stat MXBean: " + e.getMessage(), e);
             }
         }
-        this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
-                reconnectionInterval, TimeUnit.SECONDS);
+
         currentDataPublisherIndex.set(START_INDEX);
+        ReconnectionTask reconnectionTask = new ReconnectionTask();
+        Thread t = new Thread(reconnectionTask);
+        t.start();
+
+        /*this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
+                reconnectionInterval, TimeUnit.SECONDS);*/
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
@@ -436,13 +456,22 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private class ReconnectionTask implements Runnable {
         public void run() {
-            boolean isOneReceiverConnected = false;
-            List<String> noReceiverURLEndpoints = new ArrayList<String>();
-            for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
+            long delay = 0;
+            long ct = 0;
+            long gap = 0;
+
+            while(true){
+                boolean isOneReceiverConnected = false;
+                for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
                 DataEndpoint dataEndpoint = dataEndpoints.get(i);
                 if (!dataEndpoint.isConnected()) {
+                    ct = System.currentTimeMillis();
+                    gap = ct - dataEndpoint.getReConnectTimestamp();
                     try {
-                        dataEndpoint.connect();
+                        if(gap > 0) {
+                            log.info("Gap : " + gap + " ,ct : "+ct+ ", dt : " + dataEndpoint.getReConnectTimestamp());
+                            dataEndpoint.connect();
+                        }
                     } catch (Exception ex) {
                         dataEndpoint.deactivate();
                     }
@@ -458,16 +487,27 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                                 + " could not be deactivated", exception);
                     }
                 }
-                if (dataEndpoint.isConnected()) {
+                /*if (dataEndpoint.isConnected()) {
                     isOneReceiverConnected = true;
+                } else{
+                    if(gap > 0) {
+
+                        dataEndpoint.setDelay(dataEndpoint.getDelay() + 60000l);
+                        dataEndpoint.setReConnectTimestamp(ct + dataEndpoint.getDelay());
+                    }
+                }*/
+            }
+/*                if (!isOneReceiverConnected) {
+                    //log.warn("No receiver is reachable at reconnection, will try to reconnect after " + connectionWorker.getDelay() + " sec");
                 } else {
-                    noReceiverURLEndpoints.add(dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                }
+                    try {
+                        TimeUnit.SECONDS.sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }*/
             }
-            if (!isOneReceiverConnected) {
-                log.warn("No receiver is reachable at URL Endpoint/Endpoints " + noReceiverURLEndpoints.toString() +
-                        ", will try to reconnect every " + reconnectionInterval + " sec");
-            }
+
         }
 
         private boolean isServerExists(String ip, int port) {

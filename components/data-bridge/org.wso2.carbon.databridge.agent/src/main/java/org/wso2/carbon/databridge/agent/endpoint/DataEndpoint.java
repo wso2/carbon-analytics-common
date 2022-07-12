@@ -64,6 +64,26 @@ public abstract class DataEndpoint {
 
     private List<Event> events;
 
+
+    public long getReConnectTimestamp() {
+        return reConnectTimestamp;
+    }
+
+    public void setReConnectTimestamp(long reConnectTimestamp) {
+        this.reConnectTimestamp = reConnectTimestamp;
+    }
+
+    public long reConnectTimestamp = 0;
+
+    public static long getDelay() {
+        return delay;
+    }
+
+    public static void setDelay(long delay) {
+        DataEndpoint.delay = delay;
+    }
+
+    public static long delay = 0;
     private State state;
 
     private Semaphore immediateDispatchSemaphore;
@@ -139,7 +159,7 @@ public abstract class DataEndpoint {
             throws TransportException,
             DataEndpointAuthenticationException, DataEndpointException {
         if (connectionWorker != null) {
-            connectionService.submit(connectionWorker);
+           connectionWorker.be(true);
         } else {
             throw new DataEndpointException("Data Endpoint is not initialized");
         }
@@ -148,7 +168,7 @@ public abstract class DataEndpoint {
     synchronized void syncConnect(String oldSessionId) throws DataEndpointException {
         if (oldSessionId == null || oldSessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
             if (connectionWorker != null) {
-                connectionWorker.run();
+                connectionWorker.be(false);
             } else {
                 throw new DataEndpointException("Data Endpoint is not initialized");
             }

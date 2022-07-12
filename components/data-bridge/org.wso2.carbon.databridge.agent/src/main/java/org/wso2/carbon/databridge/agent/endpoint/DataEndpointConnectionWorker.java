@@ -52,7 +52,81 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     private boolean isLoggingControl = false;
 
+    public void be(boolean reconnect) {
+        if (isInitialized()) {
+            try {
+                connect();
+                if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                    loggingControlFlag.set(true);
+                }
+                dataEndpoint.activate();
+            } catch (DataEndpointAuthenticationException e) {
+                if(reconnect){
+                    if(dataEndpoint.getDelay() == 0) {
+                        dataEndpoint.setDelay(dataEndpointConfiguration.getReconnectionInterval()*1000l);
+                    }
+                    if (dataEndpointConfiguration.getExpFactor() < 1) {
+                       dataEndpointConfiguration.setExpFactor(1);
+                    }
+                    dataEndpoint.setDelay(dataEndpoint.getDelay() * dataEndpointConfiguration.getExpFactor());
+                    long maxDelayInMillis = dataEndpointConfiguration.getMaxDelayInSeconds() * 1000l;
+                    if(maxDelayInMillis > 0 && dataEndpoint.getDelay() > maxDelayInMillis ){
+                        dataEndpoint.setDelay(maxDelayInMillis);
+                    }
+                    log.info("next delay : " + dataEndpoint.getDelay());
+                    dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() + dataEndpoint.getDelay());
+                }
+                if (isLoggingControl) {
+                    if (loggingControlFlag.get()) {
+                        if (dataEndpointConfiguration.isFailOverEndpoint()) {
+                            log.info("Attempt to connect to the endpoint " +
+                                    dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
+                            log.debug("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        } else {
+                            log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                        }
+                        loggingControlFlag.set(false);
+                    }
+                } else {
+                    log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                }
+                dataEndpoint.deactivate();
+            } catch (DataEndpointLoginException e) {
+                if(reconnect){
+                    if(dataEndpoint.getDelay() == 0) {
+                        dataEndpoint.setDelay(dataEndpointConfiguration.getReconnectionInterval());
+                    }
+                    if (dataEndpointConfiguration.getExpFactor() < 1) {
+                        dataEndpointConfiguration.setExpFactor(1);
+                    }
+                    dataEndpoint.setDelay(dataEndpoint.getDelay() * dataEndpointConfiguration.getExpFactor());
+                    long maxDelayInMillis = dataEndpointConfiguration.getMaxDelayInSeconds() * 1000l;
+                    if(dataEndpoint.getDelay() > maxDelayInMillis ){
+                        dataEndpoint.setDelay(maxDelayInMillis);
+                    }
+                    log.info("next delay : " + dataEndpoint.getDelay());
+                    dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() + dataEndpoint.getDelay());
+                }
+                log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                dataEndpoint.deactivate();
+            }
+        } else {
+            String errorMsg = "Data endpoint connection worker is not properly initialized ";
+            if (dataEndpoint == null)
+                errorMsg += ", data Endpoint is not provided ";
+            if (dataEndpointConfiguration == null)
+                errorMsg += ", data Endpoint configuration is not provided";
+            errorMsg += ".";
+            log.error(errorMsg);
+        }
+    }
+
     @Override
+    public void run() {
+        log.info("Doook I am still called");
+    }
+
+   /* @Override
     public void run() {
         if (isInitialized()) {
             try {
@@ -90,7 +164,7 @@ public class DataEndpointConnectionWorker implements Runnable {
             errorMsg += ".";
             log.error(errorMsg);
         }
-    }
+    }*/
 
     DataEndpointConfiguration getDataEndpointConfiguration() {
         return dataEndpointConfiguration;

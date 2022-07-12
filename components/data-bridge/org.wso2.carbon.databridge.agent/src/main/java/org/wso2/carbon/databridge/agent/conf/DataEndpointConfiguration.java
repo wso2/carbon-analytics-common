@@ -52,6 +52,27 @@ public class DataEndpointConfiguration {
 
     private boolean failOverEndpoint;
 
+    public int getReconnectionInterval() {
+        return reconnectionInterval;
+    }
+
+    public int getExpFactor() {
+        return expFactor;
+    }
+
+    public int getMaxDelayInSeconds() {
+        return maxDelayInSeconds;
+    }
+
+    private int reconnectionInterval;
+
+    public void setExpFactor(int expFactor) {
+        this.expFactor = expFactor;
+    }
+
+    private int expFactor;
+    private int maxDelayInSeconds;
+
     public enum Protocol {
         TCP, SSL;
 
@@ -65,7 +86,8 @@ public class DataEndpointConfiguration {
                                      GenericKeyedObjectPool transportPool,
                                      GenericKeyedObjectPool securedTransportPool,
                                      int batchSize, int corePoolSize, int maxPoolSize, int keepAliveTimeInPool,
-                                     int loggingControlIntervalInSeconds, boolean failOverEndpoint) {
+                                     int loggingControlIntervalInSeconds, boolean failOverEndpoint,
+                                     int reconnectionInterval, int expFactor, int maxDelayInSeconds) {
         this.receiverURL = receiverURL;
         this.authURL = authURL;
         this.username = username;
@@ -80,6 +102,9 @@ public class DataEndpointConfiguration {
         this.keepAliveTimeInPool = keepAliveTimeInPool;
         this.loggingControlIntervalInSeconds = (long) loggingControlIntervalInSeconds;
         this.failOverEndpoint = failOverEndpoint;
+        this.reconnectionInterval = reconnectionInterval;
+        this.expFactor = expFactor;
+        this.maxDelayInSeconds = maxDelayInSeconds;
     }
 
     public String getReceiverURL() {
