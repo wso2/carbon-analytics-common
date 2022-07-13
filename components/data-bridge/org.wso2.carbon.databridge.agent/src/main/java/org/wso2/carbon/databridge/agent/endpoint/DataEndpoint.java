@@ -32,6 +32,7 @@ import org.wso2.carbon.databridge.commons.exception.UndefinedEventTypeException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -74,16 +75,7 @@ public abstract class DataEndpoint {
     }
 
     public long reConnectTimestamp = 0;
-
-    public static long getDelay() {
-        return delay;
-    }
-
-    public static void setDelay(long delay) {
-        DataEndpoint.delay = delay;
-    }
-
-    public static long delay = 0;
+    public static HashMap<String, Long> delayMap=new HashMap<String, Long>();
     private State state;
 
     private Semaphore immediateDispatchSemaphore;
@@ -159,7 +151,7 @@ public abstract class DataEndpoint {
             throws TransportException,
             DataEndpointAuthenticationException, DataEndpointException {
         if (connectionWorker != null) {
-           connectionWorker.be(true);
+           connectionWorker.runConnection(true);
         } else {
             throw new DataEndpointException("Data Endpoint is not initialized");
         }
@@ -168,7 +160,7 @@ public abstract class DataEndpoint {
     synchronized void syncConnect(String oldSessionId) throws DataEndpointException {
         if (oldSessionId == null || oldSessionId.equalsIgnoreCase(getDataEndpointConfiguration().getSessionId())) {
             if (connectionWorker != null) {
-                connectionWorker.be(false);
+                connectionWorker.runConnection(false);
             } else {
                 throw new DataEndpointException("Data Endpoint is not initialized");
             }

@@ -121,8 +121,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         currentDataPublisherIndex.set(START_INDEX);
         ReconnectionTask reconnectionTask = new ReconnectionTask();
-        Thread t = new Thread(reconnectionTask);
-        t.start();
+        Thread reconnection = new Thread(reconnectionTask);
+        reconnection.start();
 
         /*this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
                 reconnectionInterval, TimeUnit.SECONDS);*/
@@ -456,58 +456,34 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private class ReconnectionTask implements Runnable {
         public void run() {
-            long delay = 0;
-            long ct = 0;
             long gap = 0;
-
-            while(true){
-                boolean isOneReceiverConnected = false;
+            while (true) {
                 for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
-                DataEndpoint dataEndpoint = dataEndpoints.get(i);
-                if (!dataEndpoint.isConnected()) {
-                    ct = System.currentTimeMillis();
-                    gap = ct - dataEndpoint.getReConnectTimestamp();
-                    try {
-                        if(gap > 0) {
-                            log.info("Gap : " + gap + " ,ct : "+ct+ ", dt : " + dataEndpoint.getReConnectTimestamp());
-                            dataEndpoint.connect();
-                        }
-                    } catch (Exception ex) {
-                        dataEndpoint.deactivate();
-                    }
-                } else {
-                    try {
-                        String[] urlElements = DataPublisherUtil.getProtocolHostPort(
-                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                        if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                    DataEndpoint dataEndpoint = dataEndpoints.get(i);
+                    if (!dataEndpoint.isConnected()) {
+                        gap = System.currentTimeMillis() - dataEndpoint.getReConnectTimestamp();
+                        try {
+                            if (gap > 0) {
+                                dataEndpoint.connect();
+                            }
+                        } catch (Exception ex) {
                             dataEndpoint.deactivate();
                         }
-                    } catch (DataEndpointConfigurationException exception) {
-                        log.warn("Data Endpoint with receiver URL:" + dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
-                                + " could not be deactivated", exception);
+                    } else {
+                        try {
+                            String[] urlElements = DataPublisherUtil.getProtocolHostPort(
+                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
+                            if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                                dataEndpoint.deactivate();
+                            }
+                        } catch (DataEndpointConfigurationException exception) {
+                            log.warn("Data Endpoint with receiver URL:" +
+                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
+                                    + " could not be deactivated", exception);
+                        }
                     }
                 }
-                /*if (dataEndpoint.isConnected()) {
-                    isOneReceiverConnected = true;
-                } else{
-                    if(gap > 0) {
-
-                        dataEndpoint.setDelay(dataEndpoint.getDelay() + 60000l);
-                        dataEndpoint.setReConnectTimestamp(ct + dataEndpoint.getDelay());
-                    }
-                }*/
             }
-/*                if (!isOneReceiverConnected) {
-                    //log.warn("No receiver is reachable at reconnection, will try to reconnect after " + connectionWorker.getDelay() + " sec");
-                } else {
-                    try {
-                        TimeUnit.SECONDS.sleep(30);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }*/
-            }
-
         }
 
         private boolean isServerExists(String ip, int port) {

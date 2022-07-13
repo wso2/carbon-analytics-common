@@ -52,29 +52,36 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     private boolean isLoggingControl = false;
 
-    public void be(boolean reconnect) {
+    public void runConnection(boolean reconnect) {
         if (isInitialized()) {
+            String receiverURL = dataEndpoint.getDataEndpointConfiguration().getReceiverURL();
             try {
                 connect();
                 if (dataEndpointConfiguration.isFailOverEndpoint()) {
                     loggingControlFlag.set(true);
                 }
                 dataEndpoint.activate();
+                dataEndpoint.delayMap.put(receiverURL, 0l);
             } catch (DataEndpointAuthenticationException e) {
-                if(reconnect){
-                    if(dataEndpoint.getDelay() == 0) {
-                        dataEndpoint.setDelay(dataEndpointConfiguration.getReconnectionInterval()*1000l);
+                if (reconnect) {
+                    if (dataEndpoint.delayMap.get(receiverURL) == 0) {
+                        dataEndpoint.delayMap.replace(receiverURL,
+                                dataEndpointConfiguration.getReconnectionInterval() * 1000l);
                     }
                     if (dataEndpointConfiguration.getExpFactor() < 1) {
-                       dataEndpointConfiguration.setExpFactor(1);
+                        dataEndpointConfiguration.setExpFactor(1);
                     }
-                    dataEndpoint.setDelay(dataEndpoint.getDelay() * dataEndpointConfiguration.getExpFactor());
+                    dataEndpoint.delayMap.replace(receiverURL, dataEndpoint.delayMap.get(receiverURL)
+                            * dataEndpointConfiguration.getExpFactor());
                     long maxDelayInMillis = dataEndpointConfiguration.getMaxDelayInSeconds() * 1000l;
-                    if(maxDelayInMillis > 0 && dataEndpoint.getDelay() > maxDelayInMillis ){
-                        dataEndpoint.setDelay(maxDelayInMillis);
+                    if (maxDelayInMillis > 0 && dataEndpoint.delayMap.get(receiverURL) > maxDelayInMillis) {
+                        dataEndpoint.delayMap.replace(receiverURL, maxDelayInMillis);
                     }
-                    log.info("next delay : " + dataEndpoint.getDelay());
-                    dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() + dataEndpoint.getDelay());
+                    dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() +
+                            dataEndpoint.delayMap.get(receiverURL));
+                    log.warn("Next Reconnection attempt to Data endpoint : " +
+                            dataEndpoint.getDataEndpointConfiguration().getReceiverURL() +
+                            " will be after " + dataEndpoint.delayMap.get(receiverURL) / 1000 + " seconds");
                 }
                 if (isLoggingControl) {
                     if (loggingControlFlag.get()) {
@@ -92,20 +99,25 @@ public class DataEndpointConnectionWorker implements Runnable {
                 }
                 dataEndpoint.deactivate();
             } catch (DataEndpointLoginException e) {
-                if(reconnect){
-                    if(dataEndpoint.getDelay() == 0) {
-                        dataEndpoint.setDelay(dataEndpointConfiguration.getReconnectionInterval());
+                if (reconnect) {
+                    if (dataEndpoint.delayMap.get(receiverURL) == 0) {
+                        dataEndpoint.delayMap.replace(receiverURL,
+                                dataEndpointConfiguration.getReconnectionInterval() * 1000l);
                     }
                     if (dataEndpointConfiguration.getExpFactor() < 1) {
                         dataEndpointConfiguration.setExpFactor(1);
                     }
-                    dataEndpoint.setDelay(dataEndpoint.getDelay() * dataEndpointConfiguration.getExpFactor());
+                    dataEndpoint.delayMap.replace(receiverURL, dataEndpoint.delayMap.get(receiverURL)
+                            * dataEndpointConfiguration.getExpFactor());
                     long maxDelayInMillis = dataEndpointConfiguration.getMaxDelayInSeconds() * 1000l;
-                    if(dataEndpoint.getDelay() > maxDelayInMillis ){
-                        dataEndpoint.setDelay(maxDelayInMillis);
+                    if (maxDelayInMillis > 0 && dataEndpoint.delayMap.get(receiverURL) > maxDelayInMillis) {
+                        dataEndpoint.delayMap.replace(receiverURL, maxDelayInMillis);
                     }
-                    log.info("next delay : " + dataEndpoint.getDelay());
-                    dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() + dataEndpoint.getDelay());
+                    dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() +
+                            dataEndpoint.delayMap.get(receiverURL));
+                    log.warn("Next Reconnection attempt to Data endpoint : " +
+                            dataEndpoint.getDataEndpointConfiguration().getReceiverURL() +
+                            " will be after " + dataEndpoint.delayMap.get(receiverURL) / 1000 + " seconds");
                 }
                 log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
                 dataEndpoint.deactivate();
@@ -123,48 +135,7 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     @Override
     public void run() {
-        log.info("Doook I am still called");
     }
-
-   /* @Override
-    public void run() {
-        if (isInitialized()) {
-            try {
-                connect();
-                if (dataEndpointConfiguration.isFailOverEndpoint()) {
-                    loggingControlFlag.set(true);
-                }
-                dataEndpoint.activate();
-            } catch (DataEndpointAuthenticationException e) {
-                if (isLoggingControl) {
-                    if (loggingControlFlag.get()) {
-                        if (dataEndpointConfiguration.isFailOverEndpoint()) {
-                            log.info("Attempt to connect to the endpoint " +
-                                    dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
-                            log.debug("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
-                        } else {
-                            log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
-                        }
-                        loggingControlFlag.set(false);
-                    }
-                } else {
-                    log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
-                }
-                dataEndpoint.deactivate();
-            } catch (DataEndpointLoginException e) {
-                log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
-                dataEndpoint.deactivate();
-            }
-        } else {
-            String errorMsg = "Data endpoint connection worker is not properly initialized ";
-            if (dataEndpoint == null)
-                errorMsg += ", data Endpoint is not provided ";
-            if (dataEndpointConfiguration == null)
-                errorMsg += ", data Endpoint configuration is not provided";
-            errorMsg += ".";
-            log.error(errorMsg);
-        }
-    }*/
 
     DataEndpointConfiguration getDataEndpointConfiguration() {
         return dataEndpointConfiguration;
