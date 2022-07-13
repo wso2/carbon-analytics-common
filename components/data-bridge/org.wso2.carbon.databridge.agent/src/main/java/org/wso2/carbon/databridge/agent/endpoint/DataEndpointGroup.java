@@ -75,17 +75,6 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private ExecutorService reconnectionService;
 
-
-    public static long getDelay() {
-        return delay;
-    }
-
-    public static void setDelay(long delay) {
-        DataEndpointGroup.delay = delay;
-    }
-
-    static long delay;
-
     private final String publishingStrategy;
 
     private boolean isShutdown = false;
@@ -123,9 +112,6 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         ReconnectionTask reconnectionTask = new ReconnectionTask();
         Thread reconnection = new Thread(reconnectionTask);
         reconnection.start();
-
-        /*this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
-                reconnectionInterval, TimeUnit.SECONDS);*/
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
