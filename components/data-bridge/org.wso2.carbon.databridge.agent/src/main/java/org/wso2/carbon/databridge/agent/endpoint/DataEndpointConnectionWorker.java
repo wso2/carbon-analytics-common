@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * DataEndpoint Connection worker class implementation.
  */
 
-public class DataEndpointConnectionWorker implements Runnable {
+public class DataEndpointConnectionWorker {
 
     private static Log log = LogFactory.getLog(DataEndpointConnectionWorker.class);
 
@@ -52,6 +52,14 @@ public class DataEndpointConnectionWorker implements Runnable {
 
     private boolean isLoggingControl = false;
 
+
+    /**
+     * Creates the connection to the data endpoint.
+     * Increases the delay between each re connect attempt exponentially in case of connection exceptions.
+     *
+     * @param reconnect Informs whether the method is invoked from re connection task to increase the
+     *                  reconnection delay.
+     */
     public void runConnection(boolean reconnect) {
         if (isInitialized()) {
             String receiverURL = dataEndpoint.getDataEndpointConfiguration().getReceiverURL();
@@ -61,11 +69,14 @@ public class DataEndpointConnectionWorker implements Runnable {
                     loggingControlFlag.set(true);
                 }
                 dataEndpoint.activate();
-                dataEndpoint.delayMap.put(receiverURL, 0l);
+                if (dataEndpoint.delayMap.get(receiverURL) != null) {
+                    dataEndpoint.delayMap.replace(receiverURL,
+                            dataEndpointConfiguration.getReconnectionInterval() * 1000l);
+                }
             } catch (DataEndpointAuthenticationException e) {
                 if (reconnect) {
-                    if (dataEndpoint.delayMap.get(receiverURL) == 0) {
-                        dataEndpoint.delayMap.replace(receiverURL,
+                    if (dataEndpoint.delayMap.get(receiverURL) == null) {
+                        dataEndpoint.delayMap.put(receiverURL,
                                 dataEndpointConfiguration.getReconnectionInterval() * 1000l);
                     }
                     if (dataEndpointConfiguration.getExpFactor() < 1) {
@@ -131,10 +142,6 @@ public class DataEndpointConnectionWorker implements Runnable {
             errorMsg += ".";
             log.error(errorMsg);
         }
-    }
-
-    @Override
-    public void run() {
     }
 
     DataEndpointConfiguration getDataEndpointConfiguration() {

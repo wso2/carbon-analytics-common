@@ -52,6 +52,12 @@ public class DataEndpointConfiguration {
 
     private boolean failOverEndpoint;
 
+    private int reconnectionInterval;
+
+    private int expFactor;
+
+    private int maxDelayInSeconds;
+
     public int getReconnectionInterval() {
         return reconnectionInterval;
     }
@@ -64,14 +70,9 @@ public class DataEndpointConfiguration {
         return maxDelayInSeconds;
     }
 
-    private int reconnectionInterval;
-
     public void setExpFactor(int expFactor) {
         this.expFactor = expFactor;
     }
-
-    private int expFactor;
-    private int maxDelayInSeconds;
 
     public enum Protocol {
         TCP, SSL;

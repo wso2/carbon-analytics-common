@@ -65,6 +65,11 @@ public abstract class DataEndpoint {
 
     private List<Event> events;
 
+    private State state;
+
+    public long reConnectTimestamp = 0;
+
+    public static HashMap<String, Long> delayMap=new HashMap<String, Long>();
 
     public long getReConnectTimestamp() {
         return reConnectTimestamp;
@@ -74,9 +79,13 @@ public abstract class DataEndpoint {
         this.reConnectTimestamp = reConnectTimestamp;
     }
 
-    public long reConnectTimestamp = 0;
-    public static HashMap<String, Long> delayMap=new HashMap<String, Long>();
-    private State state;
+    public static HashMap<String, Long> getDelayMap() {
+        return delayMap;
+    }
+
+    public static void setDelayMap(HashMap<String, Long> delayMap) {
+        DataEndpoint.delayMap = delayMap;
+    }
 
     private Semaphore immediateDispatchSemaphore;
 

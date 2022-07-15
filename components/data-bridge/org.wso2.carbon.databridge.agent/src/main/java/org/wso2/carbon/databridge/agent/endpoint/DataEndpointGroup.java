@@ -58,14 +58,9 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private List<DataEndpoint> dataEndpoints;
 
-    private ExecutorService connectionService;
-    private DataEndpointConnectionWorker connectionWorker;
-
     private HAType haType;
 
     private EventQueue eventQueue = null;
-
-    private int reconnectionInterval;
 
     private final Integer START_INDEX = 0;
 
@@ -73,13 +68,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
-    private ExecutorService reconnectionService;
-
     private final String publishingStrategy;
 
     private boolean isShutdown = false;
 
     private MBeanServer platformMBeanServer;
+
+    private Thread reconnection;
 
     private ObjectName mbeanEventQueue;
 
@@ -90,9 +85,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     public DataEndpointGroup(HAType haType, DataEndpointAgent agent) {
         this.dataEndpoints = new ArrayList<>();
         this.haType = haType;
-        this.reconnectionService =  Executors.newSingleThreadExecutor();
 
-        this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
         this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
         if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
             this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
@@ -110,7 +103,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         currentDataPublisherIndex.set(START_INDEX);
         ReconnectionTask reconnectionTask = new ReconnectionTask();
-        Thread reconnection = new Thread(reconnectionTask);
+        reconnection = new Thread(reconnectionTask);
         reconnection.start();
     }
 
@@ -358,7 +351,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 }
                 if (index == startIndex) {
                     if (isBusyWait) {
-                        if (!reconnectionService.isShutdown()) {
+                        if (reconnection.isAlive()) {
 
                             /**
                              * Have fully iterated the data publisher list,
@@ -509,7 +502,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void shutdown() {
-        reconnectionService.shutdownNow();
+        reconnection.stop();
         if (eventQueue != null) {
             eventQueue.shutdown();
         }
