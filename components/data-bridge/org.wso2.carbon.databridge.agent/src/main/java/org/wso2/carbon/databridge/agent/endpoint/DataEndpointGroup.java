@@ -439,6 +439,10 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             while (true) {
                 for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
                     DataEndpoint dataEndpoint = dataEndpoints.get(i);
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(1);
+                    } catch (InterruptedException ignored) {
+                    }
                     if (!dataEndpoint.isConnected()) {
                         gap = System.currentTimeMillis() - dataEndpoint.getReConnectTimestamp();
                         try {
