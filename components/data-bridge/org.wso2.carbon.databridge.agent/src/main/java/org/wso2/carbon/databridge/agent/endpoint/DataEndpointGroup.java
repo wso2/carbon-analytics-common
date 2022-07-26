@@ -436,6 +436,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     private class ReconnectionTask implements Runnable {
         public void run() {
             long gap = 0;
+            long isEPCheckedGap = 0;
+            long addedDelayForEPCheck = 10000l;
             while (true) {
                 for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
                     DataEndpoint dataEndpoint = dataEndpoints.get(i);
@@ -454,10 +456,13 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         }
                     } else {
                         try {
-                            String[] urlElements = DataPublisherUtil.getProtocolHostPort(
-                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                            if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
-                                dataEndpoint.deactivate();
+                            if (System.currentTimeMillis() > isEPCheckedGap) {
+                                isEPCheckedGap = System.currentTimeMillis() + addedDelayForEPCheck;
+                                String[] urlElements = DataPublisherUtil.getProtocolHostPort(
+                                        dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
+                                if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                                    dataEndpoint.deactivate();
+                                }
                             }
                         } catch (DataEndpointConfigurationException exception) {
                             log.warn("Data Endpoint with receiver URL:" +
