@@ -42,8 +42,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -105,8 +103,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
         currentDataPublisherIndex.set(START_INDEX);
         ReconnectionTask reconnectionTask = new ReconnectionTask();
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(reconnectionTask, 0, 30000);
+        reconnection = new Thread(reconnectionTask);
+        reconnection.start();
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
@@ -435,36 +433,38 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
         return unsuccessfulEvents;
     }
 
-    private class ReconnectionTask extends TimerTask {
+    private class ReconnectionTask implements Runnable {
         public void run() {
             long gap = 0;
             long isEPCheckedGap = 0;
-            long addedDelayForEPCheck = 10000;
-            for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
-                DataEndpoint dataEndpoint = dataEndpoints.get(i);
-                if (!dataEndpoint.isConnected()) {
-                    gap = System.currentTimeMillis() - dataEndpoint.getReConnectTimestamp();
-                    try {
-                        if (gap > 0) {
-                            dataEndpoint.connect();
-                        }
-                    } catch (Exception ex) {
-                        dataEndpoint.deactivate();
-                    }
-                } else {
-                    try {
-                        if (System.currentTimeMillis() > isEPCheckedGap) {
-                            isEPCheckedGap = System.currentTimeMillis() + addedDelayForEPCheck;
-                            String[] urlElements = DataPublisherUtil.getProtocolHostPort(
-                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                            if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
-                                dataEndpoint.deactivate();
+            long addedDelayForEPCheck = 10000l;
+            while (true) {
+                for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
+                    DataEndpoint dataEndpoint = dataEndpoints.get(i);
+                    if (!dataEndpoint.isConnected()) {
+                        gap = System.currentTimeMillis() - dataEndpoint.getReConnectTimestamp();
+                        try {
+                            if (gap > 0) {
+                                dataEndpoint.connect();
                             }
+                        } catch (Exception ex) {
+                            dataEndpoint.deactivate();
                         }
-                    } catch (DataEndpointConfigurationException exception) {
-                        log.warn("Data Endpoint with receiver URL:" +
-                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
-                                + " could not be deactivated", exception);
+                    } else {
+                        try {
+                            if (System.currentTimeMillis() > isEPCheckedGap) {
+                                isEPCheckedGap = System.currentTimeMillis() + addedDelayForEPCheck;
+                                String[] urlElements = DataPublisherUtil.getProtocolHostPort(
+                                        dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
+                                if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                                    dataEndpoint.deactivate();
+                                }
+                            }
+                        } catch (DataEndpointConfigurationException exception) {
+                            log.warn("Data Endpoint with receiver URL:" +
+                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
+                                    + " could not be deactivated", exception);
+                        }
                     }
                 }
             }
