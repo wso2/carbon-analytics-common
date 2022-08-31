@@ -467,6 +467,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                         }
                     }
                 }
+                busyWait(1);
             }
         }
 
