@@ -39,6 +39,9 @@ import org.wso2.carbon.event.publisher.core.internal.ds.EventPublisherServiceVal
 import org.wso2.carbon.event.publisher.core.internal.util.helper.EventPublisherConfigurationHelper;
 import org.wso2.carbon.event.publisher.core.internal.util.helper.XmlFormatter;
 import org.wso2.carbon.event.stream.core.EventStreamService;
+import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -46,6 +49,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class EventPublisherConfigurationBuilder {
     private static final Log log = LogFactory.getLog(EventPublisherConfigurationBuilder.class);
@@ -204,6 +208,7 @@ public class EventPublisherConfigurationBuilder {
             }
         }
 
+        dynamicProperties = resolveSecrets(dynamicProperties);
         String toStreamName = "";
         String toStreamVersion = "";
 
@@ -276,6 +281,22 @@ public class EventPublisherConfigurationBuilder {
         eventPublisherConfiguration.setProcessEnabled(processingEnabled);
         return eventPublisherConfiguration;
 
+    }
+
+    private static Map<String, String> resolveSecrets(Map<String, String> dynamicProperties) {
+
+        Properties prop = new Properties();
+        dynamicProperties.forEach((key, value) -> {
+            if (value != null) {
+                prop.put(key, value);
+            }
+        });
+
+        SecretResolver secretResolver = SecretResolverFactory.create(prop);
+        if (secretResolver != null && secretResolver.isInitialized()) {
+            dynamicProperties.replaceAll((k, v) -> v == null ? null : MiscellaneousUtil.resolve(v, secretResolver));
+        }
+        return dynamicProperties;
     }
 
     public static String getMappingTypeFactoryClass(OMElement omElement) {
