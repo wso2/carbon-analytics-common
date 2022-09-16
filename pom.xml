@@ -749,7 +749,7 @@
         </equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>1.23</org.snakeyaml.version>
+        <org.snakeyaml.version>1.31</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
 
         <!-- Maven plugins -->
