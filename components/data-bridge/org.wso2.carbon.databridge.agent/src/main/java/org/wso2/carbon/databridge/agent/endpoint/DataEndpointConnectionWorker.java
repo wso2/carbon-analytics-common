@@ -90,23 +90,33 @@ public class DataEndpointConnectionWorker {
                     }
                     dataEndpoint.setReConnectTimestamp(System.currentTimeMillis() +
                             dataEndpoint.delayMap.get(receiverURL));
-                    log.warn("Next Reconnection attempt to Data endpoint : " +
-                            dataEndpoint.getDataEndpointConfiguration().getReceiverURL() +
-                            " will be after " + dataEndpoint.delayMap.get(receiverURL) / 1000 + " seconds");
                 }
                 if (isLoggingControl) {
                     if (loggingControlFlag.get()) {
                         if (dataEndpointConfiguration.isFailOverEndpoint()) {
                             log.info("Attempt to connect to the endpoint " +
-                                    dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed.");
+                                dataEndpoint.getDataEndpointConfiguration().getAuthURL() + " failed." + " " +
+                                "Next Reconnection attempt to Data endpoint : " +
+                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL() +
+                                " will be after " + dataEndpoint.delayMap.get(receiverURL) / 1000 + " seconds");
                             log.debug("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
                         } else {
                             log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                            if(reconnect) {
+                                log.warn("Next Reconnection attempt to Data endpoint : " +
+                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL() +
+                                    " will be after " + dataEndpoint.delayMap.get(receiverURL) / 1000 + " seconds");
+                            }
                         }
                         loggingControlFlag.set(false);
                     }
                 } else {
                     log.error("Error while trying to connect to the endpoint. " + e.getErrorMessage(), e);
+                    if(reconnect) {
+                        log.warn("Next Reconnection attempt to Data endpoint : " +
+                            dataEndpoint.getDataEndpointConfiguration().getReceiverURL() +
+                            " will be after " + dataEndpoint.delayMap.get(receiverURL) / 1000 + " seconds");
+                    }
                 }
                 dataEndpoint.deactivate();
             } catch (DataEndpointLoginException e) {
