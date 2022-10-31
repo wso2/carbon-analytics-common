@@ -81,6 +81,10 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>failureaccess</artifactId>
+        </dependency>
 
         <!-- databridge-agent dependencies -->
         <dependency>
@@ -178,11 +182,15 @@
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.yaml.snakeyaml</symbolicName>
-                                    <version>${org.snakeyaml.version}</version>
+                                    <version>${org.snakeyaml.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>com.google.guava</symbolicName>
                                     <version>${guava.bundle.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>com.google.guava.failureaccess</symbolicName>
+                                    <version>${guava.failureaccess.version}</version>
                                 </bundle>
 
                                 <!-- databridge-agent dependencies -->
