@@ -53,7 +53,7 @@ public class DataPublisher {
      */
     private DataEndpointAgent dataEndpointAgent;
 
-    private static final int FAILED_EVENT_LOG_INTERVAL = 10000;
+    private static int failedEventLogInterval = 10000;
 
     /**
      * The last failed event time kept, use to determine when to log an warning
@@ -90,6 +90,7 @@ public class DataPublisher {
         dataEndpointAgent = AgentHolder.getInstance().getDefaultDataEndpointAgent();
         processEndpoints(dataEndpointAgent, receiverURLSet, DataPublisherUtil.
                 getDefaultAuthURLSet(receiverURLSet), username, password);
+        failedEventLogInterval = dataEndpointAgent.getAgentConfiguration().getFailedEventLogInterval();
         dataEndpointAgent.addDataPublisher(this);
     }
 
@@ -129,6 +130,7 @@ public class DataPublisher {
             authURLSet = DataPublisherUtil.getDefaultAuthURLSet(receiverURLSet);
         }
         processEndpoints(dataEndpointAgent, receiverURLSet, authURLSet, username, password);
+        failedEventLogInterval = dataEndpointAgent.getAgentConfiguration().getFailedEventLogInterval();
         dataEndpointAgent.addDataPublisher(this);
     }
 
@@ -300,7 +302,7 @@ public class DataPublisher {
     private void onEventQueueFull(DataEndpointGroup endpointGroup, Event event) {
         this.failedEventCount++;
         long currentTime = System.currentTimeMillis();
-        if (currentTime - this.lastFailedEventTime > FAILED_EVENT_LOG_INTERVAL) {
+        if (currentTime - this.lastFailedEventTime > failedEventLogInterval) {
             log.warn("Event queue is full, unable to process the event for endpoint group "
                     + endpointGroup.toString() + ", " + this.failedEventCount + " events dropped so far.");
             this.lastFailedEventTime = currentTime;

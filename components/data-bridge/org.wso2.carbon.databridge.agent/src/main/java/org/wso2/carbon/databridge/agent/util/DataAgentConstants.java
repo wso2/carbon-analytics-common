@@ -50,6 +50,7 @@ public class DataAgentConstants {
     public static final String SECURE_MIN_IDLE_TIME_IN_POOL = "secureMinIdleTimeInPool";
     public static final String SSL_ENABLED_PROTOCOLS = "sslEnabledProtocols";
     public static final String CIPHERS = "ciphers";
+    public static final String FAILED_EVENT_LOG_INTERVAL = "failedEventLogInterval";
 
 
 
