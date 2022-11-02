@@ -86,7 +86,7 @@
     <!-- TODO Validate below -->
     <Match>
         <Class name="org.wso2.carbon.databridge.core.DataBridge"/>
-        <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+        <Bug pattern="IS2_INCONSISTENT_SYNC, RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
     </Match>
     <Match>
         <Class name="org.wso2.carbon.databridge.core.internal.EventDispatcher"/>
