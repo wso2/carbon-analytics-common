@@ -53,7 +53,7 @@ public class DataPublisher {
      */
     private DataEndpointAgent dataEndpointAgent;
 
-    private static int failedEventLogInterval = 10000;
+    private int failedEventLogInterval = 10000;
 
     /**
      * The last failed event time kept, use to determine when to log an warning
