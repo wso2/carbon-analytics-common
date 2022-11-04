@@ -40,7 +40,7 @@
     <dataReceiver name="Binary">
     {% for configuration_key,configuration_value in transport.binary.receiver.items() %}
       {% if configuration_key == "sslEnabledProtocols" || configuration_key == "ciphers" %}
-      <config name="configuration_key">{{configuration_value | join(',')}}</config>
+      <config name="{{configuration_key}}">{{configuration_value | join(',')}}</config>
       {%else%}
       <config name="{{configuration_key}}">{{configuration_value}}</config>
       {% endif %}
