@@ -298,75 +298,87 @@ public class ExternalIdPClient implements IdPClient {
 
     @Override
     public User getUser(String name) throws IdPClientException {
-        Response response = scimServiceStub.searchUser(ExternalIdPClientConstants.FILTER_PREFIX_USER + name);
-        if (response == null) {
-            String errorMessage = "Error occurred while retrieving user, '" + name + "'. Error : Response is null.";
-            LOG.error(errorMessage);
-            throw new IdPClientException(errorMessage);
+        // Ignore super tenant domain when retrieving the user data
+        if (name != null) {
+            name = name.split("@carbon.super")[0];
         }
-
-        JsonParser parser = new JsonParser();
-        if (response.status() == 200) {
-            String responseBody;
-            try (InputStream inputStream = response.body().asInputStream();
-                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
-                responseBody = bufferedReader.readLine();
-            } catch (IOException e) {
-                throw new IdPClientException("Error occurred while converting response from the scim2 endpoint for " +
-                        "user " + name + ".", e);
-            }
-            JsonObject userObject = parser.parse(responseBody).getAsJsonObject();
-            JsonArray users = userObject.get(ExternalIdPClientConstants.RESOURCES).getAsJsonArray();
-
-            if (users == null) {
-                return null;
+        try (Response response =
+                     scimServiceStub.searchUser(ExternalIdPClientConstants.FILTER_PREFIX_USER + name)) {
+            if (response == null) {
+                String errorMessage = "Error occurred while retrieving user, '" + name + "'. Error : Response is null.";
+                LOG.error(errorMessage);
+                throw new IdPClientException(errorMessage);
             }
 
-            JsonObject user = users.get(0).getAsJsonObject();
-            // Check if the user groups are there in the user object. If not do a separate call and get the user with
-            // roles.
-            JsonElement groupsElement = user.get(ExternalIdPClientConstants.SCIM2_GROUPS);
-            JsonArray groups;
-            if (groupsElement != null) {
-                groups = groupsElement.getAsJsonArray();
+            JsonParser parser = new JsonParser();
+            if (response.status() == 200) {
+                String responseBody;
+                try (InputStream inputStream = response.body().asInputStream();
+                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+                    responseBody = bufferedReader.readLine();
+                } catch (IOException e) {
+                    throw new IdPClientException("Error occurred while converting response from the scim2 " +
+                            "endpoint for user " + name + ".", e);
+                }
+                JsonObject userObject = parser.parse(responseBody).getAsJsonObject();
+                JsonArray users = userObject.get(ExternalIdPClientConstants.RESOURCES).getAsJsonArray();
+
+                if (users == null) {
+                    return null;
+                }
+
+                JsonObject user = users.get(0).getAsJsonObject();
+                // Check if the user groups are there in the user object.
+                // If not do a separate call and get the user with roles.
+                JsonElement groupsElement = user.get(ExternalIdPClientConstants.SCIM2_GROUPS);
+                JsonArray groups;
+                if (groupsElement != null) {
+                    groups = groupsElement.getAsJsonArray();
+                } else {
+                    String id = user.get(ExternalIdPClientConstants.SCIM2_ID).getAsString();
+                    Response userResponse = scimServiceStub.getUserByID(id);
+                    user = parser.parse(userResponse.body().toString()).getAsJsonObject();
+                    groups = user.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
+                }
+
+                // Get user roles
+                List<Role> allRolesInUserStore = getAllRoles();
+                List<String> groupNameList = new ArrayList<>();
+                groups.forEach(group -> {
+                    // In SCIM1 (IS 5.2.0) groupName doesn't contain the user store, but 5.7.0 it is. Hence,
+                    // prepending the user store if it is not available as a workaround.
+                    // Need a proper fix for this though.
+                    String groupName = group.getAsJsonObject()
+                            .get(ExternalIdPClientConstants.SCIM2_DISPLAY).getAsString();
+                    if (!groupName.contains("/")) {
+                        groupName = this.defaultUserStore + "/" + groupName;
+                    }
+                    groupNameList.add(groupName);
+                });
+
+                List<Role> roles = allRolesInUserStore.stream()
+                        .filter(role -> groupNameList.contains(role.getDisplayName()))
+                        .collect(Collectors.toList());
+
+                // Add user properties
+                Map<String, String> properties = new HashMap<>();
+                for (Map.Entry<String, JsonElement> entry : user.entrySet()) {
+                    if (!entry.getKey().equals(ExternalIdPClientConstants.SCIM2_USERNAME) ||
+                            !entry.getKey().equals(ExternalIdPClientConstants.SCIM2_GROUPS)) {
+                        properties.put(entry.getKey(), entry.getValue().toString());
+                    }
+                }
+                return new User(name, properties, roles);
             } else {
-                String id = user.get(ExternalIdPClientConstants.SCIM2_ID).getAsString();
-                Response userResponse = scimServiceStub.getUserByID(id);
-                user = parser.parse(userResponse.body().toString()).getAsJsonObject();
-                groups = user.get(ExternalIdPClientConstants.SCIM2_GROUPS).getAsJsonArray();
+                String errorMessage = "Error occurred while retrieving user, '" + name + "'. " +
+                        "HTTP error code: " + response.status() + " Error Response: " + response.body().toString();
+                LOG.error(errorMessage);
+                throw new IdPClientException(errorMessage);
             }
-
-            // Get user roles
-            List<Role> allRolesInUserStore = getAllRoles();
-            List<String> groupNameList = new ArrayList<>();
-            groups.forEach(group -> {
-                // In SCIM1 (IS 5.2.0) groupName doesn't contain the user store, but 5.7.0 it is. Hence prepending the
-                // user store if it is not available as a workaround. Need a proper fix for this though.
-                String groupName = group.getAsJsonObject().get(ExternalIdPClientConstants.SCIM2_DISPLAY).getAsString();
-                if (!groupName.contains("/")) {
-                    groupName = this.defaultUserStore + "/" + groupName;
-                }
-                groupNameList.add(groupName);
-            });
-
-            List<Role> roles = allRolesInUserStore.stream()
-                    .filter(role -> groupNameList.contains(role.getDisplayName()))
-                    .collect(Collectors.toList());
-
-            // Add user properties
-            Map<String, String> properties = new HashMap<>();
-            for (Map.Entry<String, JsonElement> entry : user.entrySet()) {
-                if (!entry.getKey().equals(ExternalIdPClientConstants.SCIM2_USERNAME) ||
-                        !entry.getKey().equals(ExternalIdPClientConstants.SCIM2_GROUPS)) {
-                    properties.put(entry.getKey(), entry.getValue().toString());
-                }
-            }
-            return new User(name, properties, roles);
-        } else {
-            String errorMessage = "Error occurred while retrieving user, '" + name + "'. " +
-                    "HTTP error code: " + response.status() + " Error Response: " + response.body().toString();
-            LOG.error(errorMessage);
-            throw new IdPClientException(errorMessage);
+        } catch (Error e) {
+            String errorMessage = "Error occurred while retrieving user, '" + name + "' from scim2 endpoint";
+            LOG.error(errorMessage, e);
+            throw new IdPClientException(errorMessage, e);
         }
     }
 
