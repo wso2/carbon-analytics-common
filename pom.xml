@@ -236,6 +236,12 @@
                 <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-core</artifactId>
                 <version>${siddhi.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.log4j.wso2</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
@@ -1527,7 +1533,7 @@
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
         <!--CEP versions-->
-        <siddhi.version>3.2.7</siddhi.version>
+        <siddhi.version>3.2.9</siddhi.version>
 
 
         <orbit.version.json>3.0.0.wso2v1</orbit.version.json>
