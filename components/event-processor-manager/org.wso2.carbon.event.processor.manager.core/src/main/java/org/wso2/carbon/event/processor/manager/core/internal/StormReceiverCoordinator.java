@@ -17,8 +17,6 @@
 */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
-import com.hazelcast.core.*;
-import com.hazelcast.cp.lock.FencedLock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.event.processor.manager.core.internal.ds.EventManagementServiceValueHolder;
@@ -29,15 +27,7 @@ public class StormReceiverCoordinator {
 
 
     public void tryBecomeCoordinator() {
-        HazelcastInstance hazelcastInstance = EventManagementServiceValueHolder.getHazelcastInstance();
-        if (hazelcastInstance != null) {
-            FencedLock lock = hazelcastInstance.getCPSubsystem().getLock("StormReceiverCoordinator");
-            boolean isCoordinator = lock.tryLock();
-            if(isCoordinator){
-                log.info("Node became Storm Receiver Coordinator");
-            }
-            EventManagementServiceValueHolder.getCarbonEventManagementService().getEventReceiverManagementService().setReceiverCoordinator(isCoordinator);
-        }
+        // removed hazelcast
     }
 
 

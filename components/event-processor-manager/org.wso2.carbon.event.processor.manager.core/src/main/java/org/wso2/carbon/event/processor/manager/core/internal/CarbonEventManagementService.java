@@ -17,10 +17,6 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
-import com.hazelcast.map.IMap;
-import com.hazelcast.cluster.MembershipEvent;
-import com.hazelcast.cluster.MembershipListener;
-import com.hazelcast.core.HazelcastInstance;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
@@ -65,9 +61,6 @@ public class CarbonEventManagementService implements EventManagementService {
 
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(3);
 
-    private HAManager haManager = null;
-    private IMap<String, Long> haEventPublisherTimeSyncMap = null;
-
     private PersistenceManager persistenceManager = null;
 
     private StormReceiverCoordinator stormReceiverCoordinator = null;
@@ -97,30 +90,6 @@ public class CarbonEventManagementService implements EventManagementService {
                 }
             }
         }
-    }
-
-    public void init(HazelcastInstance hazelcastInstance) {
-        if (mode == Mode.SingleNode) {
-            log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
-        }
-
-        hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
-            @Override
-            public void memberAdded(MembershipEvent membershipEvent) {
-                presenterEventHandler.registerLocalMember();
-                receiverEventHandler.registerLocalMember();
-                checkMemberUpdate();
-            }
-
-            @Override
-            public void memberRemoved(MembershipEvent membershipEvent) {
-                receiverEventHandler.removeMember(membershipEvent.getMember().getUuid().toString());
-                presenterEventHandler.removeMember(membershipEvent.getMember().getUuid().toString());
-                checkMemberUpdate();
-            }
-
-        });
-
     }
 
     private boolean validateHostName(String hostname) {
@@ -154,9 +123,6 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     public void shutdown() {
-        if (haManager != null) {
-            haManager.shutdown();
-        }
         if (executorService != null) {
             executorService.shutdown();
         }
@@ -242,38 +208,18 @@ public class CarbonEventManagementService implements EventManagementService {
 
     @Override
     public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp) {
-        haEventPublisherTimeSyncMap.putAsync(tenantId + "-" + publisherName, EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
+        // removed hazelcast
     }
 
     @Override
     public long getLatestEventSentTime(String publisherName, int tenantId) {
-        if (haEventPublisherTimeSyncMap == null) {
-            haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
-                    .getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
-        }
-        Long latestTimePublished = haEventPublisherTimeSyncMap.get(tenantId + "-" + publisherName);
-        if (latestTimePublished != null) {
-            return latestTimePublished;
-        }
+        // removed hazelcast
         return 0;
     }
 
     @Override
     public long getClusterTimeInMillis() {
-
-        if (EventManagementServiceValueHolder.getHazelcastInstance() == null) {
-            throw new RuntimeException("No HazelcastInstance found.");
-        }
-
-        if (EventManagementServiceValueHolder.getHazelcastInstance().getCluster() ==  null) {
-            throw new RuntimeException("No Cluster was found in the HazelcastInstance.");
-        }
-
-        try {
-            return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        throw new RuntimeException("No HazelcastInstance found.");
     }
 
     public void initPersistence() {
