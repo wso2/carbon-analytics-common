@@ -138,7 +138,7 @@ public class EventReceiver implements EventProducer {
                 if (distributedConfiguration != null) {
                     this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
-                sufficientToSend = mode != Mode.Distributed || (isWorkerNode && !isEventDuplicatedInCluster);
+                sufficientToSend = mode == Mode.SingleNode;
 
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" +

@@ -78,43 +78,20 @@ public class ManagementModeConfigurationLoader {
                     .getAttributeValue();
 
             if (enabled.equalsIgnoreCase("true")) {
-                if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_HA)) {
-                    managementModeInfo.setMode(Mode.HA);
-                    // Set HA Configurations.
-                    managementModeInfo.setHaConfiguration(getHAConfiguration(processingMode));
-                    // Set Persist Configurations.
-                    OMElement nodeConfig = processingMode
-                            .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
+                managementModeInfo.setMode(Mode.SingleNode);
 
-                    if (nodeConfig != null) {
-                        boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
-                        if(isPersistenceEnabled){
-                            managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig,isPersistenceEnabled));
-                            log.info("CEP started in Persistence enabled HA mode");
-                        }
-                    } else {
-                        log.info("CEP started in HA mode");
+                // Set Persist Configurations.
+                OMElement nodeConfig = processingMode
+                        .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
+
+                if (nodeConfig != null) {
+                    boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
+                    if (isPersistenceEnabled) {
+                        managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig, isPersistenceEnabled));
+                        log.info("CEP started in Persistence enabled Single Node mode");
                     }
-                } else if (attribute.equalsIgnoreCase(ConfigurationConstants.PROCESSING_MODE_DISTRIBUTED)) {
-                    managementModeInfo.setMode(Mode.Distributed);
-                    log.info("CEP started in Distributed mode");
-                    managementModeInfo.setDistributedConfiguration(getDistributedConfiguration(processingMode));
                 } else {
-                    managementModeInfo.setMode(Mode.SingleNode);
-
-                    // Set Persist Configurations.
-                    OMElement nodeConfig = processingMode
-                            .getFirstChildWithName(new QName(ConfigurationConstants.SN_PERSISTENCE_ELEMENT));
-
-                    if (nodeConfig != null) {
-                        boolean isPersistenceEnabled = nodeType(ConfigurationConstants.ENABLE_ATTRIBUTE, nodeConfig);
-                        if (isPersistenceEnabled) {
-                            managementModeInfo.setPersistenceConfiguration(getPersistConfigurations(nodeConfig, isPersistenceEnabled));
-                            log.info("CEP started in Persistence enabled Single Node mode");
-                        }
-                    } else {
-                        log.info("CEP started in Single node mode");
-                    }
+                    log.info("CEP started in Single node mode");
                 }
                 return managementModeInfo;
             }
@@ -452,66 +429,6 @@ public class ManagementModeConfigurationLoader {
 
 
         return stormDeploymentConfig;
-    }
-
-    private static HAConfiguration getHAConfiguration(OMElement processing) {
-
-        HAConfiguration haConfiguration = new HAConfiguration();
-
-        OMElement nodeType = processing.getFirstChildWithName(new QName(ConfigurationConstants.HA_NODE_TYPE));
-        String isWorkerEnabled = nodeType.getFirstChildWithName(new QName(ConfigurationConstants.HA_WORKER))
-                .getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
-        String isPresenterEnabled = nodeType.getFirstChildWithName(new QName(ConfigurationConstants.HA_PRESENTER))
-                .getAttribute(new QName(ConfigurationConstants.ENABLE_ATTRIBUTE)).getAttributeValue();
-        haConfiguration.setCheckMemberUpdateInterval(Integer.parseInt(readOMElementValue(processing, ConfigurationConstants
-                .HA_NODE_CONFIG_CHECK_MEMBER_UPDATE_INTERVAL)));
-
-        OMElement management = processing.getFirstChildWithName(new QName(ConfigurationConstants.MANAGEMENT_ELEMENT));
-        haConfiguration.setManagement(readHostName(management),
-                readPort(management, ConfigurationConstants.HA_DEFAULT_MANAGEMENT_PORT));
-        haConfiguration.setManagementTryStateChangeInterval(Integer.parseInt(readOMElementValue(management, ConfigurationConstants
-                .HA_NODE_CONFIG_MANAGEMENT_TRY_STATE_CHANGE_INTERVAL)));
-        haConfiguration.setManagementStateSyncRetryInterval(Integer.parseInt(readOMElementValue(management, ConfigurationConstants
-                .HA_NODE_CONFIG_MANAGEMENT_STATE_RETRY_INTERVAL)));
-
-        if (isWorkerEnabled.equalsIgnoreCase("true")) {
-            haConfiguration.setWorkerNode(true);
-            OMElement eventSync = processing.getFirstChildWithName(new QName(ConfigurationConstants.EVENT_SYNC_ELEMENT));
-            haConfiguration.setEventSyncConfig(readHostName(eventSync),
-                    readPort(eventSync, ConfigurationConstants.HA_DEFAULT_TRANSPORT_PORT));
-            haConfiguration.setEventSyncPublisherTcpSendBufferSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_TCP_SEND_BUFFER_SIZE)));
-            haConfiguration.setEventSyncPublisherCharSet(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_CHAR_SET));
-            haConfiguration.setEventSyncPublisherBufferSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE)));
-            haConfiguration.setEventSyncPublisherConnectionStatusCheckInterval(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
-            haConfiguration.setEventSyncReceiverQueueSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_RECEIVER_QUEUE_SIZE)));
-            haConfiguration.setEventSyncReceiverMaxQueueSizeInMb(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_RECEIVER_QUEUE_MAX_SIZE_MB)));
-            haConfiguration.setEventSyncPublisherQueueSize(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_QUEUE_SIZE)));
-            haConfiguration.setEventSyncPublisherMaxQueueSizeInMb(Integer.parseInt(readOMElementValue(eventSync, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_QUEUE_MAX_SIZE_MB)));
-        }
-        if (isPresenterEnabled.equalsIgnoreCase("true")) {
-            haConfiguration.setPresenterNode(true);
-            OMElement presentation = processing.getFirstChildWithName(new QName(ConfigurationConstants.PRESENTER_ELEMENT));
-            haConfiguration.setLocalPresenterConfig(readHostName(presentation),
-                    readPort(presentation, ConfigurationConstants.HA_DEFAULT_PRESENTER_PORT));
-            haConfiguration.setPresentationPublisherTcpSendBufferSize(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_TCP_SEND_BUFFER_SIZE)));
-            haConfiguration.setPresentationPublisherCharSet(readOMElementValue(presentation, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_CHAR_SET));
-            haConfiguration.setPresentationPublisherBufferSize(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_BUFFER_SIZE)));
-            haConfiguration.setPresentationPublisherConnectionStatusCheckInterval(Integer.parseInt(readOMElementValue(presentation, ConfigurationConstants
-                    .HA_NODE_CONFIG_PUBLISHER_CONNECTION_STATUS_CHECK_INTERVAL)));
-        }
-
-        return haConfiguration;
     }
 
     private static String readHostName(OMElement transport) {

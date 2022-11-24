@@ -384,13 +384,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     }
 
     public void prepareDestroy() {
-        if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA &&
-                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo()
-                        .getHaConfiguration().isWorkerNode()) {
-            EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
-                    eventPublisherConfiguration.getEventPublisherName(), tenantId,
-                    EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());
-        }
+        // removed hazelcast
     }
 
     public class EventWrapper {
