@@ -47,10 +47,6 @@
             <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

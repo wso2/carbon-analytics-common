@@ -17,13 +17,11 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal.ds;
 
-import com.hazelcast.core.HazelcastInstance;
 import org.wso2.carbon.event.processor.manager.core.internal.CarbonEventManagementService;
 
 
 public class EventManagementServiceValueHolder {
     private static CarbonEventManagementService carbonEventManagementService;
-    private static HazelcastInstance hazelcastInstance;
 
     public static CarbonEventManagementService getCarbonEventManagementService() {
         return carbonEventManagementService;
@@ -31,14 +29,6 @@ public class EventManagementServiceValueHolder {
 
     public static void setCarbonEventManagementService(CarbonEventManagementService eventManagementService) {
         EventManagementServiceValueHolder.carbonEventManagementService = eventManagementService;
-    }
-
-    public static void registerHazelcastInstance(HazelcastInstance hazelcastInstance) {
-        EventManagementServiceValueHolder.hazelcastInstance = hazelcastInstance;
-    }
-
-    public static HazelcastInstance getHazelcastInstance() {
-        return hazelcastInstance;
     }
 
 }

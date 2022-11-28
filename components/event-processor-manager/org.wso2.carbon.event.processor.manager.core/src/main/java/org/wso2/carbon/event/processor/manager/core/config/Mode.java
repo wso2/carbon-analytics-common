@@ -19,5 +19,5 @@
 package org.wso2.carbon.event.processor.manager.core.config;
 
 public enum Mode {
-    SingleNode, HA, Distributed
+    SingleNode
 }

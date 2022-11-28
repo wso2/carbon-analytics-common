@@ -17,9 +17,6 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.IMap;
-import com.hazelcast.cluster.Member;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,7 +45,6 @@ public class EventHandler {
 
     private TCPEventServer tcpEventServer = null;
 
-    private IMap<String, HostAndPort> members = null;
     private ConcurrentHashMap<HostAndPort, TCPEventPublisher> tcpEventPublisherPool = new ConcurrentHashMap<HostAndPort, TCPEventPublisher>();
     private ConcurrentHashMap<String, EventSync> eventSyncMap = new ConcurrentHashMap<String, EventSync>();
     private HostAndPort localMember;
@@ -60,29 +56,16 @@ public class EventHandler {
     public void init(String memberType, HostAndPort localMember,
                      TCPEventPublisherConfig localEventPublisherConfiguration, boolean isMemberNode) {
         this.isMemberNode = isMemberNode;
-        HazelcastInstance hazelcastInstance = EventManagementServiceValueHolder.getHazelcastInstance();
-        this.members = hazelcastInstance.getMap(memberType);
         this.localMember = localMember;
         registerLocalMember();
         this.localEventPublisherConfiguration = localEventPublisherConfiguration;
     }
 
     public void registerLocalMember() {
-        if (isMemberNode && members != null) {
-            this.members.set(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid().toString(), localMember);
-        }
-    }
-
-    public void removeMember(String uuid) {
-        if (members != null) {
-            members.remove(uuid);
-        }
+        // removed hazelcast
     }
 
     public void shutdown() {
-        if (members != null) {
-            members.remove(EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getLocalMember().getUuid());
-        }
         for (TCPEventPublisher publisher : tcpEventPublisherPool.values()) {
             publisher.shutdown();
         }
@@ -190,19 +173,7 @@ public class EventHandler {
     }
 
     private synchronized void updateEventPublishers() {
-        if (members != null) {
-            List<HostAndPort> memberList = new ArrayList<HostAndPort>(members.values());
-            memberList.remove(localMember);
-            List<HostAndPort> currentMembers = new ArrayList<>(tcpEventPublisherPool.keySet());
-            for (HostAndPort member : memberList) {
-                if (!currentMembers.remove(member)) {
-                    addEventPublisher(member);
-                }
-            }
-            for (HostAndPort member : currentMembers) {
-                removeEventPublisher(member);
-            }
-        }
+        // removed hazelcast
     }
 
     public synchronized void addEventPublisher(HostAndPort member) {
@@ -232,20 +203,7 @@ public class EventHandler {
     }
 
     private void cleanupMembers() {
-        if (members != null) {
-            Set<String> activeMemberUuidSet = new HashSet<String>();
-
-            for (Member member : EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getMembers()) {
-                activeMemberUuidSet.add(member.getUuid().toString());
-            }
-
-            List<String> currentMemberUuidList = new ArrayList<String>(members.keySet());
-            for (String memberUuid : currentMemberUuidList) {
-                if (!activeMemberUuidSet.contains(memberUuid)) {
-                    members.remove(memberUuid);
-                }
-            }
-        }
+        // removed hazelcast
     }
 
     public void allowEventSync(boolean allowEventSync) {

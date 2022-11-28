@@ -134,11 +134,6 @@
                 <artifactId>tyrus-standalone-client</artifactId>
                 <version>${org.glassfish.tyrus.wso2.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.com.hazelcast</groupId>
-                <artifactId>hazelcast</artifactId>
-                <version>${hazelcast.version}</version>
-            </dependency>
             <!--orbit dependencies end-->
 
             <!--carbon-kernel dependencies start-->
@@ -1578,7 +1573,6 @@
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
         <xerces.xercesImpl.version>2.12.0</xerces.xercesImpl.version>
-        <hazelcast.version>4.2.5.wso2v1</hazelcast.version>
 
         <httpclient.httpcomponents.wso2.version>4.5.13.wso2v1</httpclient.httpcomponents.wso2.version>
         <httpcore.httpcomponents.wso2.version>4.4.14.wso2v1</httpcore.httpcomponents.wso2.version>

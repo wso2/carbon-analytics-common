@@ -174,27 +174,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
                     eventPublisherConfiguration.getEventPublisherName() + ", " +
                     e.getMessage(), e);
         }
-
-        ManagementModeInfo managementModeInfo = EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo();
-        mode = managementModeInfo.getMode();
-        if (mode == Mode.Distributed || mode == Mode.HA) {
-            syncId = EventManagementUtil.constructEventSyncId(tenantId,
-                    eventPublisherConfiguration.getToAdapterConfiguration().getName(),
-                    Manager.ManagerType.Publisher);
-
-            streamDefinition = EventManagementUtil.constructDatabridgeStreamDefinition(syncId, inputStreamDefinition);
-
-            if (mode == Mode.Distributed && managementModeInfo.getDistributedConfiguration().isWorkerNode()) {
-                sendToOther = true;
-            } else if (mode == Mode.HA && managementModeInfo.getHaConfiguration().isWorkerNode()) {
-                sendToOther = true;
-                HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-                eventQueue = new BlockingEventQueue(haConfiguration.getEventSyncPublisherMaxQueueSizeInMb(),
-                        haConfiguration.getEventSyncPublisherQueueSize());
-            }
-            EventPublisherServiceValueHolder.getEventManagementService()
-                    .registerEventSync(this, Manager.ManagerType.Publisher);
-        }
     }
 
     public EventPublisherConfiguration getEventPublisherConfiguration() {
@@ -211,47 +190,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
             process(event);
         } else {
             if (!EventPublisherServiceValueHolder.getCarbonEventPublisherManagementService().isDrop()) {
-                if (mode == Mode.HA) {
-                    // Is queue not empty send events from last time.
-                    long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
-                    if (!eventQueue.isEmpty()) {
-                        long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
-                                .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
-                        while (!eventQueue.isEmpty()) {
-                            EventWrapper eventWrapper = eventQueue.poll();
-                            if (eventWrapper.getTimestampInMillis() > lastProcessedTime) {
-                                process(eventWrapper.getEvent());
-                            }
-                        }
-                    }
-                    EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
-                            eventPublisherConfiguration.getEventPublisherName(), tenantId, currentTime);
-                }
                 process(event);
-            } else {
-                if (mode == Mode.HA) {
-                    // Add to Queue.
-                    long currentTime = EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis();
-                    EventWrapper eventWrapper = new EventWrapper(event, currentTime);
-                    while (!eventQueue.offer(eventWrapper)) {
-                        EventWrapper wrapper = eventQueue.poll();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Dropping event arrived at " + wrapper.getTimestampInMillis() +
-                                    " due to insufficient capacity at Event Publisher Queue, dropped event: " +
-                                    wrapper.getEvent());
-                        }
-                    }
-
-                    // Get last processed time and remove old events from the queue.
-                    long lastProcessedTime = EventPublisherServiceValueHolder.getEventManagementService()
-                            .getLatestEventSentTime(eventPublisherConfiguration.getEventPublisherName(), tenantId);
-
-                    synchronized (this) {
-                        while (!eventQueue.isEmpty() && eventQueue.peek().getTimestampInMillis() <= lastProcessedTime) {
-                            eventQueue.remove();
-                        }
-                    }
-                }
             }
         }
     }
@@ -360,10 +299,6 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     }
 
     public void destroy() {
-        if (mode == Mode.Distributed || mode == Mode.HA) {
-            EventPublisherServiceValueHolder.getEventManagementService()
-                    .unregisterEventSync(syncId, Manager.ManagerType.Publisher);
-        }
         EventPublisherServiceValueHolder.getOutputEventAdapterService()
                 .destroy(eventPublisherConfiguration.getEventPublisherName());
     }
@@ -449,13 +384,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
     }
 
     public void prepareDestroy() {
-        if (EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo().getMode() == Mode.HA &&
-                EventPublisherServiceValueHolder.getEventManagementService().getManagementModeInfo()
-                        .getHaConfiguration().isWorkerNode()) {
-            EventPublisherServiceValueHolder.getEventManagementService().updateLatestEventSentTime(
-                    eventPublisherConfiguration.getEventPublisherName(), tenantId,
-                    EventPublisherServiceValueHolder.getEventManagementService().getClusterTimeInMillis());
-        }
+        // removed hazelcast
     }
 
     public class EventWrapper {

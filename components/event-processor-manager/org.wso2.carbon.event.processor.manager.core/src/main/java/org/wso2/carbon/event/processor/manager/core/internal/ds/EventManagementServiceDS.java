@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal.ds;
 
-import com.hazelcast.core.HazelcastInstance;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
@@ -58,23 +57,6 @@ public class EventManagementServiceDS {
     protected void deactivate(ComponentContext context) {
 
         EventManagementServiceValueHolder.getCarbonEventManagementService().shutdown();
-    }
-
-    @Reference(
-            name = "hazelcast.instance.service",
-            service = com.hazelcast.core.HazelcastInstance.class,
-            cardinality = ReferenceCardinality.OPTIONAL,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetHazelcastInstance")
-    protected void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
-
-        EventManagementServiceValueHolder.registerHazelcastInstance(hazelcastInstance);
-        EventManagementServiceValueHolder.getCarbonEventManagementService().init(hazelcastInstance);
-    }
-
-    protected void unsetHazelcastInstance(HazelcastInstance hazelcastInstance) {
-
-        EventManagementServiceValueHolder.registerHazelcastInstance(null);
     }
 
     @Reference(

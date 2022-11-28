@@ -138,7 +138,7 @@ public class EventReceiver implements EventProducer {
                 if (distributedConfiguration != null) {
                     this.isWorkerNode = distributedConfiguration.isWorkerNode();
                 }
-                sufficientToSend = mode != Mode.Distributed || (isWorkerNode && !isEventDuplicatedInCluster);
+                sufficientToSend = mode == Mode.SingleNode;
 
             } catch (InputEventAdapterException e) {
                 throw new EventReceiverConfigurationException("Cannot subscribe to input event adapter :" +
@@ -147,26 +147,7 @@ public class EventReceiver implements EventProducer {
                 throw new EventReceiverProcessingException("Cannot subscribe to input event adapter :" +
                         inputEventAdapterName + ", error while connecting by adapter. " + e.getMessage(), e);
             }
-            this.mode = mode;
-            if (mode == Mode.HA) {
-                HAConfiguration haConfiguration = EventReceiverServiceValueHolder.getEventManagementService()
-                        .getManagementModeInfo().getHaConfiguration();
-                Lock readLock = EventReceiverServiceValueHolder.getCarbonEventReceiverManagementService().getReadLock();
-                inputEventDispatcher = new QueueInputEventDispatcher(tenantId,
-                        EventManagementUtil.constructEventSyncId(tenantId,
-                                eventReceiverConfiguration.getEventReceiverName(), Manager.ManagerType.Receiver),
-                        readLock, exportedStreamDefinition, haConfiguration.getEventSyncReceiverMaxQueueSizeInMb(),
-                        haConfiguration.getEventSyncReceiverQueueSize());
-                inputEventDispatcher.setSendToOther(!isEventDuplicatedInCluster);
-                EventReceiverServiceValueHolder.getEventManagementService()
-                        .registerEventSync((EventSync) inputEventDispatcher, Manager.ManagerType.Receiver);
-            } else {
-                inputEventDispatcher = new InputEventDispatcher();
-            }
-
-            if (mode == Mode.HA && isEventDuplicatedInCluster) {
-                EventReceiverServiceValueHolder.getInputEventAdapterService().start(inputEventAdapterName);
-            }
+            inputEventDispatcher = new InputEventDispatcher();
         }
     }
 
@@ -335,10 +316,6 @@ public class EventReceiver implements EventProducer {
     public void destroy() {
         EventReceiverServiceValueHolder.getInputEventAdapterService()
                 .destroy(eventReceiverConfiguration.getFromAdapterConfiguration().getName());
-        if (mode == Mode.HA && inputEventDispatcher instanceof EventSync) {
-            EventReceiverServiceValueHolder.getEventManagementService().unregisterEventSync(
-                    ((EventSync) inputEventDispatcher).getStreamDefinition().getStreamId(), Manager.ManagerType.Receiver);
-        }
     }
 
     public boolean isEventDuplicatedInCluster() {

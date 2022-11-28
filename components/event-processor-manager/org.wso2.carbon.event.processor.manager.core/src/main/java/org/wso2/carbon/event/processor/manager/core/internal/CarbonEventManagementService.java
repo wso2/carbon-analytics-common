@@ -17,10 +17,6 @@
  */
 package org.wso2.carbon.event.processor.manager.core.internal;
 
-import com.hazelcast.map.IMap;
-import com.hazelcast.cluster.MembershipEvent;
-import com.hazelcast.cluster.MembershipListener;
-import com.hazelcast.core.HazelcastInstance;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.Event;
@@ -65,9 +61,6 @@ public class CarbonEventManagementService implements EventManagementService {
 
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(3);
 
-    private HAManager haManager = null;
-    private IMap<String, Long> haEventPublisherTimeSyncMap = null;
-
     private PersistenceManager persistenceManager = null;
 
     private StormReceiverCoordinator stormReceiverCoordinator = null;
@@ -85,28 +78,7 @@ public class CarbonEventManagementService implements EventManagementService {
         } catch (ManagementConfigurationException e) {
             throw new EventManagementException("Error getting management mode information", e);
         }
-        if (mode == Mode.HA) {
-            // HA Configuration.
-            HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-            isWorkerNode = haConfiguration.isWorkerNode();
-            isPresenterNode = haConfiguration.isPresenterNode();
-            if (isWorkerNode) {
-                // Persistence Configuration.
-                PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();
-                if (persistConfig != null) {
-                    ScheduledExecutorService scheduledExecutorService = Executors
-                            .newScheduledThreadPool(persistConfig.getThreadPoolSize());
-                    long persistenceTimeInterval = persistConfig.getPersistenceTimeInterval();
-                    if (persistenceTimeInterval > 0) {
-                        persistenceManager = new PersistenceManager(scheduledExecutorService, persistenceTimeInterval);
-                    }
-                }
-                receiverEventHandler.startServer(haConfiguration.getEventSyncConfig());
-            }
-            if (isPresenterNode && !isWorkerNode) {
-                presenterEventHandler.startServer(haConfiguration.getLocalPresenterConfig());
-            }
-        } else if (mode == Mode.SingleNode) {
+        if (mode == Mode.SingleNode) {
             PersistenceConfiguration persistConfig = managementModeInfo.getPersistenceConfiguration();
             if (persistConfig != null) {
                 ScheduledExecutorService scheduledExecutorService = Executors
@@ -117,99 +89,7 @@ public class CarbonEventManagementService implements EventManagementService {
                     persistenceManager.init();
                 }
             }
-        } else if (mode == Mode.Distributed) {
-            DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
-            isManagerNode = distributedConfiguration.isManagerNode();
-            isWorkerNode = distributedConfiguration.isWorkerNode();
-            if (isWorkerNode) {
-                stormReceiverCoordinator = new StormReceiverCoordinator();
-            }
-            isPresenterNode = distributedConfiguration.isPresenterNode();
-            if (isPresenterNode) {
-                presenterEventHandler.startServer(distributedConfiguration.getLocalPresenterConfig());
-            }
         }
-    }
-
-    public void init(HazelcastInstance hazelcastInstance) {
-        if (mode == Mode.HA) {
-            HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-            if (isWorkerNode) {
-
-                if(! validateHostName(haConfiguration.getEventSyncConfig().getHostName())){
-                    log.error("Hostname : "+ haConfiguration.getEventSyncConfig().getHostName() +" defined for " +
-                            "eventSync configuration is invalid. Please add proper IP address " +
-                            "of the node. This IP address is used by other nodes in the cluster to communicate.");
-                }
-
-                if(! validateHostName(haConfiguration.getManagementConfig().getHostName())){
-                    log.error("Hostname : "+ haConfiguration.getManagementConfig().getHostName() +" defined for " +
-                            "management configuration is invalid. Please add proper IP " +
-                            "address of the node. This IP address is used by other nodes in the cluster to communicate.");
-                }
-
-                receiverEventHandler.init(ConfigurationConstants.RECEIVERS, haConfiguration.getEventSyncConfig(),
-                        haConfiguration.constructEventSyncPublisherConfig(), isWorkerNode);
-                haManager = new HAManager(hazelcastInstance, haConfiguration, executorService, receiverEventHandler, presenterEventHandler);
-                haManager.init();
-                if (haEventPublisherTimeSyncMap == null) {
-                    haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance().getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
-                }
-            }
-
-            if(isPresenterNode && (! validateHostName(haConfiguration.getLocalPresenterConfig().getHostName()))){
-                log.error("Hostname : "+ haConfiguration.getLocalPresenterConfig().getHostName() +" defined for " +
-                        "presentation purpose is invalid. Please add proper IP address of the " +
-                        "node. This IP address is used by other nodes in the cluster to communicate.");
-            }
-
-            presenterEventHandler.init(ConfigurationConstants.PRESENTERS, haConfiguration.getLocalPresenterConfig(),
-                    haConfiguration.constructPresenterPublisherConfig(), isPresenterNode && !isWorkerNode);
-            checkMemberUpdate();
-        } else if (mode == Mode.Distributed) {
-            if (stormReceiverCoordinator != null) {
-                stormReceiverCoordinator.tryBecomeCoordinator();
-            }
-            DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
-            presenterEventHandler.init(ConfigurationConstants.PRESENTERS, distributedConfiguration
-                    .getLocalPresenterConfig(), distributedConfiguration.constructPresenterPublisherConfig(), isPresenterNode);
-            checkMemberUpdate();
-        } else if (mode == Mode.SingleNode) {
-            log.warn("CEP started with clustering enabled, but SingleNode configuration given.");
-        }
-
-        hazelcastInstance.getCluster().addMembershipListener(new MembershipListener() {
-            @Override
-            public void memberAdded(MembershipEvent membershipEvent) {
-                presenterEventHandler.registerLocalMember();
-                receiverEventHandler.registerLocalMember();
-                checkMemberUpdate();
-                if (mode == Mode.HA) {
-                    if (isWorkerNode && haManager != null) {
-                        haManager.verifyState();
-                    }
-                }
-
-            }
-
-            @Override
-            public void memberRemoved(MembershipEvent membershipEvent) {
-                receiverEventHandler.removeMember(membershipEvent.getMember().getUuid().toString());
-                presenterEventHandler.removeMember(membershipEvent.getMember().getUuid().toString());
-                checkMemberUpdate();
-                if (mode == Mode.HA) {
-                    if (isWorkerNode && haManager != null) {
-                        haManager.tryChangeState();
-                    }
-                } else if (mode == Mode.Distributed) {
-                    if (stormReceiverCoordinator != null) {
-                        stormReceiverCoordinator.tryBecomeCoordinator();
-                    }
-                }
-            }
-
-        });
-
     }
 
     private boolean validateHostName(String hostname) {
@@ -222,8 +102,7 @@ public class CarbonEventManagementService implements EventManagementService {
         if ((mode == Mode.SingleNode || isWorkerNode ) && receiverManager != null) {
             receiverManager.start();
         }
-        if (((mode == Mode.Distributed || mode == Mode.HA) && isWorkerNode || mode == Mode.SingleNode)
-                && receiverManager != null)  {
+        if (mode == Mode.SingleNode && receiverManager != null)  {
             executorService.schedule(new Runnable() {
                 @Override
                 public void run() {
@@ -241,29 +120,9 @@ public class CarbonEventManagementService implements EventManagementService {
                 }
             }, ConfigurationConstants.AXIS_TIME_INTERVAL_IN_MILLISECONDS * 4, TimeUnit.MILLISECONDS);
         }
-
-        int checkMemberUpdateInterval = 10 * 1000;
-        if (mode == Mode.Distributed) {
-            DistributedConfiguration distributedConfiguration = managementModeInfo.getDistributedConfiguration();
-            checkMemberUpdateInterval = distributedConfiguration.getMemberUpdateCheckInterval();
-        } else if (mode == Mode.HA) {
-            HAConfiguration haConfiguration = managementModeInfo.getHaConfiguration();
-            checkMemberUpdateInterval = haConfiguration.getCheckMemberUpdateInterval();
-        }
-        if (mode == Mode.Distributed || mode == Mode.HA) {
-            executorService.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    checkMemberUpdate();
-                }
-            }, checkMemberUpdateInterval, checkMemberUpdateInterval, TimeUnit.MILLISECONDS);
-        }
     }
 
     public void shutdown() {
-        if (haManager != null) {
-            haManager.shutdown();
-        }
         if (executorService != null) {
             executorService.shutdown();
         }
@@ -275,11 +134,6 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     public byte[] getState() {
-        if (mode == Mode.HA) {
-            if (isWorkerNode) {
-                return haManager.getState();
-            }
-        }
         return null;
     }
 
@@ -348,52 +202,24 @@ public class CarbonEventManagementService implements EventManagementService {
     }
 
     private void checkMemberUpdate() {
-
-        if (isWorkerNode) {
-            if (mode == Mode.HA) {
-                receiverEventHandler.checkMemberUpdate();
-                presenterEventHandler.checkMemberUpdate();
-            } else if (mode == Mode.Distributed) {
-                presenterEventHandler.checkMemberUpdate();
-            }
-        }
+        // Distributed and HA has been removed
     }
 
 
     @Override
     public void updateLatestEventSentTime(String publisherName, int tenantId, long timestamp) {
-        haEventPublisherTimeSyncMap.putAsync(tenantId + "-" + publisherName, EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime());
+        // removed hazelcast
     }
 
     @Override
     public long getLatestEventSentTime(String publisherName, int tenantId) {
-        if (haEventPublisherTimeSyncMap == null) {
-            haEventPublisherTimeSyncMap = EventManagementServiceValueHolder.getHazelcastInstance()
-                    .getMap(ConfigurationConstants.HA_EVENT_PUBLISHER_TIME_SYNC_MAP);
-        }
-        Long latestTimePublished = haEventPublisherTimeSyncMap.get(tenantId + "-" + publisherName);
-        if (latestTimePublished != null) {
-            return latestTimePublished;
-        }
+        // removed hazelcast
         return 0;
     }
 
     @Override
     public long getClusterTimeInMillis() {
-
-        if (EventManagementServiceValueHolder.getHazelcastInstance() == null) {
-            throw new RuntimeException("No HazelcastInstance found.");
-        }
-
-        if (EventManagementServiceValueHolder.getHazelcastInstance().getCluster() ==  null) {
-            throw new RuntimeException("No Cluster was found in the HazelcastInstance.");
-        }
-
-        try {
-            return EventManagementServiceValueHolder.getHazelcastInstance().getCluster().getClusterTime();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        throw new RuntimeException("No HazelcastInstance found.");
     }
 
     public void initPersistence() {
