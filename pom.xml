@@ -1443,7 +1443,7 @@
         <url>https://github.com/wso2/carbon-analytics-common.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics-common.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics-common.git</connection>
-        <tag>v5.2.48</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <pluginRepositories>
