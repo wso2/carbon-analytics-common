@@ -777,7 +777,7 @@
 
         <osgi.framework.import.version.range>[1.8.0, 2.0.0)</osgi.framework.import.version.range>
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
-        <carbon.kernel.version>5.3.0-alpha</carbon.kernel.version>
+        <carbon.kernel.version>5.3.0</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
         <slf4j.version>1.7.35</slf4j.version>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
@@ -810,7 +810,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Datasources -->
-        <carbon.datasources.version>1.1.13</carbon.datasources.version>
+        <carbon.datasources.version>1.1.14</carbon.datasources.version>
         <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
 
         <feign.version>11.0</feign.version>
