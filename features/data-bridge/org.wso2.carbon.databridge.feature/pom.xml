@@ -70,8 +70,8 @@
             <artifactId>org.wso2.carbon.databridge.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.directory.studio</groupId>
-            <artifactId>org.apache.commons.io</artifactId>
+            <groupId>commons-io.wso2</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
@@ -177,8 +177,8 @@
                                     <version>${carbon.analytics.common.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.apache.commons.io</symbolicName>
-                                    <version>${apache.commons.io.version}</version>
+                                    <symbolicName>commons-io</symbolicName>
+                                    <version>${commons.io.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.yaml.snakeyaml</symbolicName>

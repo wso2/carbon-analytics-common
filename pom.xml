@@ -288,9 +288,9 @@
                 <version>${httpclient.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.directory.studio</groupId>
-                <artifactId>org.apache.commons.io</artifactId>
-                <version>${apache.commons.io.version}</version>
+                <groupId>commons-io.wso2</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-pool.wso2</groupId>
