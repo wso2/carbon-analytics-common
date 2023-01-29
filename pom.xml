@@ -1558,8 +1558,8 @@
         <google.jsmpp.version>2.0.1</google.jsmpp.version>
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
-        <jsonpath.version>2.4.0.wso2v2</jsonpath.version>
-        <jayway.jsonpath.orbit.version>2.4.0.wso2v2</jayway.jsonpath.orbit.version>
+        <jsonpath.version>2.6.0.wso2v1</jsonpath.version>
+        <jayway.jsonpath.orbit.version>2.6.0.wso2v1</jayway.jsonpath.orbit.version>
         <jsonsmart.version>1.2</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
