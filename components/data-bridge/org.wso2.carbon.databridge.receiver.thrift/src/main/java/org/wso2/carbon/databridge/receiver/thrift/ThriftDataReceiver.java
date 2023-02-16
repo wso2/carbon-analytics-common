@@ -42,14 +42,14 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import javax.net.ssl.SSLServerSocket;
 
 /**
@@ -236,7 +236,8 @@ public class ThriftDataReceiver {
                     public Thread newThread(Runnable r) {
                         Thread thread = new Thread(r);
                         thread.setDaemon(true);
-                        thread.setName(String.format("TThreadPoolServer WorkerProcess-%d", this.count.getAndIncrement()));
+                        thread.setName(String.format("TThreadPoolServer WorkerProcess-%d",
+                                this.count.getAndIncrement()));
                         return thread;
                     }
                 });

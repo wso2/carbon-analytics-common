@@ -82,6 +82,10 @@
         <Class name="org.wso2.carbon.databridge.core.DataBridge"/>
         <Bug pattern="NP_NULL_PARAM_DEREF"/>
     </Match>
+    <Match>
+        <Package name="org.wso2.carbon.databridge.commons.thrift.service.general"/>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+    </Match>
 
     <!-- TODO Validate below -->
     <Match>
