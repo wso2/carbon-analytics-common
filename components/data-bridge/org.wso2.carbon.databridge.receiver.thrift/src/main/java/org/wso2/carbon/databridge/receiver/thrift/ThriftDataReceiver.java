@@ -42,6 +42,11 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -186,7 +191,18 @@ public class ThriftDataReceiver {
             args.minWorkerThreads = thriftDataReceiverConfiguration.getSslMinWorkerThreads();
         }
         if (thriftDataReceiverConfiguration.getSslRequestTimeout() != ThriftDataReceiverConstants.UNDEFINED) {
-            args.requestTimeout = thriftDataReceiverConfiguration.getSslRequestTimeout();
+            args.executorService = new ThreadPoolExecutor(args.minWorkerThreads, args.maxWorkerThreads,
+                    thriftDataReceiverConfiguration.getSslRequestTimeout(), TimeUnit.SECONDS,
+                    new SynchronousQueue(), new ThreadFactory() {
+                final AtomicLong count = new AtomicLong();
+
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r);
+                    thread.setDaemon(true);
+                    thread.setName(String.format("TThreadPoolServer WorkerProcess-%d", this.count.getAndIncrement()));
+                    return thread;
+                }
+            });
         }
         if (thriftDataReceiverConfiguration.getSslStopTimeoutVal() != ThriftDataReceiverConstants.UNDEFINED) {
             args.stopTimeoutVal = thriftDataReceiverConfiguration.getSslStopTimeoutVal();
@@ -212,7 +228,18 @@ public class ThriftDataReceiver {
                 args.minWorkerThreads = thriftDataReceiverConfiguration.getTcpMinWorkerThreads();
             }
             if (thriftDataReceiverConfiguration.getTcpRequestTimeout() != ThriftDataReceiverConstants.UNDEFINED) {
-                args.requestTimeout = thriftDataReceiverConfiguration.getTcpRequestTimeout();
+                args.executorService = new ThreadPoolExecutor(args.minWorkerThreads, args.maxWorkerThreads,
+                        thriftDataReceiverConfiguration.getTcpRequestTimeout(), TimeUnit.SECONDS,
+                        new SynchronousQueue(), new ThreadFactory() {
+                    final AtomicLong count = new AtomicLong();
+
+                    public Thread newThread(Runnable r) {
+                        Thread thread = new Thread(r);
+                        thread.setDaemon(true);
+                        thread.setName(String.format("TThreadPoolServer WorkerProcess-%d", this.count.getAndIncrement()));
+                        return thread;
+                    }
+                });
             }
             if (thriftDataReceiverConfiguration.getTcpStopTimeoutVal() != ThriftDataReceiverConstants.UNDEFINED) {
                 args.stopTimeoutVal = thriftDataReceiverConfiguration.getTcpStopTimeoutVal();
