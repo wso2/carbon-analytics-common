@@ -42,10 +42,11 @@ public class ThriftClientPoolFactory extends AbstractClientPoolFactory {
             int socketTimeout = AgentHolder.getInstance().
                     getDataEndpointAgent(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE).
                     getAgentConfiguration().getSocketTimeoutMS();
-            TTransport receiverTransport = new TSocket(hostName, port, socketTimeout);
-            TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
-            ThriftEventTransmissionService.Client client = new ThriftEventTransmissionService.Client(tProtocol);
+            ThriftEventTransmissionService.Client client;
             try {
+                TTransport receiverTransport = new TSocket(hostName, port, socketTimeout);
+                TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
+                client = new ThriftEventTransmissionService.Client(tProtocol);
                 receiverTransport.open();
             } catch (TTransportException e) {
                 throw new DataEndpointException("Error while making the connection." + e.getMessage(), e);
