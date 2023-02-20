@@ -38,11 +38,11 @@ public class ManagementServiceClientThriftImpl implements ManagementServiceClien
     @Override
     public byte[] getSnapshot(HostAndPort activeMember) {
 
-        TTransport receiverTransport;
-        receiverTransport = new TSocket((activeMember.getHostName()), activeMember.getPort());
-        TProtocol protocol = new TBinaryProtocol(receiverTransport);
-        ManagementService.Client client = new ManagementService.Client(protocol);
+        ManagementService.Client client;
         try {
+            TTransport receiverTransport = new TSocket((activeMember.getHostName()), activeMember.getPort());
+            TProtocol protocol = new TBinaryProtocol(receiverTransport);
+            client = new ManagementService.Client(protocol);
             receiverTransport.open();
         } catch (TTransportException e) {
             throw new RuntimeException("Error in connecting to " + activeMember.getHostName() + ":" + activeMember.getPort());
