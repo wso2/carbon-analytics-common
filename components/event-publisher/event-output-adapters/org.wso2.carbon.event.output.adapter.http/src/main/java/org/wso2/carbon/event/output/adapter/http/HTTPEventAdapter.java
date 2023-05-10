@@ -40,6 +40,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 public class HTTPEventAdapter implements OutputEventAdapter {
@@ -297,6 +298,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
 
         public void run() {
 
+            UUID uuid = UUID.randomUUID();
             EntityEnclosingMethod method = null;
 
             try {
@@ -333,12 +335,15 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 int responseCode = this.getHttpClient().executeMethod(hostConfiguration, method);
                 if (responseCode / 100 == 2) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Successfully connected to the endpoint. Received HTTP response code is : " +
-                                responseCode);
+                        log.debug("[Id: " + uuid +  "] " +
+                                "Successfully connected to the endpoint: " + this.url +
+                                ". Received HTTP response code is: " + responseCode +
+                                ". Response body : " + method.getResponseBodyAsString());
                     }
                 } else {
-                    log.error("Error while connecting the endpoint. Received HTTP response code is : " +
-                            responseCode + " Error details : " + new String(method.getResponseBody()));
+                    log.error("[Id: " + uuid + "] Error while connecting to the endpoint: " + this.url +
+                            ". Received HTTP response code is: " + responseCode +
+                            ". Response body: " + method.getResponseBodyAsString());
                 }
             } catch (UnknownHostException e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
