@@ -1564,7 +1564,7 @@
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
         <testng.version>6.11</testng.version>
-        <snakeyaml.version>1.11</snakeyaml.version>
+        <snakeyaml.version>2.0</snakeyaml.version>
         <antlr.version>4.5</antlr.version>
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
@@ -1596,9 +1596,9 @@
         <clearspring.analytics.stream.version>2.9.5.wso2v1</clearspring.analytics.stream.version>
         <kyro.version>2.24.0</kyro.version>
         <akka.version>2.3.11</akka.version>
-        <jackson.version>2.4.4</jackson.version>
+        <jackson.version>2.15.0</jackson.version>
         <jackson.module.scala.orbit.version>2.4.4.wso2v1</jackson.module.scala.orbit.version>
-        <jackson-annotations.version>2.4.4</jackson-annotations.version>
+        <jackson-annotations.version>2.15.0</jackson-annotations.version>
         <snappy.version>1.1.2.1</snappy.version>
         <org.jboss.netty.version>3.9.0.Final</org.jboss.netty.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
