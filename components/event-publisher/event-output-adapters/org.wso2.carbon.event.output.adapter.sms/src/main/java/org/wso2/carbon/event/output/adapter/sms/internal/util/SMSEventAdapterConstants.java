@@ -33,4 +33,36 @@ public final class SMSEventAdapterConstants {
     public static final int MAX_THREAD = 100;
     public static final long DEFAULT_KEEP_ALIVE_TIME = 20;
     public static final String SMS_SEPARATOR =  ",";
+
+    /**
+     * Define logging constants.
+     */
+    public static class LogConstants {
+
+        private LogConstants() {
+        }
+        public static final String SMS_EVENT_ADAPTER_SERVICE = "sms-event-adapter-service";
+
+        /**
+         * Define action IDs for diagnostic logs.
+         */
+        public static class ActionIDs {
+
+            private ActionIDs() {
+            }
+
+            public static final String HANDOVER_EVENT = "handover-event";
+        }
+
+        /**
+         * Define common and reusable Input keys for diagnostic logs.
+         */
+        public static class InputKeys {
+
+            private InputKeys() {
+            }
+            public static final String EMAIL_TO = "sms to";
+            public static final String TENANT_DOMAIN = "tenant domain";
+        }
+    }
 }

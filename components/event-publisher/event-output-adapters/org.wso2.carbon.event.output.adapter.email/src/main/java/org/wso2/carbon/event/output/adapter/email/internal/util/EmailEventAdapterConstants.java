@@ -66,5 +66,35 @@ public class EmailEventAdapterConstants {
     public static final String MAIL_SMTP_REPLY_TO = "mail.smtp.replyTo";
     public static final String MAIL_SMTP_SIGNATURE = "mail.smtp.signature";
 
+    /**
+     * Define logging constants.
+     */
+    public static class LogConstants {
 
+        private LogConstants() {
+        }
+        public static final String EMAIL_EVENT_ADAPTER_SERVICE = "email-event-adapter-service";
+
+        /**
+         * Define action IDs for diagnostic logs.
+         */
+        public static class ActionIDs {
+
+            private ActionIDs() {
+            }
+
+            public static final String HANDOVER_EVENT = "handover-event";
+        }
+
+        /**
+         * Define common and reusable Input keys for diagnostic logs.
+         */
+        public static class InputKeys {
+
+            private InputKeys() {
+            }
+            public static final String EMAIL_TO = "email to";
+            public static final String TENANT_DOMAIN = "tenant domain";
+        }
+    }
 }

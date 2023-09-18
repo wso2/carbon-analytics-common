@@ -38,6 +38,8 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.sms.internal.ds.SMSEventAdapterServiceValueHolder;
 import org.wso2.carbon.event.output.adapter.sms.internal.util.SMSEventAdapterConstants;
+import org.wso2.carbon.identity.central.log.mgt.utils.LoggerUtils;
+import org.wso2.carbon.utils.DiagnosticLog;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,6 +54,9 @@ public final class SMSEventAdapter implements OutputEventAdapter {
     private static ThreadPoolExecutor threadPoolExecutor;
     private Map<String, String> globalProperties;
     private int tenantId;
+    private String tenantDomain;
+    private String loggableSMSNo;
+    private boolean isDiagnosticLogsEnabled;
 
     public SMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String, String> globalProperties) {
         this.eventAdapterConfiguration = eventAdapterConfiguration;
@@ -60,7 +65,10 @@ public final class SMSEventAdapter implements OutputEventAdapter {
 
     @Override
     public void init() throws OutputEventAdapterException {
+
         tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        isDiagnosticLogsEnabled = LoggerUtils.isDiagnosticLogsEnabled();
 
         //ThreadPoolExecutor will be assigned  if it is null
         if (threadPoolExecutor == null) {
@@ -164,12 +172,32 @@ public final class SMSEventAdapter implements OutputEventAdapter {
                 options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
                 options.setTo(new EndpointReference("sms://" + smsNo));
                 serviceClient.setOptions(options);
+
+                loggableSMSNo = smsNo;
+                if (LoggerUtils.isLogMaskingEnable) {
+                    loggableSMSNo = LoggerUtils.getMaskedContent(loggableSMSNo);
+                }
+                if (isDiagnosticLogsEnabled) {
+                    DiagnosticLog.DiagnosticLogBuilder diagnosticLogBuilder = new DiagnosticLog.DiagnosticLogBuilder(
+                            SMSEventAdapterConstants.LogConstants.SMS_EVENT_ADAPTER_SERVICE,
+                            SMSEventAdapterConstants.LogConstants.ActionIDs.HANDOVER_EVENT);
+                    diagnosticLogBuilder
+                            .inputParam(SMSEventAdapterConstants.LogConstants.InputKeys.TENANT_DOMAIN, tenantDomain)
+                            .inputParam(SMSEventAdapterConstants.LogConstants.InputKeys.EMAIL_TO, loggableSMSNo)
+                            .resultMessage("SMS will be handed over to the SMS server.")
+                            .resultStatus(DiagnosticLog.ResultStatus.SUCCESS)
+                            .logDetailLevel(DiagnosticLog.LogDetailLevel.APPLICATION);
+                    LoggerUtils.triggerDiagnosticLogEvent(diagnosticLogBuilder);
+                }
+                log.info(String.format("SMS will be handed over to the SMS server for tenant %s.", tenantDomain));
+
                 serviceClient.fireAndForget(payload);
                 if (log.isDebugEnabled()) {
-                    log.debug("Sending SMS to " + smsNo + " , message : " + message);
+                    log.debug("Sending SMS to " + loggableSMSNo + " , message : " + message);
                 }
             } catch (Exception ex) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to '" + smsNo + "'", ex, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Cannot send to '" + loggableSMSNo +
+                        "'", ex, log, tenantId);
             } finally {
                 if (serviceClient != null) {
                     try {

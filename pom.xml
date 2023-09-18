@@ -231,6 +231,14 @@
             </dependency>
             <!--carbon-deployment dependencies stop-->
 
+            <!--carbon-identity-framework dependencies start-->
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.central.log.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+            </dependency>
+            <!--carbon-identity-framework dependencies stop-->
+
             <!--siddhi dependencies start-->
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
@@ -1523,7 +1531,7 @@
         <carbon.analytics.common.version>5.2.55-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.5.3</carbon.kernel.version>
+        <carbon.kernel.version>4.9.10</carbon.kernel.version>
         <carbon.kernel.feature.version>${carbon.kernel.version}</carbon.kernel.feature.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
         <securevault.wso2.version>1.1.5</securevault.wso2.version>
@@ -1534,6 +1542,11 @@
 
         <!--CEP versions-->
         <siddhi.version>3.2.9</siddhi.version>
+
+        <!-- Carbon Identity Framework version -->
+        <carbon.identity.framework.version>5.25.328</carbon.identity.framework.version>
+        <carbon.identity.framework.imp.pkg.version.range>[5.25.234, 7.0.0)
+        </carbon.identity.framework.imp.pkg.version.range>
 
 
         <orbit.version.json>3.0.0.wso2v2</orbit.version.json>

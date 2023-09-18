@@ -69,6 +69,14 @@
             <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.central.log.mgt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -100,6 +108,7 @@
                             org.wso2.carbon.event.output.adapter.email.*
                         </Export-Package>
                         <Import-Package>
+                            org.wso2.carbon.identity.central.log.mgt.*; version="${carbon.identity.framework.imp.pkg.version.range}",
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional
                         </Import-Package>

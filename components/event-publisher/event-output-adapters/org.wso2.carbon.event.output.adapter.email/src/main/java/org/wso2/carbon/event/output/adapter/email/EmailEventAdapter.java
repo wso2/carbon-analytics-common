@@ -31,6 +31,8 @@ import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailable
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
+import org.wso2.carbon.identity.central.log.mgt.utils.LoggerUtils;
+import org.wso2.carbon.utils.DiagnosticLog;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,7 +70,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private int tenantId;
-
+    private String tenantDomain;
+    private String loggableEmail;
+    private boolean isDiagnosticLogsEnabled;
 
     /**
      * Default from address for outgoing messages.
@@ -102,6 +106,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
     public void init() throws OutputEventAdapterException {
 
         tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        isDiagnosticLogsEnabled = LoggerUtils.isDiagnosticLogsEnabled();
 
         //ThreadPoolExecutor will be assigned  if it is null.
         if (threadPoolExecutor == null) {
@@ -364,16 +370,33 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     log.debug("Meta data of the email configured successfully");
                 }
 
+                loggableEmail = to;
+                if (LoggerUtils.isLogMaskingEnable) {
+                    loggableEmail = LoggerUtils.getMaskedContent(loggableEmail);
+                }
+                if (isDiagnosticLogsEnabled) {
+                    DiagnosticLog.DiagnosticLogBuilder diagnosticLogBuilder = new DiagnosticLog.DiagnosticLogBuilder(
+                            EmailEventAdapterConstants.LogConstants.EMAIL_EVENT_ADAPTER_SERVICE,
+                            EmailEventAdapterConstants.LogConstants.ActionIDs.HANDOVER_EVENT);
+                    diagnosticLogBuilder
+                            .inputParam(EmailEventAdapterConstants.LogConstants.InputKeys.TENANT_DOMAIN, tenantDomain)
+                            .inputParam(EmailEventAdapterConstants.LogConstants.InputKeys.EMAIL_TO, loggableEmail)
+                            .resultMessage("Email will be handed over to the email server.")
+                            .resultStatus(DiagnosticLog.ResultStatus.SUCCESS)
+                            .logDetailLevel(DiagnosticLog.LogDetailLevel.APPLICATION);
+                    LoggerUtils.triggerDiagnosticLogEvent(diagnosticLogBuilder);
+                }
+                log.info(String.format("Email will be handed over to the email server for tenant %s.", tenantDomain));
                 Transport.send(message);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Mail sent to the EmailID " + to + " Successfully");
+                    log.debug("Mail sent to the EmailID " + loggableEmail + " Successfully");
                 }
             } catch (MessagingException e) {
                 LogMessagingException(e, to, 0);
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error in message format", e, log, tenantId);
             } catch (Exception e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error sending email to '" + to + "'", e, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error sending email to '" + loggableEmail + "'", e, log, tenantId);
             }
         }
 
