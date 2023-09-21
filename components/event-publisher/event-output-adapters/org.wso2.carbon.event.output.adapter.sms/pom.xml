@@ -101,7 +101,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.wso2.carbon.identity.central.log.mgt.*; version="${carbon.identity.framework.imp.pkg.version.range}",
+                            org.wso2.carbon.identity.central.log.mgt.util; version="${carbon.identity.framework.imp.pkg.version.range}",
                             org.wso2.carbon.event.output.adapter.logger.internal,
                             org.wso2.carbon.event.output.adapter.logger.internal.*
                         </Private-Package>
