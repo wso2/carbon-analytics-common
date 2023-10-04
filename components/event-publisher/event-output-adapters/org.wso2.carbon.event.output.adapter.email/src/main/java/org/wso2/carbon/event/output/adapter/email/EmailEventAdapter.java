@@ -71,7 +71,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
     private int tenantId;
     private String tenantDomain;
     private String loggableEmail;
-    private boolean isDiagnosticLogsEnabled;
 
     /**
      * Default from address for outgoing messages.
@@ -106,7 +105,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
         tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-        isDiagnosticLogsEnabled = LoggerUtils.isDiagnosticLogsEnabled();
 
         //ThreadPoolExecutor will be assigned  if it is null.
         if (threadPoolExecutor == null) {
@@ -373,7 +371,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 if (LoggerUtils.isLogMaskingEnable) {
                     loggableEmail = LoggerUtils.getMaskedContent(loggableEmail);
                 }
-                if (isDiagnosticLogsEnabled) {
+                if (LoggerUtils.isDiagnosticLogsEnabled()) {
                     DiagnosticLog.DiagnosticLogBuilder diagnosticLogBuilder = new DiagnosticLog.DiagnosticLogBuilder(
                             EmailEventAdapterConstants.LogConstants.EMAIL_EVENT_ADAPTER_SERVICE,
                             EmailEventAdapterConstants.LogConstants.ActionIDs.HANDOVER_EVENT);

@@ -1544,7 +1544,7 @@
         <siddhi.version>3.2.9</siddhi.version>
 
         <!-- Carbon Identity Framework version -->
-        <carbon.identity.framework.version>5.25.328</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.25.367</carbon.identity.framework.version>
         <carbon.identity.framework.imp.pkg.version.range>[5.25.234, 7.0.0)
         </carbon.identity.framework.imp.pkg.version.range>
 
