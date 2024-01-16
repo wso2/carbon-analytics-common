@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.wso2.carbon.config</groupId>
                 <artifactId>org.wso2.carbon.config.maven.plugin</artifactId>
-                <version>${carbon.config.version}</version>
+                <version>${carbon.config.maven.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>

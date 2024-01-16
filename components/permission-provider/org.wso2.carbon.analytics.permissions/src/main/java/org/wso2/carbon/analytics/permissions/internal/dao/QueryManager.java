@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.permissions.bean.PermissionConfig;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -79,7 +80,7 @@ public class QueryManager {
             if (inputStream == null) {
                 throw new RuntimeException("Cannot find file '" + FILE_SQL_QUERIES + "' in class path.");
             }
-            Yaml yaml = new Yaml(new OsgiClassLoaderConstructor());
+            Yaml yaml = new Yaml(new OsgiClassLoaderConstructor(new LoaderOptions()));
             yaml.setBeanAccess(BeanAccess.FIELD);
             queries = yaml.loadAs(inputStream, PermissionConfig.class).getQueries();
         } catch (IOException e) {
@@ -144,6 +145,10 @@ public class QueryManager {
      * @since 4.0.0
      */
     private static class OsgiClassLoaderConstructor extends Constructor {
+        public OsgiClassLoaderConstructor(LoaderOptions loadingConfig) {
+            super(loadingConfig);
+        }
+
         @Override
         protected Class<?> getClassForName(String name) throws ClassNotFoundException {
             return Class.forName(name, true, this.getClass().getClassLoader());
