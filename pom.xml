@@ -151,7 +151,7 @@
                 <!-- Overridden from parent pom to exclude generated sources -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${maven.findbugsplugin.version}</version>
+                <version>${findbugs.maven.plugin.version}</version>
                 <configuration combine.self="override">
                     <effort>Max</effort>
                     <threshold>Medium</threshold>
@@ -818,6 +818,7 @@
         <feign-form.version>3.8.0</feign-form.version>
         <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
         <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
+        <findbugs.maven.plugin.version>3.0.4</findbugs.maven.plugin.version>
 
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
