@@ -791,7 +791,7 @@
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-scala_2.10</artifactId>
+                <artifactId>jackson-module-scala_3</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
@@ -1564,12 +1564,12 @@
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
         <testng.version>6.11</testng.version>
-        <snakeyaml.version>2.0</snakeyaml.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <antlr.version>4.5</antlr.version>
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
         <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
-        <google.guava.version>32.1.2-jre</google.guava.version>
+        <google.guava.version>33.0.0-jre</google.guava.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
         <xerces.xercesImpl.version>2.12.0</xerces.xercesImpl.version>
@@ -1596,9 +1596,9 @@
         <clearspring.analytics.stream.version>2.9.5.wso2v1</clearspring.analytics.stream.version>
         <kyro.version>2.24.0</kyro.version>
         <akka.version>2.3.11</akka.version>
-        <jackson.version>2.15.0</jackson.version>
+        <jackson.version>2.16.0</jackson.version>
         <jackson.module.scala.orbit.version>2.4.4.wso2v1</jackson.module.scala.orbit.version>
-        <jackson-annotations.version>2.15.0</jackson-annotations.version>
+        <jackson-annotations.version>2.16.0</jackson-annotations.version>
         <snappy.version>1.1.2.1</snappy.version>
         <org.jboss.netty.version>3.9.0.Final</org.jboss.netty.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
@@ -1607,7 +1607,6 @@
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <orbit.version.netty-all>4.0.29.wso2v1</orbit.version.netty-all>
         <compress.lzf.version>1.0.3</compress.lzf.version>
-        <jackson.version>2.4.4</jackson.version>
         <codahale.metrics.version>3.1.2</codahale.metrics.version>
         <scala.version>2.10.5</scala.version>
         <typesafe.version>1.2.1</typesafe.version>
