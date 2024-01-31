@@ -19,6 +19,7 @@ package org.wso2.carbon.databridge.agent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpointGroup;
@@ -174,6 +175,7 @@ public class DataPublisher {
             for (int j = 1; j < receiverGroup.length; j++) {
                 DataEndpointConfiguration endpointConfiguration;
                 String[] urlParams = DataPublisherUtil.getProtocolHostPort((String) receiverGroup[j]);
+                AgentConfiguration agentConfiguration = dataEndpointAgent.getAgentConfiguration();
 
                 if (urlParams[0].equalsIgnoreCase(DataEndpointConfiguration.Protocol.TCP.toString())) {
                     endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
@@ -184,7 +186,8 @@ public class DataPublisher {
                             dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
                             dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
                             dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
-                            failOver);
+                            failOver, agentConfiguration.getReconnectionInterval(), agentConfiguration.getExpFactor(),
+                            agentConfiguration.getMaxDelayInSeconds());
                 } else {
                     endpointConfiguration = new DataEndpointConfiguration((String) receiverGroup[j],
                             (String) authGroup[j], username, password, dataEndpointAgent.getSecuredTransportPool(),
@@ -194,7 +197,8 @@ public class DataPublisher {
                             dataEndpointAgent.getAgentConfiguration().getMaxPoolSize(),
                             dataEndpointAgent.getAgentConfiguration().getKeepAliveTimeInPool(),
                             dataEndpointAgent.getAgentConfiguration().getLoggingControlIntervalInSeconds(),
-                            failOver);
+                            failOver,  agentConfiguration.getReconnectionInterval(), agentConfiguration.getExpFactor(),
+                            agentConfiguration.getMaxDelayInSeconds());
                 }
                 DataEndpoint dataEndpoint = dataEndpointAgent.getNewDataEndpoint();
                 dataEndpoint.initialize(endpointConfiguration);

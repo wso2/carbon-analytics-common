@@ -62,21 +62,19 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private EventQueue eventQueue = null;
 
-    private int reconnectionInterval;
-
     private final Integer START_INDEX = 0;
 
     private AtomicInteger currentDataPublisherIndex = new AtomicInteger(START_INDEX);
 
     private AtomicInteger maximumDataPublisherIndex = new AtomicInteger();
 
-    private ScheduledExecutorService reconnectionService;
-
     private final String publishingStrategy;
 
     private boolean isShutdown = false;
 
     private MBeanServer platformMBeanServer;
+
+    private Thread reconnection;
 
     private ObjectName mbeanEventQueue;
 
@@ -87,8 +85,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     public DataEndpointGroup(HAType haType, DataEndpointAgent agent) {
         this.dataEndpoints = new ArrayList<>();
         this.haType = haType;
-        this.reconnectionService = Executors.newScheduledThreadPool(1, new DataBridgeThreadFactory("ReconnectionService"));
-        this.reconnectionInterval = agent.getAgentConfiguration().getReconnectionInterval();
+
         this.publishingStrategy = agent.getAgentConfiguration().getPublishingStrategy();
         if (!publishingStrategy.equalsIgnoreCase(DataEndpointConstants.SYNC_STRATEGY)) {
             this.eventQueue = new EventQueue(agent.getAgentConfiguration().getQueueSize());
@@ -103,9 +100,11 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 log.error("Unable to create DATABRIDGE_AGENT_EVENT_QUEUE stat MXBean: " + e.getMessage(), e);
             }
         }
-        this.reconnectionService.scheduleAtFixedRate(new ReconnectionTask(), reconnectionInterval,
-                reconnectionInterval, TimeUnit.SECONDS);
+
         currentDataPublisherIndex.set(START_INDEX);
+        ReconnectionTask reconnectionTask = new ReconnectionTask();
+        reconnection = new Thread(reconnectionTask);
+        reconnection.start();
     }
 
     public void addDataEndpoint(DataEndpoint dataEndpoint) {
@@ -352,7 +351,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 }
                 if (index == startIndex) {
                     if (isBusyWait) {
-                        if (!reconnectionService.isShutdown()) {
+                        if (reconnection.isAlive()) {
 
                             /**
                              * Have fully iterated the data publisher list,
@@ -436,37 +435,39 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
 
     private class ReconnectionTask implements Runnable {
         public void run() {
-            boolean isOneReceiverConnected = false;
-            List<String> noReceiverURLEndpoints = new ArrayList<String>();
-            for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
-                DataEndpoint dataEndpoint = dataEndpoints.get(i);
-                if (!dataEndpoint.isConnected()) {
-                    try {
-                        dataEndpoint.connect();
-                    } catch (Exception ex) {
-                        dataEndpoint.deactivate();
-                    }
-                } else {
-                    try {
-                        String[] urlElements = DataPublisherUtil.getProtocolHostPort(
-                                dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                        if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+            long gap = 0;
+            long isEPCheckedGap = 0;
+            long addedDelayForEPCheck = 10000l;
+            while (true) {
+                for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
+                    DataEndpoint dataEndpoint = dataEndpoints.get(i);
+                    if (!dataEndpoint.isConnected()) {
+                        gap = System.currentTimeMillis() - dataEndpoint.getReConnectTimestamp();
+                        try {
+                            if (gap > 0) {
+                                dataEndpoint.connect();
+                            }
+                        } catch (Exception ex) {
                             dataEndpoint.deactivate();
                         }
-                    } catch (DataEndpointConfigurationException exception) {
-                        log.warn("Data Endpoint with receiver URL:" + dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
-                                + " could not be deactivated", exception);
+                    } else {
+                        try {
+                            if (System.currentTimeMillis() > isEPCheckedGap) {
+                                isEPCheckedGap = System.currentTimeMillis() + addedDelayForEPCheck;
+                                String[] urlElements = DataPublisherUtil.getProtocolHostPort(
+                                        dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
+                                if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                                    dataEndpoint.deactivate();
+                                }
+                            }
+                        } catch (DataEndpointConfigurationException exception) {
+                            log.warn("Data Endpoint with receiver URL:" +
+                                    dataEndpoint.getDataEndpointConfiguration().getReceiverURL()
+                                    + " could not be deactivated", exception);
+                        }
                     }
                 }
-                if (dataEndpoint.isConnected()) {
-                    isOneReceiverConnected = true;
-                } else {
-                    noReceiverURLEndpoints.add(dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                }
-            }
-            if (!isOneReceiverConnected) {
-                log.warn("No receiver is reachable at URL Endpoint/Endpoints " + noReceiverURLEndpoints.toString() +
-                        ", will try to reconnect every " + reconnectionInterval + " sec");
+                busyWait(1);
             }
         }
 
@@ -507,7 +508,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void shutdown() {
-        reconnectionService.shutdownNow();
+        reconnection.stop();
         if (eventQueue != null) {
             eventQueue.shutdown();
         }

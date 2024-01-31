@@ -48,6 +48,16 @@
         {% if transport.thrift.agent.ciphers is defined %}
         <ciphers>{{transport.thrift.agent.ciphers}}</ciphers>
         {% endif %}
+        {% if transport.thrift.agent.exp_factor is defined %}
+        <ExpFactor>{{transport.thrift.agent.exp_factor}}</ExpFactor>
+        {% else %}
+        <ExpFactor>1</ExpFactor>
+        {% endif %}
+        {% if transport.thrift.agent.max_reconnection_interval is defined %}
+        <MaxReconnectionInterval>{{transport.thrift.agent.max_reconnection_interval}}</MaxReconnectionInterval>
+        {% else %}
+        <MaxReconnectionInterval>3600</MaxReconnectionInterval>
+        {% endif %}
     </Agent>
 
     <Agent>
@@ -79,6 +89,16 @@
         {% endif %}
         {% if transport.binary.agent.ciphers is defined %}
         <ciphers>{{transport.binary.agent.ciphers}}</ciphers>
+        {% endif %}
+        {% if transport.binary.agent.exp_factor is defined %}
+        <ExpFactor>{{transport.binary.agent.exp_factor}}</ExpFactor>
+        {% else %}
+        <ExpFactor>1</ExpFactor>
+        {% endif %}
+        {% if transport.binary.agent.max_reconnection_interval is defined %}
+        <MaxReconnectionInterval>{{transport.binary.agent.max_reconnection_interval}}</MaxReconnectionInterval>
+        {% else %}
+        <MaxReconnectionInterval>3600</MaxReconnectionInterval>
         {% endif %}
     </Agent>
 </DataAgentsConfiguration>
