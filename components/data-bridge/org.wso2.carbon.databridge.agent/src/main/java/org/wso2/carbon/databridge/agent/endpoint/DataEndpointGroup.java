@@ -36,6 +36,8 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeThreadFactory;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Socket;
@@ -77,6 +79,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     private Thread reconnection;
 
     private ObjectName mbeanEventQueue;
+
+    private static final String SSL_PROTOCOL = "ssl";
 
     public enum HAType {
         FAILOVER, LOADBALANCE
@@ -459,7 +463,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                                 isEPCheckedGap = System.currentTimeMillis() + addedDelayForEPCheck;
                                 String[] urlElements = DataPublisherUtil.getProtocolHostPort(
                                         dataEndpoint.getDataEndpointConfiguration().getReceiverURL());
-                                if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]))) {
+                                if (!isServerExists(urlElements[1], Integer.parseInt(urlElements[2]), urlElements[0])) {
                                     dataEndpoint.deactivate();
                                 }
                             }
@@ -474,10 +478,16 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             }
         }
 
-        private boolean isServerExists(String ip, int port) {
+        private boolean isServerExists(String ip, int port, String protocol) {
+            Socket socket = null;
+            SSLSocket sslSocket = null;
             try {
-                Socket socket = new Socket(ip, port);
-                socket.close();
+                if (SSL_PROTOCOL.equals(protocol)) {
+                    sslSocket = (SSLSocket) SSLSocketFactory.getDefault().createSocket(ip, port);
+                    sslSocket.startHandshake();
+                } else {
+                    socket = new Socket(ip, port);
+                }
                 return true;
             } catch (UnknownHostException e) {
                 return false;
@@ -485,6 +495,20 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
                 return false;
             } catch (Exception e) {
                 return false;
+            } finally {
+                if (socket != null) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        log.error("Error closing socket: " + e.getMessage());
+                    }
+                } else if (sslSocket != null) {
+                    try {
+                        sslSocket.close();
+                    } catch (IOException e) {
+                        log.error("Error closing socket: " + e.getMessage());
+                    }
+                }
             }
         }
 
