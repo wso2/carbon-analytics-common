@@ -14,6 +14,12 @@ jobs:
   build-and-upload-coverage:
     runs-on: ubuntu-latest
     steps:
+      - name: Run hostname
+        run: hostname
+      - name: Fix host entry
+        run: sudo echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts
+      - name: Show hosts
+        run: cat /etc/hosts
       - name: Checkout master
         uses: actions/checkout@v3
         with:
