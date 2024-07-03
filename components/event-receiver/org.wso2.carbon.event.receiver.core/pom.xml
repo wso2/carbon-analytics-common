@@ -125,6 +125,15 @@
                         <Axis2RequiredServices>
                             org.wso2.carbon.event.receiver.core.EventReceiverService
                         </Axis2RequiredServices>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.event.input.adapter.core.InputEventAdapterService,
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.event.stream.core.EventStreamService,
+                            osgi.service;objectClass=org.wso2.carbon.utils.ConfigurationContextService,
+                            osgi.service;objectClass=org.wso2.carbon.event.input.adapter.core.InputEventAdapterFactory,
+                            osgi.service;objectClass=org.wso2.carbon.event.processor.manager.core.EventManagementService,
+                            osgi.service;objectClass=org.wso2.carbon.user.core.service.RealmService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

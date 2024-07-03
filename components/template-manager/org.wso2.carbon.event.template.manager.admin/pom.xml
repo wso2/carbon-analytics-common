@@ -95,6 +95,9 @@
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.event.template.manager.core.TemplateManagerService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

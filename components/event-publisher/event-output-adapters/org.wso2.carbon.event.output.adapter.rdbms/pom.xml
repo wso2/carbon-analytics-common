@@ -92,6 +92,9 @@
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.ndatasource.core.DataSourceService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

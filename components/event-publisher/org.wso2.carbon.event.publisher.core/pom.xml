@@ -110,6 +110,14 @@
                         <Axis2RequiredServices>
                             org.wso2.carbon.event.publisher.core.EventPublisherService
                         </Axis2RequiredServices>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService,
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.event.stream.core.EventStreamService,
+                            osgi.service;objectClass=org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory,
+                            osgi.service;objectClass=org.wso2.carbon.utils.ConfigurationContextService,
+                            osgi.service;objectClass=org.wso2.carbon.event.processor.manager.core.EventManagementService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
