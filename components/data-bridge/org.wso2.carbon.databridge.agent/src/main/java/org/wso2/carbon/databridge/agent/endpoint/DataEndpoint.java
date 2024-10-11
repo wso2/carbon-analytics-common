@@ -73,6 +73,8 @@ public abstract class DataEndpoint {
 
     public static HashMap<String, Long> delayMap=new HashMap<String, Long>();
 
+    public boolean invalidateTransportPool = false;
+
     public long getReConnectTimestamp() {
         return reConnectTimestamp;
     }
@@ -349,6 +351,15 @@ public abstract class DataEndpoint {
 
         private void publish() throws DataEndpointException, SessionTimeoutException, UndefinedEventTypeException {
             Object client = getClient();
+            if (invalidateTransportPool) {
+                log.debug(
+                        "invalidateTransportPool' is 'true'. Going to discard existing client and get new client " +
+                                "for the DataEndpoint");
+                discardClient(client);
+                client = getClient();
+                invalidateTransportPool = false;
+                log.debug("'invalidateTransportPool' is set to 'false' for the DataEndpoint");
+            }
             try {
                 send(client, this.events);
                 semaphoreRelease();
