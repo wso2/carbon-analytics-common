@@ -285,9 +285,8 @@ public class JMSConnectionFactory {
         try {
             return (JMSPooledConnectionHolder) this.connectionPool.borrowObject();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new OutputEventAdapterRuntimeException("Error in getting JMS connection from pool", e);
         }
-        return null;
     }
 
 
@@ -366,10 +365,8 @@ public class JMSConnectionFactory {
                 entry.setProducer(producer);
                 return entry;
             } catch (JMSException e) {
-                log.error(e.getMessage(), e);
-                return null;
+                throw new OutputEventAdapterRuntimeException("Error creating JMS connection holder from JMS CF : " + name, e);
             }
-
         }
 
         @Override
