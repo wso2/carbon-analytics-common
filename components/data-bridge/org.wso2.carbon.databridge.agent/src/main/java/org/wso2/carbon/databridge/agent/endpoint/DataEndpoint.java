@@ -68,6 +68,8 @@ public abstract class DataEndpoint {
 
     private Semaphore immediateDispatchSemaphore;
 
+    public boolean invalidateTransportPool = false;
+
     /**
      * Endpoint state.
      */
@@ -326,6 +328,15 @@ public abstract class DataEndpoint {
 
         private void publish() throws DataEndpointException, SessionTimeoutException, UndefinedEventTypeException {
             Object client = getClient();
+            if (invalidateTransportPool) {
+                log.debug(
+                        "invalidateTransportPool' is 'true'. Going to discard existing client and get new client " +
+                                "for the DataEndpoint");
+                discardClient(client);
+                client = getClient();
+                invalidateTransportPool = false;
+                log.debug("'invalidateTransportPool' is set to 'false' for the DataEndpoint");
+            }
             try {
                 send(client, this.events);
                 semaphoreRelease();
