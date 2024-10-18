@@ -17,6 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint.binary;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
@@ -37,6 +39,8 @@ import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender
  * This class is Binary transport implementation for the Data Endpoint.
  */
 public class BinaryDataEndpoint extends DataEndpoint {
+
+    private static Log log = LogFactory.getLog(BinaryDataEndpoint.class);
 
     @Override
     protected String login(Object client, String userName, String password) throws DataEndpointAuthenticationException {
@@ -86,6 +90,8 @@ public class BinaryDataEndpoint extends DataEndpoint {
             } else if (e instanceof SessionTimeoutException) {
                 throw new SessionTimeoutException("Binary Session Expired Exception ", e);
             } else {
+                log.debug("Setting 'invalidateTransportPool' to 'true' for binary data transport");
+                this.invalidateTransportPool = true;
                 throw new DataEndpointException("Error while trying to publish events to data receiver :"
                         + socket.getRemoteSocketAddress().toString(), e);
             }
