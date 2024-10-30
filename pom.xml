@@ -1577,7 +1577,7 @@
         <google.guava.version>31.0.1-jre</google.guava.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <cassandra.thrift.wso2.version>1.2.13.wso2v4</cassandra.thrift.wso2.version>
-        <xerces.xercesImpl.version>2.12.0</xerces.xercesImpl.version>
+        <xerces.xercesImpl.version>2.12.2</xerces.xercesImpl.version>
         <hazelcast.version>5.3.2.wso2v1</hazelcast.version>
 
         <httpclient.httpcomponents.wso2.version>4.5.13.wso2v1</httpclient.httpcomponents.wso2.version>
