@@ -385,6 +385,7 @@ public class EventPublisher implements WSO2EventConsumer, EventSync {
 
         }
 
+        EventPublisherUtil.populateUrlPlaceholders(dynamicProperties, event.getArbitraryDataMap());
         org.wso2.siddhi.core.event.Event siddhiEvent = EventPublisherUtil.convertToSiddhiEvent(event, inputStreamSize);
 
         try {
