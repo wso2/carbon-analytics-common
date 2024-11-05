@@ -15,6 +15,7 @@
 package org.wso2.carbon.event.publisher.core.internal.util;
 
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.impl.Constants;
@@ -37,6 +38,12 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import static org.wso2.carbon.event.publisher.core.config.EventPublisherConstants.DYNAMIC_PROPERTY_HTTP_URL;
+import static org.wso2.carbon.event.publisher.core.config.EventPublisherConstants.DYNAMIC_PROPERTY_NOTIFICATION_EVENT;
+import static org.wso2.carbon.event.publisher.core.config.EventPublisherConstants.OTP_TOKEN;
+import static org.wso2.carbon.event.publisher.core.config.EventPublisherConstants.SEND_TO;
+import static org.wso2.carbon.event.publisher.core.config.EventPublisherConstants.SMS_OTP;
 
 public class EventPublisherUtil {
 
@@ -153,6 +160,40 @@ public class EventPublisherUtil {
             size += getSize(event.getArbitraryDataMap());
         }
         return size;
+    }
+
+    /**
+     * Replaces placeholders in the given URL with the corresponding values provided in the map.
+     *
+     * @param dynamicProperties The map containing the properties of the publisher.
+     * @param arbitraryDataMap  The map containing the arbitrary data coming from the event.
+     */
+    public static void populateUrlPlaceholders(Map<String, String> dynamicProperties, Map<String,
+            String> arbitraryDataMap) {
+
+        if (dynamicProperties == null || dynamicProperties.isEmpty() ||
+                StringUtils.isBlank(dynamicProperties.get(DYNAMIC_PROPERTY_HTTP_URL))) {
+            // Return if the URL is not set.
+            return;
+        }
+        if (arbitraryDataMap == null || arbitraryDataMap.isEmpty()) {
+            // Return if the arbitrary data map is not set.
+            return;
+        }
+
+        // Handle SMS OTP Flow.
+        if (arbitraryDataMap.get(DYNAMIC_PROPERTY_NOTIFICATION_EVENT) != null
+                && SMS_OTP.equalsIgnoreCase(arbitraryDataMap.get(DYNAMIC_PROPERTY_NOTIFICATION_EVENT))) {
+            String url = dynamicProperties.get(DYNAMIC_PROPERTY_HTTP_URL);
+            String encodedSmsMessage = "Verification Code: ".replaceAll("\\s", "+");
+            if (StringUtils.isNotBlank(url) && StringUtils.isNotBlank(arbitraryDataMap.get(OTP_TOKEN)) &&
+                    StringUtils.isNotBlank(arbitraryDataMap.get(SEND_TO))) {
+                url = url.replaceAll("\\$ctx.num", arbitraryDataMap.get(SEND_TO))
+                        .replaceAll("\\$ctx.msg", encodedSmsMessage + arbitraryDataMap.get(OTP_TOKEN))
+                        .replaceAll("\\$ctx.otp", arbitraryDataMap.get(OTP_TOKEN));
+                dynamicProperties.put(DYNAMIC_PROPERTY_HTTP_URL, url);
+            }
+        }
     }
 
     private static int getSize(Map<String, String> arbitraryDataMap) {

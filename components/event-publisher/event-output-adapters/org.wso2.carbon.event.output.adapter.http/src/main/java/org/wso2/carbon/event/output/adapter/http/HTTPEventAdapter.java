@@ -299,12 +299,14 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         public void run() {
 
             UUID uuid = UUID.randomUUID();
-            EntityEnclosingMethod method = null;
+            HttpMethodBase method = null;
 
             try {
 
                 if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_PUT)) {
                     method = new PutMethod(this.getUrl());
+                } else if (clientMethod.equalsIgnoreCase(HTTPEventAdapterConstants.CONSTANT_HTTP_GET)) {
+                    method = new GetMethod(this.getUrl());
                 } else {
                     method = new PostMethod(this.getUrl());
                 }
@@ -318,8 +320,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                     }
                 }
 
-                method.setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
-
+                if (method instanceof EntityEnclosingMethod) {
+                    ((EntityEnclosingMethod) method).setRequestEntity(new StringRequestEntity(this.getPayload(), contentType, "UTF-8"));
+                }
                 if (this.getUsername() != null && this.getUsername().trim().length() > 0) {
                     method.setRequestHeader("Authorization", "Basic " + Base64
                             .encode((this.getUsername() + HTTPEventAdapterConstants.ENTRY_SEPARATOR + this

@@ -117,4 +117,10 @@ public final class EventPublisherConstants {
     public static final String METRIC_DELIMITER = ".";
     public static final String METRIC_AGGREGATE_ANNOTATION = "[+]";
     public static final String TEMP_CARBON_APPS_DIRECTORY = "carbonapps";
+
+    public static final String DYNAMIC_PROPERTY_HTTP_URL = "http.url";
+    public static final String DYNAMIC_PROPERTY_NOTIFICATION_EVENT = "notification-event";
+    public static final String SMS_OTP = "smsotp";
+    public static final String SEND_TO = "send-to";
+    public static final String OTP_TOKEN = "otpToken";
 }
