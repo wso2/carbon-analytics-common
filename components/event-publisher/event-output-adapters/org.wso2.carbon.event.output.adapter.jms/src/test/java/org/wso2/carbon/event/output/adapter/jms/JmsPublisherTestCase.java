@@ -30,6 +30,7 @@ public class JmsPublisherTestCase {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private static final Log LOGGER = LogFactory.getLog(JmsPublisherTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
+    private Map<String, String> globalProperties;
 
     private void setupCarbonConfig(String tenantName) {
         System.setProperty("carbon.home",
@@ -57,11 +58,15 @@ public class JmsPublisherTestCase {
         //staticProperties.put("transport.LOGGER.UserName","admin");
         //staticProperties.put("transport.LOGGER.Password","admin");
         eventAdapterConfiguration.setStaticProperties(staticProperties);
-        Map<String, String> globalProperties = new HashMap<>();
-        globalProperties.put("keepAliveTimeInMillis", "20000");
-        globalProperties.put("minThread", "8");
-        globalProperties.put("jobQueueSize", "10000");
+        globalProperties = new HashMap<>();
+        globalProperties.put("minIdle", "0");
+        globalProperties.put("timeBetweenEvictionRunsInMillis", "5000");
+        globalProperties.put("maxWait", "3000");
         globalProperties.put("maxThread", "100");
+        globalProperties.put("keepAliveTimeInMillis", "20000");
+        globalProperties.put("minEvictableIdleTimeInMillis", "3000");
+        globalProperties.put("jobQueueSize", "10000");
+        globalProperties.put("minThread", "8");
 
         return new JMSEventAdapter(eventAdapterConfiguration, globalProperties);
     }
@@ -118,7 +123,7 @@ public class JmsPublisherTestCase {
         adaptorProperties.putAll(eventAdapterConfiguration.getStaticProperties());
         JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties,
                 eventAdapterConfiguration.getName(), adaptorProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION),
-                1);
+                1, globalProperties);
         jmsConnectionFactory.createConnection();
         jmsConnectionFactory.getConnectionFromPool();
         jmsConnectionFactory.getContext();

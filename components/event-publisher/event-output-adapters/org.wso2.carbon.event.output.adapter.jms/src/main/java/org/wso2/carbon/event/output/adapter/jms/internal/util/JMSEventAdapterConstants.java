@@ -44,6 +44,10 @@ public class JMSEventAdapterConstants {
     public static final String ADAPTER_MAX_THREAD_POOL_SIZE_NAME = "maxThread";
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
+    public static final String ADAPTER_MAX_WAIT_NAME = "maxWait";
+    public static final String ADAPTER_MIN_IDLE_NAME = "minIdle";
+    public static final String ADAPTER_MIN_EVICTABLE_IDLE_TIME_NAME = "minEvictableIdleTimeInMillis";
+    public static final String ADAPTER_TIME_BETWEEN_EVICTION_RUNS_NAME = "timeBetweenEvictionRunsInMillis";
     public static final int ADAPTER_MIN_THREAD_POOL_SIZE = 8;
     public static final int ADAPTER_MAX_THREAD_POOL_SIZE = 100;
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;

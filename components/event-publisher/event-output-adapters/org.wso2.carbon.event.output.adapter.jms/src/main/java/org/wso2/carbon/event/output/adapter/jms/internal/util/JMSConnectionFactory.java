@@ -28,6 +28,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Encapsulate a JMS Connection factory definition within an Axis2.xml
@@ -64,6 +65,8 @@ public class JMSConnectionFactory {
 
     private int maxConnections;
 
+    private Map<String, String> jmsConnectionProperties;
+
     private GenericObjectPool connectionPool;
 
     private String destinationName;
@@ -71,10 +74,11 @@ public class JMSConnectionFactory {
     /**
      * Digest a JMS CF definition from an axis2.xml 'Parameter' and construct
      */
-    public JMSConnectionFactory(Hashtable<String, String> parameters, String name, String destination, int maxConcurrentConnections) {
+    public JMSConnectionFactory(Hashtable<String, String> parameters, String name, String destination, int maxConcurrentConnections, Map<String, String> jmsConnectionProperties) {
         this.parameters = parameters;
         this.name = name;
         this.destinationName = destination;
+        this.jmsConnectionProperties = jmsConnectionProperties;
 
         if (maxConcurrentConnections > 0) {
             this.maxConnections = maxConcurrentConnections;
@@ -100,13 +104,13 @@ public class JMSConnectionFactory {
     // need to initialize
     private void createConnectionPool() {
         GenericObjectPool.Config poolConfig = new GenericObjectPool.Config();
-        poolConfig.minEvictableIdleTimeMillis = 3000;
-        poolConfig.maxWait = 3000;
+        poolConfig.minEvictableIdleTimeMillis = (Long) parseJmsProperty(JMSEventAdapterConstants.ADAPTER_MIN_EVICTABLE_IDLE_TIME_NAME, 3000L);
+        poolConfig.maxWait = (Long) parseJmsProperty(JMSEventAdapterConstants.ADAPTER_MAX_WAIT_NAME, 3000L);
         poolConfig.maxActive = maxConnections;
         poolConfig.maxIdle = maxConnections;
-        poolConfig.minIdle = 0;
+        poolConfig.minIdle = (Integer) parseJmsProperty(JMSEventAdapterConstants.ADAPTER_MIN_IDLE_NAME, 0);
         poolConfig.numTestsPerEvictionRun = Math.max(1, maxConnections / 10);
-        poolConfig.timeBetweenEvictionRunsMillis = 5000;
+        poolConfig.timeBetweenEvictionRunsMillis = (Long) parseJmsProperty(JMSEventAdapterConstants.ADAPTER_TIME_BETWEEN_EVICTION_RUNS_NAME, 5000L);
         this.connectionPool = new GenericObjectPool(new PoolableJMSConnectionFactory(), poolConfig);
 
     }
@@ -289,6 +293,25 @@ public class JMSConnectionFactory {
         }
     }
 
+    /**
+     * Parses a JMS property value and returns it as the specified type (Integer or Long).
+     * If the value is empty, returns the provided default value.
+     *
+     * @param jmsPropertyKey the JMS property key as a String
+     * @param defaultValue the default value to use if the value is empty
+     * @return the parsed value as Integer or Long, based on the type of defaultValue
+     */
+    private Number parseJmsProperty(String jmsPropertyKey, Number defaultValue) {
+        String value = jmsConnectionProperties.get(jmsPropertyKey);
+        if (value != null && !value.isEmpty()) {
+            if (defaultValue instanceof Long) {
+                return Long.parseLong(value);
+            } else if (defaultValue instanceof Integer) {
+                return Integer.parseInt(value);
+            }
+        }
+        return defaultValue;
+    }
 
     public synchronized void close() {
 
