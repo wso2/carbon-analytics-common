@@ -114,7 +114,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
         try {
             Hashtable<String, String> adaptorProperties = new Hashtable<String, String>();
             adaptorProperties.putAll(eventAdapterConfiguration.getStaticProperties());
-            JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, eventAdapterConfiguration.getName(), adaptorProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), 1);
+            JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adaptorProperties, eventAdapterConfiguration.getName(), adaptorProperties.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), 1, globalProperties);
             Connection connection = jmsConnectionFactory.createConnection();
             connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             connection.close();
@@ -199,7 +199,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
             maxConnections = JMSEventAdapterConstants.ADAPTER_MAX_THREAD_POOL_SIZE;
         }
 
-        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adapterProperties, outputEventAdaptorConfiguration.getName(), messageConfig.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), maxConnections);
+        JMSConnectionFactory jmsConnectionFactory = new JMSConnectionFactory(adapterProperties, outputEventAdaptorConfiguration.getName(), messageConfig.get(JMSEventAdapterConstants.ADAPTER_JMS_DESTINATION), maxConnections, globalProperties);
         JMSMessageSender jmsMessageSender = new JMSMessageSender(jmsConnectionFactory);
         publisherDetails = new PublisherDetails(jmsConnectionFactory, jmsMessageSender, messageConfig);
 
