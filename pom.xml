@@ -825,7 +825,7 @@
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
 
         <com.fasterxml.jackson.core.version>2.13.3</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.13.3</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.databind.version>2.13.4.2</com.fasterxml.jackson.databind.version>
         <io.swagger.version>1.5.22</io.swagger.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
