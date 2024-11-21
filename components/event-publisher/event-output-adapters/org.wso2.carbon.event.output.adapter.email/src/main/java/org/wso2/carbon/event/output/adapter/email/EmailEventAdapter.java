@@ -23,6 +23,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jivesoftware.smack.packet.Authentication;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
@@ -43,6 +44,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Address;
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -417,8 +419,12 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
         }
 
-        log.error("Exception occurred when sending email to " + mailRecipient + ". " + e.getMessage(), e);
-
+        String errorMessage = "Exception occurred when sending email to " + mailRecipient + ". " + e.getMessage();
+        if (e instanceof AuthenticationFailedException) {
+            log.warn(errorMessage, e);
+        } else {
+            log.error(errorMessage, e);
+        }
         // MessagingException has the capability to chain exceptions.
         // Therefore checking for any chained exceptions.
         Exception nextEx = e.getNextException();
