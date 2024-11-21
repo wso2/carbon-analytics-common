@@ -66,5 +66,21 @@ public class EmailEventAdapterConstants {
     public static final String MAIL_SMTP_REPLY_TO = "mail.smtp.replyTo";
     public static final String MAIL_SMTP_SIGNATURE = "mail.smtp.signature";
 
+    /**
+     * Constants related to logging.
+     */
+    public static class LogConstants {
 
+        public static final String COMPONENT_ID = "event-output-adapter-email";
+
+        public static class ActionIDs {
+
+            public static final String HANDLE_EMAIL_SENDING = "handle-email-sending";
+        }
+
+        public static class InputKeys {
+
+            public static final String EMAIL_RECIPIENT = "email recipient";
+        }
+    }
 }

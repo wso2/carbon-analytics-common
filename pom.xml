@@ -221,6 +221,11 @@
                 <artifactId>org.wso2.carbon.identity.authentication</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.central.log.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+            </dependency>
             <!--carbon-commons dependencies stop-->
 
             <!--carbon-deployment dependencies start-->
@@ -1523,9 +1528,13 @@
         <carbon.analytics.common.version>5.2.60-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.5.3</carbon.kernel.version>
+        <carbon.kernel.version>4.10.24</carbon.kernel.version>
         <carbon.kernel.feature.version>${carbon.kernel.version}</carbon.kernel.feature.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
+        <!-- Carbon Identity Framework version -->
+        <carbon.identity.framework.version>7.6.15</carbon.identity.framework.version>
+        <carbon.identity.framework.imp.pkg.version.range>[5.25.234, 8.0.0)
+        </carbon.identity.framework.imp.pkg.version.range>
         <securevault.wso2.version>1.1.5</securevault.wso2.version>
 
         <carbon.commons.version>4.7.19</carbon.commons.version>
