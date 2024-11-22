@@ -1,21 +1,20 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*
-*/
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.event.output.adapter.email;
 
 import org.apache.axis2.transport.mail.MailConstants;
@@ -31,6 +30,7 @@ import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailable
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
+import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterUtil;
 import org.wso2.carbon.identity.central.log.mgt.utils.LoggerUtils;
 import org.wso2.carbon.utils.DiagnosticLog;
 
@@ -374,7 +374,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 }
             } catch (MessagingException e) {
                 LogMessagingException(e, to, 0);
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error in message format", e, log, tenantId);
+                EmailEventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message,
+                        "Error in message format", e, log, tenantId);
             } catch (Exception e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error sending email to '" + to + "'", e, log, tenantId);
             }
@@ -433,7 +434,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     EmailEventAdapterConstants.LogConstants.ActionIDs.HANDLE_EMAIL_SENDING);
             diagnosticLogBuilder
                     .resultMessage(e.getMessage())
-                    .inputParam(EmailEventAdapterConstants.LogConstants.InputKeys.EMAIL_RECIPIENT, mailRecipient)
+                    .inputParam(EmailEventAdapterConstants.LogConstants.InputKeys.EMAIL_RECIPIENT,
+                            LoggerUtils.isLogMaskingEnable ? LoggerUtils.getMaskedContent(mailRecipient) :
+                                    mailRecipient)
                     .logDetailLevel(DiagnosticLog.LogDetailLevel.INTERNAL_SYSTEM)
                     .resultStatus(DiagnosticLog.ResultStatus.FAILED);
             LoggerUtils.triggerDiagnosticLogEvent(diagnosticLogBuilder);
