@@ -179,7 +179,7 @@
                 <version>${carbon.kernel.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.ops4j.pax.logging</groupId>
+                <groupId>org.wso2.org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-api</artifactId>
                 <version>${pax.logging.api.version}</version>
             </dependency>
@@ -1177,6 +1177,12 @@
                 <groupId>org.wso2.securevault</groupId>
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${securevault.wso2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.ops4j.pax.logging</groupId>
+                        <artifactId>pax-logging-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jacoco</groupId>
@@ -1241,12 +1247,12 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-                <version>2.12.0</version>
+                <version>2.17.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
-                <version>2.12.0</version>
+                <version>2.17.1</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -1523,7 +1529,7 @@
         <carbon.analytics.common.version>5.2.61-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.5.3</carbon.kernel.version>
+        <carbon.kernel.version>4.10.26</carbon.kernel.version>
         <carbon.kernel.feature.version>${carbon.kernel.version}</carbon.kernel.feature.version>
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
         <securevault.wso2.version>1.1.5</securevault.wso2.version>
@@ -1665,7 +1671,7 @@
 
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
-        <pax.logging.api.version>1.10.1</pax.logging.api.version>
+        <pax.logging.api.version>2.1.0-wso2v4</pax.logging.api.version>
         <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
     </properties>
 
