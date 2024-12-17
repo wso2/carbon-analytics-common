@@ -20,7 +20,7 @@
     <parent>
         <artifactId>event-output-adapters</artifactId>
         <groupId>org.wso2.carbon.analytics-common</groupId>
-        <version>5.2.60-SNAPSHOT</version>
+        <version>5.2.62-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -46,7 +46,7 @@
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
 <dependency>
-    <groupId>org.ops4j.pax.logging</groupId>
+    <groupId>org.wso2.org.ops4j.pax.logging</groupId>
     <artifactId>pax-logging-api</artifactId>
 </dependency>
         <dependency>
