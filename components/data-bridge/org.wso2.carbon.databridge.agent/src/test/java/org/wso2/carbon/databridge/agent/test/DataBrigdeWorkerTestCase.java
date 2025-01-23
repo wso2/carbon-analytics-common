@@ -42,8 +42,8 @@ public class DataBrigdeWorkerTestCase {
 
     @Test
     public void testDataEndpointConnectionWorkerNotInitializedTest() {
-        Thread thread = new Thread(new DataEndpointConnectionWorker());
-        thread.start();
+        DataEndpointConnectionWorker dataEndpointConnectionWorker = new DataEndpointConnectionWorker();
+        dataEndpointConnectionWorker.runConnection(false);
     }
 
     @Test
