@@ -15,6 +15,12 @@
 
 <outputEventAdaptersConfig xmlns:svns="http://org.wso2.securevault/configuration">
 
+    <!-- Publisher Thread Pool Related Properties -->
+    <minThread key="minThread">{{output_adapter.publisher.min_thread}}</minThread>
+    <maxThread key="maxThread">{{output_adapter.publisher.max_thread}}</maxThread>
+    <keepAliveTime key="keepAliveTime">{{output_adapter.publisher.keep_alive_time}}</keepAliveTime>
+    <jobQueueSize key="jobQueueSize">{{output_adapter.publisher.job_queue_size}}</jobQueueSize>
+
     <adapterConfig type="wso2event">
         <property key="default.thrift.tcp.url">tcp://localhost:7612</property>
         <property key="default.thrift.ssl.url">ssl://localhost:7712</property>

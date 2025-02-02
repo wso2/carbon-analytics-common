@@ -62,5 +62,13 @@ public interface EventStreamConstants {
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String EVENT_ATTRIBUTE_SEPARATOR = ",";
 
+    public static final String GLOBAL_CONFIG_FILE_NAME = "output-event-adapters.xml";
+    public static final String SECURE_VAULT_NS = "http://org.wso2.securevault/configuration";
+    public static final String SECRET_ALIAS_ATTR_NAME = "secretAlias";
+
+    public static final String EVENT_PUBLISHER_MIN_THREAD_POOL_SIZE = "minThread";
+    public static final String EVENT_PUBLISHER_MAX_THREAD_POOL_SIZE = "maxThread";
+    public static final String EVENT_PUBLISHER_KEEP_ALIVE_TIME = "keepAliveTime";
+    public static final String EVENT_PUBLISHER_JOB_QUEUE_SIZE = "jobQueueSize";
 
 }

@@ -45,7 +45,7 @@ public class JMSEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private PublisherDetails publisherDetails = null;
-    private static ExecutorService executorService;
+    private ExecutorService executorService;
     private int tenantId;
 
     public JMSEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration,

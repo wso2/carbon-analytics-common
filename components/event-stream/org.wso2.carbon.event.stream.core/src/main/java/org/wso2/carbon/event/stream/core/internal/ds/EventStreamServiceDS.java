@@ -26,6 +26,8 @@ import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
+import org.wso2.carbon.event.stream.core.internal.util.EventPublisherConfigHelper;
+import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 @Component(
@@ -39,6 +41,7 @@ public class EventStreamServiceDS {
     protected void activate(ComponentContext context) {
 
         try {
+            EventStreamServiceValueHolder.setEventPublisherConfigs(EventPublisherConfigHelper.loadGlobalConfigs());
             EventStreamServiceValueHolder.registerEventStreamRuntime(new EventStreamRuntime());
             CarbonEventStreamService carbonEventStreamService = new CarbonEventStreamService();
             EventStreamServiceValueHolder.setCarbonEventStreamService(carbonEventStreamService);
@@ -85,5 +88,21 @@ public class EventStreamServiceDS {
     protected void unsetEventStreamListener(EventStreamListener eventStreamListener) {
 
         EventStreamServiceValueHolder.unregisterEventStreamListener(eventStreamListener);
+    }
+
+    @Reference(
+            name = "secret.callback.handler.service",
+            service = org.wso2.carbon.securevault.SecretCallbackHandlerService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSecretCallbackHandlerService")
+    protected void setSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+
+        EventStreamServiceValueHolder.setSecretCallbackHandlerService(secretCallbackHandlerService);
+    }
+
+    protected void unsetSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+
+        EventStreamServiceValueHolder.setSecretCallbackHandlerService(null);
     }
 }

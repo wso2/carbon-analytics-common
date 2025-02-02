@@ -16,6 +16,7 @@ package org.wso2.carbon.event.stream.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.stream.core.EventProducer;
@@ -23,10 +24,18 @@ import org.wso2.carbon.event.stream.core.EventProducerCallback;
 import org.wso2.carbon.event.stream.core.SiddhiEventConsumer;
 import org.wso2.carbon.event.stream.core.WSO2EventConsumer;
 import org.wso2.carbon.event.stream.core.WSO2EventListConsumer;
+import org.wso2.carbon.event.stream.core.internal.config.EventPublisherConfigs;
+import org.wso2.carbon.event.stream.core.internal.ds.EventStreamServiceValueHolder;
 import org.wso2.carbon.event.stream.core.internal.util.EventConverter;
+import org.wso2.carbon.event.stream.core.internal.util.EventStreamConstants;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Acts as the pass through point for a given stream. Does not distinguish between input and output streams.
@@ -59,6 +68,7 @@ public class EventJunction implements EventProducerCallback {
     private CopyOnWriteArrayList<SiddhiEventConsumer> siddhiEventConsumers;
     private CopyOnWriteArrayList<WSO2EventConsumer> wso2EventConsumers;
     private CopyOnWriteArrayList<WSO2EventListConsumer> wso2EventListConsumers;
+    private ThreadPoolExecutor eventConsumerThreadPoolExecutor;
 
     public EventJunction(StreamDefinition streamDefinition) {
         this.streamDefinition = streamDefinition;
@@ -67,6 +77,21 @@ public class EventJunction implements EventProducerCallback {
         this.wso2EventConsumers = new CopyOnWriteArrayList<WSO2EventConsumer>();
         this.wso2EventListConsumers = new CopyOnWriteArrayList<WSO2EventListConsumer>();
         populateEventTemplate(streamDefinition);
+
+        Map<String, Integer> publisherConfigs = getPublisherConfigs();
+        this.eventConsumerThreadPoolExecutor = new ThreadPoolExecutor(
+                publisherConfigs.get(EventStreamConstants.EVENT_PUBLISHER_MIN_THREAD_POOL_SIZE),
+                publisherConfigs.get(EventStreamConstants.EVENT_PUBLISHER_MAX_THREAD_POOL_SIZE),
+                publisherConfigs.get(EventStreamConstants.EVENT_PUBLISHER_KEEP_ALIVE_TIME)
+                , java.util.concurrent.TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(publisherConfigs.get(EventStreamConstants.EVENT_PUBLISHER_JOB_QUEUE_SIZE)),
+                new ThreadFactory() {
+                    private final AtomicInteger count = new AtomicInteger(1);
+                    @Override
+                    public Thread newThread(Runnable eventConsumer) {
+                        return new Thread(eventConsumer, "EventConsumerThread-" + count.getAndIncrement());
+                    }
+                });
     }
 
     public void addConsumer(SiddhiEventConsumer consumer) {
@@ -154,7 +179,8 @@ public class EventJunction implements EventProducerCallback {
         if (!wso2EventConsumers.isEmpty()) {
             for (WSO2EventConsumer consumer : wso2EventConsumers) {
                 try {
-                    consumer.onEvent(event);
+                    eventConsumerThreadPoolExecutor.submit(new EventConsumerThread(consumer, event, PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                            .getTenantId()));
                 } catch (Exception e) {
                     log.error("Error while dispatching events: " + e.getMessage(), e);
                 }
@@ -228,5 +254,13 @@ public class EventJunction implements EventProducerCallback {
         }
 
         this.attributesCount = attributesCount;
+    }
+
+    private static Map<String, Integer> getPublisherConfigs() {
+        EventPublisherConfigs publisherConfigs = EventStreamServiceValueHolder.getEventPublisherConfigs();
+        if (publisherConfigs != null) {
+            return publisherConfigs.getEventPublisherThreadPoolConfigs();
+        }
+        return null;
     }
 }
