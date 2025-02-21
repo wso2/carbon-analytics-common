@@ -16,5 +16,9 @@
   "output_adapter.email.enable_authentication": true,
   "output_adapter.email.signature": "$ref{output_adapter.email.username}",
   "output_adapter.email.reply_to": "$ref{output_adapter.email.from_address}",
-  "output_adapter.http.enable_form_url_encoded": false
+  "output_adapter.http.enable_form_url_encoded": false,
+  "output_adapter.publisher.min_thread": "100",
+  "output_adapter.publisher.max_thread": "150",
+  "output_adapter.publisher.keep_alive_time": "20000",
+  "output_adapter.publisher.job_queue_size": "100"
 }

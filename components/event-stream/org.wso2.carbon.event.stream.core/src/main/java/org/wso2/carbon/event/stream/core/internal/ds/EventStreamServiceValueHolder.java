@@ -17,6 +17,8 @@ package org.wso2.carbon.event.stream.core.internal.ds;
 import org.wso2.carbon.event.stream.core.EventStreamListener;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 import org.wso2.carbon.event.stream.core.internal.EventStreamRuntime;
+import org.wso2.carbon.event.stream.core.internal.config.EventPublisherConfigs;
+import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.List;
@@ -28,6 +30,8 @@ public class EventStreamServiceValueHolder {
     private static ConfigurationContextService configurationContextService;
     private static List<EventStreamListener> eventStreamListenerList =  new CopyOnWriteArrayList<EventStreamListener>();
     private static EventStreamRuntime eventStreamRuntime;
+    private static EventPublisherConfigs eventPublisherConfigs;
+    private static SecretCallbackHandlerService secretCallbackHandlerService;
 
     private EventStreamServiceValueHolder() {
 
@@ -68,5 +72,21 @@ public class EventStreamServiceValueHolder {
 
     public static void registerEventStreamRuntime(EventStreamRuntime eventStreamRuntime) {
         EventStreamServiceValueHolder.eventStreamRuntime = eventStreamRuntime;
+    }
+
+    public static void setEventPublisherConfigs(EventPublisherConfigs globalAdapterConfigs) {
+        EventStreamServiceValueHolder.eventPublisherConfigs = globalAdapterConfigs;
+    }
+
+    public static EventPublisherConfigs getEventPublisherConfigs() {
+        return eventPublisherConfigs;
+    }
+
+    public static void setSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+        EventStreamServiceValueHolder.secretCallbackHandlerService = secretCallbackHandlerService;
+    }
+
+    public static SecretCallbackHandlerService getSecretCallbackHandlerService() {
+        return secretCallbackHandlerService;
     }
 }
