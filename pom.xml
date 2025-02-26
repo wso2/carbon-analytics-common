@@ -1560,7 +1560,7 @@
         <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
         <jsonpath.version>2.9.0.wso2v1</jsonpath.version>
         <jayway.jsonpath.orbit.version>2.9.0.wso2v1</jayway.jsonpath.orbit.version>
-        <jsonsmart.version>2.5.0</jsonsmart.version>
+        <jsonsmart.version>2.5.2</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
         <testng.version>6.11</testng.version>
