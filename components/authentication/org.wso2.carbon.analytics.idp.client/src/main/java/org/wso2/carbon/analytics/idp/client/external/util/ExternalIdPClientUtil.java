@@ -30,6 +30,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -77,7 +78,7 @@ public class ExternalIdPClientUtil {
     private static IdPClientConfiguration readYamlContent(InputStream yamlContent) {
 
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(IdPClientConfiguration.class,
-                IdPClientConfiguration.class.getClassLoader()));
+                IdPClientConfiguration.class.getClassLoader(), new LoaderOptions()));
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml.loadAs(yamlContent, IdPClientConfiguration.class);
     }
