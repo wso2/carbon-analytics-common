@@ -800,7 +800,7 @@
         <carbon.config.version>2.1.17</carbon.config.version>
         <carbon.config.maven.plugin.version>2.1.16</carbon.config.maven.plugin.version>
         <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
-        <carbon.secvault.version>5.0.13.4</carbon.secvault.version>
+        <carbon.secvault.version>5.0.20</carbon.secvault.version>
         <mavan.checkstyle.suppression.file>checkstyle-suppressions.xml</mavan.checkstyle.suppression.file>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
