@@ -35,6 +35,9 @@ public class EmailEventAdapterConstants {
     public static final String ADAPTER_EMAIL_SMTP_HOST  = "mail.smtp.host";
     public static final String ADAPTER_EMAIL_SMTP_AUTH  = "mail.smtp.auth";
     public static final String ADAPTER_EMAIL_SMTP_STARTTLS_ENABLE  = "mail.smtp.starttls.enable";
+    public static final String ADAPTER_EMAIL_CLIENT_ID = "mail.smtp.clientId";
+    public static final String ADAPTER_EMAIL_CLIENT_SECRET = "mail.smtp.clientSecret";
+    public static final String ADAPTER_EMAIL_TOKEN_ENDPOINT = "mail.smtp.tokenEndpoint";
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";

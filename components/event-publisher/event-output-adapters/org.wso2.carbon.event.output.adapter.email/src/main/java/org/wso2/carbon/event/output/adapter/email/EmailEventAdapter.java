@@ -22,6 +22,13 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
@@ -64,6 +71,7 @@ import javax.mail.internet.MimeMessage;
 public class EmailEventAdapter implements OutputEventAdapter {
 
     private static final Log log = LogFactory.getLog(EmailEventAdapter.class);
+    private static final String SCOPE = "https://graph.microsoft.com/.default";
     private static ThreadPoolExecutor threadPoolExecutor;
     private Session session;
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
@@ -176,6 +184,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
             final String smtpUsername;
             final String smtpPassword;
 
+            final String clientId;
+            final String clientSecret;
+            final String tokenEndpoint;
 
             // initialize SMTP session.
             Properties props = new Properties();
@@ -242,9 +253,23 @@ public class EmailEventAdapter implements OutputEventAdapter {
             }
 
             //Retrieving username and password of SMTP server.
-            smtpUsername = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
-            smtpPassword = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
+            if (props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID) != null &&
+                    props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET) != null &&
+                    props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT) != null) {
 
+                clientId = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID);
+                clientSecret = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET);
+                tokenEndpoint = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
+
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+
+                smtpUsername = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_FROM);
+                smtpPassword = getAccessToken(clientId, clientSecret, tokenEndpoint);
+            } else {
+                smtpUsername = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
+                smtpPassword = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
+            }
 
             //initializing SMTP server to create session object.
             if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
@@ -260,6 +285,38 @@ public class EmailEventAdapter implements OutputEventAdapter {
             }
         }
     }
+
+    public static String getAccessToken(String clientId, String clientSecret, String tokenEndpoint) {
+
+        // Automatically closes resources when exiting the try block
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(createTokenRequest(clientId, clientSecret,
+                     tokenEndpoint))) {
+
+            String responseString = EntityUtils.toString(response.getEntity());
+            JSONObject jsonResponse = new JSONObject(responseString);
+            return jsonResponse.getString("access_token");
+        } catch (Exception e) {
+            log.error("Error while getting access token", e);
+            return null;
+        }
+    }
+
+    private static HttpPost createTokenRequest(String clientId, String clientSecret, String tokenEndpoint) {
+
+        HttpPost request = new HttpPost(tokenEndpoint);
+        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        // Request body
+        String body = "client_id=" + clientId +
+                "&client_secret=" + clientSecret +
+                "&scope=" + SCOPE +
+                "&grant_type=client_credentials";
+
+        request.setEntity(new StringEntity(body, "UTF-8"));
+        return request;
+    }
+
 
     /**
      * This will be invoked upon a successful trigger of

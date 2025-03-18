@@ -99,6 +99,18 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         startTLSEnable.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.MAIL_SMTP_REPLY_TO));
         startTLSEnable.setRequired(false);
 
+        Property clientId = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID);
+        clientId.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID));
+        clientId.setRequired(false);
+
+        Property clientSecret = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET);
+        clientSecret.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET));
+        clientSecret.setRequired(false);
+
+        Property tokenEndpoint = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
+        tokenEndpoint.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT));
+        tokenEndpoint.setRequired(false);
+
         staticpropertyList.add(smtplUserName);
         staticpropertyList.add(smtpPassword);
         staticpropertyList.add(smtpAuth);
@@ -108,6 +120,9 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         staticpropertyList.add(startTLSEnable);
         staticpropertyList.add(senderSignature);
         staticpropertyList.add(replyToAddress);
+        staticpropertyList.add(clientId);
+        staticpropertyList.add(clientSecret);
+        staticpropertyList.add(tokenEndpoint);
 
         return staticpropertyList;
     }
