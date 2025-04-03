@@ -62,9 +62,9 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
 
         List<Property> staticpropertyList = new ArrayList<>();
 
-        Property smtplUserName = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER);
-        smtplUserName.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER));
-        smtplUserName.setRequired(false);
+        Property smtpUsername = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER);
+        smtpUsername.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER));
+        smtpUsername.setRequired(false);
 
         Property smtpPassword = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PASSWORD);
         smtpPassword.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PASSWORD));
@@ -111,7 +111,11 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         tokenEndpoint.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT));
         tokenEndpoint.setRequired(false);
 
-        staticpropertyList.add(smtplUserName);
+        Property scopes = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
+        tokenEndpoint.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES));
+        tokenEndpoint.setRequired(false);
+
+        staticpropertyList.add(smtpUsername);
         staticpropertyList.add(smtpPassword);
         staticpropertyList.add(smtpAuth);
         staticpropertyList.add(smtpFrom);
@@ -123,6 +127,7 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         staticpropertyList.add(clientId);
         staticpropertyList.add(clientSecret);
         staticpropertyList.add(tokenEndpoint);
+        staticpropertyList.add(scopes);
 
         return staticpropertyList;
     }
@@ -171,6 +176,5 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
     public OutputEventAdapter createEventAdapter(OutputEventAdapterConfiguration eventAdapterConfiguration, Map<String,
             String> globalProperties) {
         return new EmailEventAdapter(eventAdapterConfiguration, globalProperties);
-
     }
 }

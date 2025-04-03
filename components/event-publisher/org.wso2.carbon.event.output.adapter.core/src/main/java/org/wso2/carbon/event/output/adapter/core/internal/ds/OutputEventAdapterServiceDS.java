@@ -29,6 +29,8 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.internal.CarbonOutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.internal.util.EventAdapterConfigHelper;
+import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
+import org.wso2.carbon.identity.secret.mgt.core.SecretResolveManager;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -141,5 +143,43 @@ public class OutputEventAdapterServiceDS {
     protected void unsetSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
 
         OutputEventAdapterServiceValueHolder.setSecretCallbackHandlerService(null);
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.identity.secret.mgt.core.SecretManager",
+            service = SecretManager.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSecretManager"
+    )
+    private void setSecretManager(SecretManager secretManager) {
+
+        OutputEventAdapterServiceValueHolder.setSecretManager(secretManager);
+        log.debug("SecretManager set in OutputEventAdapterServiceValueHolder bundle.");
+    }
+
+    private void unsetSecretManager(SecretManager secretManager) {
+
+        OutputEventAdapterServiceValueHolder.setSecretManager(null);
+        log.debug("SecretManager unset in OutputEventAdapterServiceValueHolder bundle.");
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.identity.secret.mgt.core.SecretResolveManager",
+            service = SecretResolveManager.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSecretResolveManager"
+    )
+    private void setSecretResolveManager(SecretResolveManager secretResolveManager) {
+
+        OutputEventAdapterServiceValueHolder.setSecretResolveManager(secretResolveManager);
+        log.debug("SecretResolveManager set in OutputEventAdapterServiceValueHolder bundle.");
+    }
+
+    private void unsetSecretResolveManager(SecretResolveManager secretResolveManager) {
+
+        OutputEventAdapterServiceValueHolder.setSecretResolveManager(null);
+        log.debug("SecretResolveManager unset in OutputEventAdapterServiceValueHolder bundle.");
     }
 }

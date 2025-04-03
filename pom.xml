@@ -210,6 +210,12 @@
             </dependency>
             <!--carbon-kernel dependencies stop-->
 
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.secret.mgt.core</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+            </dependency>
+
             <!--carbon-commons dependencies start-->
             <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
@@ -1526,7 +1532,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.2.63-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.2.61</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.10.26</carbon.kernel.version>
@@ -1537,6 +1543,9 @@
         <carbon.commons.version>4.7.19</carbon.commons.version>
         <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
+
+        <carbon.identity.framework.version>7.7.23</carbon.identity.framework.version>
+        <carbon.identity.framework.imp.pkg.version.range>[7.1.0, 8.0.0)</carbon.identity.framework.imp.pkg.version.range>
 
         <!--CEP versions-->
         <siddhi.version>3.2.11</siddhi.version>

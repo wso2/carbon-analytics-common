@@ -38,6 +38,7 @@ public class EmailEventAdapterConstants {
     public static final String ADAPTER_EMAIL_CLIENT_ID = "mail.smtp.clientId";
     public static final String ADAPTER_EMAIL_CLIENT_SECRET = "mail.smtp.clientSecret";
     public static final String ADAPTER_EMAIL_TOKEN_ENDPOINT = "mail.smtp.tokenEndpoint";
+    public static final String ADAPTER_EMAIL_SCOPES = "mail.smtp.scopes";
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
