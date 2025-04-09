@@ -18,6 +18,14 @@ package org.wso2.carbon.event.output.adapter.core;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
@@ -29,6 +37,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import java.util.Map;
 
 public class EventAdapterUtil {
+
+    private static final Log LOG = LogFactory.getLog(EventAdapterUtil.class);
 
     public static AxisConfiguration getAxisConfiguration() {
         AxisConfiguration axisConfiguration = null;
@@ -81,4 +91,36 @@ public class EventAdapterUtil {
         return null;
     }
 
+    /**
+     *
+     */
+    public static String getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(createTokenRequest(clientId, secret,
+                     tokenEndpoint, scopes))) {
+
+            String responseString = EntityUtils.toString(response.getEntity());
+            JSONObject jsonResponse = new JSONObject(responseString);
+            return jsonResponse.getString("access_token");
+        } catch (Exception e) {
+            LOG.error("Error while getting access token", e);
+            return null;
+        }
+    }
+
+    private static HttpPost createTokenRequest(String clientId, String secret, String tokenEndpoint, String scopes) {
+
+        HttpPost request = new HttpPost(tokenEndpoint);
+        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        // Request body
+        String body = "client_id=" + clientId +
+                "&client_secret=" + secret +
+                "&scope=" + scopes +
+                "&grant_type=client_credentials";
+
+        request.setEntity(new StringEntity(body, "UTF-8"));
+        return request;
+    }
 }

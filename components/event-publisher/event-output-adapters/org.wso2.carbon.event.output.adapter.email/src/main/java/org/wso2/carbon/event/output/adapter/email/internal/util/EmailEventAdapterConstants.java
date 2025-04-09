@@ -22,6 +22,7 @@ public class EmailEventAdapterConstants {
     private EmailEventAdapterConstants() {
     }
 
+    public static final String EMAIL_PROVIDER = "EMAIL_PROVIDER";
     public static final String ADAPTER_TYPE_EMAIL = "email";
     public static final String ADAPTER_MESSAGE_EMAIL_ADDRESS = "email.address";
     public static final String ADAPTER_MESSAGE_EMAIL_ADDRESS_HINT = "emailAddress.hint";
@@ -35,6 +36,11 @@ public class EmailEventAdapterConstants {
     public static final String ADAPTER_EMAIL_SMTP_HOST  = "mail.smtp.host";
     public static final String ADAPTER_EMAIL_SMTP_AUTH  = "mail.smtp.auth";
     public static final String ADAPTER_EMAIL_SMTP_STARTTLS_ENABLE  = "mail.smtp.starttls.enable";
+    public static final String ADAPTER_EMAIL_AUTH_TYPE = "mail.smtp.authType";
+    public static final String ADAPTER_EMAIL_CLIENT_ID = "mail.smtp.clientId";
+    public static final String ADAPTER_EMAIL_CLIENT_SECRET = "mail.smtp.clientSecret";
+    public static final String ADAPTER_EMAIL_TOKEN_ENDPOINT = "mail.smtp.tokenEndpoint";
+    public static final String ADAPTER_EMAIL_SCOPES = "mail.smtp.scopes";
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
@@ -45,18 +51,29 @@ public class EmailEventAdapterConstants {
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
 
+    /**
+     * Authentication types.
+     */
+    public static final String CLIENT_CREDENTIAL = "CLIENT_CREDENTIAL";
+    public static final String BASIC = "BASIC";
 
     /**
      * SMTP property constants.
      */
-
     public static final String MAIL_SMTP_HOST = "mail.smtp.host";
     public static final String MAIL_SMTP_PORT = "mail.smtp.port";
 
     /**
+     * Credential Properties.
+     */
+    public static final String CLIENT_ID = "clientId";
+    public static final String CLIENT_SECRET = "clientSecret";
+    public static final String USERNAME = "userName";
+    public static final String PASSWORD = "password";
+
+    /**
      * Email Adapter MIME types.
      */
-
     public static final String MAIL_TEXT_PLAIN = "text/plain";
     public static final String MAIL_TEXT_HTML = "text/html";
 

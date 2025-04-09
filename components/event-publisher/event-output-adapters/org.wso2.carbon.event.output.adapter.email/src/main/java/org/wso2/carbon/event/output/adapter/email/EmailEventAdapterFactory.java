@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -99,6 +98,26 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         startTLSEnable.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.MAIL_SMTP_REPLY_TO));
         startTLSEnable.setRequired(false);
 
+        Property authType = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_AUTH_TYPE);
+        authType.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_AUTH_TYPE));
+        authType.setRequired(false);
+
+        Property clientId = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID);
+        clientId.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID));
+        clientId.setRequired(false);
+
+        Property clientSecret = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET);
+        clientSecret.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET));
+        clientSecret.setRequired(false);
+
+        Property tokenEndpoint = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
+        tokenEndpoint.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT));
+        tokenEndpoint.setRequired(false);
+
+        Property scopes = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
+        tokenEndpoint.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES));
+        tokenEndpoint.setRequired(false);
+
         staticpropertyList.add(smtplUserName);
         staticpropertyList.add(smtpPassword);
         staticpropertyList.add(smtpAuth);
@@ -108,6 +127,11 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         staticpropertyList.add(startTLSEnable);
         staticpropertyList.add(senderSignature);
         staticpropertyList.add(replyToAddress);
+        staticpropertyList.add(authType);
+        staticpropertyList.add(clientId);
+        staticpropertyList.add(clientSecret);
+        staticpropertyList.add(tokenEndpoint);
+        staticpropertyList.add(scopes);
 
         return staticpropertyList;
     }

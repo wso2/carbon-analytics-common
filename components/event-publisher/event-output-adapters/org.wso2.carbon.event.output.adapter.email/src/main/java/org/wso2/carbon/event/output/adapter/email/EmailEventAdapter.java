@@ -31,9 +31,11 @@ import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterExc
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants;
 import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterUtil;
+import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -54,6 +56,16 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor.decryptCredential;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_AUTH_TYPE;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_FROM;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.BASIC;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_CREDENTIAL;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_ID;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_SECRET;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.PASSWORD;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.USERNAME;
 
 
 /**
@@ -241,10 +253,9 @@ public class EmailEventAdapter implements OutputEventAdapter {
                         ("The adapter " + eventAdapterConfiguration.getName() + " " + msg, e);
             }
 
-            //Retrieving username and password of SMTP server.
-            smtpUsername = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
-            smtpPassword = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
-
+            Map<String, String> credentials = resolveCredentials(props);
+            smtpUsername = credentials.get(USERNAME);
+            smtpPassword = credentials.get(PASSWORD);
 
             //initializing SMTP server to create session object.
             if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
@@ -256,9 +267,53 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 });
             } else {
                 session = Session.getInstance(props);
-                log.info("Connecting adapter " + eventAdapterConfiguration.getName() + "without user authentication for tenant " + tenantId);
+                log.info("Connecting adapter " + eventAdapterConfiguration.getName() +
+                        " without user authentication for tenant " + tenantId);
             }
         }
+    }
+
+    private Map<String, String> resolveCredentials(Properties props) {
+
+        Map<String, String> credentials = new HashMap<>();
+        if (CLIENT_CREDENTIAL.equalsIgnoreCase(props.getProperty(ADAPTER_EMAIL_AUTH_TYPE))) {
+            String clientId = null;
+            String clientSecret = null;
+            try {
+                clientId = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, CLIENT_CREDENTIAL,
+                        CLIENT_ID);
+                clientSecret = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, CLIENT_CREDENTIAL,
+                        CLIENT_SECRET);
+            } catch (SecretManagementException e) {
+                log.error("credentials cannot be decrypted");
+            }
+            String tokenEndpoint = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
+            String scopes = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
+
+            if (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret) ||
+                    StringUtils.isEmpty(tokenEndpoint) || StringUtils.isEmpty(scopes)) {
+                throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() +
+                        " failed to connect to the mail server due to missing client credentials");
+            }
+            credentials.put(USERNAME, props.getProperty(ADAPTER_EMAIL_SMTP_FROM));
+            credentials.put(PASSWORD, EventAdapterUtil.getAccessToken(clientId, clientSecret, tokenEndpoint, scopes));
+        } else {
+            String userName;
+            String password;
+            try {
+                userName = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, BASIC, USERNAME);
+            } catch (SecretManagementException e) {
+                userName = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
+            }
+            try {
+                password = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, BASIC, PASSWORD);
+            } catch (SecretManagementException e) {
+                password = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
+            }
+            credentials.put(USERNAME, userName);
+            credentials.put(PASSWORD, password);
+        }
+        return credentials;
     }
 
     /**
@@ -268,8 +323,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
      * @param message           the event stream data.
      * @param dynamicProperties the dynamic attributes of the email.
      */
-
-
     @Override
     public void publish(Object message, Map<String, String> dynamicProperties) {
         //Get subject and emailIds from dynamic properties
