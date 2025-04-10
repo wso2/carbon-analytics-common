@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.output.adapter.email;
 
+import com.sun.mail.smtp.SMTPTransport;
 import org.apache.axis2.transport.mail.MailConstants;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -64,9 +65,9 @@ import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEven
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_CREDENTIAL;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_ID;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_SECRET;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.MAIL_SMTP_HOST;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.PASSWORD;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.USERNAME;
-
 
 /**
  * The Email event adapter sends mail using an SMTP server configuration defined
@@ -81,7 +82,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
     private OutputEventAdapterConfiguration eventAdapterConfiguration;
     private Map<String, String> globalProperties;
     private int tenantId;
-
+    private String smtpPassword;
+    private String smtpUsername;
 
     /**
      * Default from address for outgoing messages.
@@ -154,7 +156,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
             threadPoolExecutor = new ThreadPoolExecutor(minThread, maxThread, defaultKeepAliveTime,
                     TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(jobQueSize));
         }
-
     }
 
     @Override
@@ -168,7 +169,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
      * @throws ConnectionUnavailableException on error.
      */
 
-
     @Override
     public void connect() throws ConnectionUnavailableException {
 
@@ -181,20 +181,11 @@ public class EmailEventAdapter implements OutputEventAdapter {
             String smtpHost;
             String smtpPort;
 
-
-            /**
-             *  Default from username and password for outgoing messages.
-             */
-            final String smtpUsername;
-            final String smtpPassword;
-
-
             // initialize SMTP session.
             Properties props = new Properties();
             props.putAll(globalProperties);
 
             //Verifying default SMTP properties of the SMTP server.
-
             smtpFrom = props.getProperty(MailConstants.MAIL_SMTP_FROM);
             smtpHost = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_HOST);
             smtpPort = props.getProperty(EmailEventAdapterConstants.MAIL_SMTP_PORT);
@@ -206,7 +197,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 }
                 throw new ConnectionUnavailableException("The adapter " +
                         eventAdapterConfiguration.getName() + " " + msg);
-
             }
 
             if (smtpHost == null) {
@@ -259,12 +249,22 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
             //initializing SMTP server to create session object.
             if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
-                session = Session.getInstance(props, new Authenticator() {
-                    public PasswordAuthentication
-                    getPasswordAuthentication() {
-                        return new PasswordAuthentication(smtpUsername, smtpPassword);
-                    }
-                });
+                if (!CLIENT_CREDENTIAL.equalsIgnoreCase(props.getProperty(ADAPTER_EMAIL_AUTH_TYPE))) {
+                    session = Session.getInstance(props, new Authenticator() {
+                        public PasswordAuthentication
+                        getPasswordAuthentication() {
+                            return new PasswordAuthentication(smtpUsername, smtpPassword);
+                        }
+                    });
+                } else {
+                    props.put("mail.smtp.auth", "true");
+                    props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
+                    props.put("mail.smtp.starttls.enable", "true");
+                    props.put("mail.smtp.ssl.trust", props.getProperty(MAIL_SMTP_HOST));
+
+                    session = Session.getInstance(props);
+                    session.setDebug(true); // Optional: debug output
+                }
             } else {
                 session = Session.getInstance(props);
                 log.info("Connecting adapter " + eventAdapterConfiguration.getName() +
@@ -418,7 +418,15 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     log.debug("Meta data of the email configured successfully");
                 }
 
-                Transport.send(message);
+                if (globalProperties.get(ADAPTER_EMAIL_AUTH_TYPE).equalsIgnoreCase(CLIENT_CREDENTIAL)) {
+                    SMTPTransport transport = (SMTPTransport) session.getTransport("smtp");
+                    transport.connect(globalProperties.get(MAIL_SMTP_HOST),
+                            smtpUsername,smtpPassword);
+                    transport.sendMessage(message, message.getAllRecipients());
+                }
+                else {
+                    Transport.send(message);
+                }
 
                 if (log.isDebugEnabled()) {
                     log.debug("Mail sent to the EmailID " + to + " Successfully");
