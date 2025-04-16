@@ -41,6 +41,8 @@ public class EmailEventAdapterConstants {
     public static final String ADAPTER_EMAIL_CLIENT_SECRET = "mail.smtp.clientSecret";
     public static final String ADAPTER_EMAIL_TOKEN_ENDPOINT = "mail.smtp.tokenEndpoint";
     public static final String ADAPTER_EMAIL_SCOPES = "mail.smtp.scopes";
+    public static final String ADAPTER_EMAIL_SMTP_AUTH_MECHANISMS = "mail.smtp.auth.mechanisms";
+    public static final String ADAPTER_EMAIL_SMTP_SSL_TRUST = "mail.smtp.ssl.trust";
     public static final String MIN_THREAD_NAME = "minThread";
     public static final String MAX_THREAD_NAME = "maxThread";
     public static final String ADAPTER_KEEP_ALIVE_TIME_NAME = "keepAliveTimeInMillis";
@@ -50,6 +52,8 @@ public class EmailEventAdapterConstants {
     public static final long DEFAULT_KEEP_ALIVE_TIME_IN_MILLS = 20000;
     public static final String ADAPTER_EXECUTOR_JOB_QUEUE_SIZE_NAME = "jobQueueSize";
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
+    public static final String SMTP_PROTOCOL = "smtp";
+    public static final int MAX_RETRY_ATTEMPTS = 2;
 
     /**
      * Authentication types.

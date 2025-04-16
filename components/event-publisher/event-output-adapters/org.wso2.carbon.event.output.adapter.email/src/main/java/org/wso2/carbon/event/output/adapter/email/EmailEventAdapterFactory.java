@@ -115,8 +115,8 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         tokenEndpoint.setRequired(false);
 
         Property scopes = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
-        tokenEndpoint.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES));
-        tokenEndpoint.setRequired(false);
+        scopes.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES));
+        scopes.setRequired(false);
 
         staticpropertyList.add(smtplUserName);
         staticpropertyList.add(smtpPassword);

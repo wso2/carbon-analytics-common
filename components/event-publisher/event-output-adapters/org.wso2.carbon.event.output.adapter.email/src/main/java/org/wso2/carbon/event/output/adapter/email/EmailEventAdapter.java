@@ -59,14 +59,21 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor.decryptCredential;
+import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessToken;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_AUTH_TYPE;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_AUTH_MECHANISMS;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_FROM;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_SSL_TRUST;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.BASIC;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_CREDENTIAL;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_ID;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.CLIENT_SECRET;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.MAIL_SMTP_HOST;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.MAX_RETRY_ATTEMPTS;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.PASSWORD;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.SMTP_PROTOCOL;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.USERNAME;
 
 /**
@@ -84,6 +91,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
     private int tenantId;
     private String smtpPassword;
     private String smtpUsername;
+    private String clientId;
+    private String clientSecret;
 
     /**
      * Default from address for outgoing messages.
@@ -124,7 +133,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
             int maxThread;
             long defaultKeepAliveTime;
             int jobQueSize;
-
 
             //If global properties are available those will be assigned else constant values will be assigned
             if (globalProperties.get(EmailEventAdapterConstants.MIN_THREAD_NAME) != null) {
@@ -173,10 +181,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
     public void connect() throws ConnectionUnavailableException {
 
         if (session == null) {
-
-            /**
-             * Default SMTP properties for outgoing messages.
-             */
+            // Default SMTP properties for outgoing messages.
             String smtpFrom;
             String smtpHost;
             String smtpPort;
@@ -234,8 +239,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
             try {
                 smtpFromAddress = new InternetAddress(smtpFrom);
             } catch (AddressException e) {
-                String msg = "failed to connect to the mail server due to error in retrieving " +
-                        "smtp from address";
+                String msg = "failed to connect to the mail server due to error in retrieving smtp from address";
                 if (log.isDebugEnabled()) {
                     log.debug(msg + ": " + smtpFrom);
                 }
@@ -243,28 +247,22 @@ public class EmailEventAdapter implements OutputEventAdapter {
                         ("The adapter " + eventAdapterConfiguration.getName() + " " + msg, e);
             }
 
-            Map<String, String> credentials = resolveCredentials(props);
+            Map<String, String> credentials = resolveCredentials(globalProperties);
             smtpUsername = credentials.get(USERNAME);
             smtpPassword = credentials.get(PASSWORD);
 
             //initializing SMTP server to create session object.
             if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
-                if (!CLIENT_CREDENTIAL.equalsIgnoreCase(props.getProperty(ADAPTER_EMAIL_AUTH_TYPE))) {
-                    session = Session.getInstance(props, new Authenticator() {
-                        public PasswordAuthentication
-                        getPasswordAuthentication() {
-                            return new PasswordAuthentication(smtpUsername, smtpPassword);
-                        }
-                    });
-                } else {
-                    props.put("mail.smtp.auth", "true");
-                    props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
-                    props.put("mail.smtp.starttls.enable", "true");
-                    props.put("mail.smtp.ssl.trust", props.getProperty(MAIL_SMTP_HOST));
-
-                    session = Session.getInstance(props);
-                    session.setDebug(true); // Optional: debug output
+                if (CLIENT_CREDENTIAL.equalsIgnoreCase(props.getProperty(ADAPTER_EMAIL_AUTH_TYPE))) {
+                    props.put(ADAPTER_EMAIL_SMTP_AUTH_MECHANISMS, "XOAUTH2");
+                    props.put(ADAPTER_EMAIL_SMTP_SSL_TRUST, props.getProperty(MAIL_SMTP_HOST));
                 }
+                session = Session.getInstance(props, new Authenticator() {
+                    public PasswordAuthentication
+                    getPasswordAuthentication() {
+                        return new PasswordAuthentication(smtpUsername, smtpPassword);
+                    }
+                });
             } else {
                 session = Session.getInstance(props);
                 log.info("Connecting adapter " + eventAdapterConfiguration.getName() +
@@ -273,42 +271,41 @@ public class EmailEventAdapter implements OutputEventAdapter {
         }
     }
 
-    private Map<String, String> resolveCredentials(Properties props) {
+    private Map<String, String> resolveCredentials(Map<String, String> props) {
 
         Map<String, String> credentials = new HashMap<>();
-        if (CLIENT_CREDENTIAL.equalsIgnoreCase(props.getProperty(ADAPTER_EMAIL_AUTH_TYPE))) {
-            String clientId = null;
-            String clientSecret = null;
+        if (CLIENT_CREDENTIAL.equalsIgnoreCase(props.get(ADAPTER_EMAIL_AUTH_TYPE))) {
             try {
                 clientId = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, CLIENT_CREDENTIAL,
                         CLIENT_ID);
                 clientSecret = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, CLIENT_CREDENTIAL,
                         CLIENT_SECRET);
             } catch (SecretManagementException e) {
-                log.error("credentials cannot be decrypted");
+                throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() +
+                        " failed to connect to the mail server due credential decryption failure", e);
             }
-            String tokenEndpoint = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
-            String scopes = props.getProperty(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
+            String tokenEndpoint = props.get(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
+            String scopes = props.get(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
 
             if (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret) ||
                     StringUtils.isEmpty(tokenEndpoint) || StringUtils.isEmpty(scopes)) {
                 throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() +
                         " failed to connect to the mail server due to missing client credentials");
             }
-            credentials.put(USERNAME, props.getProperty(ADAPTER_EMAIL_SMTP_FROM));
-            credentials.put(PASSWORD, EventAdapterUtil.getAccessToken(clientId, clientSecret, tokenEndpoint, scopes));
+            credentials.put(USERNAME, props.get(ADAPTER_EMAIL_SMTP_FROM));
+            credentials.put(PASSWORD, getAccessToken(clientId, clientSecret, tokenEndpoint, scopes));
         } else {
             String userName;
             String password;
             try {
                 userName = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, BASIC, USERNAME);
             } catch (SecretManagementException e) {
-                userName = props.getProperty(MailConstants.MAIL_SMTP_USERNAME);
+                userName = props.get(MailConstants.MAIL_SMTP_USERNAME);
             }
             try {
                 password = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, BASIC, PASSWORD);
             } catch (SecretManagementException e) {
-                password = props.getProperty(MailConstants.MAIL_SMTP_PASSWORD);
+                password = props.get(MailConstants.MAIL_SMTP_PASSWORD);
             }
             credentials.put(USERNAME, userName);
             credentials.put(PASSWORD, password);
@@ -317,8 +314,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
     }
 
     /**
-     * This will be invoked upon a successful trigger of
-     * a data stream.
+     * This will be invoked upon a successful trigger of a data stream.
      *
      * @param message           the event stream data.
      * @param dynamicProperties the dynamic attributes of the email.
@@ -407,9 +403,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     message.setReplyTo(smtpReplyToAddress);
                 }
 
-                message.addRecipient(Message.RecipientType.TO,
-                        new InternetAddress(to));
-
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
                 message.setSubject(subject);
                 message.setSentDate(new Date());
                 message.setContent(body, type);
@@ -418,15 +412,8 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     log.debug("Meta data of the email configured successfully");
                 }
 
-                if (globalProperties.get(ADAPTER_EMAIL_AUTH_TYPE).equalsIgnoreCase(CLIENT_CREDENTIAL)) {
-                    SMTPTransport transport = (SMTPTransport) session.getTransport("smtp");
-                    transport.connect(globalProperties.get(MAIL_SMTP_HOST),
-                            smtpUsername,smtpPassword);
-                    transport.sendMessage(message, message.getAllRecipients());
-                }
-                else {
-                    Transport.send(message);
-                }
+                //Sending the email using SMTP transport.
+                sendWithRetry(message);
 
                 if (log.isDebugEnabled()) {
                     log.debug("Mail sent to the EmailID " + to + " Successfully");
@@ -436,10 +423,47 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 EmailEventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message,
                         "Error in message format", e, log, tenantId);
             } catch (Exception e) {
-                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message, "Error sending email to '" + to + "'", e, log, tenantId);
+                EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), message,
+                        "Error sending email to '" + to + "'", e, log, tenantId);
             }
         }
+    }
 
+    private void sendWithRetry(Message message) throws MessagingException {
+
+        int attempts = 0;
+
+        try {
+            Transport.send(message);
+        } catch (AuthenticationFailedException exception) {
+            // Retry only for CLIENT_CREDENTIAL authentication type.
+            if (!CLIENT_CREDENTIAL.equalsIgnoreCase(globalProperties.get(ADAPTER_EMAIL_AUTH_TYPE))) {
+                return;
+            }
+            // Log the failure and prepare for retry.
+            log.warn("Authentication failed, attempting token refresh and retry...", exception);
+            while (attempts < MAX_RETRY_ATTEMPTS) {
+                SMTPTransport transport;
+                attempts++;
+
+                try {
+                    transport = (SMTPTransport) session.getTransport(SMTP_PROTOCOL);
+                    smtpPassword = getAccessToken(clientId, clientSecret,
+                            globalProperties.get(ADAPTER_EMAIL_TOKEN_ENDPOINT),
+                            globalProperties.get(ADAPTER_EMAIL_SCOPES));
+                    transport.connect(globalProperties.get(MAIL_SMTP_HOST), smtpUsername, smtpPassword);
+
+                    transport.sendMessage(message, message.getAllRecipients());
+                    return; // Success, so exit the method.
+
+                } catch (Exception e) {
+                    log.warn("Authentication failed, attempting token refresh and retry (attempt " + attempts + ")", e);
+                }
+                if (attempts == MAX_RETRY_ATTEMPTS) {
+                    throw new MessagingException("Authentication failed even after retrying with new token.");
+                }
+            }
+        }
     }
 
     private void LogMessagingException(MessagingException e, String mailRecipient, int recurseCount) {
