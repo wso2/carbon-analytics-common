@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.event.output.adapter.core;
 
@@ -34,6 +36,7 @@ import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class EventAdapterUtil {
@@ -92,7 +95,13 @@ public class EventAdapterUtil {
     }
 
     /**
+     * Retrieves the access token using the client credentials grant type.
      *
+     * @param clientId      The client ID.
+     * @param secret        The client Secret.
+     * @param tokenEndpoint The token endpointURL.
+     * @param scopes        The scopes to be requested.
+     * @return Access Token.
      */
     public static String getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
 
@@ -114,13 +123,13 @@ public class EventAdapterUtil {
         HttpPost request = new HttpPost(tokenEndpoint);
         request.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        // Request body
+        // Request body.
         String body = "client_id=" + clientId +
                 "&client_secret=" + secret +
                 "&scope=" + scopes +
                 "&grant_type=client_credentials";
 
-        request.setEntity(new StringEntity(body, "UTF-8"));
+        request.setEntity(new StringEntity(body, StandardCharsets.UTF_8));
         return request;
     }
 }

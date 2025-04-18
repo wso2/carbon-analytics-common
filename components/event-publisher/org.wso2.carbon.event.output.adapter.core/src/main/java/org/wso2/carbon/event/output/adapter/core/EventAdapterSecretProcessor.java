@@ -31,6 +31,7 @@ public class EventAdapterSecretProcessor {
      * @param notificationSender    Notification Sender: EMAIL_PROVIDER.
      * @param authType              Authentication Type: BASIC, CLIENT_CREDENTIAL.
      * @param property              Authentication Property: userName, password, clientId, clientSecret.
+     * @return Decrypted secret value.
      * @throws SecretManagementException If an error occurs while decrypting the secret.
      */
     public static String decryptCredential(String notificationSender, String authType, String property)
