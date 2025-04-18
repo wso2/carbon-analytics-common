@@ -62,6 +62,8 @@ import javax.mail.internet.MimeMessage;
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor.decryptCredential;
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessToken;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_AUTH_TYPE;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_ID;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_CLIENT_SECRET;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_AUTH_MECHANISMS;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_FROM;
@@ -279,11 +281,14 @@ public class EmailEventAdapter implements OutputEventAdapter {
             try {
                 clientId = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, CLIENT_CREDENTIAL,
                         CLIENT_ID);
+            } catch (SecretManagementException e) {
+                clientId = props.get(ADAPTER_EMAIL_CLIENT_ID);
+            }
+            try {
                 clientSecret = decryptCredential(EmailEventAdapterConstants.EMAIL_PROVIDER, CLIENT_CREDENTIAL,
                         CLIENT_SECRET);
             } catch (SecretManagementException e) {
-                throw new ConnectionUnavailableException("The adapter " + eventAdapterConfiguration.getName() +
-                        " failed to connect to the mail server due credential decryption failure", e);
+                clientSecret = props.get(ADAPTER_EMAIL_CLIENT_SECRET);
             }
             String tokenEndpoint = props.get(EmailEventAdapterConstants.ADAPTER_EMAIL_TOKEN_ENDPOINT);
             String scopes = props.get(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES);
