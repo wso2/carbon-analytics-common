@@ -35,6 +35,7 @@ import org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapte
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -454,6 +455,10 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     transport.connect(globalProperties.get(MAIL_SMTP_HOST), smtpUsername, smtpPassword);
 
                     transport.sendMessage(message, message.getAllRecipients());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Mail sent to the EmailID " + Arrays.toString(message.getAllRecipients()) +
+                                " Successfully with retry.");
+                    }
                     return; // Success, so exit the method.
 
                 } catch (Exception e) {
