@@ -61,9 +61,9 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
 
         List<Property> staticpropertyList = new ArrayList<>();
 
-        Property smtplUserName = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER);
-        smtplUserName.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER));
-        smtplUserName.setRequired(false);
+        Property smtpUserName = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER);
+        smtpUserName.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_USER));
+        smtpUserName.setRequired(false);
 
         Property smtpPassword = new Property(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PASSWORD);
         smtpPassword.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SMTP_PASSWORD));
@@ -118,7 +118,7 @@ public class EmailEventAdapterFactory extends OutputEventAdapterFactory {
         scopes.setDisplayName(resourceBundle.getString(EmailEventAdapterConstants.ADAPTER_EMAIL_SCOPES));
         scopes.setRequired(false);
 
-        staticpropertyList.add(smtplUserName);
+        staticpropertyList.add(smtpUserName);
         staticpropertyList.add(smtpPassword);
         staticpropertyList.add(smtpAuth);
         staticpropertyList.add(smtpFrom);

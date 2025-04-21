@@ -78,6 +78,7 @@ import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEven
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.PASSWORD;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.SMTP_PROTOCOL;
 import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.USERNAME;
+import static org.wso2.carbon.event.output.adapter.email.internal.util.EmailEventAdapterConstants.XOAUTH2;
 
 /**
  * The Email event adapter sends mail using an SMTP server configuration defined
@@ -257,7 +258,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
             //initializing SMTP server to create session object.
             if (smtpUsername != null && smtpPassword != null && !smtpUsername.isEmpty() && !smtpPassword.isEmpty()) {
                 if (CLIENT_CREDENTIAL.equalsIgnoreCase(props.getProperty(ADAPTER_EMAIL_AUTH_TYPE))) {
-                    props.put(ADAPTER_EMAIL_SMTP_AUTH_MECHANISMS, "XOAUTH2");
+                    props.put(ADAPTER_EMAIL_SMTP_AUTH_MECHANISMS, XOAUTH2);
                     props.put(ADAPTER_EMAIL_SMTP_SSL_TRUST, props.getProperty(MAIL_SMTP_HOST));
                 }
                 session = Session.getInstance(props, new Authenticator() {
@@ -418,7 +419,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
                     log.debug("Meta data of the email configured successfully");
                 }
 
-                //Sending the email using SMTP transport.
+                // Sending the email using SMTP transport.
                 sendWithRetry(message);
 
                 if (log.isDebugEnabled()) {
@@ -437,41 +438,46 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
     private void sendWithRetry(Message message) throws MessagingException {
 
-        int attempts = 0;
 
         try {
             Transport.send(message);
         } catch (AuthenticationFailedException exception) {
             // Retry only for CLIENT_CREDENTIAL authentication type.
             if (!CLIENT_CREDENTIAL.equalsIgnoreCase(globalProperties.get(ADAPTER_EMAIL_AUTH_TYPE))) {
-                return;
+                throw new AuthenticationFailedException();
             }
-            // Log the failure and prepare for retry.
+            handleRetry(message);
             log.warn("Authentication failed, attempting token refresh and retry...", exception);
-            while (attempts < MAX_RETRY_ATTEMPTS) {
-                SMTPTransport transport;
-                attempts++;
+        }
+    }
 
-                try {
-                    transport = (SMTPTransport) session.getTransport(SMTP_PROTOCOL);
-                    smtpPassword = getAccessToken(clientId, clientSecret,
-                            globalProperties.get(ADAPTER_EMAIL_TOKEN_ENDPOINT),
-                            globalProperties.get(ADAPTER_EMAIL_SCOPES));
-                    transport.connect(globalProperties.get(MAIL_SMTP_HOST), smtpUsername, smtpPassword);
+    private void handleRetry(Message message) throws MessagingException {
 
-                    transport.sendMessage(message, message.getAllRecipients());
-                    if (log.isDebugEnabled()) {
-                        log.debug("Mail sent to the EmailID " + Arrays.toString(message.getAllRecipients()) +
-                                " Successfully with retry.");
-                    }
-                    return; // Success, so exit the method.
+        int attempts = 0;
 
-                } catch (Exception e) {
-                    log.warn("Authentication failed, attempting token refresh and retry (attempt " + attempts + ")", e);
+        while (attempts < MAX_RETRY_ATTEMPTS) {
+            SMTPTransport transport;
+            attempts++;
+
+            try {
+                transport = (SMTPTransport) session.getTransport(SMTP_PROTOCOL);
+                smtpPassword = getAccessToken(clientId, clientSecret,
+                        globalProperties.get(ADAPTER_EMAIL_TOKEN_ENDPOINT),
+                        globalProperties.get(ADAPTER_EMAIL_SCOPES));
+                transport.connect(globalProperties.get(MAIL_SMTP_HOST), smtpUsername, smtpPassword);
+
+                transport.sendMessage(message, message.getAllRecipients());
+                if (log.isDebugEnabled()) {
+                    log.debug("Mail sent to the EmailID " + Arrays.toString(message.getAllRecipients()) +
+                            " Successfully with retry.");
                 }
-                if (attempts == MAX_RETRY_ATTEMPTS) {
-                    throw new MessagingException("Authentication failed even after retrying with new token.");
-                }
+                return;
+
+            } catch (Exception e) {
+                log.warn("Authentication failed, attempting token refresh and retry (attempt " + attempts + ")", e);
+            }
+            if (attempts == MAX_RETRY_ATTEMPTS) {
+                throw new MessagingException("Authentication failed even after retrying with new token.");
             }
         }
     }

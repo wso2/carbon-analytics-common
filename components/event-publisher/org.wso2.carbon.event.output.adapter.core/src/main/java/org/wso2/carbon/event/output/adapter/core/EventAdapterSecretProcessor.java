@@ -21,6 +21,9 @@ import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterS
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.model.ResolvedSecret;
 
+/**
+ * Secret processor for event adapters.
+ */
 public class EventAdapterSecretProcessor {
 
     private static final String SECRET_PROPERTIES = "_SECRET_PROPERTIES";

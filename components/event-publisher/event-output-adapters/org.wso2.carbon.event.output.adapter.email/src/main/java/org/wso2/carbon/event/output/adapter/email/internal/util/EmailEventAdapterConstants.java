@@ -54,6 +54,7 @@ public class EmailEventAdapterConstants {
     public static final int ADAPTER_EXECUTOR_JOB_QUEUE_SIZE = 2000;
     public static final String SMTP_PROTOCOL = "smtp";
     public static final int MAX_RETRY_ATTEMPTS = 2;
+    public static final String XOAUTH2 = "XOAUTH2";
 
     /**
      * Authentication types.

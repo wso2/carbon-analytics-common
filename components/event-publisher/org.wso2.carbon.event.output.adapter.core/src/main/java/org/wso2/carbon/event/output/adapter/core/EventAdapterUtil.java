@@ -21,11 +21,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.wso2.carbon.context.CarbonContext;
@@ -36,7 +38,9 @@ import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EventAdapterUtil {
@@ -118,18 +122,19 @@ public class EventAdapterUtil {
         }
     }
 
-    private static HttpPost createTokenRequest(String clientId, String secret, String tokenEndpoint, String scopes) {
+    private static HttpPost createTokenRequest(String clientId, String secret, String tokenEndpoint, String scopes)
+            throws UnsupportedEncodingException {
 
         HttpPost request = new HttpPost(tokenEndpoint);
         request.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        // Request body.
-        String body = "client_id=" + clientId +
-                "&client_secret=" + secret +
-                "&scope=" + scopes +
-                "&grant_type=client_credentials";
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("client_id", clientId));
+        params.add(new BasicNameValuePair("client_secret", secret));
+        params.add(new BasicNameValuePair("scope", scopes));
+        params.add(new BasicNameValuePair("grant_type", "client_credentials"));
 
-        request.setEntity(new StringEntity(body, StandardCharsets.UTF_8));
+        request.setEntity(new UrlEncodedFormEntity(params));
         return request;
     }
 }
