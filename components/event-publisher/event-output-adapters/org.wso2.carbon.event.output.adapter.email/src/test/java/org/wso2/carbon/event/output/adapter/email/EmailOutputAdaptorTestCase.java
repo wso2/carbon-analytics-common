@@ -146,6 +146,10 @@ public class EmailOutputAdaptorTestCase {
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");
         EmailEventAdapter emailEventAdapter2 = new EmailEventAdapter(eventAdapterConfiguration, properties);
+
+        SecretManager secretManager = new SecretManagerImpl();
+        OutputEventAdapterServiceValueHolder.setSecretManager(secretManager);
+
         emailEventAdapter2.connect();
     }
 
@@ -220,6 +224,9 @@ public class EmailOutputAdaptorTestCase {
         globalProperties.put("mail.smtp.host", "smtp.gmail.com");
         globalProperties.put("minThread", "8");
         EmailEventAdapter emailEventAdapter2 = new EmailEventAdapter(eventAdapterConfiguration, globalProperties);
+
+        SecretManager secretManager = new SecretManagerImpl();
+        OutputEventAdapterServiceValueHolder.setSecretManager(secretManager);
         emailEventAdapter2.connect();
         // TODO: 9/26/17 logger reader
     }

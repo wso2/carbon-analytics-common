@@ -37,7 +37,7 @@ public class EventAdapterSecretProcessor {
      * @return Decrypted secret value.
      * @throws SecretManagementException If an error occurs while decrypting the secret.
      */
-    public static String decryptCredential(String notificationSender, String authType, String property)
+    public static char[] decryptCredential(String notificationSender, String authType, String property)
             throws SecretManagementException {
 
         String secretName = buildSecretName(notificationSender, authType, property);
@@ -49,7 +49,7 @@ public class EventAdapterSecretProcessor {
         ResolvedSecret resolvedSecret = OutputEventAdapterServiceValueHolder.getSecretResolveManager()
                 .getResolvedSecret(secretType, secretName);
 
-        return resolvedSecret.getResolvedSecretValue();
+        return resolvedSecret.getResolvedSecretValue().toCharArray();
     }
 
     /**

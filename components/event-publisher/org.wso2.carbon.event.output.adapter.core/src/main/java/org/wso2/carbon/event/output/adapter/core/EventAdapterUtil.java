@@ -118,8 +118,7 @@ public class EventAdapterUtil {
             return jsonResponse.getString("access_token");
         } catch (Exception e) {
             LOG.error("Error while getting access token", e);
-            return null;
-        }
+            throw new OutputEventAdapterRuntimeException("Error while getting access token", e);}
     }
 
     private static HttpPost createTokenRequest(String clientId, String secret, String tokenEndpoint, String scopes)
@@ -130,7 +129,7 @@ public class EventAdapterUtil {
 
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("client_id", clientId));
-        params.add(new BasicNameValuePair("client_secret", secret));
+        params.add(new BasicNameValuePair("client_secret", secret.toString()));
         params.add(new BasicNameValuePair("scope", scopes));
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
 

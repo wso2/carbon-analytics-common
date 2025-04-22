@@ -29,4 +29,8 @@ public final class EventAdapterConstants {
 
     public static final String SECRET_ALIAS_ATTR_NAME = "secretAlias";
 
+    public static final String ADAPTER_EMAIL_AUTH_TYPE = "mail.smtp.authType";
+    public static final String ADAPTER_EMAIL_SMTP_USER = "mail.smtp.user";
+
+    public static final String BASIC = "BASIC";
 }
