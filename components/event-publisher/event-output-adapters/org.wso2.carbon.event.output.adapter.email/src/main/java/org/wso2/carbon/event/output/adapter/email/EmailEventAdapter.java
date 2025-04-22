@@ -438,7 +438,6 @@ public class EmailEventAdapter implements OutputEventAdapter {
 
     private void sendWithRetry(Message message) throws MessagingException {
 
-
         try {
             Transport.send(message);
         } catch (AuthenticationFailedException exception) {
