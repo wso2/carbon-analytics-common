@@ -2,14 +2,20 @@ package org.wso2.carbon.event.output.adapter.email;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.Property;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
+import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
+import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
+import org.wso2.carbon.identity.secret.mgt.core.SecretManagerImpl;
+import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +27,7 @@ import java.util.Map;
 /**
  * Test case.
  */
+@PrepareForTest(EventAdapterSecretProcessor.class)
 public class EmailOutputAdaptorTestCase {
     private static final Log logger = LogFactory.getLog(EmailOutputAdaptorTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
@@ -106,10 +113,14 @@ public class EmailOutputAdaptorTestCase {
 
     @Test(dependsOnMethods = {"testEmailPublisherConnect1", "testEmailPublisherConnect2", "testEmailPublisherConnect3",
             "testEmailPublisherConnect5"})
-    public void testEmailPublisherConnect() {
+    public void testEmailPublisherConnect() throws SecretManagementException {
         logger.info("Test case for connection of email output adaptor.");
         EmailEventAdapter emailEventAdapter = getEmailAdaptor();
+
+        SecretManager secretManager = new SecretManagerImpl();
+        OutputEventAdapterServiceValueHolder.setSecretManager(secretManager);
         emailEventAdapter.connect();
+
         emailEventAdapter.disconnect();
         emailEventAdapter.destroy();
     }
@@ -135,6 +146,10 @@ public class EmailOutputAdaptorTestCase {
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");
         EmailEventAdapter emailEventAdapter2 = new EmailEventAdapter(eventAdapterConfiguration, properties);
+
+        SecretManager secretManager = new SecretManagerImpl();
+        OutputEventAdapterServiceValueHolder.setSecretManager(secretManager);
+
         emailEventAdapter2.connect();
     }
 
@@ -209,6 +224,9 @@ public class EmailOutputAdaptorTestCase {
         globalProperties.put("mail.smtp.host", "smtp.gmail.com");
         globalProperties.put("minThread", "8");
         EmailEventAdapter emailEventAdapter2 = new EmailEventAdapter(eventAdapterConfiguration, globalProperties);
+
+        SecretManager secretManager = new SecretManagerImpl();
+        OutputEventAdapterServiceValueHolder.setSecretManager(secretManager);
         emailEventAdapter2.connect();
         // TODO: 9/26/17 logger reader
     }

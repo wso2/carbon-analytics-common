@@ -19,6 +19,8 @@ package org.wso2.carbon.event.output.adapter.core.internal.ds;
 
 import org.wso2.carbon.event.output.adapter.core.internal.CarbonOutputEventAdapterService;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
+import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
+import org.wso2.carbon.identity.secret.mgt.core.SecretResolveManager;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -30,6 +32,8 @@ public class OutputEventAdapterServiceValueHolder {
     private static AdapterConfigs globalAdapterConfigs;
     private static ConfigurationContextService configurationContextService;
     private static SecretCallbackHandlerService secretCallbackHandlerService;
+    private static SecretManager secretManager;
+    private static SecretResolveManager secretResolveManager;
 
     private OutputEventAdapterServiceValueHolder() {
 
@@ -73,5 +77,45 @@ public class OutputEventAdapterServiceValueHolder {
 
     public static SecretCallbackHandlerService getSecretCallbackHandlerService() {
         return secretCallbackHandlerService;
+    }
+
+    /**
+     * Get the SecretResolveManager.
+     *
+     * @return SecretResolveManager instance.
+     */
+    public static SecretResolveManager getSecretResolveManager() {
+
+        return secretResolveManager;
+    }
+
+    /**
+     * Set the SecretResolveManager.
+     *
+     * @param secretResolveManager SecretResolveManager instance.
+     */
+    public static void setSecretResolveManager(SecretResolveManager secretResolveManager) {
+
+        OutputEventAdapterServiceValueHolder.secretResolveManager = secretResolveManager;
+    }
+
+    /**
+     * Get the SecretManager.
+     *
+     * @return SecretManager instance.
+     */
+    public static SecretManager getSecretManager() {
+
+        return secretManager;
+    }
+
+    /**
+     * Set the SecretManager.
+     *
+     * @param secretManager SecretManager instance.
+     */
+    public static void setSecretManager(SecretManager secretManager) {
+
+        OutputEventAdapterServiceValueHolder.secretManager = secretManager;
     }
 }

@@ -16,10 +16,13 @@ package org.wso2.carbon.event.output.adapter.core.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.output.adapter.core.*;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterFactory;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterSchema;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.wso2.carbon.event.output.adapter.core.Property;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
@@ -29,6 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.wso2.carbon.event.output.adapter.core.internal.EventAdapterConstants.ADAPTER_EMAIL_AUTH_TYPE;
+import static org.wso2.carbon.event.output.adapter.core.internal.EventAdapterConstants.ADAPTER_EMAIL_SMTP_USER;
+import static org.wso2.carbon.event.output.adapter.core.internal.EventAdapterConstants.BASIC;
 
 /**
  * EventAdapter service implementation.
@@ -79,7 +86,7 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
 
     @Override
     public void create(OutputEventAdapterConfiguration outputEventAdapterConfiguration) throws OutputEventAdapterException {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConcurrentHashMap<String, OutputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
         if (eventAdapters == null) {
             tenantSpecificEventAdapters.putIfAbsent(tenantId, new ConcurrentHashMap<String, OutputAdapterRuntime>());
@@ -100,18 +107,18 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
         }
         //check if all the required properties are given here
         List<Property> staticPropertyList = adapterFactory.getStaticPropertyList();
-        if(staticPropertyList != null){
-            Map<String,String> staticPropertyMap = outputEventAdapterConfiguration.getStaticProperties();
-            for (Property property: staticPropertyList){
-                if(property.isRequired()){
-                    if(staticPropertyMap == null){
+        if (staticPropertyList != null) {
+            Map<String, String> staticPropertyMap = outputEventAdapterConfiguration.getStaticProperties();
+            for (Property property : staticPropertyList) {
+                if (property.isRequired()) {
+                    if (staticPropertyMap == null) {
                         throw new OutputEventAdapterException("Output Event Adapter not created as the 'staticProperties' are null, " +
-                                "which means, the required property "+property.getPropertyName()+" is not  being set, for the adapter type " +
+                                "which means, the required property " + property.getPropertyName() + " is not  being set, for the adapter type " +
                                 outputEventAdapterConfiguration.getType());
                     }
-                    if(staticPropertyMap.get(property.getPropertyName()) == null){
-                        throw new OutputEventAdapterException("Output Event Adapter not created as the required property: "+property.getPropertyName()+
-                                " is not set, for the adapter type " +outputEventAdapterConfiguration.getType());
+                    if (staticPropertyMap.get(property.getPropertyName()) == null) {
+                        throw new OutputEventAdapterException("Output Event Adapter not created as the required property: " + property.getPropertyName() +
+                                " is not set, for the adapter type " + outputEventAdapterConfiguration.getType());
                     }
                 }
             }
@@ -128,13 +135,14 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
 
     /**
      * publishes the message using the given event adapter to the given topic.
-     *  @param name              - name of the event adapter
+     *
+     * @param name              - name of the event adapter
      * @param dynamicProperties
      * @param message
      */
     @Override
     public void publish(String name, Map<String, String> dynamicProperties, Object message) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConcurrentHashMap<String, OutputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
         if (eventAdapters == null) {
             throw new OutputEventAdapterRuntimeException("Event not published as no Output Event Adapter found with for" +
@@ -184,7 +192,7 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
 
     @Override
     public void destroy(String name) {
-        int tenantId= PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConcurrentHashMap<String, OutputAdapterRuntime> eventAdapters = tenantSpecificEventAdapters.get(tenantId);
         if (eventAdapters == null) {
             return;
@@ -197,15 +205,15 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
 
     @Override
     public boolean isPolled(String outputAdapterName) throws OutputEventAdapterException {
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            ConcurrentHashMap<String, OutputAdapterRuntime> inputRuntimeMap = tenantSpecificEventAdapters.get(tenantId);
-            if (inputRuntimeMap != null) {
-                OutputAdapterRuntime outputAdapterRuntime = inputRuntimeMap.get(outputAdapterName);
-                if (outputAdapterRuntime != null) {
-                    return outputAdapterRuntime.isPolled();
-                }
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        ConcurrentHashMap<String, OutputAdapterRuntime> inputRuntimeMap = tenantSpecificEventAdapters.get(tenantId);
+        if (inputRuntimeMap != null) {
+            OutputAdapterRuntime outputAdapterRuntime = inputRuntimeMap.get(outputAdapterName);
+            if (outputAdapterRuntime != null) {
+                return outputAdapterRuntime.isPolled();
             }
-            throw new OutputEventAdapterException("Adopter with name'" + outputAdapterName + "' not found");
+        }
+        throw new OutputEventAdapterException("Adopter with name'" + outputAdapterName + "' not found");
     }
 
     /**
@@ -216,11 +224,16 @@ public class CarbonOutputEventAdapterService implements OutputEventAdapterServic
      * @param tenantProps
      */
     private void overrideGlobalPropertiesWithTenantProperties(Map<String, String> globalProps,
-            Map<String, String> tenantProps) {
+                                                              Map<String, String> tenantProps) {
 
         for (String key : tenantProps.keySet()) {
             if (globalProps.containsKey(key) && tenantProps.get(key) != null) {
                 globalProps.put(key, tenantProps.get(key));
+            }
+            // If the email provider is set with notification sender v1 API, auth type will be null. In case global
+            // properties are set with CLIENT_CREDENTIAL grant type, we need to set the auth type as BASIC.
+            if (ADAPTER_EMAIL_AUTH_TYPE.equals(key) && tenantProps.get(ADAPTER_EMAIL_SMTP_USER) != null) {
+                globalProps.put(ADAPTER_EMAIL_AUTH_TYPE, BASIC);
             }
         }
     }
