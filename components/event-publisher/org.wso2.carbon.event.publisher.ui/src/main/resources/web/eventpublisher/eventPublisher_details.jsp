@@ -13,6 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   --%>
+<%@ page import="org.apache.taglibs.standard.functions.Functions" %>
 <%@ page
         import="org.wso2.carbon.event.publisher.stub.EventPublisherAdminServiceStub" %>
 
@@ -363,7 +364,7 @@
                    name="<%=eventPublisherPropertyDto[index].getKey()%>"
                    id="<%=propertyId%><%=index%>" class="initE"
                    style="width:75%"
-                   value="<%= eventPublisherPropertyDto[index].getValue() != null ? eventPublisherPropertyDto[index].getValue() : "" %>" disabled="disabled"/>
+                   value="<%= eventPublisherPropertyDto[index].getValue() != null ? Functions.escapeXml(eventPublisherPropertyDto[index].getValue()) : "" %>" disabled="disabled"/>
 
             <% } %>
 
@@ -443,7 +444,7 @@
                    name="<%=eventPublisherPropertyDto[index].getKey()%>"
                    id="<%=propertyId%><%=index%>" class="initE"
                    style="width:75%"
-                   value="<%= eventPublisherPropertyDto[index].getValue() != null ? eventPublisherPropertyDto[index].getValue() : "" %>" disabled="disabled"/>
+                   value="<%= eventPublisherPropertyDto[index].getValue() != null ? Functions.escapeXml(eventPublisherPropertyDto[index].getValue()) : "" %>" disabled="disabled"/>
 
             <% } %>
 

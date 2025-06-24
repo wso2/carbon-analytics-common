@@ -13,6 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   --%>
+<%@ page import="org.apache.taglibs.standard.functions.Functions" %>
 <%@ page
         import="org.wso2.carbon.event.receiver.stub.EventReceiverAdminServiceStub" %>
 
@@ -324,7 +325,7 @@
                    name="<%=eventReceiverPropertyDto[index].getKey()%>"
                    id="<%=propertyId%><%=index%>" class="initE"
                    style="width:75%"
-                   value="<%= eventReceiverPropertyDto[index].getValue() != null ? eventReceiverPropertyDto[index].getValue() : "" %>" disabled="disabled"/>
+                   value="<%= eventReceiverPropertyDto[index].getValue() != null ? Functions.escapeXml(eventReceiverPropertyDto[index].getValue()) : "" %>" disabled="disabled"/>
 
             <% } %>
 
