@@ -113,6 +113,9 @@
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0
                         </Import-Package>
+                        <Embed-Dependency>
+                            geronimo-jms_1.1_spec;scope=compile|runtime;inline=false
+                        </Embed-Dependency>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
