@@ -212,6 +212,7 @@ public class BinaryDataReceiver implements ServerStartupObserver {
             while (true) {
                 try {
                     Socket socket = this.serverSocket.accept();
+                    socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                     sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
@@ -232,6 +233,7 @@ public class BinaryDataReceiver implements ServerStartupObserver {
             while (true) {
                 try {
                     Socket socket = this.serverSocket.accept();
+                    socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                     tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
