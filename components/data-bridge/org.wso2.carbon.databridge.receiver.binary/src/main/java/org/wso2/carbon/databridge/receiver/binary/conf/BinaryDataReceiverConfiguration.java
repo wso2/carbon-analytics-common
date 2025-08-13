@@ -35,6 +35,8 @@ public class BinaryDataReceiverConfiguration {
     private String sslProtocols;
     private String ciphers;
 
+    private int socketTimeout;
+
     public BinaryDataReceiverConfiguration(int sslPort, int tcpPort) {
         this.sslPort = sslPort;
         this.tcpPort = tcpPort;
@@ -61,6 +63,11 @@ public class BinaryDataReceiverConfiguration {
         sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
         Object ciphersObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME, null);
         ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;
+        this.socketTimeout = Integer.parseInt(dataReceiver.getConfiguration(BinaryDataReceiverConstants.SOCKET_TIMEOUT,
+                BinaryDataReceiverConstants.DEFAULT_SOCKET_TIMEOUT).toString());
+        if (this.socketTimeout < 0) {
+            this.socketTimeout = BinaryDataReceiverConstants.DEFAULT_SOCKET_TIMEOUT;
+        }
     }
 
     public int getSSLPort() {
@@ -94,5 +101,8 @@ public class BinaryDataReceiverConfiguration {
     public boolean isEnable() {
 
         return enable;
+    }
+    public int getSocketTimeout() {
+        return socketTimeout;
     }
 }

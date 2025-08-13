@@ -32,6 +32,8 @@ public class BinaryDataReceiverConstants {
     public static final int DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE = 100;
     public static final int DEFAULT_SSL_RECEIVER_PORT = 9611;
     public static final int DEFAULT_TCP_RECEIVER_PORT = 9711;
+    public static final String SOCKET_TIMEOUT = "socketTimeout";
+    public static final int DEFAULT_SOCKET_TIMEOUT = 0;
     public static final String DATA_BRIDGE_RECEIVER_CONFIG_NAME = "Binary";
     public static final String SSL_RECEIVER_PORT_CONFIG_NAME = "sslPort";
     public static final String TCP_RECEIVER_PORT_CONFIG_NAME = "tcpPort";
