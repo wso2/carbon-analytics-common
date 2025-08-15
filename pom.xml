@@ -1530,8 +1530,7 @@
         <!--CEP versions-->
         <siddhi.version>3.2.15</siddhi.version>
 
-
-        <orbit.version.json>3.0.0.wso2v1</orbit.version.json>
+        <orbit.version.json>3.0.0.wso2v7</orbit.version.json>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
         <tomcat.websocket.version>7.0.54</tomcat.websocket.version>
         <orbit.version.axiom>1.2.11-wso2v16</orbit.version.axiom>
@@ -1560,7 +1559,7 @@
         <!--<httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>-->
         <jsonpath.version>2.9.0.wso2v1</jsonpath.version>
         <jayway.jsonpath.orbit.version>2.9.0.wso2v1</jayway.jsonpath.orbit.version>
-        <jsonsmart.version>2.5.2</jsonsmart.version>
+        <jsonsmart.version>2.6.0</jsonsmart.version>
         <javax.websocket.version>1.0</javax.websocket.version>
         <jaggery.version>0.12.8</jaggery.version>
         <testng.version>6.11</testng.version>
