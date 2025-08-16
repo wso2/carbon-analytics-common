@@ -42,7 +42,6 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -211,23 +210,12 @@ public class BinaryDataReceiver implements ServerStartupObserver {
         @Override
         public void run() {
             while (true) {
-                Socket socket = null;
                 try {
-                    socket = this.serverSocket.accept();
+                    Socket socket = this.serverSocket.accept();
                     socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                     sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                } catch (SocketTimeoutException socketTimeoutException) {
-                    log.error("Socket read timed out for client", socketTimeoutException);
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
-                } finally {
-                    if (socket != null && !socket.isClosed()) {
-                        try {
-                            socket.close();
-                        } catch (IOException ex) {
-                            log.error("Error while closing socket", ex);
-                        }
-                    }
                 }
             }
         }
@@ -243,23 +231,12 @@ public class BinaryDataReceiver implements ServerStartupObserver {
         @Override
         public void run() {
             while (true) {
-                Socket socket = null;
                 try {
-                    socket = this.serverSocket.accept();
+                    Socket socket = this.serverSocket.accept();
                     socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                     tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                } catch (SocketTimeoutException socketTimeoutException) {
-                    log.error("Socket read timed out for client", socketTimeoutException);
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
-                } finally {
-                    if (socket != null && !socket.isClosed()) {
-                        try {
-                            socket.close();
-                        } catch (IOException ex) {
-                            log.error("Error while closing socket", ex);
-                        }
-                    }
                 }
             }
         }
