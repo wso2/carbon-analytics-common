@@ -214,20 +214,9 @@ public class BinaryDataReceiver implements ServerStartupObserver {
                 Socket socket = null;
                 try {
                     socket = this.serverSocket.accept();
-                    socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                     sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                } catch (SocketTimeoutException socketTimeoutException) {
-                    log.error("Socket read timed out for client", socketTimeoutException);
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
-                } finally {
-                    if (socket != null && !socket.isClosed()) {
-                        try {
-                            socket.close();
-                        } catch (IOException ex) {
-                            log.error("Error while closing socket", ex);
-                        }
-                    }
                 }
             }
         }
@@ -246,35 +235,24 @@ public class BinaryDataReceiver implements ServerStartupObserver {
                 Socket socket = null;
                 try {
                     socket = this.serverSocket.accept();
-                    socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                     tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                } catch (SocketTimeoutException socketTimeoutException) {
-                    log.error("Socket read timed out for client", socketTimeoutException);
                 } catch (IOException e) {
                     log.error("Error while accepting the connection. ", e);
-                } finally {
-                    if (socket != null && !socket.isClosed()) {
-                        try {
-                            socket.close();
-                        } catch (IOException ex) {
-                            log.error("Error while closing socket", ex);
-                        }
-                    }
                 }
             }
         }
     }
 
     public class BinaryTransportReceiver implements Runnable {
-        private Socket socket;
+        private final Socket socket;
 
         public BinaryTransportReceiver(Socket socket) {
             this.socket = socket;
         }
 
-        @Override
-        public void run() {
+        @Override public void run() {
             try {
+                this.socket.setSoTimeout(binaryDataReceiverConfiguration.getSocketTimeout());
                 InputStream inputstream = new BufferedInputStream(socket.getInputStream());
                 OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
                 int messageType = inputstream.read();
@@ -284,8 +262,18 @@ public class BinaryDataReceiver implements ServerStartupObserver {
                     processMessage(messageType, message, outputStream);
                     messageType = inputstream.read();
                 }
+            } catch (SocketTimeoutException socketTimeoutException) {
+                log.error("Socket read timed out for client", socketTimeoutException);
             } catch (IOException ex) {
                 log.error("Error while reading from the socket. ", ex);
+            } finally {
+                if (socket != null && !socket.isClosed()) {
+                    try {
+                        socket.close();
+                    } catch (IOException ex) {
+                        log.error("Error while closing socket", ex);
+                    }
+                }
             }
         }
     }
