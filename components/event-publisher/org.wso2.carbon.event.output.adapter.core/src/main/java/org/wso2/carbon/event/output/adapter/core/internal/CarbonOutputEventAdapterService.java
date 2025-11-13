@@ -40,6 +40,13 @@ import static org.wso2.carbon.event.output.adapter.core.internal.EventAdapterCon
 /**
  * EventAdapter service implementation.
  */
+@org.osgi.annotation.bundle.Capability(
+        namespace = "osgi.service",
+        attribute = {
+                "objectClass=org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService",
+                "service.scope=singleton"
+        }
+)
 public class CarbonOutputEventAdapterService implements OutputEventAdapterService {
 
     private static Log log = LogFactory.getLog(CarbonOutputEventAdapterService.class);

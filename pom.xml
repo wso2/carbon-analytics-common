@@ -313,12 +313,12 @@
                 <version>${httpcore.httpcomponents.wso2.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.osgi</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.osgi</artifactId>
                 <version>${org.eclipse.osgi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.osgi</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.osgi.services</artifactId>
                 <version>${version.equinox.osgi.services}</version>
             </dependency>
@@ -1265,6 +1265,11 @@
                 <artifactId>org.wso2.carbon.pax-logging-log4j2-plugins</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${version.jaxb.api}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -1340,7 +1345,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>5.1.9</version>
                     <extensions>true</extensions>
                     <configuration>
                         <obrRepository>NONE</obrRepository>
@@ -1553,7 +1558,7 @@
 
 
         <orbit.version.json>3.0.0.wso2v4</orbit.version.json>
-        <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
+        <carbon.p2.plugin.version>5.4.12-SNAPSHOT</carbon.p2.plugin.version>
         <tomcat.websocket.version>7.0.54</tomcat.websocket.version>
         <orbit.version.axiom>1.2.11-wso2v16</orbit.version.axiom>
         <imp.pkg.version.range.axiom>[1.2.11-wso2v16, 1.3.0)</imp.pkg.version.range.axiom>
@@ -1587,8 +1592,8 @@
         <testng.version>6.11</testng.version>
         <snakeyaml.version>1.11</snakeyaml.version>
         <antlr.version>4.5</antlr.version>
-        <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
-        <version.equinox.osgi.services>3.3.100.v20120522-1822</version.equinox.osgi.services>
+        <org.eclipse.osgi.version>3.19.0</org.eclipse.osgi.version>
+        <version.equinox.osgi.services>3.12.0</version.equinox.osgi.services>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
         <google.guava.version>31.0.1-jre</google.guava.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
@@ -1683,6 +1688,8 @@
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
         <pax.logging.api.version>2.1.0-wso2v4</pax.logging.api.version>
         <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
+
+        <version.jaxb.api>2.4.0-b180830.0359</version.jaxb.api>
     </properties>
 
 </project>
