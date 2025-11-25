@@ -204,7 +204,8 @@ public class EventPublisherConfigurationBuilder {
             } else if (dynamicProperties.containsKey(propertyName)) {
                 dynamicProperties.put(propertyName, propertyValue);
             } else {
-                log.warn("To property " + propertyName + " with value " + propertyValue + " is dropped as its irrelevant of output adapter type:" + toEventAdapterType);
+                log.warn("To property " + propertyName + " is dropped as its irrelevant of output adapter type:"
+                        + toEventAdapterType);
             }
         }
 
