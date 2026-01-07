@@ -1527,7 +1527,7 @@
         <!--<carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>-->
         <securevault.wso2.version>1.1.5</securevault.wso2.version>
 
-        <carbon.commons.version>4.7.19</carbon.commons.version>
+        <carbon.commons.version>4.9.20-SNAPSHOT</carbon.commons.version> <!-- TODO minor version bump from 4.7.x.  org.wso2.carbon.identity.authentication jar comes from this commons version-->
         <!--<carbon.deployment.version>4.3.1</carbon.deployment.version>-->
         <!--<carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>-->
 
