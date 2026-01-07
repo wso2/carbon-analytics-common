@@ -54,5 +54,15 @@
 
     <build>
         <finalName>outputwebsocket</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+        </plugins>
     </build>
 </project>

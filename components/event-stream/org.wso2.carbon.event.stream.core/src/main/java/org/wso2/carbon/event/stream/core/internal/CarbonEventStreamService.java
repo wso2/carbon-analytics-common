@@ -20,6 +20,7 @@ package org.wso2.carbon.event.stream.core.internal;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.annotation.bundle.Capability;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
@@ -49,6 +50,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Capability(
+        namespace = "osgi.service",
+        attribute = {
+                "objectClass=org.wso2.carbon.event.stream.core.EventStreamService",
+                "service.scope=singleton"
+        }
+)
 public class CarbonEventStreamService implements EventStreamService {
 
     private static final Log log = LogFactory.getLog(CarbonEventStreamService.class);
