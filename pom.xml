@@ -1180,20 +1180,8 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito</artifactId>
-                <version>${powermock.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <version>${powermock.version}</version>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito-core.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1655,7 +1643,7 @@
         <org.eclipse.osgi.version.range>[1.2.0, 2.0.0)</org.eclipse.osgi.version.range>
 
         <mockito.version>1.10.19</mockito.version>
-        <powermock.version>1.6.4</powermock.version>
+        <mockito-core.version>5.3.1</mockito-core.version>
         <org.jacoco.ant.version>0.8.12</org.jacoco.ant.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v2</version.org.wso2.orbit.javax.activation>
 
