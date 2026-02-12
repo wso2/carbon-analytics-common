@@ -1541,7 +1541,7 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.common.version>5.3.30-SNAPSHOT</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.4.0-SNAPSHOT</carbon.analytics.common.version>
 
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.5.3</carbon.kernel.version>
