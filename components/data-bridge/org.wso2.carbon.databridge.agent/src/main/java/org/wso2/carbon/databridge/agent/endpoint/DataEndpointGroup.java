@@ -379,7 +379,8 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     private void busyWait(long timeInMilliSec) {
         try {
             Thread.sleep(timeInMilliSec);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -440,13 +441,14 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
             long gap = 0;
             long isEPCheckedGap = 0;
             long addedDelayForEPCheck = 10000l;
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 for (int i = START_INDEX; i < maximumDataPublisherIndex.get(); i++) {
                     DataEndpoint dataEndpoint = dataEndpoints.get(i);
                     try {
                         TimeUnit.MILLISECONDS.sleep(10);
-                    } catch (InterruptedException ignored) {
-                        //Exception is ignored as it does not impact the functionality.
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
                     }
                     if (!dataEndpoint.isConnected()) {
                         gap = System.currentTimeMillis() - dataEndpoint.getReConnectTimestamp();
@@ -535,7 +537,7 @@ public class DataEndpointGroup implements DataEndpointFailureCallback {
     }
 
     public void shutdown() {
-        reconnection.stop();
+        reconnection.interrupt();
         if (eventQueue != null) {
             eventQueue.shutdown();
         }

@@ -19,6 +19,7 @@ package org.wso2.carbon.databridge.streamdefn.filesystem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.annotation.bundle.Capability;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
@@ -31,6 +32,13 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.Collection;
 
+@Capability(
+        namespace = "osgi.service",
+        attribute = {
+                "objectClass=org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore",
+                "service.scope=singleton"
+        }
+)
 public class FileSystemStreamDefinitionStore extends AbstractStreamDefinitionStore {
     private static final Log log = LogFactory.getLog(FileSystemStreamDefinitionStore.class);
 

@@ -19,13 +19,12 @@ package org.wso2.carbon.event.application.deployer;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import org.wso2.carbon.CarbonException;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
@@ -42,13 +41,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
-import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.mockito.Mockito.mock;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(AppDeployerUtils.class)
 public class EventProcessingAppDeployerTest {
 
     private static final String CAppName = "SampleCarbonApp";
@@ -58,6 +55,7 @@ public class EventProcessingAppDeployerTest {
     private ApplicationConfiguration applicationConfiguration;
     private EventProcessingDeployer eventProcessingDeployer;
     private EventProcessingAppDeployer eventProcessingAppDeployer;
+    private MockedStatic<AppDeployerUtils> appDeployerUtilsMockedStatic;
 
     @Before
     public void initialize() throws CarbonException, IOException {
@@ -79,18 +77,28 @@ public class EventProcessingAppDeployerTest {
         carbonApplication.setAppVersion("1.0.0");
         axisConfiguration = new AxisConfiguration();
 
-        CarbonAppPersistenceManager carbonAppPersistenceManager = PowerMockito.mock(CarbonAppPersistenceManager.class);
-        PowerMockito.stub(PowerMockito.method(AppDeployerUtils.class, "readServerRoles")).toReturn(new
-                String[]{"DataAnalyticsServer"});
+        CarbonAppPersistenceManager carbonAppPersistenceManager = mock(CarbonAppPersistenceManager.class);
         eventProcessingDeployer = mock(EventProcessingDeployer.class);
-        PowerMockito.stub(PowerMockito.method(AppDeployerUtils.class, "buildAcceptanceList")).toReturn(map);
-        PowerMockito.stub(PowerMockito.method(AppDeployerUtils.class, "getArtifactDeployer")).toReturn
-                (eventProcessingDeployer);
+
+        appDeployerUtilsMockedStatic = Mockito.mockStatic(AppDeployerUtils.class, Mockito.CALLS_REAL_METHODS);
+        appDeployerUtilsMockedStatic.when(() -> AppDeployerUtils.readServerRoles(any()))
+                .thenReturn(new String[]{"DataAnalyticsServer"});
+        appDeployerUtilsMockedStatic.when(() -> AppDeployerUtils.buildAcceptanceList(any()))
+                .thenReturn(map);
+        appDeployerUtilsMockedStatic.when(() -> AppDeployerUtils.getArtifactDeployer(any(AxisConfiguration.class),
+                anyString(), anyString())).thenReturn(eventProcessingDeployer);
 
         applicationConfiguration = new ApplicationConfiguration(carbonAppPersistenceManager, extractedPath +
                 File.separator + "artifacts.xml");
         carbonApplication.setAppConfig(applicationConfiguration);
         eventProcessingAppDeployer = new EventProcessingAppDeployer();
+    }
+
+    @After
+    public void tearDown() {
+        if (appDeployerUtilsMockedStatic != null) {
+            appDeployerUtilsMockedStatic.close();
+        }
     }
 
     @Test

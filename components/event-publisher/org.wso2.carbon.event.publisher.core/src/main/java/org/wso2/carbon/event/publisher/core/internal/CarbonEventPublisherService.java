@@ -21,6 +21,7 @@ import org.apache.axis2.dataretrieval.DataRetrievalUtil;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.annotation.bundle.Capability;
 import org.w3c.dom.Document;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -59,6 +60,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamException;
 
+@Capability(
+        namespace = "osgi.service",
+        attribute = {
+                "objectClass=org.wso2.carbon.event.publisher.core.EventPublisherService",
+                "service.scope=singleton"
+        }
+)
 public class CarbonEventPublisherService implements EventPublisherService {
 
     private static final Log log = LogFactory.getLog(CarbonEventPublisherService.class);

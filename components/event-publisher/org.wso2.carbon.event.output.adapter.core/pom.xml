@@ -35,6 +35,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.platform</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.platform</groupId>
+            <artifactId>org.eclipse.osgi.services</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
@@ -51,12 +59,9 @@
             <artifactId>testng</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -72,6 +77,11 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

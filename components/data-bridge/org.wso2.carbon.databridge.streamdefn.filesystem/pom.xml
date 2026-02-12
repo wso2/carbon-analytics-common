@@ -37,7 +37,7 @@
             <artifactId>org.wso2.carbon.databridge.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osgi</groupId>
+            <groupId>org.eclipse.platform</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
         <dependency>
@@ -71,17 +71,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
