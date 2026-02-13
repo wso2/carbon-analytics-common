@@ -106,6 +106,9 @@
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.event.publisher.core.EventPublisherService,
+                        </Provide-Capability>
                         <Axis2Deployer>EventPublisherDeployer</Axis2Deployer>
                         <Axis2RequiredServices>
                             org.wso2.carbon.event.publisher.core.EventPublisherService

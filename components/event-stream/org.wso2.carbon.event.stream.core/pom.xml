@@ -98,6 +98,9 @@
                         </Import-Package>
                         <Axis2Deployer>EventStreamDeployer</Axis2Deployer>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.event.stream.core.EventStreamService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
