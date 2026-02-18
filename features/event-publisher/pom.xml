@@ -53,7 +53,6 @@
         <module>org.wso2.carbon.event.output.adapter.feature</module>
         <module>org.wso2.carbon.event.output.adapter.ui.server.feature</module>
         <module>org.wso2.carbon.event.publisher.aggregate.feature</module>
-        <module>org.wso2.carbon.event.publisher.template.deployer.server.feature</module>
     </modules>
 
 
