@@ -19,18 +19,17 @@
 package org.wso2.carbon.event.template.manager.core.internal;
 
 import org.junit.Assert;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.event.template.manager.core.TemplateDeployer;
 import org.wso2.carbon.event.template.manager.core.exception.TemplateManagerException;
 import org.wso2.carbon.event.template.manager.core.internal.ds.TemplateManagerValueHolder;
@@ -51,16 +50,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.script.ScriptEngine;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({TemplateManagerHelper.class})
 public class CarbonTemplateManagerServiceTest {
 
     @Rule
@@ -70,23 +64,31 @@ public class CarbonTemplateManagerServiceTest {
     @Captor
     private ArgumentCaptor<String> stringArgument;
 
+    private static MockedStatic<TemplateManagerHelper> mockedTemplateManagerHelper;
+
     @BeforeClass
     public static void init() {
         System.setProperty("carbon.home", "");
+        mockedTemplateManagerHelper = Mockito.mockStatic(TemplateManagerHelper.class);
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        mockedTemplateManagerHelper.close();
     }
 
     @Before
     public void initMocks() {
-        MockitoAnnotations.initMocks(this);
-        mockStatic(TemplateManagerHelper.class);
+        MockitoAnnotations.openMocks(this);
+        mockedTemplateManagerHelper.reset();
     }
 
     @Test
     public void testSaveConfigurationWhenResourceExists() throws Exception {
         UserRegistry registry = mock(UserRegistry.class);
-        when(registry.resourceExists(anyString())).thenReturn(true);
+        Mockito.when(registry.resourceExists(anyString())).thenReturn(true);
         RegistryService registryService = mock(RegistryService.class);
-        when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
+        Mockito.when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
         TemplateManagerValueHolder.setRegistryService(registryService);
 
         thrown.expect(TemplateManagerException.class);
@@ -96,13 +98,14 @@ public class CarbonTemplateManagerServiceTest {
     @Test
     public void testSaveConfiguration() throws Exception {
         UserRegistry registry = mock(UserRegistry.class);
-        when(registry.resourceExists(anyString())).thenReturn(false);
+        Mockito.when(registry.resourceExists(anyString())).thenReturn(false);
         RegistryService registryService = mock(RegistryService.class);
-        when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
+        Mockito.when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
         TemplateManagerValueHolder.setRegistryService(registryService);
 
-        when(TemplateManagerHelper.getStreamIDsToBeMapped(any(ScenarioConfiguration.class), any(Domain.class),
-                                                          any(ScriptEngine.class))).thenCallRealMethod();
+        mockedTemplateManagerHelper.when(() -> TemplateManagerHelper.getStreamIDsToBeMapped(
+                any(ScenarioConfiguration.class), any(Domain.class), any(ScriptEngine.class)))
+                .thenCallRealMethod();
 
         CarbonTemplateManagerService carbonTemplateManagerService = createCarbonTemplateManagerService();
         Domain domain = carbonTemplateManagerService.getDomain("test-domain");
@@ -111,14 +114,12 @@ public class CarbonTemplateManagerServiceTest {
 
         Assert.assertNull("Return value should be null", carbonTemplateManagerService.saveConfiguration(configuration));
 
-        verifyStatic();
-        TemplateManagerHelper.deployArtifacts(any(ScenarioConfiguration.class), domainArgument.capture(),
-                                              any(ScriptEngine.class));
+        mockedTemplateManagerHelper.verify(() -> TemplateManagerHelper.deployArtifacts(
+                any(ScenarioConfiguration.class), domainArgument.capture(), any(ScriptEngine.class)));
         Assert.assertEquals("Incorrect domain was passed to deployArtifacts method", domain, domainArgument.getValue());
 
-        verifyStatic();
-        TemplateManagerHelper.getStreamIDsToBeMapped(any(ScenarioConfiguration.class), domainArgument.capture(),
-                                                     any(ScriptEngine.class));
+        mockedTemplateManagerHelper.verify(() -> TemplateManagerHelper.getStreamIDsToBeMapped(
+                any(ScenarioConfiguration.class), domainArgument.capture(), any(ScriptEngine.class)));
         Assert.assertEquals("Incorrect domain was passed to getStreamIDsToBeMapped method", domain,
                             domainArgument.getValue());
     }
@@ -128,9 +129,12 @@ public class CarbonTemplateManagerServiceTest {
         final String scenarioConfigName = "scenario-config-name";
         final String domainName = "domain-name";
         final List<StreamMapping> streamMappingList = Collections.emptyList();
-        when(TemplateManagerHelper.getConfiguration(anyString())).thenReturn(new ScenarioConfiguration());
-        when(TemplateManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName)).thenReturn("plan-id");
-        when(TemplateManagerHelper.generateExecutionPlan(streamMappingList, "plan-id")).thenReturn("execution-plan");
+        mockedTemplateManagerHelper.when(() -> TemplateManagerHelper.getConfiguration(anyString()))
+                .thenReturn(new ScenarioConfiguration());
+        mockedTemplateManagerHelper.when(() -> TemplateManagerHelper.getStreamMappingPlanId(domainName, scenarioConfigName))
+                .thenReturn("plan-id");
+        mockedTemplateManagerHelper.when(() -> TemplateManagerHelper.generateExecutionPlan(streamMappingList, "plan-id"))
+                .thenReturn("execution-plan");
 
         try {
             createCarbonTemplateManagerService().saveStreamMapping(streamMappingList, scenarioConfigName, domainName);
@@ -162,22 +166,23 @@ public class CarbonTemplateManagerServiceTest {
                                     configName + TemplateManagerConstants.CONFIG_FILE_EXTENSION;
         createCarbonTemplateManagerService().getConfiguration(domainName, configName);
 
-        verifyStatic();
-        TemplateManagerHelper.getConfiguration(stringArgument.capture());
+        mockedTemplateManagerHelper.verify(() -> TemplateManagerHelper.getConfiguration(stringArgument.capture()));
         Assert.assertEquals("Incorrect registry path", registryPath, stringArgument.getValue());
     }
 
     @Test
     public void testDeleteConfiguration() throws Exception {
         ScenarioConfiguration configuration = new ScenarioConfiguration();
-        when(TemplateManagerHelper.getConfiguration(anyString())).thenReturn(configuration);
+        mockedTemplateManagerHelper.when(() -> TemplateManagerHelper.getConfiguration(anyString()))
+                .thenReturn(configuration);
 
         UserRegistry registry = mock(UserRegistry.class);
         RegistryService registryService = mock(RegistryService.class);
-        when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
+        Mockito.when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
         TemplateManagerValueHolder.setRegistryService(registryService);
 
-        when(TemplateManagerHelper.getTemplatedArtifactId(anyString(), anyString(), anyString(), anyString(), anyInt()))
+        mockedTemplateManagerHelper.when(() -> TemplateManagerHelper.getTemplatedArtifactId(
+                anyString(), anyString(), anyString(), anyString(), anyInt()))
                 .thenCallRealMethod();
 
         final String domainName = "test-domain";
@@ -200,7 +205,7 @@ public class CarbonTemplateManagerServiceTest {
         domain.setName("test-domain");
         domain.setScenarios(scenarios);
         Map<String, Domain> domains = Collections.singletonMap(domain.getName(), domain);
-        when(TemplateManagerHelper.loadDomains()).thenReturn(domains);
+        mockedTemplateManagerHelper.when(TemplateManagerHelper::loadDomains).thenReturn(domains);
         return new CarbonTemplateManagerService();
     }
 }
