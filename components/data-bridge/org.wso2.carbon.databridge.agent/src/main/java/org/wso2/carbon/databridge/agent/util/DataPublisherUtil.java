@@ -178,7 +178,7 @@ public class DataPublisherUtil {
             throw new DataEndpointConfigurationException("Invalid URL is provided :" + url +
                     ". Receiver URL property should take the format : " + "protocol://host:port");
         }
-        return new String[]{urlElements[0], urlElements[1].replace("//", ""), urlElements[2]};
+        return new String[]{urlElements[0].trim(), urlElements[1].replace("//", "").trim(), urlElements[2].trim()};
     }
 
     /**

@@ -21,11 +21,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.powermock.api.mockito.PowerMockito;
 import org.wso2.carbon.databridge.streamdefn.filesystem.internal.FileSystemStreamDefnStoreDS;
 import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FileSystemStreamDefnStoreDSTestCase extends FileSystemStreamDefnStoreDS {
@@ -37,8 +37,8 @@ public class FileSystemStreamDefnStoreDSTestCase extends FileSystemStreamDefnSto
     @Before
     public void init() throws Exception {
         FilesystemTestUtil.setupCarbonConfig();
-        componentContext = PowerMockito.mock(ComponentContext.class);
-        bundleContext = PowerMockito.mock(BundleContext.class);
+        componentContext = mock(ComponentContext.class);
+        bundleContext = mock(BundleContext.class);
 
         when(componentContext.getBundleContext()).thenReturn(bundleContext);
     }

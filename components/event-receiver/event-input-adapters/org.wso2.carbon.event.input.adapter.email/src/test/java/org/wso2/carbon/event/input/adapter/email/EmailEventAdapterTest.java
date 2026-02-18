@@ -18,12 +18,11 @@
 
 package org.wso2.carbon.event.input.adapter.email;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapter;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterConfiguration;
 import org.wso2.carbon.event.input.adapter.core.InputEventAdapterListener;
@@ -45,12 +44,10 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Session.class, Store.class, Folder.class, Message.class})
 public class EmailEventAdapterTest {
 
     private static final String LOCALHOST = "localhost";
@@ -59,10 +56,12 @@ public class EmailEventAdapterTest {
     private static final String EMAIL_SUBJECT = "email_subject";
     private static final Path testDir = Paths.get("src", "test", "resources");
 
+    private MockedStatic<Session> sessionMockedStatic;
+
     @Before
     public void initialize() throws MessagingException, IOException {
 
-        mockStatic(Session.class);
+        sessionMockedStatic = mockStatic(Session.class);
         Session session = mock(Session.class);
         Store store = mock(Store.class);
         Folder folder = mock(Folder.class);
@@ -94,7 +93,7 @@ public class EmailEventAdapterTest {
                 String.format("mail.%s.socketFactory.port", PROTOCOL),
                 String.valueOf(PORT));
 
-        when(Session.getDefaultInstance(properties)).thenReturn(session);
+        sessionMockedStatic.when(() -> Session.getDefaultInstance(properties)).thenReturn(session);
         when(session.getStore(PROTOCOL)).thenReturn(store);
         when(store.isConnected()).thenReturn(true);
         when(store.getFolder("INBOX")).thenReturn(folder);
@@ -109,6 +108,13 @@ public class EmailEventAdapterTest {
 
         System.setProperty("carbon.home", Paths.get(testDir.toString(), "carbon-context").toString());
         System.setProperty("tenant.name", "testTenant");
+    }
+
+    @After
+    public void tearDown() {
+        if (sessionMockedStatic != null) {
+            sessionMockedStatic.close();
+        }
     }
 
     private InputEventAdapterConfiguration getEmailConfigurations(String email, String interval, String port) {

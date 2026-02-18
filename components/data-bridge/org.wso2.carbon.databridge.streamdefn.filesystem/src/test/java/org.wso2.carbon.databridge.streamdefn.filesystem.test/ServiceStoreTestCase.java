@@ -20,12 +20,9 @@ package org.wso2.carbon.databridge.streamdefn.filesystem.test;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
@@ -34,8 +31,6 @@ import org.wso2.carbon.databridge.streamdefn.filesystem.FileSystemStreamDefiniti
 import org.wso2.carbon.databridge.streamdefn.filesystem.internal.ServiceHolder;
 import org.wso2.carbon.event.stream.core.internal.CarbonEventStreamService;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ServiceStoreTestCase.class)
 public class ServiceStoreTestCase {
     private FileSystemStreamDefinitionStore fileSystemStreamDefinitionStore = new FileSystemStreamDefinitionStore();
 
