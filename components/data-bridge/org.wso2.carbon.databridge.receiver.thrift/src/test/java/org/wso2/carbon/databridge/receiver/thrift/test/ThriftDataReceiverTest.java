@@ -147,11 +147,14 @@ public class ThriftDataReceiverTest {
         receiverOne.start("localhost");
         Thread.sleep(1000);
         receiverOne.stop();
+        Thread.sleep(2000); // Wait for port to be released
         receiverTwo.start("localhost");
         Thread.sleep(1000);
         receiverTwo.stop();
+        Thread.sleep(2000); // Wait for port to be released
         receiverThree.start("localhost",10);
         Thread.sleep(1000);
         receiverThree.stop();
+        Thread.sleep(2000); // Wait for port to be released
     }
 }

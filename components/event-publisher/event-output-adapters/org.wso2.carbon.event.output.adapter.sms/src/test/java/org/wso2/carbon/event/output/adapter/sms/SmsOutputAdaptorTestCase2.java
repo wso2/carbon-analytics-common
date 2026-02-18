@@ -5,11 +5,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -30,8 +26,6 @@ import java.util.Map;
 /**
  * .
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SMSEventAdapterServiceValueHolder.class)
 public class SmsOutputAdaptorTestCase2 {
     PrivilegedCarbonContext privilegedCarbonContext;
     private static final Log logger = LogFactory.getLog(SmsOutputAdaptorTestCase2.class);

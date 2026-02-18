@@ -20,23 +20,23 @@ package org.wso2.carbon.jaggeryapp.template.deployer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
 import org.wso2.carbon.event.template.manager.core.TemplateDeploymentException;
 import org.wso2.carbon.event.template.manager.core.structure.configuration.ScenarioConfiguration;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerConstants;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.util.JaggeryappTemplateDeployerUtility;
+import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
-import org.wso2.carbon.registry.api.Resource;
 import org.wso2.carbon.registry.core.ResourceImpl;
-import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
@@ -47,36 +47,36 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 import org.wso2.carbon.jaggeryapp.template.deployer.internal.JaggeryappTemplateDeployerException;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({JaggeryappTemplateDeployerUtility.class, CarbonUtils.class})
+@RunWith(MockitoJUnitRunner.class)
 public class JaggeryTemplateDeployerTest {
 
     private static final String ARTIFACT_ID = "TwitterAnalytics";
     private static final Log log = LogFactory.getLog(JaggeryappTemplateDeployer.class);
 
-    private UserRegistry registry;
-    private Resource resource;
+    private Registry registry;
+    private ResourceImpl resource;
     private DeployableTemplate deployableTemplate;
     private JaggeryappTemplateDeployer jaggeryappTemplateDeployer;
     private ScenarioConfiguration scenarioConfiguration;
     private final Map<String, Object> mockRegistry = new HashMap<>();
     private Map<String, String> artifactContents = new HashMap<>();
+    
+    private MockedStatic<JaggeryappTemplateDeployerUtility> mockedUtility;
+    private MockedStatic<CarbonUtils> mockedCarbonUtils;
 
     @Before
     public void initialize() throws RegistryException, IOException {
-        mockStatic(JaggeryappTemplateDeployerUtility.class);
-        mockStatic(CarbonUtils.class);
-        registry = mock(UserRegistry.class);
-        mock(Resource.class);
+        mockedUtility = mockStatic(JaggeryappTemplateDeployerUtility.class);
+        mockedCarbonUtils = mockStatic(CarbonUtils.class);
+        registry = mock(Registry.class);
 
         artifactContents.put("application-data.json", "{config :{file: 'application-data.json'}}");
         artifactContents.put("config.json", "{config: {file: 'config.json'}}");
@@ -109,9 +109,9 @@ public class JaggeryTemplateDeployerTest {
         };
 
         when(registry.newResource()).thenReturn(new ResourceImpl());
-        when(CarbonUtils.getCarbonConfigDirPath()).thenReturn(fsRoot + "/conf");
-        when(JaggeryappTemplateDeployerUtility.getJaggeryappArtifactPath()).thenReturn(fsRoot + "/jaggeryapps/");
-        when(JaggeryappTemplateDeployerUtility.getRegistry()).thenReturn(registry);
+        mockedCarbonUtils.when(() -> CarbonUtils.getCarbonConfigDirPath()).thenReturn(fsRoot + "/conf");
+        mockedUtility.when(() -> JaggeryappTemplateDeployerUtility.getJaggeryappArtifactPath()).thenReturn(fsRoot + "/jaggeryapps/");
+        mockedUtility.when(() -> JaggeryappTemplateDeployerUtility.getRegistry()).thenReturn(registry);
 
         for (String dir : dirs) {
             File d = new File(dir);
@@ -121,19 +121,28 @@ public class JaggeryTemplateDeployerTest {
         }
 
         mockRegistry.clear();
-        doAnswer(new Answer() {
-            public Object answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                String key = (String) args[0];
-                Resource resource = (Resource) args[1];
-                mockRegistry.put(key, resource);
-                return null;
-            }
-        }).when(registry).put(anyString(), (Resource) anyObject());
+        doAnswer(invocation -> {
+            Object[] args = invocation.getArguments();
+            String key = (String) args[0];
+            Object resource = args[1];
+            mockRegistry.put(key, resource);
+            return null;
+        }).when(registry).put(anyString(), any());
+    }
+    
+    @After
+    public void cleanup() {
+        if (mockedUtility != null) {
+            mockedUtility.close();
+        }
+        if (mockedCarbonUtils != null) {
+            mockedCarbonUtils.close();
+        }
     }
 
     @Test
     public void testDeploy() throws TemplateDeploymentException, RegistryException, IOException {
+        when(registry.resourceExists(anyString())).thenReturn(false);
         jaggeryappTemplateDeployer.deployIfNotDoneAlready(deployableTemplate);
         Assert.assertTrue(mockRegistry.containsKey(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH));
         Assert.assertTrue(validateFilesystem());
@@ -149,8 +158,8 @@ public class JaggeryTemplateDeployerTest {
 
     @Test(expected = JaggeryappTemplateDeployerException.class)
     public void testDeployWhenDestinationDirExists() throws Exception {
-        doReturn(true).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(true);
+        when(registry.get(anyString())).thenReturn(resource);
         resetEnvironment();
         addRegistryResource(null);
         buildJaggeryapp();
@@ -159,8 +168,8 @@ public class JaggeryTemplateDeployerTest {
 
     @Test
     public void testDeployWhenResourceExists() throws Exception {
-        doReturn(true).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(true);
+        when(registry.get(anyString())).thenReturn(resource);
         addRegistryResource();
         jaggeryappTemplateDeployer.deployIfNotDoneAlready(deployableTemplate);
         Assert.assertTrue(mockRegistry.containsKey(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH));
@@ -168,8 +177,8 @@ public class JaggeryTemplateDeployerTest {
 
     @Test
     public void testDeployWithNoArtifactResource() throws Exception {
-        doReturn(true).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(true);
+        when(registry.get(anyString())).thenReturn(resource);
         resetEnvironment();
         addRegistryResource(null);
         jaggeryappTemplateDeployer.deployIfNotDoneAlready(deployableTemplate);
@@ -179,8 +188,8 @@ public class JaggeryTemplateDeployerTest {
 
     @Test
     public void testFreshDeployWhenResourceExists() throws Exception {
-        doReturn(true).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(true);
+        when(registry.get(anyString())).thenReturn(resource);
         resetEnvironment();
         addRegistryResource();
         jaggeryappTemplateDeployer.deployArtifact(deployableTemplate);
@@ -190,8 +199,8 @@ public class JaggeryTemplateDeployerTest {
 
     @Test
     public void testUndeploy() throws Exception {
-        doReturn(true).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(true);
+        when(registry.get(anyString())).thenReturn(resource);
         addRegistryResource();
         buildJaggeryapp();
         jaggeryappTemplateDeployer.undeployArtifact(ARTIFACT_ID);
@@ -203,8 +212,7 @@ public class JaggeryTemplateDeployerTest {
 
     @Test
     public void testUndeployWhenNoRegistryResource() throws Exception {
-        doReturn(false).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(false);
         buildJaggeryapp();
         jaggeryappTemplateDeployer.undeployArtifact(ARTIFACT_ID);
         Assert.assertFalse(mockRegistry.containsKey(JaggeryappTemplateDeployerConstants.META_INFO_COLLECTION_PATH));
@@ -212,8 +220,8 @@ public class JaggeryTemplateDeployerTest {
 
     @Test
     public void testUndeployWithNoArtifactResource() throws Exception {
-        doReturn(true).when(registry, "resourceExists", anyString());
-        doReturn(resource).when(registry, "get", anyString());
+        when(registry.resourceExists(anyString())).thenReturn(true);
+        when(registry.get(anyString())).thenReturn(resource);
         resetEnvironment();
         addRegistryResource(null);
         jaggeryappTemplateDeployer.undeployArtifact(ARTIFACT_ID);

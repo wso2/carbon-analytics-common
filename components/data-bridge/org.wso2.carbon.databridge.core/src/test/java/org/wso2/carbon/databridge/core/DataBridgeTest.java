@@ -18,10 +18,6 @@ package org.wso2.carbon.databridge.core;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.IndexDefinitionConstants;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
@@ -37,12 +33,11 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
 
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(DataBridgeTest.class)
 public class DataBridgeTest {
     private static final int TENANT_ID = -1234;
 
@@ -371,8 +366,8 @@ public class DataBridgeTest {
         String sessionId = dataBridge.login("user", "password");
         dataBridge.defineStream(sessionId, definition);
 
-        EventConverter converter = PowerMockito.mock(EventConverter.class);
-        when(converter.getNumberOfEvents(anyObject())).thenReturn(200000);
+        EventConverter converter = mock(EventConverter.class);
+        when(converter.getNumberOfEvents(any())).thenReturn(200000);
 
         dataBridge.publish(new Object(), sessionId, converter);
         File file = new File(CarbonUtils.getCarbonHome() + File.separator + "receiver-perf.txt");

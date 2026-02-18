@@ -20,19 +20,16 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
+import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.api.mockito.PowerMockito;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import org.wso2.carbon.event.template.manager.core.DeployableTemplate;
 import org.wso2.carbon.gadget.template.deployer.internal.GadgetTemplateDeployerConstants;
@@ -51,8 +48,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({GadgetTemplateDeployerUtility.class, CarbonUtils.class})
 public class GadgetTemplateDeployerTest {
 
     public static final String ARTIFACT_ID = "SensorDataAnalysis-SensorAnalytics-SensorAnalytics-gadget1";
@@ -73,14 +68,8 @@ public class GadgetTemplateDeployerTest {
         deployableTemplate.setArtifactId(ARTIFACT_ID);
         deployableTemplate.setArtifact(artifact);
 
-        registry = PowerMockito.mock(Registry.class);
+        registry = mock(Registry.class);
         resource = new ResourceImpl();
-        mockStatic(CarbonUtils.class);
-        mockStatic(GadgetTemplateDeployerUtility.class);
-
-        when(CarbonUtils.getCarbonConfigDirPath()).thenReturn(getTestResourceLocation());
-        when(GadgetTemplateDeployerUtility.getGadgetArtifactPath()).thenReturn(getTestGadgetArtifactPath());
-        when(GadgetTemplateDeployerUtility.getRegistry()).thenReturn(registry);
         when(registry.newResource()).thenReturn(new ResourceImpl());
 
         registryHashMap.clear();
@@ -93,7 +82,7 @@ public class GadgetTemplateDeployerTest {
                 registryHashMap.put(key, resource);
                 return null;
             }
-        }).when(registry).put(anyString(), (Resource) anyObject());
+        }).when(registry).put(anyString(), (Resource) any());
 
     }
 
@@ -105,20 +94,27 @@ public class GadgetTemplateDeployerTest {
 
     @Test
     public void testDeployNewGadgetResource() throws Exception {
-        when(registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)).thenReturn(false);
-        createGadgetArtifactDir();
-        gadgetTemplateDeployer.deployArtifact(deployableTemplate);
-        Assert.assertTrue("Failure at copying generic gadget files", validateDeployedGadget(getTestResourceLocation() +
-                        File.separator + GadgetTemplateDeployerConstants.TEMPLATE_MANAGER +
-                        File.separator + GadgetTemplateDeployerConstants.GADGET_TEMPLATES +
-                        File.separator + "numberchart" + File.separator,
-                getTestGadgetArtifactPath() + File.separator + "temperature-count-chart" + File.separator));
-        Assert.assertTrue("Failure at copying templated files", validateDeployedGadget(getTestResourceLocation() +
-                        File.separator + "generatedGadgetFiles",
-                getTestGadgetArtifactPath() + File.separator + "temperature-count-chart" + File.separator));
-        Assert.assertTrue(registryHashMap.containsKey(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH));
-        resetEnvironment();
-
+        try (MockedStatic<CarbonUtils> carbonUtilsMock = mockStatic(CarbonUtils.class);
+             MockedStatic<GadgetTemplateDeployerUtility> utilityMock = mockStatic(GadgetTemplateDeployerUtility.class)) {
+            
+            carbonUtilsMock.when(CarbonUtils::getCarbonConfigDirPath).thenReturn(getTestResourceLocation());
+            utilityMock.when(GadgetTemplateDeployerUtility::getGadgetArtifactPath).thenReturn(getTestGadgetArtifactPath());
+            utilityMock.when(GadgetTemplateDeployerUtility::getRegistry).thenReturn(registry);
+            
+            when(registry.resourceExists(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH)).thenReturn(false);
+            createGadgetArtifactDir();
+            gadgetTemplateDeployer.deployArtifact(deployableTemplate);
+            Assert.assertTrue("Failure at copying generic gadget files", validateDeployedGadget(getTestResourceLocation() +
+                            File.separator + GadgetTemplateDeployerConstants.TEMPLATE_MANAGER +
+                            File.separator + GadgetTemplateDeployerConstants.GADGET_TEMPLATES +
+                            File.separator + "numberchart" + File.separator,
+                    getTestGadgetArtifactPath() + File.separator + "temperature-count-chart" + File.separator));
+            Assert.assertTrue("Failure at copying templated files", validateDeployedGadget(getTestResourceLocation() +
+                            File.separator + "generatedGadgetFiles",
+                    getTestGadgetArtifactPath() + File.separator + "temperature-count-chart" + File.separator));
+            Assert.assertTrue(registryHashMap.containsKey(GadgetTemplateDeployerConstants.ARTIFACT_DIRECTORY_MAPPING_PATH));
+            resetEnvironment();
+        }
     }
 
     private String getTestResourceLocation() {

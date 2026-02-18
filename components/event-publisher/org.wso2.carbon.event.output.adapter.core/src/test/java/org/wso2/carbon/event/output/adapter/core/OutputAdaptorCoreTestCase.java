@@ -7,10 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.context.CarbonContext;
@@ -28,15 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 /**
  * .
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(CarbonContext.class)
 public class OutputAdaptorCoreTestCase  {
     private static final Log logger = LogFactory.getLog(OutputAdaptorCoreTestCase.class);
     private static final Path testDir = Paths.get("src", "test", "resources");
@@ -62,37 +57,39 @@ public class OutputAdaptorCoreTestCase  {
         globalAdapterConfigs.setAdapterConfigs(adapterConfigs);
         OutputEventAdapterServiceValueHolder.setGlobalAdapterConfigs(globalAdapterConfigs);
         setupCarbonConfig();
-        mockStatic(CarbonContext.class);
-        CarbonContext context = PowerMockito.mock(CarbonContext.getThreadLocalCarbonContext().getClass());
-        when(context.getTenantId()).thenReturn(-1233);
-        PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        privilegedCarbonContext.setTenantId(-1233);
-        ConfigurationContext context1 = mock(ConfigurationContext.class);
-        ConfigurationContextService configurationContextService = new ConfigurationContextService(context1, context1);
-        mockStatic(OutputEventAdapterServiceValueHolder.class);
-        OutputEventAdapterServiceValueHolder.setConfigurationContextService(configurationContextService);
-        AxisConfiguration axisConfiguration = new AxisConfiguration();
-        when(context1.getAxisConfiguration()).thenReturn(axisConfiguration);
-        EventAdapterUtil.getAxisConfiguration();
+        
+        try (MockedStatic<CarbonContext> carbonContextMock = mockStatic(CarbonContext.class)) {
+            CarbonContext context = mock(CarbonContext.class);
+            carbonContextMock.when(CarbonContext::getThreadLocalCarbonContext).thenReturn(context);
+            when(context.getTenantId()).thenReturn(-1233);
+            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            privilegedCarbonContext.setTenantId(-1233);
+            ConfigurationContext context1 = mock(ConfigurationContext.class);
+            ConfigurationContextService configurationContextService = new ConfigurationContextService(context1, context1);
+            OutputEventAdapterServiceValueHolder.setConfigurationContextService(configurationContextService);
+            AxisConfiguration axisConfiguration = new AxisConfiguration();
+            when(context1.getAxisConfiguration()).thenReturn(axisConfiguration);
+            EventAdapterUtil.getAxisConfiguration();
 
-        String adapterName = "logger adaptor";
-        Object event = "Event:{ name: wso2}";
-        String message = "Test Log";
-        Log log = LogFactory.getLog(OutputAdaptorCoreTestCase.class);
-        int tenantId = -1233;
-        EventAdapterUtil.logAndDrop(adapterName, event, message, log, tenantId);
-        EventAdapterUtil.logAndDrop(adapterName, event, message, new RuntimeException("Test Run time exception"), log,
-                tenantId);
-        Map<String, String> map = EventAdapterUtil.getGlobalProperties("Test Adaptor");
-        Assert.assertEquals(map.get("test key"), "test Value");
-        final List<LogEvent> logEntries = appender.getLog();
-        List<Object> logMessages = new ArrayList<>();
-        for (LogEvent logEvent : logEntries) {
-            logMessages.add(logEvent.getMessage());
+            String adapterName = "logger adaptor";
+            Object event = "Event:{ name: wso2}";
+            String message = "Test Log";
+            Log log = LogFactory.getLog(OutputAdaptorCoreTestCase.class);
+            int tenantId = -1233;
+            EventAdapterUtil.logAndDrop(adapterName, event, message, log, tenantId);
+            EventAdapterUtil.logAndDrop(adapterName, event, message, new RuntimeException("Test Run time exception"), log,
+                    tenantId);
+            Map<String, String> map = EventAdapterUtil.getGlobalProperties("Test Adaptor");
+            Assert.assertEquals(map.get("test key"), "test Value");
+            final List<LogEvent> logEntries = appender.getLog();
+            List<Object> logMessages = new ArrayList<>();
+            for (LogEvent logEvent : logEntries) {
+                logMessages.add(logEvent.getMessage());
+            }
+            PrivilegedCarbonContext.unloadTenant(-1233);
+            Assert.assertEquals(logMessages.contains("Error at Output Adapter 'logger adaptor' for tenant id '-1233', " +
+                    "dropping event: \nEvent:{ name: wso2}"), true);
         }
-        PrivilegedCarbonContext.unloadTenant(-1233);
-        Assert.assertEquals(logMessages.contains("Error at Output Adapter 'logger adaptor' for tenant id '-1233', " +
-                "dropping event: \nEvent:{ name: wso2}"), true);
     }
 
     @Test
@@ -133,26 +130,28 @@ public class OutputAdaptorCoreTestCase  {
         config.setGlobalProperties(globalProperties);
         adapterConfigs.add(config);
         globalAdapterConfigs.setAdapterConfigs(adapterConfigs);
-        OutputEventAdapterServiceValueHolder.setGlobalAdapterConfigs(globalAdapterConfigs);
-        setupCarbonConfig();
-        mockStatic(CarbonContext.class);
-        CarbonContext context = PowerMockito.mock(CarbonContext.getThreadLocalCarbonContext().getClass());
-        when(context.getTenantId()).thenReturn(-1233);
-        PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        privilegedCarbonContext.setTenantId(-1233);
-        ConfigurationContext context1 = mock(ConfigurationContext.class);
-        ConfigurationContextService configurationContextService = new ConfigurationContextService(context1, context1);
-        mockStatic(OutputEventAdapterServiceValueHolder.class);
-        TenantConfigHolder.addTenantConfig(-1233, context1);
-        OutputEventAdapterServiceValueHolder.setConfigurationContextService(configurationContextService);
-        AxisConfiguration axisConfiguration = new AxisConfiguration();
-        when(context1.getAxisConfiguration()).thenReturn(axisConfiguration);
-        EventAdapterUtil.getAxisConfiguration();
-        PrivilegedCarbonContext.unloadTenant(-1233);
-        final List<LogEvent> logEntries = appender.getLog();
+        
         List<Object> logMessages = new ArrayList<>();
-        for (LogEvent logEvent : logEntries) {
-            logMessages.add(logEvent.getMessage());
+        try (MockedStatic<CarbonContext> carbonContextMock = mockStatic(CarbonContext.class)) {
+            CarbonContext context = mock(CarbonContext.class);
+            carbonContextMock.when(CarbonContext::getThreadLocalCarbonContext).thenReturn(context);
+            when(context.getTenantId()).thenReturn(-1233);
+            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            privilegedCarbonContext.setTenantId(-1233);
+            ConfigurationContext context1 = mock(ConfigurationContext.class);
+            ConfigurationContextService configurationContextService = new ConfigurationContextService(context1, context1);
+            TenantConfigHolder.addTenantConfig(-1233, context1);
+            OutputEventAdapterServiceValueHolder.setConfigurationContextService(configurationContextService);
+            AxisConfiguration axisConfiguration = new AxisConfiguration();
+            when(context1.getAxisConfiguration()).thenReturn(axisConfiguration);
+            EventAdapterUtil.getAxisConfiguration();
+            PrivilegedCarbonContext.unloadTenant(-1233);
+            final List<LogEvent> logEntries = appender.getLog();
+            for (LogEvent logEvent : logEntries) {
+                logMessages.add(logEvent.getMessage());
+            }
+            Assert.assertEquals(logMessages.contains("Unload Tenant Task: org.wso2.carbon.context.internal." +
+                    "CarbonContextDataHolder$CarbonContextCleanupTask was registered."), true);
         }
         Assert.assertEquals(logMessages.contains("Unload Tenant Task: org.wso2.carbon.context.internal." +
                 "CarbonContextDataHolder$CarbonContextCleanupTask was registered."), true);
