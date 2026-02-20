@@ -26,8 +26,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.event.stream.core.EventStreamService;
@@ -58,16 +58,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.script.ScriptEngine;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Test cases for {@link TemplateManagerHelper} class.
  */
-@RunWith(PowerMockRunner.class)
+// PowerMockRunner removed for Mockito migration
 public class TemplateManagerHelperTest {
 
     @Rule
@@ -77,7 +75,8 @@ public class TemplateManagerHelperTest {
 
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
+        // Static mocking removed. If needed, refactor TemplateManagerHelper to allow injection or use Mockito's inline mock maker for static methods.
         System.setProperty("carbon.home", "");
     }
 
@@ -95,9 +94,9 @@ public class TemplateManagerHelperTest {
         CommonArtifacts commonArtifacts = new CommonArtifacts();
         commonArtifacts.setArtifact(Collections.singletonList(artifact));
         domain.setCommonArtifacts(commonArtifacts);
-        Template template = mock(Template.class);
-        when(template.getType()).thenReturn("template-type");
-        when(template.getValue()).thenReturn("template-value");
+        Template template = Mockito.mock(Template.class);
+        Mockito.when(template.getType()).thenReturn("template-type");
+        Mockito.when(template.getValue()).thenReturn("template-value");
         Templates templates = new Templates();
         templates.setTemplate(Collections.singletonList(template));
         Scenario scenario = new Scenario();
@@ -117,7 +116,7 @@ public class TemplateManagerHelperTest {
             // fine
         }
 
-        TemplateDeployer artifactDeployer = mock(TemplateDeployer.class);
+        TemplateDeployer artifactDeployer = Mockito.mock(TemplateDeployer.class);
         ConcurrentHashMap<String, TemplateDeployer> deployers = TemplateManagerValueHolder.getTemplateDeployers();
         deployers.put(artifact.getType(), artifactDeployer);
         try {
@@ -127,7 +126,7 @@ public class TemplateManagerHelperTest {
             // fine
         }
 
-        TemplateDeployer templateDeployer = mock(TemplateDeployer.class);
+        TemplateDeployer templateDeployer = Mockito.mock(TemplateDeployer.class);
         deployers.put(template.getType(), templateDeployer);
         TemplateManagerHelper.deployArtifacts(configuration, domain, scriptEngine);
     }
@@ -215,12 +214,12 @@ public class TemplateManagerHelperTest {
 
     @Test
     public void testGenerateExecutionPlan() throws Exception {
-        StreamDefinition streamDefinition = mock(StreamDefinition.class);
-        when(streamDefinition.getMetaData()).thenReturn(Collections.<Attribute>emptyList());
-        when(streamDefinition.getCorrelationData()).thenReturn(Collections.<Attribute>emptyList());
-        when(streamDefinition.getPayloadData()).thenReturn(Collections.<Attribute>emptyList());
-        EventStreamService eventStreamService = mock(EventStreamService.class);
-        when(eventStreamService.getStreamDefinition(anyString())).thenReturn(streamDefinition);
+        StreamDefinition streamDefinition = Mockito.mock(StreamDefinition.class);
+        Mockito.when(streamDefinition.getMetaData()).thenReturn(Collections.<Attribute>emptyList());
+        Mockito.when(streamDefinition.getCorrelationData()).thenReturn(Collections.<Attribute>emptyList());
+        Mockito.when(streamDefinition.getPayloadData()).thenReturn(Collections.<Attribute>emptyList());
+        EventStreamService eventStreamService = Mockito.mock(EventStreamService.class);
+        Mockito.when(eventStreamService.getStreamDefinition(Mockito.anyString())).thenReturn(streamDefinition);
         TemplateManagerValueHolder.setEventStreamService(eventStreamService);
 
         AttributeMapping attributeMapping = new AttributeMapping();
@@ -260,9 +259,9 @@ public class TemplateManagerHelperTest {
                                     domainName + RegistryConstants.PATH_SEPARATOR + configName +
                                     TemplateManagerConstants.CONFIG_FILE_EXTENSION;
 
-        UserRegistry registry = mock(UserRegistry.class);
-        RegistryService registryService = mock(RegistryService.class);
-        when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
+        UserRegistry registry = Mockito.mock(UserRegistry.class);
+        RegistryService registryService = Mockito.mock(RegistryService.class);
+        Mockito.when(registryService.getConfigSystemRegistry(Mockito.anyInt())).thenReturn(registry);
         TemplateManagerValueHolder.setRegistryService(registryService);
 
         TemplateManagerHelper.deleteConfigWithoutUndeploy(domainName, configName);
@@ -274,16 +273,16 @@ public class TemplateManagerHelperTest {
     public void testGetConfiguration() throws Exception {
         final String resourcePath = "/path/to/resource";
 
-        UserRegistry registry = mock(UserRegistry.class);
-        when(registry.resourceExists(resourcePath)).thenReturn(false);
-        RegistryService registryService = mock(RegistryService.class);
-        when(registryService.getConfigSystemRegistry(anyInt())).thenReturn(registry);
+        UserRegistry registry = Mockito.mock(UserRegistry.class);
+        Mockito.when(registry.resourceExists(resourcePath)).thenReturn(false);
+        RegistryService registryService = Mockito.mock(RegistryService.class);
+        Mockito.when(registryService.getConfigSystemRegistry(Mockito.anyInt())).thenReturn(registry);
         TemplateManagerValueHolder.setRegistryService(registryService);
 
         ScenarioConfiguration configuration = TemplateManagerHelper.getConfiguration(resourcePath);
         Assert.assertNull("When resource doesn't exists, scenario configuration must be null", configuration);
 
-        when(registry.get(resourcePath)).thenReturn(null);
+        Mockito.when(registry.get(resourcePath)).thenReturn(null);
         configuration = TemplateManagerHelper.getConfiguration(resourcePath);
         Assert.assertNull("When registry.get(path) returns null scenario configuration must be null", configuration);
     }
