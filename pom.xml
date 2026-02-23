@@ -43,6 +43,7 @@
         <module>components/event-processor-manager</module>
         <module>components/event-receiver</module>
         <module>components/event-publisher</module>
+        <module>components/template-manager</module>
         <module>features/event-stream</module>
         <module>features/data-bridge</module>
         <module>features/analytics-dashboard</module>
@@ -54,6 +55,7 @@
         <module>features/event-processor-manager</module>
         <module>features/spark-common</module>
         <module>features/analytics-gadget-templates</module>
+        <module>features/template-manager</module>
     </modules>
 
     <dependencyManagement>
@@ -420,6 +422,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.template.manager.admin</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.template.manager.core</artifactId>
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
@@ -903,6 +910,12 @@
             <!-- spark commons dependencies end -->
 
             <!--features start-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.template.manager.server.feature</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+                <type>zip</type>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.template.manager.ui.feature</artifactId>

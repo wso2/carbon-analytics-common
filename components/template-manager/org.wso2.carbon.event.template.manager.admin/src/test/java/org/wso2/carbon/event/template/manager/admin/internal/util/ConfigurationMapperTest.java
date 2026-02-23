@@ -6,7 +6,7 @@
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -20,8 +20,6 @@ package org.wso2.carbon.event.template.manager.admin.internal.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.event.template.manager.admin.dto.configuration.AttributeMappingDTO;
 import org.wso2.carbon.event.template.manager.admin.dto.configuration.ScenarioConfigurationDTO;
 import org.wso2.carbon.event.template.manager.admin.dto.configuration.StreamMappingDTO;
@@ -31,7 +29,10 @@ import org.wso2.carbon.event.template.manager.core.structure.configuration.Strea
 import java.util.Collections;
 import java.util.List;
 
-@RunWith(PowerMockRunner.class)
+/**
+ * Test class for ConfigurationMapper migrated to Mockito 5.x.
+ * PowerMock dependencies have been removed to support modern JDKs.
+ */
 public class ConfigurationMapperTest {
 
     @Test
@@ -40,6 +41,7 @@ public class ConfigurationMapperTest {
         attributeMappingDTO.setAttributeType("attribute-type");
         attributeMappingDTO.setFromAttribute("attribute-from");
         attributeMappingDTO.setToAttribute("attribute-to");
+        
         StreamMappingDTO streamMappingDTO = new StreamMappingDTO();
         streamMappingDTO.setFromStream("from-stream");
         streamMappingDTO.setToStream("to-stream");
@@ -55,6 +57,7 @@ public class ConfigurationMapperTest {
     public void testMapConfigurations() {
         List<ScenarioConfiguration> configurations = Collections.singletonList(new ScenarioConfiguration());
         ScenarioConfigurationDTO[] configurationDTOS = ConfigurationMapper.mapConfigurations(configurations);
+        
         Assert.assertEquals("Incorrect number of configuration DTOs", configurations.size(), configurationDTOS.length);
     }
 }
