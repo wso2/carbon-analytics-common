@@ -68,9 +68,49 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         clientMethod.setOptions(new String[]{HTTPEventAdapterConstants.CONSTANT_HTTP_POST, HTTPEventAdapterConstants.CONSTANT_HTTP_PUT});
         clientMethod.setDefaultValue(HTTPEventAdapterConstants.CONSTANT_HTTP_POST);
 
+        Property authType = new Property(HTTPEventAdapterConstants.ADAPTER_AUTH_TYPE);
+        authType.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_AUTH_TYPE));
+        authType.setRequired(false);
+
+        Property clientId = new Property(HTTPEventAdapterConstants.ADAPTER_CLIENT_ID);
+        clientId.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_CLIENT_ID));
+        clientId.setRequired(false);
+
+        Property clientSecret = new Property(HTTPEventAdapterConstants.ADAPTER_CLIENT_SECRET);
+        clientSecret.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_CLIENT_SECRET));
+        clientSecret.setRequired(false);
+
+        Property tokenEndpoint = new Property(HTTPEventAdapterConstants.ADAPTER_TOKEN_ENDPOINT);
+        tokenEndpoint.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_TOKEN_ENDPOINT));
+        tokenEndpoint.setRequired(false);
+
+        Property scopes = new Property(HTTPEventAdapterConstants.ADAPTER_SCOPES);
+        scopes.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_SCOPES));
+        scopes.setRequired(false);
+
+        Property accessToken = new Property(HTTPEventAdapterConstants.ADAPTER_ACCESS_TOKEN);
+        accessToken.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_ACCESS_TOKEN));
+        accessToken.setRequired(false);
+
+        Property apiKeyHeader = new Property(HTTPEventAdapterConstants.ADAPTER_API_KEY_HEADER);
+        apiKeyHeader.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_API_KEY_HEADER));
+        apiKeyHeader.setRequired(false);
+
+        Property apiKeyValue = new Property(HTTPEventAdapterConstants.ADAPTER_API_KEY_VALUE);
+        apiKeyValue.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_API_KEY_VALUE));
+        apiKeyValue.setRequired(false);
+
         staticPropertyList.add(proxyHostProp);
         staticPropertyList.add(proxyPortProp);
         staticPropertyList.add(clientMethod);
+        staticPropertyList.add(authType);
+        staticPropertyList.add(clientId);
+        staticPropertyList.add(clientSecret);
+        staticPropertyList.add(tokenEndpoint);
+        staticPropertyList.add(scopes);
+        staticPropertyList.add(accessToken);
+        staticPropertyList.add(apiKeyHeader);
+        staticPropertyList.add(apiKeyValue);
 
         return staticPropertyList;
 

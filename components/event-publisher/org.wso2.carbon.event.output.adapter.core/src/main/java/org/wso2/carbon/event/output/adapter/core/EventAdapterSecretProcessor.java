@@ -20,6 +20,7 @@ package org.wso2.carbon.event.output.adapter.core;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.model.ResolvedSecret;
+import org.wso2.carbon.identity.secret.mgt.core.model.Secret;
 
 /**
  * Secret processor for event adapters.
@@ -53,6 +54,27 @@ public class EventAdapterSecretProcessor {
     }
 
     /**
+     * Encrypt secret property.
+     *
+     * @param notificationSender Notification Sender: EMAIL_PROVIDER.
+     * @param authType           Authentication Type
+     * @param property           Authentication Property.
+     * @param value              Authentication Property Value.
+     * @throws SecretManagementException If an error occurs while encrypting the secret.
+     */
+    public static void encryptAndStoreCredential(String notificationSender, String authType, String property, String value)
+            throws SecretManagementException {
+
+        String secretName = buildSecretName(notificationSender, authType, property);
+        String secretType = notificationSender + SECRET_PROPERTIES;
+        if (isSecretPropertyExists(secretType, secretName)) {
+            updateExistingSecretProperty(secretType, secretName, value);
+        } else {
+            addNewNotificationSenderSecretProperty(secretType, secretName, value);
+        }
+    }
+
+    /**
      * Create secret name.
      *
      * @param notificationSender     Notification Sender.
@@ -76,5 +98,41 @@ public class EventAdapterSecretProcessor {
             throws SecretManagementException {
 
         return OutputEventAdapterServiceValueHolder.getSecretManager().isSecretExist(secretType, secretName);
+    }
+
+    /**
+     * Add new Secret for Notification Sender secret type.
+     *
+     * @param secretType Secret type.
+     * @param secretName Name of the secret.
+     * @param value      secret value.
+     * @throws SecretManagementException If an error occurs while adding the secret.
+     */
+    private static void addNewNotificationSenderSecretProperty(String secretType, String secretName, String value)
+            throws SecretManagementException {
+
+        Secret secret = new Secret();
+        secret.setSecretName(secretName);
+        secret.setSecretValue(value);
+        OutputEventAdapterServiceValueHolder.getSecretManager().addSecret(secretType, secret);
+    }
+
+
+    /**
+     * Update an existing secret of Notification Sender secret type.
+     *
+     * @param secretType Secret type.
+     * @param secretName Name of the secret.
+     * @param value      secret value.
+     * @throws SecretManagementException If an error occurs while adding the secret.
+     */
+    private static void updateExistingSecretProperty(String secretType, String secretName, String value)
+            throws SecretManagementException {
+
+        ResolvedSecret resolvedSecret = OutputEventAdapterServiceValueHolder.getSecretResolveManager()
+                .getResolvedSecret(secretType, secretName);
+        if (!resolvedSecret.getResolvedSecretValue().equals(value)) {
+            OutputEventAdapterServiceValueHolder.getSecretManager().updateSecretValue(secretType, secretName, value);
+        }
     }
 }
