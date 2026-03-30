@@ -653,6 +653,7 @@ public class TemplateManagerHelper {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
         return xmlInputFactory;
     }
 }
