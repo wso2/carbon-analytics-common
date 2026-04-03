@@ -87,6 +87,16 @@
         <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
     </Match>
 
+    <!-- RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE false positives from try-with-resources bytecode -->
+    <Match>
+        <Class name="org.wso2.carbon.analytics.permissions.internal.dao.QueryManager"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    </Match>
+
     <!-- TODO Validate below -->
     <Match>
         <Class name="org.wso2.carbon.databridge.core.DataBridge"/>
