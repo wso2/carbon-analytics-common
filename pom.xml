@@ -736,12 +736,33 @@
                 <artifactId>java-jwt</artifactId>
                 <version>${java.jwt.version}</version>
             </dependency>
+            <!-- Vulnerability fix: override transitive commons-compress -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons.compress.version}</version>
+            </dependency>
+            <!-- Vulnerability fix: override transitive org.json -->
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${org.json.version}</version>
+            </dependency>
+            <!-- Vulnerability fix: ban log4j 1.x globally -->
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.common.version>6.1.71-SNAPSHOT</carbon.analytics.common.version>
-        <log4j.version>2.17.1</log4j.version>
+        <carbon.analytics.common.version>6.1.70-SNAPSHOT</carbon.analytics.common.version>
+        <log4j.version>2.24.3</log4j.version>
+        <commons.compress.version>1.26.0</commons.compress.version>
+        <org.json.version>20231013</org.json.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
         <commons.io.version>2.17.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
@@ -843,8 +864,8 @@
         <msf4j.version>2.8.7</msf4j.version>
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
 
-        <com.fasterxml.jackson.core.version>2.16.0</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.16.0</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.core.version>2.18.6</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.databind.version>2.18.6</com.fasterxml.jackson.databind.version>
         <io.swagger.version>1.6.9</io.swagger.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
@@ -852,7 +873,7 @@
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <org.snakeyaml.import.version.range>[1.17.0,3.0.0)</org.snakeyaml.import.version.range>
         <awaitility.version>3.1.6</awaitility.version>
-        <commons-lang3.version>3.3.2</commons-lang3.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
 
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
         <carbon.utils.version>2.1.1</carbon.utils.version>
