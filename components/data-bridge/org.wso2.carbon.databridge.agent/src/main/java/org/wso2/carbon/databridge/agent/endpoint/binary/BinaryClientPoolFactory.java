@@ -62,9 +62,8 @@ public class BinaryClientPoolFactory extends AbstractClientPoolFactory {
 
     @Override
     public void terminateClient(Object client) {
-        Socket socket = null;
+        Socket socket = (Socket) client;
         try {
-            socket = (Socket) client;
             socket.close();
         } catch (IOException e) {
             log.warn("Cannot close the socket successfully from " + socket.getLocalAddress().getHostAddress()

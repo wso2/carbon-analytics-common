@@ -24,7 +24,6 @@ import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
-import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
 import org.wso2.carbon.utils.Utils;
