@@ -79,6 +79,8 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         Property clientSecret = new Property(HTTPEventAdapterConstants.ADAPTER_CLIENT_SECRET);
         clientSecret.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_CLIENT_SECRET));
         clientSecret.setRequired(false);
+        clientSecret.setSecured(true);
+        clientSecret.setEncrypted(true);
 
         Property tokenEndpoint = new Property(HTTPEventAdapterConstants.ADAPTER_TOKEN_ENDPOINT);
         tokenEndpoint.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_TOKEN_ENDPOINT));
@@ -91,6 +93,8 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         Property accessToken = new Property(HTTPEventAdapterConstants.ADAPTER_ACCESS_TOKEN);
         accessToken.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_ACCESS_TOKEN));
         accessToken.setRequired(false);
+        accessToken.setSecured(true);
+        accessToken.setEncrypted(true);
 
         Property apiKeyHeader = new Property(HTTPEventAdapterConstants.ADAPTER_API_KEY_HEADER);
         apiKeyHeader.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_API_KEY_HEADER));
@@ -99,6 +103,8 @@ public class HTTPEventAdapterFactory extends OutputEventAdapterFactory {
         Property apiKeyValue = new Property(HTTPEventAdapterConstants.ADAPTER_API_KEY_VALUE);
         apiKeyValue.setDisplayName(resourceBundle.getString(HTTPEventAdapterConstants.ADAPTER_API_KEY_VALUE));
         apiKeyValue.setRequired(false);
+        apiKeyValue.setSecured(true);
+        apiKeyValue.setEncrypted(true);
 
         staticPropertyList.add(proxyHostProp);
         staticPropertyList.add(proxyPortProp);
