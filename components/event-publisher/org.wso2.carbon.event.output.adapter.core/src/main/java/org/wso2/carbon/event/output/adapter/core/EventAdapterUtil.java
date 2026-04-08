@@ -30,6 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.MDC;
 import org.wso2.carbon.context.CarbonContext;
@@ -53,6 +54,7 @@ public class EventAdapterUtil {
 
     private static final Log LOG = LogFactory.getLog(EventAdapterUtil.class);
     private static final String TENANT_DOMAIN = "tenantDomain";
+    private static final String ACCESS_TOKEN_KEY = "access_token";
 
     public static AxisConfiguration getAxisConfiguration() {
         AxisConfiguration axisConfiguration = null;
@@ -119,13 +121,41 @@ public class EventAdapterUtil {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(createTokenRequest(clientId, secret,
                      tokenEndpoint, scopes))) {
+            if (response == null ) {
+                throw new OutputEventAdapterRuntimeException("Error while getting access token. " +
+                        "Null response received from the token endpoint");
+            }
+            if (response.getStatusLine().getStatusCode() / 100 != 2) {
+                throw new OutputEventAdapterRuntimeException("Received unsuccessful response from the token endpoint." +
+                        " Received response code: " + response.getStatusLine().getStatusCode() + ".");
+            }
 
             String responseString = EntityUtils.toString(response.getEntity());
-            JSONObject jsonResponse = new JSONObject(responseString);
-            return jsonResponse.getString("access_token");
+            if (responseString != null) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(responseString);
+                    if (jsonResponse.has(ACCESS_TOKEN_KEY) && !jsonResponse.isNull(ACCESS_TOKEN_KEY)) {
+                        return jsonResponse.getString(ACCESS_TOKEN_KEY);
+                    } else {
+                        throw new OutputEventAdapterRuntimeException(
+                                "Access Token is not available in the token response. Received response code: " +
+                                        response.getStatusLine().getStatusCode() + ".");
+                    }
+                } catch (JSONException e) {
+                    throw new OutputEventAdapterRuntimeException("Error while getting access token. " +
+                            "Invalid JSON response received from the token endpoint. Received response code: " +
+                            response.getStatusLine().getStatusCode() + ".");
+                }
+            } else {
+                throw new OutputEventAdapterRuntimeException("Error while getting access token. " +
+                        "Null response received from the token endpoint");
+            }
+        } catch (OutputEventAdapterRuntimeException e) {
+            throw e;
         } catch (Exception e) {
             LOG.error("Error while getting access token", e);
-            throw new OutputEventAdapterRuntimeException("Error while getting access token", e);}
+            throw new OutputEventAdapterRuntimeException("Error while getting access token", e);
+        }
     }
 
     /**
