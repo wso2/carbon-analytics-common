@@ -19,6 +19,7 @@ package org.wso2.carbon.event.output.adapter.core;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.NameValuePair;
@@ -30,22 +31,28 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.slf4j.MDC;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfig;
 import org.wso2.carbon.event.output.adapter.core.internal.config.AdapterConfigs;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.DiagnosticLog;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EventAdapterUtil {
 
     private static final Log LOG = LogFactory.getLog(EventAdapterUtil.class);
+    private static final String TENANT_DOMAIN = "tenantDomain";
 
     public static AxisConfiguration getAxisConfiguration() {
         AxisConfiguration axisConfiguration = null;
@@ -119,6 +126,34 @@ public class EventAdapterUtil {
         } catch (Exception e) {
             LOG.error("Error while getting access token", e);
             throw new OutputEventAdapterRuntimeException("Error while getting access token", e);}
+    }
+
+    /**
+     * Triggers a diagnostic log event with the given diagnostic log builder.
+     *
+     * @param diagnosticLogBuilder The diagnostic log builder containing the details of the log event.
+     */
+    public static void triggerDiagnosticLogEvent(DiagnosticLog.DiagnosticLogBuilder diagnosticLogBuilder) {
+
+        Map<String, Object> diagnosticLogProperties = new HashMap();
+        DiagnosticLog diagnosticLog = diagnosticLogBuilder.build();
+        diagnosticLogProperties.put("diagnosticLog", diagnosticLog);
+        diagnosticLogProperties.put("tenantId", resolveTenantId());
+        CarbonUtils.publishDiagnosticLog(diagnosticLogProperties);
+    }
+
+    /**
+     * Resolves the tenant ID from the MDC context or CarbonContext.
+     *
+     * @return The resolved tenant ID.
+     */
+    private static int resolveTenantId() {
+
+        String tenantDomain = MDC.get(TENANT_DOMAIN);
+        if (StringUtils.isBlank(tenantDomain)) {
+            tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        }
+        return IdentityTenantUtil.getTenantId(tenantDomain);
     }
 
     private static HttpPost createTokenRequest(String clientId, String secret, String tokenEndpoint, String scopes)

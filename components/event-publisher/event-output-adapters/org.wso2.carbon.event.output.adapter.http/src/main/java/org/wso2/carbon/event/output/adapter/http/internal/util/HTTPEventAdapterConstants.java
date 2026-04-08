@@ -80,4 +80,35 @@ public class HTTPEventAdapterConstants {
     public static final String ACCESS_TOKEN = "accessToken";
     public static final String API_KEY_HEADER = "apiKeyHeader";
     public static final String API_KEY_VALUE = "apiKeyValue";
+
+    /**
+     * Constants related to log management.
+     */
+    public static class LogConstants {
+
+        public static final String EMAIL_PUBLISHER_EVENT_ADAPTER_NAME = "EmailPublisher";
+        public static final String HTTP_EVENT_ADAPTER_SERVICE = "http-output-event-adapter";
+
+        /**
+         * Define action IDs for diagnostic logs.
+         */
+        public static class ActionIDs {
+
+            public static final String SEND_EMAIL = "send-email";
+        }
+
+        /**
+         * Define common and reusable Input keys for diagnostic logs.
+         */
+        public static class InputKeys {
+
+            private InputKeys() {
+
+            }
+
+            public static final String RESPONSE_CODE = "Response code";
+            public static final String ERROR_RESPONSE = "Error Response";
+        }
+    }
+
 }
