@@ -527,7 +527,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
+                <version>${com.fasterxml.jackson.annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
@@ -792,8 +792,8 @@
         </equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>2.2</org.snakeyaml.version>
-        <org.snakeyaml.bundle.version>2.2.0</org.snakeyaml.bundle.version>
+        <org.snakeyaml.version>2.6</org.snakeyaml.version>
+        <org.snakeyaml.bundle.version>2.6.0</org.snakeyaml.bundle.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
 
         <!-- Maven plugins -->
@@ -861,11 +861,12 @@
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <msf4j.version>2.8.7</msf4j.version>
+        <msf4j.version>2.8.14-SNAPSHOT</msf4j.version>
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
 
-        <com.fasterxml.jackson.core.version>2.18.6</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.18.6</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.annotations.version>2.21</com.fasterxml.jackson.annotations.version>
+        <com.fasterxml.jackson.core.version>2.21.2</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.databind.version>2.21.2</com.fasterxml.jackson.databind.version>
         <io.swagger.version>1.6.9</io.swagger.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
@@ -873,7 +874,7 @@
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <org.snakeyaml.import.version.range>[1.17.0,3.0.0)</org.snakeyaml.import.version.range>
         <awaitility.version>3.1.6</awaitility.version>
-        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
 
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
         <carbon.utils.version>2.1.1</carbon.utils.version>
