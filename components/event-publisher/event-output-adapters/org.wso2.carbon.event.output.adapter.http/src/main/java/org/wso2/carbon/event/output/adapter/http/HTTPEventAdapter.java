@@ -34,9 +34,12 @@ import org.wso2.carbon.event.output.adapter.core.OutputEventAdapter;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.ConnectionUnavailableException;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
+import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.exception.TestConnectionNotSupportedException;
 import org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.DiagnosticLog;
 
 import java.io.IOException;
 import java.net.URL;
@@ -69,6 +72,11 @@ import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventA
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.CLIENT_SECRET;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.EMAIL_PROVIDER;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.INTERNAL_ACCESS_TOKEN;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.ActionIDs.SEND_EMAIL;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.EMAIL_PUBLISHER_EVENT_ADAPTER_NAME;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.HTTP_EVENT_ADAPTER_SERVICE;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.InputKeys.ERROR_RESPONSE;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.InputKeys.RESPONSE_CODE;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.MAX_RETRY_ATTEMPTS;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.NONE;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.PASSWORD;
@@ -240,8 +248,19 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                                 log.debug("Access token is not available. Generating a new access token for " +
                                         "HTTP-Based Event Publishing");
                             }
-                            this.internalAccessToken = getAccessToken(new String(clientId),
-                                    new String(clientSecret), tokenEndpoint, scopes);
+                            try {
+                                this.internalAccessToken = getAccessToken(new String(clientId),
+                                        new String(clientSecret), tokenEndpoint, scopes);
+                                logEventPublishing(
+                                        "Access token is successfully retrieved using client " +
+                                                "credentials grant type for HTTP-based email publishing.",
+                                        DiagnosticLog.ResultStatus.SUCCESS);
+                            } catch (OutputEventAdapterRuntimeException e) {
+                                logEventPublishingFailure(
+                                        "Received failure response while retrieving access token " +
+                                                "using client credentials grant for HTTP-based email publishing.", e);
+                                throw e;
+                            }
                             try {
                                 encryptAndStoreCredential(EMAIL_PROVIDER, CLIENT_CREDENTIAL, INTERNAL_ACCESS_TOKEN,
                                         internalAccessToken);
@@ -400,7 +419,45 @@ public class HTTPEventAdapter implements OutputEventAdapter {
             }
         }
         return result;
+    }
 
+    private boolean isDiagnosticLogEnabledForEmailPublishing() {
+
+        return CarbonUtils.isDiagnosticLogsEnabled() &&
+                StringUtils.equalsIgnoreCase(eventAdapterConfiguration.getName(),
+                        EMAIL_PUBLISHER_EVENT_ADAPTER_NAME);
+    }
+
+    private void logEventPublishing(String message, DiagnosticLog.ResultStatus status) {
+
+        logEventPublishing(message, status, null);
+    }
+
+    private void logEventPublishing(String message, DiagnosticLog.ResultStatus status,
+                                    Map<String, Object> inputParams) {
+
+        if (!isDiagnosticLogEnabledForEmailPublishing()) {
+            // Diagnostic logs are enabled only for http-based email publishing within the http-based output adapter.
+            return;
+        }
+        DiagnosticLog.DiagnosticLogBuilder builder = new DiagnosticLog.DiagnosticLogBuilder(
+                HTTP_EVENT_ADAPTER_SERVICE, SEND_EMAIL);
+        builder.resultMessage(message)
+                .resultStatus(status)
+                .logDetailLevel(DiagnosticLog.LogDetailLevel.APPLICATION);
+        if (inputParams != null) {
+            for (Map.Entry<String, Object> entry : inputParams.entrySet()) {
+                builder.inputParam(entry.getKey(), entry.getValue());
+            }
+        }
+        EventAdapterUtil.triggerDiagnosticLogEvent(builder);
+    }
+
+    private void logEventPublishingFailure(String message, Throwable e) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(ERROR_RESPONSE, e.getMessage());
+        logEventPublishing(message, DiagnosticLog.ResultStatus.FAILED, params);
     }
 
     /**
@@ -552,6 +609,10 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                                 ". Received HTTP response code is: " + responseCode +
                                 ". Response body : " + method.getResponseBodyAsString());
                     }
+                    logEventPublishing(
+                            "Received success response from external endpoint: " + this.url +
+                                    " for HTTP-based email publishing.",
+                            DiagnosticLog.ResultStatus.SUCCESS);
                 } else if ((responseCode == 401 || responseCode == 403) &&
                         StringUtils.equalsIgnoreCase(CLIENT_CREDENTIAL, this.getAuthType())) {
                     if (log.isDebugEnabled()) {
@@ -561,16 +622,31 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                                 ". Response body: " + method.getResponseBodyAsString() +
                                 ". Hence refreshing the access token and retrying.");
                     }
+                    logEventPublishing(
+                            "Received unauthorized response from external endpoint: " +
+                                    this.url + ". Refreshing access token and retrying.",
+                            DiagnosticLog.ResultStatus.SUCCESS);
                     retryWithNewAccessToken(method);
                 } else {
                     log.error("[Id: " + uuid + "] Error while connecting to the endpoint: " + this.url +
                             ". Received HTTP response code is: " + responseCode +
                             ". Response body: " + method.getResponseBodyAsString());
+                    Map<String, Object> params = new HashMap<>();
+                    params.put(RESPONSE_CODE, responseCode);
+                    params.put(ERROR_RESPONSE, method.getResponseBodyAsString());
+                    logEventPublishing(
+                            "Received error response from external endpoint: " + this.url +
+                                    " for HTTP-based email publishing.",
+                            DiagnosticLog.ResultStatus.FAILED, params);
                 }
             } catch (UnknownHostException e) {
                 EventAdapterUtil.logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(),
                         "Cannot connect to " + this.getUrl(), e, log, tenantId);
+                logEventPublishingFailure("Received failure response from external endpoint: " + this.url +
+                        " for HTTP-based email publishing.", e);
             } catch (Throwable e) {
+                logEventPublishingFailure("Received failure response from external endpoint: " + this.url +
+                        " for HTTP-based email publishing.", e);
                 EventAdapterUtil
                         .logAndDrop(eventAdapterConfiguration.getName(), this.getPayload(), null, e, log, tenantId);
             } finally {
@@ -613,8 +689,20 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 int attempts = 0;
                 while (attempts < MAX_RETRY_ATTEMPTS) {
                     attempts++;
-                    internalAccessToken =
-                            EventAdapterUtil.getAccessToken(new String(clientId), new String(clientSecret), tokenEndpoint, scopes);
+                    try {
+                        internalAccessToken =
+                                EventAdapterUtil.getAccessToken(new String(clientId), new String(clientSecret),
+                                        tokenEndpoint, scopes);
+                        logEventPublishing(
+                                "Access token is successfully retrieved using client " +
+                                        "credentials grant type for HTTP-based email publishing.",
+                                DiagnosticLog.ResultStatus.SUCCESS);
+                    } catch (OutputEventAdapterRuntimeException e) {
+                        logEventPublishingFailure(
+                                "Received failure response while retrieving access token " +
+                                        "using client credentials grant type for HTTP-based email publishing.", e);
+                        throw e;
+                    }
                     method.setRequestHeader("Authorization", "Bearer " + internalAccessToken);
 
                     int responseCode = this.getHttpClient().executeMethod(hostConfiguration, method);
@@ -625,6 +713,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                                     ". Received HTTP response code is: " + responseCode +
                                     ". Response body : " + method.getResponseBodyAsString());
                         }
+                        logEventPublishing(
+                                "Received success response from external endpoint",
+                                DiagnosticLog.ResultStatus.SUCCESS);
                         try {
                             encryptAndStoreCredential(EMAIL_PROVIDER, CLIENT_CREDENTIAL, INTERNAL_ACCESS_TOKEN,
                                     internalAccessToken);
@@ -633,14 +724,26 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                         }
                         return;
                     } else {
-                        log.warn("[Id: " + uuid + "] Error while connecting to the endpoint: " + this.url +
-                                ". Received HTTP response code is: " + responseCode +
-                                ". Retry (attempt " + attempts + ")");
+                        Map<String, Object> params = new HashMap<>();
+                        params.put(RESPONSE_CODE, responseCode);
+                        params.put(ERROR_RESPONSE, method.getResponseBodyAsString());
                         if (attempts == MAX_RETRY_ATTEMPTS) {
                             log.error("[Id: " + uuid + "] Error while connecting even after retrying with " +
                                     "new token to the endpoint: " + this.url +
                                     ". Received HTTP response code is: " + responseCode +
                                     ". Response body: " + method.getResponseBodyAsString());
+                            logEventPublishing(
+                                    "Received error response from external endpoint: " + this.url +
+                                            " and maximum retry attempts reached.",
+                                    DiagnosticLog.ResultStatus.FAILED, params);
+                        } else {
+                            log.warn("[Id: " + uuid + "] Error while connecting to the endpoint: " + this.url +
+                                    ". Received HTTP response code is: " + responseCode +
+                                    ". Retry (attempt " + attempts + ")");
+                            logEventPublishing(
+                                    "Received error response from external endpoint: " + this.url +
+                                            " Retrying again.",
+                                    DiagnosticLog.ResultStatus.SUCCESS, params);
                         }
                     }
                 }
