@@ -41,7 +41,7 @@
 <link rel="stylesheet" href="../eventpublisher/css/eventPublisher.css"/>
 
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
-<jsp:include page="../resources/resources-i18n-ajaxprocessor.jsp"/>
+<jsp:include page="/carbon/resources/resources-i18n-ajaxprocessor.jsp"/>
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
 <script type="text/javascript"
@@ -437,21 +437,21 @@
 <div id="outerDiv" style="display:none">
                 <%if (firstMappingTypeName != null) {
                     if (firstMappingTypeName.equals("wso2event")) {%>
-                        <jsp:include page="wso2event_mapping_ui.jsp" flush="true">
+                        <jsp:include page="/carbon/eventpublisher/wso2event_mapping_ui.jsp" flush="true">
                             <jsp:param name="streamNameWithVersion"
                                        value="<%=streamId%>"/>
                         </jsp:include>
                 <%}else if (firstMappingTypeName.equals("xml")) {%>
-                    <jsp:include page="xml_mapping_ui.jsp" flush="true"/>
+                    <jsp:include page="/carbon/eventpublisher/xml_mapping_ui.jsp" flush="true"/>
                 <%} else if (firstMappingTypeName.equals("map")) {%>
-                    <jsp:include page="map_mapping_ui.jsp" flush="true">
+                    <jsp:include page="/carbon/eventpublisher/map_mapping_ui.jsp" flush="true">
                         <jsp:param name="streamNameWithVersion"
                                    value="<%=streamId%>"/>
                     </jsp:include>
                 <%} else if (firstMappingTypeName.equals("text")) {%>
-                    <jsp:include page="text_mapping_ui.jsp" flush="true"/>
+                    <jsp:include page="/carbon/eventpublisher/text_mapping_ui.jsp" flush="true"/>
                 <%} else if (firstMappingTypeName.equals("json")) {%>
-                    <jsp:include page="json_mapping_ui.jsp" flush="true"/>
+                    <jsp:include page="/carbon/eventpublisher/json_mapping_ui.jsp" flush="true"/>
                 <%}
             }
         }

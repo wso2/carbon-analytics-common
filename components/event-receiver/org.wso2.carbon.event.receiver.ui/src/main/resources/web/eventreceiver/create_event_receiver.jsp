@@ -27,7 +27,7 @@
 <script type="text/javascript" src="../eventreceiver/js/registry-browser.js"></script>
 
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
-<jsp:include page="../resources/resources-i18n-ajaxprocessor.jsp"/>
+<jsp:include page="/carbon/resources/resources-i18n-ajaxprocessor.jsp"/>
 <link rel="stylesheet" type="text/css" href="../resources/css/registry.css"/>
 <link rel="stylesheet" href="../eventreceiver/css/eventReceiver.css"/>
 <script type="text/javascript" src="../ajax/js/prototype.js"></script>
@@ -298,35 +298,35 @@
 
 
             %>
-            <jsp:include page="wso2event_mapping_ui.jsp" flush="true">
+            <jsp:include page="/carbon/eventreceiver/wso2event_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"
                            value="<%=streamId%>"/>
             </jsp:include>
             <%
             } else if (firstMappingTypeName.equals("xml")) {
             %>
-            <jsp:include page="xml_mapping_ui.jsp" flush="true">
+            <jsp:include page="/carbon/eventreceiver/xml_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"
                            value="<%=streamId%>"/>
             </jsp:include>
             <%
             } else if (firstMappingTypeName.equals("map")) {
             %>
-            <jsp:include page="map_mapping_ui.jsp" flush="true">
+            <jsp:include page="/carbon/eventreceiver/map_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"
                            value="<%=streamId%>"/>
             </jsp:include>
             <%
             } else if (firstMappingTypeName.equals("text")) {
             %>
-            <jsp:include page="text_mapping_ui.jsp" flush="true">
+            <jsp:include page="/carbon/eventreceiver/text_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"
                            value="<%=streamId%>"/>
             </jsp:include>
             <%
             } else if (firstMappingTypeName.equals("json")) {
             %>
-            <jsp:include page="json_mapping_ui.jsp" flush="true">
+            <jsp:include page="/carbon/eventreceiver/json_mapping_ui.jsp" flush="true">
                 <jsp:param name="streamNameWithVersion"
                            value="<%=streamId%>"/>
             </jsp:include>
