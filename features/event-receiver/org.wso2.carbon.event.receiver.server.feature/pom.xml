@@ -99,7 +99,7 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics-common:org.wso2.carbon.event.receiver.admin:${carbon.analytics.common.version}
                                 </bundleDef>
-                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path:${jsonpath.version}
+                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path:${jayway.jsonpath.orbit.version}
                                 </bundleDef>
                                 <bundleDef>net.minidev:json-smart:${jsonsmart.version}</bundleDef>
                             </bundles>
