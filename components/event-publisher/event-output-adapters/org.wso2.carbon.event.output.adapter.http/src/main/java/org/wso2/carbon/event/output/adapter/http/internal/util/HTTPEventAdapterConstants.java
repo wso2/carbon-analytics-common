@@ -48,6 +48,12 @@ public class HTTPEventAdapterConstants {
     public static final String ADAPTER_API_KEY_VALUE = "http.apiKeyValue";
     public static final String ADAPTER_HEADERS = "http.headers";
     public static final String ADAPTER_HEADERS_HINT = "http.headers.hint";
+    public static final String ADAPTER_SECRET_PROVIDER = "http.secret.provider";
+    public static final String ADAPTER_SECRET_PROVIDER_HINT = "Provider identifier for secret management. " +
+            "Defaults to EMAIL_PROVIDER if not set.";
+    public static final String ADAPTER_PUBLISH_EVENT_PAYLOAD_ONLY = "http.publishEventPayloadOnly";
+    public static final String ADAPTER_PUBLISH_EVENT_PAYLOAD_ONLY_HINT = "If enabled, only the event payload will " +
+            "be published to the endpoint, otherwise the entire event will be published.";
     public static final String HEADER_SEPARATOR = ",";
     public static final String ENTRY_SEPARATOR = ":";
     public static final String ADAPTER_HTTP_CLIENT_METHOD = "http.client.method";
@@ -80,4 +86,7 @@ public class HTTPEventAdapterConstants {
     public static final String ACCESS_TOKEN = "accessToken";
     public static final String API_KEY_HEADER = "apiKeyHeader";
     public static final String API_KEY_VALUE = "apiKeyValue";
+
+    // Default value.
+    public static final String DEFAULT_SECRET_PROVIDER = "EMAIL_PROVIDER";
 }
