@@ -17,8 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint.binary;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.carbon.databridge.agent.endpoint.DataEndpoint;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
@@ -40,7 +40,7 @@ import static org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender
  */
 public class BinaryDataEndpoint extends DataEndpoint {
 
-    private static Log log = LogFactory.getLog(BinaryDataEndpoint.class);
+    private static final Logger log = LogManager.getLogger(BinaryDataEndpoint.class);
 
     @Override
     protected String login(Object client, String userName, String password) throws DataEndpointAuthenticationException {

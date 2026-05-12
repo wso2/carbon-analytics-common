@@ -217,8 +217,7 @@ public class ThriftDataReceiver {
                                           DataBridgeReceiverService dataBridgeReceiverService)
             throws DataBridgeException {
         try {
-            TServerSocket serverTransport = new TServerSocket(
-                    new InetSocketAddress(hostName, port));
+            TServerSocket serverTransport = new TServerSocket(new InetSocketAddress(hostName, port));
             ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor =
                     new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
                             new ThriftEventTransmissionServiceImpl(dataBridgeReceiverService));

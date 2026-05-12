@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.databridge.agent.endpoint.thrift;
 
+import org.apache.thrift.TConfiguration;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -44,7 +45,7 @@ public class ThriftClientPoolFactory extends AbstractClientPoolFactory {
                     getAgentConfiguration().getSocketTimeoutMS();
             ThriftEventTransmissionService.Client client;
             try {
-                TTransport receiverTransport = new TSocket(hostName, port, socketTimeout);
+                TTransport receiverTransport = new TSocket(new TConfiguration(), hostName, port, socketTimeout);
                 TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
                 client = new ThriftEventTransmissionService.Client(tProtocol);
                 receiverTransport.open();
