@@ -46,12 +46,9 @@ public class ThriftClientPoolFactory extends AbstractClientPoolFactory {
             ThriftEventTransmissionService.Client client;
             try {
                 TTransport receiverTransport = new TSocket(new TConfiguration(), hostName, port, socketTimeout);
-                log.info("Creating Thrift client connection to " + hostName + ":" + port);
                 TProtocol tProtocol = new TBinaryProtocol(receiverTransport);
                 client = new ThriftEventTransmissionService.Client(tProtocol);
                 receiverTransport.open();
-                log.debug("Successfully opened Thrift transport connection to " + hostName + ":" + port);
-                return client;
             } catch (TTransportException e) {
                 throw new DataEndpointException("Error while making the connection." + e.getMessage(), e);
             }
