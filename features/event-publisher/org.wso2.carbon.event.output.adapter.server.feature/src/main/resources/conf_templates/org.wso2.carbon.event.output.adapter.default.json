@@ -13,11 +13,11 @@
   "output_adapter.email.signature": "$ref{output_adapter.email.username}",
   "output_adapter.email.reply_to": "$ref{output_adapter.email.from_address}",
   "output_adapter.http.enable_form_url_encoded": true,
-  "output_adapter.http.sync_connection_timeout": 1000,
-  "output_adapter.http.sync_read_timeout": 1000,
-  "output_adapter.http.sync_connection_request_timeout": 1000,
-  "output_adapter.http.sync_pool_size": 20,
-  "output_adapter.http.sync_max_connections_per_route": 2,
-  "output_adapter.http.sync_response_limit_bytes": 1048576,
-  "output_adapter.http.sync_retry_count": 0
+  "output_adapter.http.sync_connection_timeout": "1000",
+  "output_adapter.http.sync_read_timeout": "1000",
+  "output_adapter.http.sync_connection_request_timeout": "1000",
+  "output_adapter.http.sync_pool_size": "20",
+  "output_adapter.http.sync_max_connections_per_route": "2",
+  "output_adapter.http.sync_response_limit_bytes": "1048576",
+  "output_adapter.http.sync_retry_count": "0"
 }
