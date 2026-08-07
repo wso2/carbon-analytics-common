@@ -118,9 +118,39 @@ public class EventAdapterUtil {
      */
     public static String getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
 
+        try {
+            return getAccessTokenFromRequest(createTokenRequest(clientId, secret, tokenEndpoint, scopes));
+        } catch (UnsupportedEncodingException e) {
+            throw new OutputEventAdapterRuntimeException("Error while building the access token request", e);
+        }
+    }
+
+    /**
+     * Retrieves the access token using the OAuth2 resource owner password credentials grant type.
+     *
+     * @param clientId      The client ID.
+     * @param secret        The client Secret.
+     * @param username      The resource owner username.
+     * @param password      The resource owner password.
+     * @param tokenEndpoint The token endpoint URL.
+     * @param scopes        The scopes to be requested.
+     * @return Access Token.
+     */
+    public static String getAccessTokenPasswordGrant(String clientId, String secret, String username,
+                                                       String password, String tokenEndpoint, String scopes) {
+
+        try {
+            return getAccessTokenFromRequest(createPasswordGrantTokenRequest(clientId, secret, username, password,
+                    tokenEndpoint, scopes));
+        } catch (UnsupportedEncodingException e) {
+            throw new OutputEventAdapterRuntimeException("Error while building the access token request", e);
+        }
+    }
+
+    private static String getAccessTokenFromRequest(HttpPost tokenRequest) {
+
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(createTokenRequest(clientId, secret,
-                     tokenEndpoint, scopes))) {
+             CloseableHttpResponse response = httpClient.execute(tokenRequest)) {
             if (response == null ) {
                 throw new OutputEventAdapterRuntimeException("Error while getting access token. " +
                         "Null response received from the token endpoint");
@@ -197,6 +227,25 @@ public class EventAdapterUtil {
         params.add(new BasicNameValuePair("client_secret", secret));
         params.add(new BasicNameValuePair("scope", scopes));
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+
+        request.setEntity(new UrlEncodedFormEntity(params));
+        return request;
+    }
+
+    private static HttpPost createPasswordGrantTokenRequest(String clientId, String secret, String username,
+                                                              String password, String tokenEndpoint, String scopes)
+            throws UnsupportedEncodingException {
+
+        HttpPost request = new HttpPost(tokenEndpoint);
+        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("client_id", clientId));
+        params.add(new BasicNameValuePair("client_secret", secret));
+        params.add(new BasicNameValuePair("username", username));
+        params.add(new BasicNameValuePair("password", password));
+        params.add(new BasicNameValuePair("scope", scopes));
+        params.add(new BasicNameValuePair("grant_type", "password"));
 
         request.setEntity(new UrlEncodedFormEntity(params));
         return request;

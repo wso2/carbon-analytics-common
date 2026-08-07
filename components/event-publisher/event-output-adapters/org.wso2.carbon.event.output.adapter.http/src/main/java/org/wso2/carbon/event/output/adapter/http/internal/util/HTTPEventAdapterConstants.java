@@ -72,6 +72,7 @@ public class HTTPEventAdapterConstants {
     public static final String BASIC = "BASIC";
     public static final String BEARER = "BEARER";
     public static final String API_KEY = "API_KEY";
+    public static final String PASSWORD_CREDENTIAL = "PASSWORD_CREDENTIAL";
     public static final String NONE = "NONE";
 
     // Credential properties.
