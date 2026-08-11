@@ -58,6 +58,7 @@ import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProces
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor.encryptAndStoreCredential;
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessToken;
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessTokenPasswordGrant;
+import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessTokenUsingRefreshToken;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.ACCESS_TOKEN;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.ADAPTER_ACCESS_TOKEN;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.ADAPTER_API_KEY_HEADER;
@@ -79,6 +80,7 @@ import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventA
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.CLIENT_SECRET;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.DEFAULT_SECRET_PROVIDER;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.INTERNAL_ACCESS_TOKEN;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.INTERNAL_REFRESH_TOKEN;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.ActionIDs.SEND_EMAIL;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.EMAIL_PUBLISHER_EVENT_ADAPTER_NAME;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.LogConstants.HTTP_EVENT_ADAPTER_SERVICE;
@@ -383,7 +385,8 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                         "Received unauthorized response (HTTP " + responseCode + ") from external endpoint: " + url +
                                 ". Refreshing access token and retrying.",
                         DiagnosticLog.ResultStatus.FAILED);
-                String newToken = fetchNewAccessToken(authType);
+                EventAdapterUtil.TokenResponse tokenResponse = fetchNewAccessToken(authType);
+                String newToken = tokenResponse.getAccessToken();
                 Map<String, String> retryHeaders = new HashMap<>(headers);
                 retryHeaders.put("Authorization", "Bearer " + newToken);
                 APIResponse retryResponse = syncHttpClientManager.send(url, httpMethod, retryHeaders, payload);
@@ -402,14 +405,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                     throw resolveHttpError(retryCode, url, retryResponse.getResponseBody());
                 }
                 this.internalAccessToken = newToken;
-                try {
-                    encryptAndStoreCredential(provider, authType.toUpperCase(), INTERNAL_ACCESS_TOKEN, newToken);
-                } catch (SecretManagementException e) {
-                    log.warn("Adapter '" + eventAdapterConfiguration.getName() + "': unable to persist the " +
-                            "refreshed access token to the secret manager. Token refresh will repeat on " +
-                            "every publish call until the secret manager is available again. Cause: " +
-                            e.getMessage());
-                }
+                storeTokenResponse(authType, tokenResponse);
                 if (log.isDebugEnabled()) {
                     log.debug("[Id: " + uuid + "] Successfully published event to the endpoint: " + url +
                             " after token refresh. Received HTTP response code is: " + retryCode +
@@ -519,9 +515,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                             log.debug("Access token is not available. Generating a new access token for " +
                                     "HTTP-Based Event Publishing");
                         }
+                        EventAdapterUtil.TokenResponse tokenResponse;
                         try {
-                            this.internalAccessToken = getAccessToken(new String(clientId),
-                                    new String(clientSecret), tokenEndpoint, scopes);
+                            tokenResponse = fetchOrRefreshToken(CLIENT_CREDENTIAL, clientId, clientSecret, null, null,
+                                    tokenEndpoint, scopes);
+                            this.internalAccessToken = tokenResponse.getAccessToken();
                             logEventPublishing(
                                     "Access token is successfully retrieved using client " +
                                             "credentials grant type for HTTP-based email publishing.",
@@ -532,12 +530,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                                             "using client credentials grant for HTTP-based email publishing.", e);
                             throw e;
                         }
-                        try {
-                            encryptAndStoreCredential(provider, CLIENT_CREDENTIAL, INTERNAL_ACCESS_TOKEN,
-                                    internalAccessToken);
-                        } catch (SecretManagementException e) {
-                            log.warn("Unable to store the newly generated access token in the secret manager.");
-                        }
+                        storeTokenResponse(CLIENT_CREDENTIAL, tokenResponse);
                     }
                 }
                 authProperties.put(INTERNAL_ACCESS_TOKEN, this.internalAccessToken);
@@ -590,10 +583,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                             log.debug("Access token is not available. Generating a new access token for " +
                                     "HTTP-Based Event Publishing using the password credential grant type.");
                         }
+                        EventAdapterUtil.TokenResponse tokenResponse;
                         try {
-                            this.internalAccessToken = getAccessTokenPasswordGrant(new String(pwCredClientId),
-                                    new String(pwCredClientSecret), new String(pwCredUsername),
-                                    new String(pwCredPassword), tokenEndpoint, scopes);
+                            tokenResponse = fetchOrRefreshToken(PASSWORD_CREDENTIAL, pwCredClientId, pwCredClientSecret,
+                                    pwCredUsername, pwCredPassword, tokenEndpoint, scopes);
+                            this.internalAccessToken = tokenResponse.getAccessToken();
                             logEventPublishing(
                                     "Access token is successfully retrieved using password " +
                                             "credentials grant type for HTTP-based email publishing.",
@@ -604,12 +598,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                                             "using password credentials grant for HTTP-based email publishing.", e);
                             throw e;
                         }
-                        try {
-                            encryptAndStoreCredential(provider, PASSWORD_CREDENTIAL, INTERNAL_ACCESS_TOKEN,
-                                    internalAccessToken);
-                        } catch (SecretManagementException e) {
-                            log.warn("Unable to store the newly generated access token in the secret manager.");
-                        }
+                        storeTokenResponse(PASSWORD_CREDENTIAL, tokenResponse);
                     }
                 }
                 authProperties.put(INTERNAL_ACCESS_TOKEN, this.internalAccessToken);
@@ -791,7 +780,80 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         return new OutputEventAdapterException(error.getCode(), message);
     }
 
-    private String fetchNewAccessToken(String authType) throws OutputEventAdapterException {
+    /**
+     * Attempts to obtain a fresh access token using a previously stored refresh token, falling back to a full
+     * grant request (client credentials or password credentials) if no refresh token is stored, or if the
+     * refresh attempt itself fails (e.g. the refresh token has expired or been revoked).
+     * <p>
+     * Per RFC 6749 &sect;4.4.3, an authorization server SHOULD NOT issue a refresh token for the client
+     * credentials grant, since the client can simply re-authenticate with its client secret at any time -
+     * there is no resource-owner credential whose repeated transmission needs to be avoided. Refresh-token
+     * renewal is therefore only attempted for PASSWORD_CREDENTIAL.
+     *
+     * @param authType     CLIENT_CREDENTIAL or PASSWORD_CREDENTIAL.
+     * @param clientId     Decrypted client ID.
+     * @param clientSecret Decrypted client secret.
+     * @param username     Decrypted resource owner username. Only used when authType is PASSWORD_CREDENTIAL.
+     * @param password     Decrypted resource owner password. Only used when authType is PASSWORD_CREDENTIAL.
+     * @param tokenEndpoint Token endpoint URL.
+     * @param scopes       Scopes to be requested.
+     * @return The resulting token response.
+     */
+    private EventAdapterUtil.TokenResponse fetchOrRefreshToken(String authType, char[] clientId, char[] clientSecret,
+            char[] username, char[] password, String tokenEndpoint, String scopes) {
+
+        boolean isPasswordCredential = StringUtils.equalsIgnoreCase(PASSWORD_CREDENTIAL, authType);
+        if (isPasswordCredential) {
+            try {
+                char[] storedRefreshToken = decryptCredential(provider, authType.toUpperCase(),
+                        INTERNAL_REFRESH_TOKEN);
+                if (storedRefreshToken != null && storedRefreshToken.length > 0) {
+                    try {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Attempting to obtain a new access token using the stored refresh token for " +
+                                    "auth type: " + authType);
+                        }
+                        return getAccessTokenUsingRefreshToken(new String(clientId), new String(clientSecret),
+                                new String(storedRefreshToken), tokenEndpoint, scopes);
+                    } catch (OutputEventAdapterRuntimeException e) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Refresh token grant failed for auth type: " + authType +
+                                    ". Falling back to a full grant request.", e);
+                        }
+                    }
+                }
+            } catch (SecretManagementException e) {
+                // No refresh token available in the secret store yet. Fall back to a full grant request.
+            }
+        }
+
+        return isPasswordCredential
+                ? getAccessTokenPasswordGrant(new String(clientId), new String(clientSecret), new String(username),
+                        new String(password), tokenEndpoint, scopes)
+                : getAccessToken(new String(clientId), new String(clientSecret), tokenEndpoint, scopes);
+    }
+
+    /**
+     * Persists the access token in the secret manager, along with the refresh token if one was issued or
+     * rotated. Refresh tokens are only meaningful (and only ever expected) for PASSWORD_CREDENTIAL; see
+     * {@link #fetchOrRefreshToken}.
+     */
+    private void storeTokenResponse(String authType, EventAdapterUtil.TokenResponse tokenResponse) {
+
+        try {
+            encryptAndStoreCredential(provider, authType.toUpperCase(), INTERNAL_ACCESS_TOKEN,
+                    tokenResponse.getAccessToken());
+            if (StringUtils.equalsIgnoreCase(PASSWORD_CREDENTIAL, authType)
+                    && StringUtils.isNotBlank(tokenResponse.getRefreshToken())) {
+                encryptAndStoreCredential(provider, authType.toUpperCase(), INTERNAL_REFRESH_TOKEN,
+                        tokenResponse.getRefreshToken());
+            }
+        } catch (SecretManagementException e) {
+            log.warn("Unable to store the newly generated token(s) in the secret manager.");
+        }
+    }
+
+    private EventAdapterUtil.TokenResponse fetchNewAccessToken(String authType) throws OutputEventAdapterException {
 
         boolean isPasswordCredential = StringUtils.equalsIgnoreCase(PASSWORD_CREDENTIAL, authType);
 
@@ -829,16 +891,14 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         String tokenEndpoint = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_TOKEN_ENDPOINT);
         String scopes = eventAdapterConfiguration.getStaticProperties().get(ADAPTER_SCOPES);
         try {
-            String newToken = isPasswordCredential
-                    ? getAccessTokenPasswordGrant(new String(clientId), new String(clientSecret),
-                            new String(username), new String(password), tokenEndpoint, scopes)
-                    : getAccessToken(new String(clientId), new String(clientSecret), tokenEndpoint, scopes);
+            EventAdapterUtil.TokenResponse tokenResponse = fetchOrRefreshToken(authType, clientId, clientSecret,
+                    username, password, tokenEndpoint, scopes);
             logEventPublishing(
                     "Access token is successfully retrieved using " + (isPasswordCredential ?
                             "password credentials" : "client credentials") + " grant type " +
                             "for HTTP-based sync publishing.",
                     DiagnosticLog.ResultStatus.SUCCESS);
-            return newToken;
+            return tokenResponse;
         } catch (OutputEventAdapterRuntimeException e) {
             logEventPublishingFailure("Failed to obtain a new access token for HTTP-based sync publishing.", e);
             throw new OutputEventAdapterException(
@@ -1169,13 +1229,11 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                 int attempts = 0;
                 while (attempts < MAX_RETRY_ATTEMPTS) {
                     attempts++;
+                    EventAdapterUtil.TokenResponse tokenResponse;
                     try {
-                        internalAccessToken = isPasswordCredential
-                                ? EventAdapterUtil.getAccessTokenPasswordGrant(new String(clientId),
-                                        new String(clientSecret), new String(retryUsername), new String(retryPassword),
-                                        tokenEndpoint, scopes)
-                                : EventAdapterUtil.getAccessToken(new String(clientId), new String(clientSecret),
-                                        tokenEndpoint, scopes);
+                        tokenResponse = fetchOrRefreshToken(tokenAuthType, clientId, clientSecret, retryUsername,
+                                retryPassword, tokenEndpoint, scopes);
+                        internalAccessToken = tokenResponse.getAccessToken();
                         logEventPublishing(
                                 "Access token is successfully retrieved using " + (isPasswordCredential ?
                                         "password credentials" : "client credentials") + " grant type " +
@@ -1201,12 +1259,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                         logEventPublishing(
                                 "Received success response from external endpoint",
                                 DiagnosticLog.ResultStatus.SUCCESS);
-                        try {
-                            encryptAndStoreCredential(provider, tokenAuthType, INTERNAL_ACCESS_TOKEN,
-                                    internalAccessToken);
-                        } catch (SecretManagementException e) {
-                            log.warn("Unable to store the newly generated access token in the secret manager.");
-                        }
+                        storeTokenResponse(tokenAuthType, tokenResponse);
                         return;
                     } else {
                         Map<String, Object> params = new HashMap<>();

@@ -82,6 +82,7 @@ public class HTTPEventAdapterConstants {
     public static final String CLIENT_ID = "clientId";
     public static final String CLIENT_SECRET = "clientSecret";
     public static final String INTERNAL_ACCESS_TOKEN = "internalAccessToken";
+    public static final String INTERNAL_REFRESH_TOKEN = "internalRefreshToken";
     public static final String ACCESS_TOKEN = "accessToken";
     public static final String API_KEY_HEADER = "apiKeyHeader";
     public static final String API_KEY_VALUE = "apiKeyValue";

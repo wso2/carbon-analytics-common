@@ -114,13 +114,16 @@ public class EventAdapterUtilTest {
 
         AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
         String tokenEndpoint = startTokenServer(200,
-                "{\"access_token\":\"password-grant-access-token\",\"token_type\":\"Bearer\"}", capturedParams);
+                "{\"access_token\":\"password-grant-access-token\"," +
+                        "\"refresh_token\":\"password-grant-refresh-token\"," +
+                        "\"token_type\":\"Bearer\"}", capturedParams);
 
-        String token = EventAdapterUtil.getAccessTokenPasswordGrant(
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessTokenPasswordGrant(
                 "test-client-id", "test-client-secret", "svc-verifone-notify", "S3cretPass!",
                 tokenEndpoint, "send:sms");
 
-        Assert.assertEquals(token, "password-grant-access-token");
+        Assert.assertEquals(tokenResponse.getAccessToken(), "password-grant-access-token");
+        Assert.assertEquals(tokenResponse.getRefreshToken(), "password-grant-refresh-token");
 
         Map<String, String> params = capturedParams.get();
         Assert.assertNotNull(params, "Token endpoint did not receive a request");
@@ -130,6 +133,22 @@ public class EventAdapterUtilTest {
         Assert.assertEquals(params.get("username"), "svc-verifone-notify");
         Assert.assertEquals(params.get("password"), "S3cretPass!");
         Assert.assertEquals(params.get("scope"), "send:sms");
+    }
+
+    @Test
+    public void testGetAccessTokenPasswordGrant_noRefreshTokenInResponse_refreshTokenIsNull() throws Exception {
+
+        AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
+        String tokenEndpoint = startTokenServer(200,
+                "{\"access_token\":\"password-grant-access-token\"}", capturedParams);
+
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessTokenPasswordGrant(
+                "test-client-id", "test-client-secret", "svc-verifone-notify", "S3cretPass!",
+                tokenEndpoint, "send:sms");
+
+        Assert.assertEquals(tokenResponse.getAccessToken(), "password-grant-access-token");
+        Assert.assertNull(tokenResponse.getRefreshToken(),
+                "Authorization servers are not required to issue a refresh token; must not fabricate one");
     }
 
     @Test(expectedExceptions = OutputEventAdapterRuntimeException.class)
@@ -165,10 +184,11 @@ public class EventAdapterUtilTest {
         String tokenEndpoint = startTokenServer(200,
                 "{\"access_token\":\"client-credential-access-token\"}", capturedParams);
 
-        String token = EventAdapterUtil.getAccessToken(
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessToken(
                 "test-client-id", "test-client-secret", tokenEndpoint, "openid");
 
-        Assert.assertEquals(token, "client-credential-access-token");
+        Assert.assertEquals(tokenResponse.getAccessToken(), "client-credential-access-token");
+        Assert.assertNull(tokenResponse.getRefreshToken());
 
         Map<String, String> params = capturedParams.get();
         Assert.assertEquals(params.get("grant_type"), "client_credentials");
@@ -176,5 +196,46 @@ public class EventAdapterUtilTest {
         Assert.assertEquals(params.get("client_secret"), "test-client-secret");
         Assert.assertNull(params.get("username"), "Client credentials request must not include a username param");
         Assert.assertNull(params.get("password"), "Client credentials request must not include a password param");
+    }
+
+    // -----------------------------------------------------------------------
+    // getAccessTokenUsingRefreshToken — renewing a token without resending the resource owner's
+    // credentials on every refresh cycle
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void testGetAccessTokenUsingRefreshToken_sendsCorrectRequestAndParsesToken() throws Exception {
+
+        AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
+        String tokenEndpoint = startTokenServer(200,
+                "{\"access_token\":\"refreshed-access-token\",\"refresh_token\":\"rotated-refresh-token\"}",
+                capturedParams);
+
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                "test-client-id", "test-client-secret", "original-refresh-token", tokenEndpoint, "send:sms");
+
+        Assert.assertEquals(tokenResponse.getAccessToken(), "refreshed-access-token");
+        Assert.assertEquals(tokenResponse.getRefreshToken(), "rotated-refresh-token");
+
+        Map<String, String> params = capturedParams.get();
+        Assert.assertNotNull(params, "Token endpoint did not receive a request");
+        Assert.assertEquals(params.get("grant_type"), "refresh_token");
+        Assert.assertEquals(params.get("client_id"), "test-client-id");
+        Assert.assertEquals(params.get("client_secret"), "test-client-secret");
+        Assert.assertEquals(params.get("refresh_token"), "original-refresh-token");
+        Assert.assertNull(params.get("username"),
+                "Refresh token grant must not resend the resource owner's username");
+        Assert.assertNull(params.get("password"),
+                "Refresh token grant must not resend the resource owner's password");
+    }
+
+    @Test(expectedExceptions = OutputEventAdapterRuntimeException.class)
+    public void testGetAccessTokenUsingRefreshToken_expiredRefreshToken_throwsException() throws Exception {
+
+        AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
+        String tokenEndpoint = startTokenServer(400, "{\"error\":\"invalid_grant\"}", capturedParams);
+
+        EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                "test-client-id", "test-client-secret", "expired-refresh-token", tokenEndpoint, "send:sms");
     }
 }
