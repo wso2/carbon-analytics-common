@@ -1535,7 +1535,7 @@
         <siddhi.version>3.2.11</siddhi.version>
 
 
-        <orbit.version.json>3.0.0.wso2v8</orbit.version.json>
+        <orbit.version.json>3.0.0.wso2v9</orbit.version.json>
         <carbon.p2.plugin.version>5.5.1</carbon.p2.plugin.version>
         <tomcat.websocket.version>7.0.54</tomcat.websocket.version>
         <orbit.version.axiom>1.2.11-wso2v16</orbit.version.axiom>
