@@ -301,7 +301,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
                         " failed to connect to the mail server due to missing client credentials");
             }
             char[] accessToken = getAccessToken(new String(clientId), new String(clientSecret), tokenEndpoint, scopes)
-                    .toCharArray();
+                    .getAccessToken().toCharArray();
             credentials.put(USERNAME, props.get(ADAPTER_EMAIL_SMTP_FROM).toCharArray());
             credentials.put(PASSWORD, accessToken);
         } else {
@@ -531,7 +531,7 @@ public class EmailEventAdapter implements OutputEventAdapter {
                 transport = (SMTPTransport) session.getTransport(SMTP_PROTOCOL);
                 smtpPassword = getAccessToken(new String(clientId), new String(clientSecret),
                         globalProperties.get(ADAPTER_EMAIL_TOKEN_ENDPOINT),
-                        globalProperties.get(ADAPTER_EMAIL_SCOPES)).toCharArray();
+                        globalProperties.get(ADAPTER_EMAIL_SCOPES)).getAccessToken().toCharArray();
                 transport.connect(globalProperties.get(MAIL_SMTP_HOST), new String(smtpUsername),
                         new String(smtpPassword));
 
