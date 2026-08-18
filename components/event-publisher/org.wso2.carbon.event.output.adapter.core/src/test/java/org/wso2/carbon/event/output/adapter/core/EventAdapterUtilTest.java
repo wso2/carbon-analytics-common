@@ -106,7 +106,7 @@ public class EventAdapterUtilTest {
     }
 
     // -----------------------------------------------------------------------
-    // getAccessTokenPasswordGrant — the new PASSWORD_CREDENTIAL grant support
+    // getTokenResponsePasswordGrant — the new PASSWORD_CREDENTIAL grant support
     // -----------------------------------------------------------------------
 
     @Test
@@ -118,7 +118,7 @@ public class EventAdapterUtilTest {
                         "\"refresh_token\":\"password-grant-refresh-token\"," +
                         "\"token_type\":\"Bearer\"}", capturedParams);
 
-        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessTokenPasswordGrant(
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getTokenResponsePasswordGrant(
                 "test-client-id", "test-client-secret", "svc-verifone-notify", "S3cretPass!",
                 tokenEndpoint, "send:sms");
 
@@ -142,7 +142,7 @@ public class EventAdapterUtilTest {
         String tokenEndpoint = startTokenServer(200,
                 "{\"access_token\":\"password-grant-access-token\"}", capturedParams);
 
-        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessTokenPasswordGrant(
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getTokenResponsePasswordGrant(
                 "test-client-id", "test-client-secret", "svc-verifone-notify", "S3cretPass!",
                 tokenEndpoint, "send:sms");
 
@@ -157,7 +157,7 @@ public class EventAdapterUtilTest {
         AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
         String tokenEndpoint = startTokenServer(401, "{\"error\":\"invalid_grant\"}", capturedParams);
 
-        EventAdapterUtil.getAccessTokenPasswordGrant(
+        EventAdapterUtil.getTokenResponsePasswordGrant(
                 "bad-client-id", "bad-client-secret", "svc-verifone-notify", "wrong-password",
                 tokenEndpoint, "send:sms");
     }
@@ -168,13 +168,13 @@ public class EventAdapterUtilTest {
         AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
         String tokenEndpoint = startTokenServer(200, "{\"token_type\":\"Bearer\"}", capturedParams);
 
-        EventAdapterUtil.getAccessTokenPasswordGrant(
+        EventAdapterUtil.getTokenResponsePasswordGrant(
                 "test-client-id", "test-client-secret", "svc-verifone-notify", "S3cretPass!",
                 tokenEndpoint, "send:sms");
     }
 
     // -----------------------------------------------------------------------
-    // getAccessToken (CLIENT_CREDENTIAL) — regression coverage for the request-building refactor
+    // getTokenResponse (CLIENT_CREDENTIAL) — regression coverage for the request-building refactor
     // -----------------------------------------------------------------------
 
     @Test
@@ -184,7 +184,7 @@ public class EventAdapterUtilTest {
         String tokenEndpoint = startTokenServer(200,
                 "{\"access_token\":\"client-credential-access-token\"}", capturedParams);
 
-        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessToken(
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getTokenResponse(
                 "test-client-id", "test-client-secret", tokenEndpoint, "openid");
 
         Assert.assertEquals(tokenResponse.getAccessToken(), "client-credential-access-token");
@@ -199,7 +199,43 @@ public class EventAdapterUtilTest {
     }
 
     // -----------------------------------------------------------------------
-    // getAccessTokenUsingRefreshToken — renewing a token without resending the resource owner's
+    // getAccessToken / getAccessTokenPasswordGrant — deprecated String-returning overloads kept for
+    // pre-existing external callers (e.g. EmailEventAdapter's CLIENT_CREDENTIAL/XOAUTH2 flow) that
+    // predate TokenResponse. Regression coverage: a previous change here altered these methods'
+    // return type in place instead of adding new ones, which silently broke EmailEventAdapter's build.
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void testGetAccessToken_returnsPlainAccessTokenString() throws Exception {
+
+        AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
+        String tokenEndpoint = startTokenServer(200,
+                "{\"access_token\":\"client-credential-access-token\",\"refresh_token\":\"should-be-ignored\"}",
+                capturedParams);
+
+        String accessToken = EventAdapterUtil.getAccessToken(
+                "test-client-id", "test-client-secret", tokenEndpoint, "openid");
+
+        Assert.assertEquals(accessToken, "client-credential-access-token");
+    }
+
+    @Test
+    public void testGetAccessTokenPasswordGrant_returnsPlainAccessTokenString() throws Exception {
+
+        AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
+        String tokenEndpoint = startTokenServer(200,
+                "{\"access_token\":\"password-grant-access-token\",\"refresh_token\":\"should-be-ignored\"}",
+                capturedParams);
+
+        String accessToken = EventAdapterUtil.getAccessTokenPasswordGrant(
+                "test-client-id", "test-client-secret", "svc-verifone-notify", "S3cretPass!",
+                tokenEndpoint, "send:sms");
+
+        Assert.assertEquals(accessToken, "password-grant-access-token");
+    }
+
+    // -----------------------------------------------------------------------
+    // getTokenResponseUsingRefreshToken — renewing a token without resending the resource owner's
     // credentials on every refresh cycle
     // -----------------------------------------------------------------------
 
@@ -211,7 +247,7 @@ public class EventAdapterUtilTest {
                 "{\"access_token\":\"refreshed-access-token\",\"refresh_token\":\"rotated-refresh-token\"}",
                 capturedParams);
 
-        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getAccessTokenUsingRefreshToken(
+        EventAdapterUtil.TokenResponse tokenResponse = EventAdapterUtil.getTokenResponseUsingRefreshToken(
                 "test-client-id", "test-client-secret", "original-refresh-token", tokenEndpoint, "send:sms");
 
         Assert.assertEquals(tokenResponse.getAccessToken(), "refreshed-access-token");
@@ -235,7 +271,7 @@ public class EventAdapterUtilTest {
         AtomicReference<Map<String, String>> capturedParams = new AtomicReference<>();
         String tokenEndpoint = startTokenServer(400, "{\"error\":\"invalid_grant\"}", capturedParams);
 
-        EventAdapterUtil.getAccessTokenUsingRefreshToken(
+        EventAdapterUtil.getTokenResponseUsingRefreshToken(
                 "test-client-id", "test-client-secret", "expired-refresh-token", tokenEndpoint, "send:sms");
     }
 }

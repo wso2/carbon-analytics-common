@@ -510,7 +510,7 @@ public class HttpOutputAdaptorTestCase {
             mockedSecretProcessor.when(() -> EventAdapterSecretProcessor.encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenThrow(new SecretManagementException("Cannot store secret"));
             // Mock the access token generation
-            mockedUtil.when(() -> EventAdapterUtil.getAccessToken(anyString(), anyString(), anyString(), anyString()))
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponse(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(invocation -> new EventAdapterUtil.TokenResponse("generatedAccessToken", null));
 
             HTTPEventAdapter httpEventAdapter = getHttpAdaptorWithAuthType("CLIENT_CREDENTIAL");
@@ -524,9 +524,9 @@ public class HttpOutputAdaptorTestCase {
             mockedSecretProcessor.verify(() ->
                     EventAdapterSecretProcessor.decryptCredential(eq("EMAIL_PROVIDER"), eq("CLIENT_CREDENTIAL"), eq("internalAccessToken")),
                     asyncVerification());
-            // Verify that getAccessToken was called to generate new token
+            // Verify that getTokenResponse was called to generate new token
             mockedUtil.verify(() ->
-                    EventAdapterUtil.getAccessToken(anyString(), anyString(), anyString(), anyString()),
+                    EventAdapterUtil.getTokenResponse(anyString(), anyString(), anyString(), anyString()),
                     asyncVerification());
 
             httpEventAdapter.disconnect();
@@ -560,7 +560,7 @@ public class HttpOutputAdaptorTestCase {
                             eq("EMAIL_PROVIDER"), eq("CLIENT_CREDENTIAL"), eq("clientSecret")))
                     .thenAnswer(invocation -> "encryptedClientSecret".toCharArray());
             // Mock the access token generation
-            mockedUtil.when(() -> EventAdapterUtil.getAccessToken(anyString(), anyString(), anyString(), anyString()))
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponse(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(invocation -> new EventAdapterUtil.TokenResponse("generatedAccessToken", null));
 
             HTTPEventAdapter httpEventAdapter = getHttpAdaptorWithAuthType("CLIENT_CREDENTIAL");
@@ -577,9 +577,9 @@ public class HttpOutputAdaptorTestCase {
             mockedSecretProcessor.verify(() ->
                     EventAdapterSecretProcessor.decryptCredential(eq("EMAIL_PROVIDER"), eq("CLIENT_CREDENTIAL"), eq("clientSecret")),
                     asyncVerification());
-            // Verify that getAccessToken was called
+            // Verify that getTokenResponse was called
             mockedUtil.verify(() ->
-                    EventAdapterUtil.getAccessToken(anyString(), anyString(), anyString(), anyString()),
+                    EventAdapterUtil.getTokenResponse(anyString(), anyString(), anyString(), anyString()),
                     asyncVerification());
 
             httpEventAdapter.disconnect();

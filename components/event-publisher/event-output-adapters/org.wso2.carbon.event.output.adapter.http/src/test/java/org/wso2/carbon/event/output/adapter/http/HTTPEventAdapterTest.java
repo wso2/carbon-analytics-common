@@ -489,7 +489,7 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
-                    .getAccessToken(anyString(), anyString(), anyString(), anyString()))
+                    .getTokenResponse(anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
             when(mockManager.send(anyString(), any(), anyMap(), anyString()))
@@ -499,7 +499,7 @@ public class HTTPEventAdapterTest {
             adapter.publishSync("payload", defaultDynamicProps());
 
             verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessToken(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponse(
                     anyString(), anyString(), anyString(), anyString()), times(1));
         }
     }
@@ -527,7 +527,7 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
-                    .getAccessToken(anyString(), anyString(), anyString(), anyString()))
+                    .getTokenResponse(anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
             when(mockManager.send(anyString(), any(), anyMap(), anyString()))
@@ -561,7 +561,7 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
-                    .getAccessToken(anyString(), anyString(), anyString(), anyString()))
+                    .getTokenResponse(anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
             when(mockManager.send(anyString(), any(), anyMap(), anyString()))
@@ -603,7 +603,7 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
-                    .getAccessTokenPasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
+                    .getTokenResponsePasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
                             anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
@@ -614,9 +614,9 @@ public class HTTPEventAdapterTest {
             adapter.publishSync("payload", defaultDynamicProps());
 
             verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponsePasswordGrant(
                     anyString(), anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessToken(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponse(
                     anyString(), anyString(), anyString(), anyString()), times(0));
         }
     }
@@ -644,7 +644,7 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
-                    .getAccessTokenPasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
+                    .getTokenResponsePasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
                             anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
@@ -679,7 +679,7 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
-                    .getAccessTokenPasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
+                    .getTokenResponsePasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
                             anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
@@ -714,7 +714,7 @@ public class HTTPEventAdapterTest {
             ArgumentCaptor<String> clientSecretCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
-            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponsePasswordGrant(
                     clientIdCaptor.capture(), clientSecretCaptor.capture(), usernameCaptor.capture(),
                     passwordCaptor.capture(), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("password-grant-token", null));
@@ -766,7 +766,7 @@ public class HTTPEventAdapterTest {
             mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
-            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponseUsingRefreshToken(
                             anyString(), anyString(), eq("stored-refresh-token"), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-via-refresh-token",
                             "rotated-refresh-token"));
@@ -778,10 +778,10 @@ public class HTTPEventAdapterTest {
             adapter.publishSync("payload", defaultDynamicProps());
 
             verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponseUsingRefreshToken(
                     anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
             // The full grant (which would resend the resource owner's username/password) must not be attempted.
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponsePasswordGrant(
                     anyString(), anyString(), anyString(), anyString(), anyString(), anyString()), times(0));
             // The rotated refresh token returned by the server must be persisted for the next renewal.
             mockedSecretProcessor.verify(() -> EventAdapterSecretProcessor.encryptAndStoreCredential(
@@ -815,10 +815,10 @@ public class HTTPEventAdapterTest {
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
             // The stored refresh token has expired or been revoked by the authorization server.
-            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponseUsingRefreshToken(
                             anyString(), anyString(), anyString(), anyString(), anyString()))
                     .thenThrow(new OutputEventAdapterRuntimeException("invalid_grant"));
-            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponsePasswordGrant(
                             anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-via-full-grant", null));
 
@@ -829,9 +829,9 @@ public class HTTPEventAdapterTest {
             adapter.publishSync("payload", defaultDynamicProps());
 
             verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponseUsingRefreshToken(
                     anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponsePasswordGrant(
                     anyString(), anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
         }
     }
@@ -860,7 +860,7 @@ public class HTTPEventAdapterTest {
             mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
                     .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
                     .thenAnswer(inv -> null);
-            mockedUtil.when(() -> EventAdapterUtil.getAccessToken(
+            mockedUtil.when(() -> EventAdapterUtil.getTokenResponse(
                             anyString(), anyString(), anyString(), anyString()))
                     .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
@@ -872,7 +872,7 @@ public class HTTPEventAdapterTest {
 
             mockedSecretProcessor.verify(() -> EventAdapterSecretProcessor.decryptCredential(
                     anyString(), anyString(), eq(INTERNAL_REFRESH_TOKEN)), times(0));
-            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+            mockedUtil.verify(() -> EventAdapterUtil.getTokenResponseUsingRefreshToken(
                     anyString(), anyString(), anyString(), anyString(), anyString()), times(0));
         }
     }

@@ -142,9 +142,48 @@ public class EventAdapterUtil {
      * @param secret        The client Secret.
      * @param tokenEndpoint The token endpointURL.
      * @param scopes        The scopes to be requested.
+     * @return The access token.
+     * @deprecated Does not expose a refresh token, if one was issued. Use
+     * {@link #getTokenResponse(String, String, String, String)} instead.
+     */
+    @Deprecated
+    public static String getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
+
+        return getTokenResponse(clientId, secret, tokenEndpoint, scopes).getAccessToken();
+    }
+
+    /**
+     * Retrieves the access token using the OAuth2 resource owner password credentials grant type.
+     *
+     * @param clientId      The client ID.
+     * @param secret        The client Secret.
+     * @param username      The resource owner username.
+     * @param password      The resource owner password.
+     * @param tokenEndpoint The token endpoint URL.
+     * @param scopes        The scopes to be requested.
+     * @return The access token.
+     * @deprecated Does not expose a refresh token, if one was issued. Use
+     * {@link #getTokenResponsePasswordGrant(String, String, String, String, String, String)} instead.
+     */
+    @Deprecated
+    public static String getAccessTokenPasswordGrant(String clientId, String secret, String username,
+                                                       String password, String tokenEndpoint, String scopes) {
+
+        return getTokenResponsePasswordGrant(clientId, secret, username, password, tokenEndpoint, scopes)
+                .getAccessToken();
+    }
+
+    /**
+     * Retrieves the access token using the client credentials grant type.
+     *
+     * @param clientId      The client ID.
+     * @param secret        The client Secret.
+     * @param tokenEndpoint The token endpointURL.
+     * @param scopes        The scopes to be requested.
      * @return Token response, containing the access token and, if issued, a refresh token.
      */
-    public static TokenResponse getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
+    public static TokenResponse getTokenResponse(String clientId, String secret, String tokenEndpoint,
+                                                  String scopes) {
 
         try {
             return getAccessTokenFromRequest(createTokenRequest(clientId, secret, tokenEndpoint, scopes));
@@ -164,8 +203,8 @@ public class EventAdapterUtil {
      * @param scopes        The scopes to be requested.
      * @return Token response, containing the access token and, if issued, a refresh token.
      */
-    public static TokenResponse getAccessTokenPasswordGrant(String clientId, String secret, String username,
-                                                              String password, String tokenEndpoint, String scopes) {
+    public static TokenResponse getTokenResponsePasswordGrant(String clientId, String secret, String username,
+                                                               String password, String tokenEndpoint, String scopes) {
 
         try {
             return getAccessTokenFromRequest(createPasswordGrantTokenRequest(clientId, secret, username, password,
@@ -186,8 +225,9 @@ public class EventAdapterUtil {
      * @param scopes        The scopes to be requested.
      * @return Token response, containing the new access token and, if re-issued/rotated, a refresh token.
      */
-    public static TokenResponse getAccessTokenUsingRefreshToken(String clientId, String secret, String refreshToken,
-                                                                  String tokenEndpoint, String scopes) {
+    public static TokenResponse getTokenResponseUsingRefreshToken(String clientId, String secret,
+                                                                   String refreshToken, String tokenEndpoint,
+                                                                   String scopes) {
 
         try {
             return getAccessTokenFromRequest(createRefreshTokenRequest(clientId, secret, refreshToken, tokenEndpoint,
