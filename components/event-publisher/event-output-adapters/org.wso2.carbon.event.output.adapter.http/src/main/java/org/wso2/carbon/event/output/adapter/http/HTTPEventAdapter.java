@@ -56,9 +56,9 @@ import java.util.concurrent.*;
 
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor.decryptCredential;
 import static org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor.encryptAndStoreCredential;
-import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessToken;
-import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessTokenPasswordGrant;
-import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getAccessTokenUsingRefreshToken;
+import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getTokenResponse;
+import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getTokenResponsePasswordGrant;
+import static org.wso2.carbon.event.output.adapter.core.EventAdapterUtil.getTokenResponseUsingRefreshToken;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.ACCESS_TOKEN;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.ADAPTER_ACCESS_TOKEN;
 import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.ADAPTER_API_KEY_HEADER;
@@ -813,7 +813,7 @@ public class HTTPEventAdapter implements OutputEventAdapter {
                             log.debug("Attempting to obtain a new access token using the stored refresh token for " +
                                     "auth type: " + authType);
                         }
-                        return getAccessTokenUsingRefreshToken(new String(clientId), new String(clientSecret),
+                        return getTokenResponseUsingRefreshToken(new String(clientId), new String(clientSecret),
                                 new String(storedRefreshToken), tokenEndpoint, scopes);
                     } catch (OutputEventAdapterRuntimeException e) {
                         if (log.isDebugEnabled()) {
@@ -828,9 +828,9 @@ public class HTTPEventAdapter implements OutputEventAdapter {
         }
 
         return isPasswordCredential
-                ? getAccessTokenPasswordGrant(new String(clientId), new String(clientSecret), new String(username),
+                ? getTokenResponsePasswordGrant(new String(clientId), new String(clientSecret), new String(username),
                         new String(password), tokenEndpoint, scopes)
-                : getAccessToken(new String(clientId), new String(clientSecret), tokenEndpoint, scopes);
+                : getTokenResponse(new String(clientId), new String(clientSecret), tokenEndpoint, scopes);
     }
 
     /**
