@@ -511,7 +511,7 @@ public class HttpOutputAdaptorTestCase {
                     .thenThrow(new SecretManagementException("Cannot store secret"));
             // Mock the access token generation
             mockedUtil.when(() -> EventAdapterUtil.getAccessToken(anyString(), anyString(), anyString(), anyString()))
-                    .thenAnswer(invocation -> "generatedAccessToken");
+                    .thenAnswer(invocation -> new EventAdapterUtil.TokenResponse("generatedAccessToken", null));
 
             HTTPEventAdapter httpEventAdapter = getHttpAdaptorWithAuthType("CLIENT_CREDENTIAL");
             httpEventAdapter.init();
@@ -561,7 +561,7 @@ public class HttpOutputAdaptorTestCase {
                     .thenAnswer(invocation -> "encryptedClientSecret".toCharArray());
             // Mock the access token generation
             mockedUtil.when(() -> EventAdapterUtil.getAccessToken(anyString(), anyString(), anyString(), anyString()))
-                    .thenAnswer(invocation -> "generatedAccessToken");
+                    .thenAnswer(invocation -> new EventAdapterUtil.TokenResponse("generatedAccessToken", null));
 
             HTTPEventAdapter httpEventAdapter = getHttpAdaptorWithAuthType("CLIENT_CREDENTIAL");
             httpEventAdapter.init();

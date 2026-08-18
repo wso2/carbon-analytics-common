@@ -55,6 +55,34 @@ public class EventAdapterUtil {
     private static final Log LOG = LogFactory.getLog(EventAdapterUtil.class);
     private static final String TENANT_DOMAIN = "tenantDomain";
     private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String REFRESH_TOKEN_KEY = "refresh_token";
+
+    /**
+     * Holds the result of an OAuth2 token request: the access token, and the refresh token if one was issued.
+     * Not every grant type or authorization server issues a refresh token, so {@link #getRefreshToken()} may be
+     * {@code null}.
+     */
+    public static class TokenResponse {
+
+        private final String accessToken;
+        private final String refreshToken;
+
+        public TokenResponse(String accessToken, String refreshToken) {
+
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
+        }
+
+        public String getAccessToken() {
+
+            return accessToken;
+        }
+
+        public String getRefreshToken() {
+
+            return refreshToken;
+        }
+    }
 
     public static AxisConfiguration getAxisConfiguration() {
         AxisConfiguration axisConfiguration = null;
@@ -114,13 +142,65 @@ public class EventAdapterUtil {
      * @param secret        The client Secret.
      * @param tokenEndpoint The token endpointURL.
      * @param scopes        The scopes to be requested.
-     * @return Access Token.
+     * @return Token response, containing the access token and, if issued, a refresh token.
      */
-    public static String getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
+    public static TokenResponse getAccessToken(String clientId, String secret, String tokenEndpoint, String scopes) {
+
+        try {
+            return getAccessTokenFromRequest(createTokenRequest(clientId, secret, tokenEndpoint, scopes));
+        } catch (UnsupportedEncodingException e) {
+            throw new OutputEventAdapterRuntimeException("Error while building the access token request", e);
+        }
+    }
+
+    /**
+     * Retrieves the access token using the OAuth2 resource owner password credentials grant type.
+     *
+     * @param clientId      The client ID.
+     * @param secret        The client Secret.
+     * @param username      The resource owner username.
+     * @param password      The resource owner password.
+     * @param tokenEndpoint The token endpoint URL.
+     * @param scopes        The scopes to be requested.
+     * @return Token response, containing the access token and, if issued, a refresh token.
+     */
+    public static TokenResponse getAccessTokenPasswordGrant(String clientId, String secret, String username,
+                                                              String password, String tokenEndpoint, String scopes) {
+
+        try {
+            return getAccessTokenFromRequest(createPasswordGrantTokenRequest(clientId, secret, username, password,
+                    tokenEndpoint, scopes));
+        } catch (UnsupportedEncodingException e) {
+            throw new OutputEventAdapterRuntimeException("Error while building the access token request", e);
+        }
+    }
+
+    /**
+     * Retrieves a new access token using a previously issued refresh token, avoiding the need to resend the
+     * client secret / resource owner password on every renewal.
+     *
+     * @param clientId      The client ID.
+     * @param secret        The client Secret.
+     * @param refreshToken  The refresh token issued alongside a previous access token.
+     * @param tokenEndpoint The token endpoint URL.
+     * @param scopes        The scopes to be requested.
+     * @return Token response, containing the new access token and, if re-issued/rotated, a refresh token.
+     */
+    public static TokenResponse getAccessTokenUsingRefreshToken(String clientId, String secret, String refreshToken,
+                                                                  String tokenEndpoint, String scopes) {
+
+        try {
+            return getAccessTokenFromRequest(createRefreshTokenRequest(clientId, secret, refreshToken, tokenEndpoint,
+                    scopes));
+        } catch (UnsupportedEncodingException e) {
+            throw new OutputEventAdapterRuntimeException("Error while building the refresh token request", e);
+        }
+    }
+
+    private static TokenResponse getAccessTokenFromRequest(HttpPost tokenRequest) {
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(createTokenRequest(clientId, secret,
-                     tokenEndpoint, scopes))) {
+             CloseableHttpResponse response = httpClient.execute(tokenRequest)) {
             if (response == null ) {
                 throw new OutputEventAdapterRuntimeException("Error while getting access token. " +
                         "Null response received from the token endpoint");
@@ -135,7 +215,10 @@ public class EventAdapterUtil {
                 try {
                     JSONObject jsonResponse = new JSONObject(responseString);
                     if (jsonResponse.has(ACCESS_TOKEN_KEY) && !jsonResponse.isNull(ACCESS_TOKEN_KEY)) {
-                        return jsonResponse.getString(ACCESS_TOKEN_KEY);
+                        String refreshToken = jsonResponse.has(REFRESH_TOKEN_KEY)
+                                && !jsonResponse.isNull(REFRESH_TOKEN_KEY)
+                                ? jsonResponse.getString(REFRESH_TOKEN_KEY) : null;
+                        return new TokenResponse(jsonResponse.getString(ACCESS_TOKEN_KEY), refreshToken);
                     } else {
                         throw new OutputEventAdapterRuntimeException(
                                 "Access Token is not available in the token response. Received response code: " +
@@ -197,6 +280,43 @@ public class EventAdapterUtil {
         params.add(new BasicNameValuePair("client_secret", secret));
         params.add(new BasicNameValuePair("scope", scopes));
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+
+        request.setEntity(new UrlEncodedFormEntity(params));
+        return request;
+    }
+
+    private static HttpPost createPasswordGrantTokenRequest(String clientId, String secret, String username,
+                                                              String password, String tokenEndpoint, String scopes)
+            throws UnsupportedEncodingException {
+
+        HttpPost request = new HttpPost(tokenEndpoint);
+        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("client_id", clientId));
+        params.add(new BasicNameValuePair("client_secret", secret));
+        params.add(new BasicNameValuePair("username", username));
+        params.add(new BasicNameValuePair("password", password));
+        params.add(new BasicNameValuePair("scope", scopes));
+        params.add(new BasicNameValuePair("grant_type", "password"));
+
+        request.setEntity(new UrlEncodedFormEntity(params));
+        return request;
+    }
+
+    private static HttpPost createRefreshTokenRequest(String clientId, String secret, String refreshToken,
+                                                        String tokenEndpoint, String scopes)
+            throws UnsupportedEncodingException {
+
+        HttpPost request = new HttpPost(tokenEndpoint);
+        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("client_id", clientId));
+        params.add(new BasicNameValuePair("client_secret", secret));
+        params.add(new BasicNameValuePair("refresh_token", refreshToken));
+        params.add(new BasicNameValuePair("scope", scopes));
+        params.add(new BasicNameValuePair("grant_type", "refresh_token"));
 
         request.setEntity(new UrlEncodedFormEntity(params));
         return request;

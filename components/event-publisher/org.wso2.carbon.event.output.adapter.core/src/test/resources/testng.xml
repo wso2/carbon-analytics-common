@@ -27,6 +27,7 @@
             <!--<class name="org.wso2.carbon.event.output.adapter.core.OutputAdaptorServiceTestCase"/>-->
             <class name="org.wso2.carbon.event.output.adapter.core.CarbonOutputEventAdapterServiceTest"/>
             <class name="org.wso2.carbon.event.output.adapter.core.OutputAdapterRuntimeTest"/>
+            <class name="org.wso2.carbon.event.output.adapter.core.EventAdapterUtilTest"/>
         </classes>
     </test>
 </suite>

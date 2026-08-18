@@ -28,6 +28,7 @@ import org.wso2.carbon.event.output.adapter.core.EventAdapterSecretProcessor;
 import org.wso2.carbon.event.output.adapter.core.EventAdapterUtil;
 import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
 import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
+import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterRuntimeException;
 import org.wso2.carbon.event.output.adapter.core.internal.ds.OutputEventAdapterServiceValueHolder;
 import org.wso2.carbon.identity.external.api.client.api.constant.ErrorMessageConstant;
 import org.wso2.carbon.identity.external.api.client.api.exception.APIClientException;
@@ -45,10 +46,12 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.wso2.carbon.event.output.adapter.http.internal.util.HTTPEventAdapterConstants.INTERNAL_REFRESH_TOKEN;
 
 /**
  * Unit tests for the HTTPEventAdapter.
@@ -143,6 +146,18 @@ public class HTTPEventAdapterTest {
         Map<String, String> props = new HashMap<>();
         props.put("http.clientId", "test-client-id");
         props.put("http.clientSecret", "test-client-secret");
+        props.put("http.tokenEndpoint", "https://localhost:9443/oauth2/token");
+        props.put("http.scopes", "openid");
+        return props;
+    }
+
+    private Map<String, String> passwordCredentialStaticProps() {
+
+        Map<String, String> props = new HashMap<>();
+        props.put("http.clientId", "test-client-id");
+        props.put("http.clientSecret", "test-client-secret");
+        props.put("http.username", "test-username");
+        props.put("http.password", "test-password");
         props.put("http.tokenEndpoint", "https://localhost:9443/oauth2/token");
         props.put("http.scopes", "openid");
         return props;
@@ -475,7 +490,7 @@ public class HTTPEventAdapterTest {
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
                     .getAccessToken(anyString(), anyString(), anyString(), anyString()))
-                    .thenReturn("refreshed-token");
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
             when(mockManager.send(anyString(), any(), anyMap(), anyString()))
                     .thenReturn(unauthorized)
@@ -513,7 +528,7 @@ public class HTTPEventAdapterTest {
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
                     .getAccessToken(anyString(), anyString(), anyString(), anyString()))
-                    .thenReturn("refreshed-token");
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
             when(mockManager.send(anyString(), any(), anyMap(), anyString()))
                     .thenReturn(unauthorized)
@@ -547,7 +562,7 @@ public class HTTPEventAdapterTest {
                     .thenAnswer(inv -> null);
             mockedUtil.when(() -> EventAdapterUtil
                     .getAccessToken(anyString(), anyString(), anyString(), anyString()))
-                    .thenReturn("refreshed-token");
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
 
             when(mockManager.send(anyString(), any(), anyMap(), anyString()))
                     .thenReturn(forbidden)
@@ -556,6 +571,309 @@ public class HTTPEventAdapterTest {
             adapter.publishSync("payload", defaultDynamicProps());
 
             verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // publishSync — PASSWORD_CREDENTIAL 401/403 triggers token refresh and retry
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void testPublishSync_passwordCredential_401_refreshesTokenAndRetries_success() throws Exception {
+
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "PASSWORD_CREDENTIAL", passwordCredentialStaticProps());
+        SyncHttpClientManager mockManager = injectMockManager(adapter);
+        setContentType(adapter, "application/json");
+        // Pre-set a token so resolveAuthProperties() skips the initial token-fetch call.
+        setInternalAccessToken(adapter, "initial-token");
+
+        APIResponse unauthorized = mockResponse(401, "Unauthorized");
+        APIResponse success = mockResponse(200, "OK");
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            // fetchNewAccessToken() falls back to static-property credentials when decryption fails.
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+            mockedUtil.when(() -> EventAdapterUtil
+                    .getAccessTokenPasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
+                            anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
+
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(unauthorized)
+                    .thenReturn(success);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+
+            verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+                    anyString(), anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessToken(
+                    anyString(), anyString(), anyString(), anyString()), times(0));
+        }
+    }
+
+    @Test(expectedExceptions = OutputEventAdapterException.class)
+    public void testPublishSync_passwordCredential_401_retryAlsoFails_throwsException() throws Exception {
+
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "PASSWORD_CREDENTIAL", passwordCredentialStaticProps());
+        SyncHttpClientManager mockManager = injectMockManager(adapter);
+        setContentType(adapter, "application/json");
+        setInternalAccessToken(adapter, "initial-token");
+
+        APIResponse unauthorized = mockResponse(401, "Unauthorized");
+        APIResponse forbidden = mockResponse(403, "Forbidden after refresh");
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+            mockedUtil.when(() -> EventAdapterUtil
+                    .getAccessTokenPasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
+                            anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
+
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(unauthorized)
+                    .thenReturn(forbidden);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+        }
+    }
+
+    @Test
+    public void testPublishSync_passwordCredential_403_refreshesTokenAndRetries_success() throws Exception {
+
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "PASSWORD_CREDENTIAL", passwordCredentialStaticProps());
+        SyncHttpClientManager mockManager = injectMockManager(adapter);
+        setContentType(adapter, "application/json");
+        setInternalAccessToken(adapter, "initial-token");
+
+        APIResponse forbidden = mockResponse(403, "Forbidden");
+        APIResponse success = mockResponse(200, "OK");
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+            mockedUtil.when(() -> EventAdapterUtil
+                    .getAccessTokenPasswordGrant(anyString(), anyString(), anyString(), anyString(), anyString(),
+                            anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
+
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(forbidden)
+                    .thenReturn(success);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+
+            verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
+        }
+    }
+
+    @Test
+    public void testResolveAuthProperties_passwordCredential_fetchesTokenUsingPasswordGrant() throws Exception {
+
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "PASSWORD_CREDENTIAL", passwordCredentialStaticProps());
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+
+            ArgumentCaptor<String> clientIdCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> clientSecretCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+                    clientIdCaptor.capture(), clientSecretCaptor.capture(), usernameCaptor.capture(),
+                    passwordCaptor.capture(), anyString(), anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("password-grant-token", null));
+
+            SyncHttpClientManager mockManager = injectMockManager(adapter);
+            setContentType(adapter, "application/json");
+            APIResponse success = mockResponse(200, "OK");
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(success);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+
+            Assert.assertEquals(clientIdCaptor.getValue(), "test-client-id");
+            Assert.assertEquals(clientSecretCaptor.getValue(), "test-client-secret");
+            Assert.assertEquals(usernameCaptor.getValue(), "test-username");
+            Assert.assertEquals(passwordCaptor.getValue(), "test-password");
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Token refresh — a stored refresh token is preferred over a full grant request, and a
+    // rejected/expired refresh token falls back to a full grant.
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void testPublishSync_passwordCredential_401_refreshTokenAvailable_prefersRefreshGrant() throws Exception {
+
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "PASSWORD_CREDENTIAL", passwordCredentialStaticProps());
+        SyncHttpClientManager mockManager = injectMockManager(adapter);
+        setContentType(adapter, "application/json");
+        setInternalAccessToken(adapter, "initial-token");
+
+        APIResponse unauthorized = mockResponse(401, "Unauthorized");
+        APIResponse success = mockResponse(200, "OK");
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            // clientId/clientSecret/username/password decryption falls back to static properties.
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            // But a refresh token IS available in the secret store.
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), eq(INTERNAL_REFRESH_TOKEN)))
+                    .thenReturn("stored-refresh-token".toCharArray());
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                            anyString(), anyString(), eq("stored-refresh-token"), anyString(), anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-via-refresh-token",
+                            "rotated-refresh-token"));
+
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(unauthorized)
+                    .thenReturn(success);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+
+            verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                    anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
+            // The full grant (which would resend the resource owner's username/password) must not be attempted.
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+                    anyString(), anyString(), anyString(), anyString(), anyString(), anyString()), times(0));
+            // The rotated refresh token returned by the server must be persisted for the next renewal.
+            mockedSecretProcessor.verify(() -> EventAdapterSecretProcessor.encryptAndStoreCredential(
+                    anyString(), anyString(), eq(INTERNAL_REFRESH_TOKEN), eq("rotated-refresh-token")), times(1));
+        }
+    }
+
+    @Test
+    public void testPublishSync_passwordCredential_401_refreshTokenRejected_fallsBackToFullGrant() throws Exception {
+
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "PASSWORD_CREDENTIAL", passwordCredentialStaticProps());
+        SyncHttpClientManager mockManager = injectMockManager(adapter);
+        setContentType(adapter, "application/json");
+        setInternalAccessToken(adapter, "initial-token");
+
+        APIResponse unauthorized = mockResponse(401, "Unauthorized");
+        APIResponse success = mockResponse(200, "OK");
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), eq(INTERNAL_REFRESH_TOKEN)))
+                    .thenReturn("expired-refresh-token".toCharArray());
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+            // The stored refresh token has expired or been revoked by the authorization server.
+            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                            anyString(), anyString(), anyString(), anyString(), anyString()))
+                    .thenThrow(new OutputEventAdapterRuntimeException("invalid_grant"));
+            mockedUtil.when(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+                            anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-via-full-grant", null));
+
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(unauthorized)
+                    .thenReturn(success);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+
+            verify(mockManager, times(2)).send(anyString(), any(), anyMap(), anyString());
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                    anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenPasswordGrant(
+                    anyString(), anyString(), anyString(), anyString(), anyString(), anyString()), times(1));
+        }
+    }
+
+    @Test
+    public void testPublishSync_clientCredential_401_neverAttemptsRefreshTokenLookup() throws Exception {
+
+        // Per RFC 6749 §4.4.3, an authorization server SHOULD NOT issue a refresh token for the client
+        // credentials grant. CLIENT_CREDENTIAL must never even attempt a refresh-token lookup/renewal.
+        HTTPEventAdapter adapter = buildAdapter("HttpPost", "CLIENT_CREDENTIAL", clientCredentialStaticProps());
+        SyncHttpClientManager mockManager = injectMockManager(adapter);
+        setContentType(adapter, "application/json");
+        setInternalAccessToken(adapter, "initial-token");
+
+        APIResponse unauthorized = mockResponse(401, "Unauthorized");
+        APIResponse success = mockResponse(200, "OK");
+
+        try (MockedStatic<EventAdapterSecretProcessor> mockedSecretProcessor =
+                     Mockito.mockStatic(EventAdapterSecretProcessor.class);
+             MockedStatic<EventAdapterUtil> mockedUtil =
+                     Mockito.mockStatic(EventAdapterUtil.class)) {
+
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .decryptCredential(anyString(), anyString(), anyString()))
+                    .thenThrow(new SecretManagementException("not stored"));
+            mockedSecretProcessor.when(() -> EventAdapterSecretProcessor
+                    .encryptAndStoreCredential(anyString(), anyString(), anyString(), anyString()))
+                    .thenAnswer(inv -> null);
+            mockedUtil.when(() -> EventAdapterUtil.getAccessToken(
+                            anyString(), anyString(), anyString(), anyString()))
+                    .thenReturn(new EventAdapterUtil.TokenResponse("refreshed-token", null));
+
+            when(mockManager.send(anyString(), any(), anyMap(), anyString()))
+                    .thenReturn(unauthorized)
+                    .thenReturn(success);
+
+            adapter.publishSync("payload", defaultDynamicProps());
+
+            mockedSecretProcessor.verify(() -> EventAdapterSecretProcessor.decryptCredential(
+                    anyString(), anyString(), eq(INTERNAL_REFRESH_TOKEN)), times(0));
+            mockedUtil.verify(() -> EventAdapterUtil.getAccessTokenUsingRefreshToken(
+                    anyString(), anyString(), anyString(), anyString(), anyString()), times(0));
         }
     }
 
