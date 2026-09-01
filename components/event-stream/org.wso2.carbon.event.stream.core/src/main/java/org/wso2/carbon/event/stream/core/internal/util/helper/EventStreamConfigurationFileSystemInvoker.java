@@ -34,6 +34,8 @@ public class EventStreamConfigurationFileSystemInvoker {
     private static final Log log = LogFactory.getLog(EventStreamConfigurationFileSystemInvoker.class);
 
     public static void save(StreamDefinition streamDefinition, String filePath, AxisConfiguration axisConfig) throws EventStreamConfigurationException{
+        // validate path to block ../ traversal
+        CarbonEventStreamUtil.validatePath(filePath);
         EventStreamDeployer eventStreamDeployer = (EventStreamDeployer)((DeploymentEngine) axisConfig.getConfigurator()).
                 getDeployer(EventStreamConstants.EVENT_STREAMS, EventStreamConstants.STREAM_DEFINITION_FILE_EXTENSION_TYPE);
         try {
