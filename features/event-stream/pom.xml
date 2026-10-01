@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics-common</groupId>
         <artifactId>carbon-analytics-common</artifactId>
-        <version>5.5.12</version>
+        <version>5.5.13-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
