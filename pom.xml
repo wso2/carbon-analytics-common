@@ -832,7 +832,7 @@
         <libthrift.wso2.imp.pkg.version.range>[0.25.0.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
         <databridge.version.range>[6.0.0, 7.0.0)</databridge.version.range>
         <disruptor.version.range>[3.0.0,4.0.0)</disruptor.version.range>
-        <org.wso2.json.version>3.0.0.wso2v1</org.wso2.json.version>
+        <org.wso2.json.version>3.0.0.wso2v9</org.wso2.json.version>
 
         <!-- Latest Dependencies -->
         <carbon.config.version>2.1.17</carbon.config.version>
